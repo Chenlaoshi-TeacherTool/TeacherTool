@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teaching Tools - Teacher Toolkit</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin-bottom: 10px;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+        .tool-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .tool-card p {
+            margin-bottom: 20px;
+        }
+        .btn {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background-color: #5a67d8;
+        }
+        .coming-soon {
+            opacity: 0.6;
+        }
+        .qr-generator {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        .qr-generator input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .qr-output {
+            margin-top: 20px;
+            text-align: center;
+        }
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+    <section class="header">
+        <h1>Teaching Tools</h1>
+        <p>Simple tools to save teachers time in the classroom.</p>
+    </section>
+
+    <section class="tools-grid">
+        <div class="tool-card">
+            <h3>📌 QR Code Generator</h3>
+            <p>Generate QR codes from any text or website link for classroom use.</p>
+            <a href="qr-code-generator.html" class="btn">Open Tool</a>
+        </div>
+        <div class="tool-card coming-soon">
+            <h3>🎲 Random Group Generator</h3>
+            <p>Coming Soon</p>
+            <button class="btn" disabled>Open Tool</button>
+        </div>
+        <div class="tool-card coming-soon">
+            <h3>📚 Vocabulary Practice Tool</h3>
+            <p>Coming Soon</p>
+            <button class="btn" disabled>Open Tool</button>
+        </div>
+        <div class="tool-card coming-soon">
+            <h3>✏️ Sentence Builder Tool</h3>
+            <p>Coming Soon</p>
+            <button class="btn" disabled>Open Tool</button>
+        </div>
+        <div class="tool-card coming-soon">
+            <h3>📄 Worksheet Generator</h3>
+            <p>Coming Soon</p>
+            <button class="btn" disabled>Open Tool</button>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <script>
+        // Removed QR generator functionality as it's now on a separate page
+    </script>
+</body>
+</html>
