@@ -161,31 +161,26 @@
             return btoa(binary);
         }
 
-        async function ensureChineseFont(doc) {
-            if (window.chineseFontAdded) return;
-            const fallbackUrls = [
-                'https://github.com/googlefonts/noto-cjk/raw/main/Sans/TTF/SC/NotoSansSC-Regular.ttf',
-                'https://cdn.jsdelivr.net/gh/googlefonts/noto-cjk@main/Sans/TTF/SC/NotoSansSC-Regular.ttf',
-                'https://raw.githubusercontent.com/googlefonts/noto-cjk/main/Sans/TTF/SC/NotoSansSC-Regular.ttf'
-            ];
+async function ensureChineseFont(doc) {
+    try {
+        const fontUrl = "https://cdn.jsdelivr.net/gh/googlefonts/noto-cjk@main/Sans/TTF/SC/NotoSansSC-Regular.ttf";
+        const res = await fetch(fontUrl);
+        const buffer = await res.arrayBuffer();
 
-            for (const fontUrl of fallbackUrls) {
-                try {
-                    const res = await fetch(fontUrl);
-                    if (!res.ok) continue;
-                    const buffer = await res.arrayBuffer();
-                    const base64 = arrayBufferToBase64(buffer);
-                    doc.addFileToVFS('NotoSansSC-Regular.ttf', base64);
-                    doc.addFont('NotoSansSC-Regular.ttf', 'NotoSansSC', 'normal');
-                    window.chineseFontAdded = true;
-                    console.log('已加载中文字体：', fontUrl);
-                    return;
-                } catch (e) {
-                    console.warn('尝试加载中文字体失败：', fontUrl, e);
-                }
-            }
-            console.warn('所有中文字体加载尝试失败，中文将可能无法正常显示。');
-        }
+        const base64 = arrayBufferToBase64(buffer);
+
+        doc.addFileToVFS("NotoSansSC.ttf", base64);
+        doc.addFont("NotoSansSC.ttf", "NotoSansSC", "normal");
+
+        doc.setFont("NotoSansSC");
+        window.chineseFontAdded = true;
+
+        console.log("中文字体加载成功");
+    } catch (e) {
+        console.error("中文字体加载失败", e);
+        window.chineseFontAdded = false;
+    }
+}
 
         async function exportToPDFClickable() {
             const worksheetGrid = document.getElementById('worksheet-grid');
@@ -202,7 +197,6 @@
                 doc.setFont('NotoSansSC', 'normal');
             } else {
                 console.warn('中文字体未加载，PDF 中文渲染可能有问题。');
-                doc.setFont('Helvetica', 'normal');
             }
             doc.setFontSize(12);
 
