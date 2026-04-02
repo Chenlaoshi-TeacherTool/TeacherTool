@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Toolkit - Resources for Chinese Language Teachers</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .main-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .card p {
+            margin-bottom: 20px;
+        }
+        .featured {
+            background-color: #e9ecef;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .featured h2 {
+            color: #495057;
+            margin-bottom: 30px;
+        }
+        .featured-items {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .featured-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 250px;
+        }
+        .grade-nav {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+        .grade-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .grade-btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .grade-btn:hover {
+            background-color: #5a6268;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2em;
+            }
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .main-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <h1>Teacher Toolkit</h1>
+        <p>A simple toolkit for Chinese language teachers — lesson ideas, low-prep activities, and classroom tools.</p>
+        <div class="hero-buttons">
+            <a href="#theme" class="btn">🎯 Theme Activities</a>
+            <a href="#low-prep" class="btn">⚡ Low-Prep Activities</a>
+            <a href="teaching-tools.html" class="btn">🧰 Teaching Tools</a>
+        </div>
+    </section>
+
+    <section class="main-sections">
+        <div class="card" id="theme">
+            <h2>🎯 Theme Activities</h2>
+            <p>Organized by themes (e.g. holidays, units, culture topics). Includes lesson ideas and classroom-ready materials. Can be filtered by grade level (1st–12th grade).</p>
+        </div>
+        <div class="card" id="low-prep">
+            <h2>⚡ Low-Prep Activities</h2>
+            <p>Fast classroom activities that require minimal or no preparation. Includes warm-ups, speaking games, and emergency sub plans.</p>
+            <p><em>No printing. No prep. Ready in 5 minutes.</em></p>
+        </div>
+        <div class="card" id="tools">
+            <h2>🧰 Teaching Tools</h2>
+            <p>Simple digital tools for teachers. Examples: QR code generator, random group maker, vocabulary or sentence practice tools. Designed to save teacher time.</p>
+        </div>
+    </section>
+
+    <section class="featured">
+        <h2>Featured / Recommended</h2>
+        <div class="featured-items">
+            <div class="featured-item">
+                <h3>New Activities</h3>
+                <p>Check out the latest lesson ideas added this month.</p>
+            </div>
+            <div class="featured-item">
+                <h3>Popular Tools</h3>
+                <p>Most-used teaching tools by our community.</p>
+            </div>
+            <div class="featured-item">
+                <h3>Seasonal Ideas</h3>
+                <p>Timely lesson ideas for current holidays and events.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="grade-nav">
+        <h3>Filter by Grade Level</h3>
+        <div class="grade-buttons">
+            <button class="grade-btn">Grade 1–2</button>
+            <button class="grade-btn">Grade 3–4</button>
+            <button class="grade-btn">Grade 5–7</button>
+            <button class="grade-btn">Grade 8–12</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Teacher Toolkit. All rights reserved.</p>
+    </footer>
+</body>
+</html>
