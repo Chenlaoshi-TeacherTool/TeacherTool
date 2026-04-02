@@ -279,51 +279,70 @@ async function ensureChineseFont(doc) {
             }
         }
 
-        async function exportToPDFClickablePdfMake(items) {
-            await generatePdfMakeFont();
-            const hasFont = window.pdfMakeChineseFontAdded;
-            const docDefinition = {
-                pageSize: 'A4',
-                pageMargins: [20, 20, 20, 20],
-                defaultStyle: {
-                    font: hasFont ? 'NotoSansSC' : 'Helvetica',
-                    fontSize: 12
+        async function exportToPDFPdfMake() {
+    const worksheetGrid = document.getElementById('worksheet-grid');
+    if (!worksheetGrid.innerHTML.trim()) {
+        alert('请先生成二维码工作表。');
+        return;
+    }
+
+    const items = Array.from(worksheetGrid.querySelectorAll('.qr-item'));
+
+    const columns = 4; // ⭐关键：一行4个
+    let row = [];
+    const content = [];
+
+    items.forEach((item, index) => {
+        const titleEl = item.querySelector('.item-title');
+        const title = titleEl?.innerText || 'QR Link';
+        const url = titleEl?.href || '';
+
+        const canvas = item.querySelector('canvas');
+        const imgData = canvas ? canvas.toDataURL('image/png') : null;
+
+        row.push({
+            stack: [
+                {
+                    text: title,
+                    link: url, // ⭐ clickable hyperlink
+                    color: 'blue',
+                    decoration: 'underline',
+                    alignment: 'center',
+                    margin: [0, 0, 0, 6]
                 },
-                content: []
-            };
+                imgData
+                    ? { image: imgData, width: 90, height: 90, alignment: 'center' }
+                    : { text: '' }
+            ],
+            alignment: 'center',
+            margin: [5, 5, 5, 5]
+        });
 
-            const columns = 2;
-            let row = [];
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i];
-                const titleEl = item.querySelector('.item-title');
-                const title = titleEl?.innerText || 'QR Link';
-                const url = titleEl?.href || '';
-                const canvas = item.querySelector('canvas');
-                const imgData = canvas ? canvas.toDataURL('image/png') : '';
+        // 每4个换一行
+        if (row.length === columns || index === items.length - 1) {
+            while (row.length < columns) row.push({ text: '' });
 
-                row.push({
-                    stack: [
-                        { text: title, link: url, color: 'blue', decoration: 'underline', alignment: 'center', margin: [0, 0, 0, 6] },
-                        imgData ? { image: imgData, width: 100, height: 100, alignment: 'center' } : { text: '' }
-                    ],
-                    margin: [5, 5, 5, 5],
-                    border: [false, false, false, false]
-                });
+            content.push({
+                columns: row,
+                columnGap: 10
+            });
 
-                if (row.length === columns || i === items.length - 1) {
-                    while (row.length < columns) row.push({ text: '' });
-                    docDefinition.content.push({
-                        columns: row,
-                        columnGap: 10
-                    });
-                    row = [];
-                }
-            }
-
-            const pdfDoc = pdfMake.createPdf(docDefinition);
-            pdfDoc.download('qr-worksheet-clickable.pdf');
+            row = [];
         }
+    });
+
+    const docDefinition = {
+        pageSize: 'A4',
+        pageMargins: [20, 20, 20, 20],
+        defaultStyle: {
+            font: 'NotoSansSC',   // ⭐中文字体
+            fontSize: 11
+        },
+        content: content
+    };
+
+    pdfMake.createPdf(docDefinition).download('qr-worksheet.pdf');
+}
 
       async function exportToWord() {
     const worksheetGrid = document.getElementById('worksheet-grid');
