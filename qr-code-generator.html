@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Worksheet Generator - Teacher Toolkit</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #333; line-height: 1.6; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 20px; text-align: center; }
+        .header h1 { margin-bottom: 10px; }
+        .back-btn { position: absolute; top: 20px; left: 20px; background-color: rgba(255, 255, 255, 0.2); border: 1px solid white; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; }
+        .page-actions { text-align: center; margin-top: 20px; margin-bottom: 20px; }
+        .container { max-width: 980px; margin: 20px auto 40px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .tool-card { text-align: left; }
+        textarea { width: 100%; min-height: 140px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; resize: vertical; }
+        input, .btn { font-size: 1em; }
+        .btn { background-color: #667eea; color: white; padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; margin-right: 10px; }
+        .btn:hover { background-color: #5a67d8; }
+        .worksheet { margin-top: 20px; }
+        .worksheet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+        .qr-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-item .item-title {
+            display: block;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 14px;
+            text-decoration: none;
+            text-align: center;
+            z-index: 2;
+        }
+        .qr-item .item-title:hover {
+            text-decoration: underline;
+        }
+        .qr-item .qrcode-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 200px;
+            margin: 10px 0 0;
+            padding: 12px;
+            background: #fff;
+            border-radius: 8px;
+        }
+        .qr-item .qrcode-wrapper canvas {
+            margin: 0 auto;
+            display: block;
+        }
+        #print-help { margin-top: 12px; color: #555; font-size: .9em; }
+        @media print {
+            body { background: white; }
+            .back-btn, .tool-card, .page-actions { display: none !important; }
+            .container { box-shadow: none; margin: 0; border-radius: 0; }
+            .worksheet-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .qr-item { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <a href="teaching-tools.html" class="back-btn">← Back to Teaching Tools</a>
+    <section class="header">
+        <h1>QR Worksheet Generator</h1>
+        <p>粘贴一组“Title - URL”，批量生成可打印的二维码工作表。</p>
+    </section>
+
+    <div class="container">
+        <div class="tool-card">
+            <label for="batch-input" style="font-weight: bold;">批量链接输入（每行一个，格式：Title - URL）</label>
+            <textarea id="batch-input" placeholder="Google - https://google.com\nYouTube - https://youtube.com\nSchool - https://school.com"></textarea>
+            <div class="page-actions">
+                <button class="btn" onclick="generateWorksheet()">Generate Worksheet</button>
+                <button class="btn" onclick="exportToPDFClickable()">Export PDF (Clickable)</button>
+                <button class="btn" onclick="exportToWord()">Export to Word</button>
+            </div>
+            <div id="print-help">※ 生成完毕！点击"Export PDF (Clickable)"导出可点击 PDF（中文支持，链接可点击），或"Export to Word"导出可编辑 Word 文件。</div>
+        </div>
+
+        <div class="worksheet" id="worksheet">
+            <div class="worksheet-grid" id="worksheet-grid"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/pdfmake@0.2.7/build/pdfmake.min.js"></script>
+    <script src="https://unpkg.com/pdfmake@0.2.7/build/vfs_fonts.js"></script>
+    <script>
+        function parseBatchText(value) {
+            return value.split('\n').map(line => line.trim()).filter(line => line).map(line => {
+                const parts = line.split('-');
+                if (parts.length < 2) return null;
+                const title = parts.slice(0, parts.length - 1).join('-').trim();
+                const url = parts[parts.length - 1].trim();
+                if (!title || !url) return null;
+                return { title, url };
+            }).filter(item => item);
+        }
+
+        function clearWorksheet() {
+            const grid = document.getElementById('worksheet-grid');
+            grid.innerHTML = '';
+        }
+
+        function generateWorksheet() {
+            const text = document.getElementById('batch-input').value;
+            const items = parseBatchText(text);
+            if (items.length === 0) {
+                alert('请输入至少一个有效的 Title - URL 行。');
+                return;
+            }
+            clearWorksheet();
+            const grid = document.getElementById('worksheet-grid');
+            items.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'qr-item';
+                card.id = 'item-' + index;
+
+                const titleLink = document.createElement('a');
+                titleLink.className = 'item-title';
+                titleLink.href = item.url;
+                titleLink.target = '_blank';
+                titleLink.innerText = item.title;
+
+                const qrcodeWrapper = document.createElement('div');
+                qrcodeWrapper.className = 'qrcode-wrapper';
+                const qrcodeEl = document.createElement('div');
+
+                qrcodeWrapper.appendChild(qrcodeEl);
+                card.appendChild(titleLink);
+                card.appendChild(qrcodeWrapper);
+                grid.appendChild(card);
+
+                new QRCode(qrcodeEl, { text: item.url, width: 170, height: 170 });
+            });
+            document.getElementById('print-help').innerText = '生成完毕！点击"Export PDF (Clickable)"导出可点击 PDF（中文支持，链接可点击），或"Export to Word"导出可编辑 Word 文件。';
+        }
+
+        function printWorksheet() {
+            // 旧功能不再使用；保留占位符以避免引用错误
+        }
+
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const chunkSize = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+                binary += String.fromCharCode.apply(null, chunk);
+            }
+            return btoa(binary);
+        }
+
+        async function ensureChineseFont(doc) {
+            if (window.chineseFontAdded) return;
+            const fallbackUrls = [
+                'https://github.com/googlefonts/noto-cjk/raw/main/Sans/TTF/SC/NotoSansSC-Regular.ttf',
+                'https://cdn.jsdelivr.net/gh/googlefonts/noto-cjk@main/Sans/TTF/SC/NotoSansSC-Regular.ttf',
+                'https://raw.githubusercontent.com/googlefonts/noto-cjk/main/Sans/TTF/SC/NotoSansSC-Regular.ttf'
+            ];
+
+            for (const fontUrl of fallbackUrls) {
+                try {
+                    const res = await fetch(fontUrl);
+                    if (!res.ok) continue;
+                    const buffer = await res.arrayBuffer();
+                    const base64 = arrayBufferToBase64(buffer);
+                    doc.addFileToVFS('NotoSansSC-Regular.ttf', base64);
+                    doc.addFont('NotoSansSC-Regular.ttf', 'NotoSansSC', 'normal');
+                    window.chineseFontAdded = true;
+                    console.log('已加载中文字体：', fontUrl);
+                    return;
+                } catch (e) {
+                    console.warn('尝试加载中文字体失败：', fontUrl, e);
+                }
+            }
+            console.warn('所有中文字体加载尝试失败，中文将可能无法正常显示。');
+        }
+
+        async function exportToPDFClickable() {
+            const worksheetGrid = document.getElementById('worksheet-grid');
+            if (!worksheetGrid.innerHTML.trim()) {
+                alert('请先生成二维码工作表。');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            await ensureChineseFont(doc);
+
+            if (window.chineseFontAdded) {
+                doc.setFont('NotoSansSC', 'normal');
+            } else {
+                console.warn('中文字体未加载，PDF 中文渲染可能有问题。');
+                doc.setFont('Helvetica', 'normal');
+            }
+            doc.setFontSize(12);
+
+            const items = Array.from(worksheetGrid.querySelectorAll('.qr-item'));
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 12;
+            const colCount = 2;
+            const colWidth = (pageWidth - margin * 2 - 10) / colCount;
+            const imgSize = 70;
+            const rowHeight = imgSize + 22 + 24;
+
+            let x = margin;
+            let y = margin + 10;
+
+            for (let i = 0; i < items.length; i++) {
+                if (i > 0 && i % colCount === 0) {
+                    x = margin;
+                    y += rowHeight;
+                }
+
+                if (y + rowHeight > pageHeight - margin) {
+                    doc.addPage();
+                    y = margin + 10;
+                }
+
+                const item = items[i];
+                const titleEl = item.querySelector('.item-title');
+                const title = titleEl?.innerText || 'QR Link';
+                const url = titleEl?.href || '';
+
+                // 绘制标题文字（中文）并添加可点击链接
+                const textWidth = doc.getTextWidth(title);
+                const titleX = x + Math.max(0, (colWidth - textWidth) / 2);
+                if (url) {
+                    doc.textWithLink(title, titleX, y, { url });
+                } else {
+                    doc.text(title, titleX, y);
+                }
+
+                // QR image
+                const canvas = item.querySelector('canvas');
+                if (canvas) {
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgX = x + (colWidth - imgSize) / 2;
+                    const imgY = y + 8;
+                    doc.addImage(imgData, 'PNG', imgX, imgY, imgSize, imgSize);
+                }
+
+                x += colWidth + 10;
+            }
+
+            try {
+                doc.save('qr-worksheet-clickable.pdf');
+            } catch (err) {
+                console.warn('jsPDF 导出失败，改用 pdfMake 备选方案：', err);
+                const items = Array.from(worksheetGrid.querySelectorAll('.qr-item'));
+                await exportToPDFClickablePdfMake(items);
+            }
+        }
+
+        async function generatePdfMakeFont() {
+            if (window.pdfMakeChineseFontAdded) return;
+            try {
+                const fontUrl = 'https://github.com/googlefonts/noto-cjk/raw/main/Sans/TTF/SC/NotoSansSC-Regular.ttf';
+                const res = await fetch(fontUrl);
+                if (!res.ok) throw new Error('无法加载 pdfMake 中文字体：' + res.status);
+                const buffer = await res.arrayBuffer();
+                const base64 = arrayBufferToBase64(buffer);
+                pdfMake.vfs['NotoSansSC-Regular.ttf'] = base64;
+                pdfMake.fonts = {
+                    NotoSansSC: {
+                        normal: 'NotoSansSC-Regular.ttf'
+                    }
+                };
+                window.pdfMakeChineseFontAdded = true;
+                console.log('pdfMake 中文字体加载成功');
+            } catch (err) {
+                console.warn('pdfMake 中文字体加载失败', err);
+            }
+        }
+
+        async function exportToPDFClickablePdfMake(items) {
+            await generatePdfMakeFont();
+            const hasFont = window.pdfMakeChineseFontAdded;
+            const docDefinition = {
+                pageSize: 'A4',
+                pageMargins: [20, 20, 20, 20],
+                defaultStyle: {
+                    font: hasFont ? 'NotoSansSC' : 'Helvetica',
+                    fontSize: 12
+                },
+                content: []
+            };
+
+            const columns = 2;
+            let row = [];
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const titleEl = item.querySelector('.item-title');
+                const title = titleEl?.innerText || 'QR Link';
+                const url = titleEl?.href || '';
+                const canvas = item.querySelector('canvas');
+                const imgData = canvas ? canvas.toDataURL('image/png') : '';
+
+                row.push({
+                    stack: [
+                        { text: title, link: url, color: 'blue', decoration: 'underline', alignment: 'center', margin: [0, 0, 0, 6] },
+                        imgData ? { image: imgData, width: 100, height: 100, alignment: 'center' } : { text: '' }
+                    ],
+                    margin: [5, 5, 5, 5],
+                    border: [false, false, false, false]
+                });
+
+                if (row.length === columns || i === items.length - 1) {
+                    while (row.length < columns) row.push({ text: '' });
+                    docDefinition.content.push({
+                        columns: row,
+                        columnGap: 10
+                    });
+                    row = [];
+                }
+            }
+
+            const pdfDoc = pdfMake.createPdf(docDefinition);
+            pdfDoc.download('qr-worksheet-clickable.pdf');
+        }
+
+        async function exportToWord() {
+            const worksheetGrid = document.getElementById('worksheet-grid');
+            if (!worksheetGrid.innerHTML.trim()) {
+                alert('请先生成二维码工作表。');
+                return;
+            }
+
+            const items = Array.from(worksheetGrid.querySelectorAll('.qr-item'));
+            const rowHtml = items.map(item => {
+                const titleEl = item.querySelector('.item-title');
+                const url = titleEl?.href || '#';
+                const title = titleEl?.innerText || 'QR Link';
+                const canvas = item.querySelector('canvas');
+                const imgDataUrl = canvas ? canvas.toDataURL('image/png') : '';
+
+                return `
+                    <div class="doc-item">
+                        <a href="${url}" style="font-weight: bold; color: #333; font-size: 14pt; text-decoration: underline; display: block; margin-bottom: 8px;" target="_blank">${title}</a>
+                        ${imgDataUrl ? `<img src="${imgDataUrl}" style="width:120px;height:120px;" />` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+                body { font-family: 'Segoe UI','Microsoft YaHei', 'Noto Sans SC', sans-serif; margin: 20px; }
+                .doc-item { width: 45%; display: inline-block; vertical-align: top; margin: 0 2.5% 24px 2.5%; text-align: center; }
+                .doc-item img { border: 1px solid #e2e8f0; border-radius: 8px; }
+            </style></head><body>${rowHtml}</body></html>`;
+
+            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'qr-worksheet.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
