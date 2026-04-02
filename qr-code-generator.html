@@ -331,43 +331,83 @@
             pdfDoc.download('qr-worksheet-clickable.pdf');
         }
 
-        async function exportToWord() {
-            const worksheetGrid = document.getElementById('worksheet-grid');
-            if (!worksheetGrid.innerHTML.trim()) {
-                alert('请先生成二维码工作表。');
-                return;
-            }
+      async function exportToWord() {
+    const worksheetGrid = document.getElementById('worksheet-grid');
+    if (!worksheetGrid.innerHTML.trim()) {
+        alert('请先生成二维码工作表。');
+        return;
+    }
 
-            const items = Array.from(worksheetGrid.querySelectorAll('.qr-item'));
-            const rowHtml = items.map(item => {
-                const titleEl = item.querySelector('.item-title');
-                const url = titleEl?.href || '#';
-                const title = titleEl?.innerText || 'QR Link';
-                const canvas = item.querySelector('canvas');
-                const imgDataUrl = canvas ? canvas.toDataURL('image/png') : '';
+    const items = Array.from(worksheetGrid.querySelectorAll('.qr-item'));
 
-                return `
-                    <div class="doc-item">
-                        <a href="${url}" style="font-weight: bold; color: #333; font-size: 14pt; text-decoration: underline; display: block; margin-bottom: 8px;" target="_blank">${title}</a>
-                        ${imgDataUrl ? `<img src="${imgDataUrl}" style="width:120px;height:120px;" />` : ''}
-                    </div>
-                `;
-            }).join('');
+    let rowsHtml = '';
+    let rowCells = [];
 
-            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-                body { font-family: 'Segoe UI','Microsoft YaHei', 'Noto Sans SC', sans-serif; margin: 20px; }
-                .doc-item { width: 45%; display: inline-block; vertical-align: top; margin: 0 2.5% 24px 2.5%; text-align: center; }
-                .doc-item img { border: 1px solid #e2e8f0; border-radius: 8px; }
-            </style></head><body>${rowHtml}</body></html>`;
+    items.forEach((item, index) => {
+        const titleEl = item.querySelector('.item-title');
+        const url = titleEl?.href || '#';
+        const title = titleEl?.innerText || 'QR Link';
+        const canvas = item.querySelector('canvas');
+        const imgDataUrl = canvas ? canvas.toDataURL('image/png') : '';
 
-            const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'qr-worksheet.doc';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        const cell = `
+            <td style="width:25%; text-align:center; vertical-align:top; padding:10px;">
+                <a href="${url}" style="font-weight:bold; font-size:14pt; color:#000; text-decoration:underline; display:block; margin-bottom:8px;">
+                    ${title}
+                </a>
+                ${imgDataUrl ? `<img src="${imgDataUrl}" style="width:120px;height:120px;" />` : ''}
+            </td>
+        `;
+
+        rowCells.push(cell);
+
+        // 每4个换一行
+        if (rowCells.length === 4 || index === items.length - 1) {
+            rowsHtml += `<tr>${rowCells.join('')}</tr>`;
+            rowCells = [];
         }
+    });
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {
+                font-family: 'Segoe UI','Microsoft YaHei','Noto Sans SC',sans-serif;
+                margin: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            td {
+                border: 0px solid #ddd;
+            }
+            img {
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <table>
+            ${rowsHtml}
+        </table>
+    </body>
+    </html>
+    `;
+
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'qr-worksheet.doc';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
     </script>
 </body>
 </html>
