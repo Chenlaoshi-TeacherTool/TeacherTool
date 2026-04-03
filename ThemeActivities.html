@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Theme Activities - Teacher Toolkit</title>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -35,6 +36,21 @@
             padding: 10px 15px;
             text-decoration: none;
             border-radius: 5px;
+        }
+
+        /* 🔍 SEARCH BOX */
+        .search-container {
+            text-align: center;
+            margin: 20px;
+        }
+
+        #searchBox {
+            width: 80%;
+            max-width: 500px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
         }
 
         .tools-grid {
@@ -102,93 +118,122 @@
         <p>Explore ready-to-use classroom activities by topic.</p>
     </section>
 
+    <!-- 🔍 SEARCH BOX -->
+    <div class="search-container">
+        <input 
+            type="text" 
+            id="searchBox" 
+            placeholder="🔍 Search themes (e.g. animals, family, colors...)"
+            onkeyup="filterThemes()"
+        >
+    </div>
+
     <section class="tools-grid">
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="body parts 身体 部位">
             <h3>🧍 身体部位</h3>
             <p>Body parts vocabulary and games</p>
             <a href="theme-body.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="animals 动物">
             <h3>🐶 动物</h3>
             <p>Animals vocabulary & fun activities</p>
             <a href="theme-animals.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="weather seasons 四季 天气">
             <h3>🌦 四季与天气</h3>
             <p>Seasons and weather practice</p>
             <a href="theme-weather.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="countries 国家">
             <h3>🌍 国家</h3>
             <p>Countries and cultural connections</p>
             <a href="theme-countries.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="family 家人">
             <h3>👨‍👩‍👧 家人</h3>
             <p>Family members vocabulary practice</p>
             <a href="theme-family.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="rooms house 房间">
             <h3>🏠 房间</h3>
             <p>House and rooms vocabulary</p>
             <a href="theme-rooms.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="clothing 服饰 clothes">
             <h3>👕 服饰</h3>
             <p>Clothing vocabulary activities</p>
             <a href="theme-clothing.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="jobs occupations 职业">
             <h3>👩‍🏫 职业</h3>
             <p>Jobs and occupations practice</p>
             <a href="theme-jobs.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="self introduction 自我介绍">
             <h3>🙋 自我介绍</h3>
             <p>Introduce yourself in Chinese</p>
             <a href="theme-intro.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="colors 颜色">
             <h3>🎨 颜色</h3>
             <p>Colors vocabulary games</p>
             <a href="theme-colors.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="pinyin 拼音">
             <h3>🔤 拼音</h3>
             <p>Pinyin practice activities</p>
             <a href="theme-pinyin.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="numbers 数字">
             <h3>🔢 数字</h3>
             <p>Numbers practice and games</p>
             <a href="theme-numbers.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="back to school 返校">
             <h3>🏫 返校活动</h3>
             <p>Back-to-school activities</p>
             <a href="theme-backtoschool.html" class="btn">Open</a>
         </div>
 
-        <div class="tool-card">
+        <div class="tool-card" data-tags="festivals holidays 节日">
             <h3>🎉 节日</h3>
             <p>Festivals and cultural holidays</p>
             <a href="theme-festivals.html" class="btn">Open</a>
         </div>
 
     </section>
+
+    <!-- 🔍 JS SEARCH FUNCTION -->
+    <script>
+        function filterThemes() {
+            let input = document.getElementById("searchBox").value.toLowerCase();
+            let cards = document.querySelectorAll(".tool-card");
+
+            cards.forEach(card => {
+                let tags = card.getAttribute("data-tags").toLowerCase();
+                let text = card.innerText.toLowerCase();
+
+                if (tags.includes(input) || text.includes(input)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+    </script>
 
 </body>
 </html>
