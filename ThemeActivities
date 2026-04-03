@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Activities - Teacher Toolkit</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tool-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .tool-card p {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .btn {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background-color: #5a67d8;
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-btn">← Back to Homepage</a>
+
+    <section class="header">
+        <h1>Theme Activities</h1>
+        <p>Explore ready-to-use classroom activities by topic.</p>
+    </section>
+
+    <section class="tools-grid">
+
+        <div class="tool-card">
+            <h3>🧍 身体部位</h3>
+            <p>Body parts vocabulary and games</p>
+            <a href="theme-body.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🐶 动物</h3>
+            <p>Animals vocabulary & fun activities</p>
+            <a href="theme-animals.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🌦 四季与天气</h3>
+            <p>Seasons and weather practice</p>
+            <a href="theme-weather.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🌍 国家</h3>
+            <p>Countries and cultural connections</p>
+            <a href="theme-countries.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>👨‍👩‍👧 家人</h3>
+            <p>Family members vocabulary practice</p>
+            <a href="theme-family.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🏠 房间</h3>
+            <p>House and rooms vocabulary</p>
+            <a href="theme-rooms.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>👕 服饰</h3>
+            <p>Clothing vocabulary activities</p>
+            <a href="theme-clothing.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>👩‍🏫 职业</h3>
+            <p>Jobs and occupations practice</p>
+            <a href="theme-jobs.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🙋 自我介绍</h3>
+            <p>Introduce yourself in Chinese</p>
+            <a href="theme-intro.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🎨 颜色</h3>
+            <p>Colors vocabulary games</p>
+            <a href="theme-colors.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🔤 拼音</h3>
+            <p>Pinyin practice activities</p>
+            <a href="theme-pinyin.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🔢 数字</h3>
+            <p>Numbers practice and games</p>
+            <a href="theme-numbers.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🏫 返校活动</h3>
+            <p>Back-to-school activities</p>
+            <a href="theme-backtoschool.html" class="btn">Open</a>
+        </div>
+
+        <div class="tool-card">
+            <h3>🎉 节日</h3>
+            <p>Festivals and cultural holidays</p>
+            <a href="theme-festivals.html" class="btn">Open</a>
+        </div>
+
+    </section>
+
+</body>
+</html>
