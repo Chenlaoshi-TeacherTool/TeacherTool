@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/7b8581c9-3604-4820-a066-e252368ed9e3/resourceGroups/rg-xchen/providers/Microsoft.Web/sites/chenlaoshi-teachingtools",
+    "appService.deploySubpath": "src\\teachingTools"
+}
