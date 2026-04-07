@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Songs</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .song-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .song-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .lyrics {
+            background: #f1f3f5;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-line;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .video-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        iframe {
+            width: 100%;
+            max-width: 560px;
+            height: 315px;
+            border-radius: 10px;
+        }
+        .lyrics {
+            white-space: pre-line;      /* 保留换行 */
+            text-align: center;         /* 居中 */
+            font-size: 1.2rem;          /* 字体稍微大一点 */
+            line-height: 1.8;           /* 行距更舒服 */
+            padding: 20px;              /* 内边距 */
+            background: #f9f9f9;        /* 淡灰背景（可选） */
+            border-radius: 10px;        /* 圆角 */
+            border: 1px solid #ddd;     /* 淡淡的边框 */
+            max-width: 600px;           /* 限制宽度，让歌词更像一段诗 */
+            margin: 20px auto;          /* 居中整个歌词块 */
+            font-family: 'SanJiFont', sans-serif;
+
+        }
+
+        @font-face {
+            font-family: 'SanJiFont';
+            src: url('/teachingTools/public/fonts/SanJiJiHeiPinYinJianTi-Regular-2.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+    
+
+}
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <a href="theme-weather.ejs" class="back-btn">⬅ Back</a>
+        <h1>🎵 天气歌曲 Weather Songs</h1>
+        <p>Learn Chinese through music!</p>
+    </div>
+
+    <div class="container">
+
+        <!-- 🌤️ SONG 1 -->
+        <div class="song-card">
+            <h3>流浪 - 卢焱</h3>
+            <p>Simple beginner weather song</p>
+
+            <!-- 🎬 YouTube -->
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/Nxx4HXeCnyk"
+                        allowfullscreen>
+                </iframe>
+            </div>
+
+            <!-- 📄 LYRICS -->
+            <div class="lyrics">
+<div class="song-card">
+    <h3>《流浪》卢焱-歌词 PDF</h3>
+
+    <!-- 📄 PDF 预览 -->
+<iframe 
+  src="../../public/pdf/流浪_by_卢焱.pdf"
+  height="500px"
+  style="border-radius:10px; border:1px solid #ccc;">
+</iframe>
+
+    <!-- ⬇ 下载按钮 -->
+    <div style="margin-top:15px;">
+        <a href="src/teachingTools/public/pdf/流浪 by 卢焱.pdf" download class="btn">
+            ⬇ Download Lyrics PDF
+        </a>
+    </div>
+</div>
+            </div>
+        </div>
+
+
+        <!-- 🌧️ SONG 2 -->
+        <div class="song-card">
+            <h3>🌧️ 下雨歌</h3>
+            <p>Rainy day vocabulary practice</p>
+
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/tyo3Rzbtl3w"
+                        allowfullscreen>
+                </iframe>
+            </div>
+
+            <div class="lyrics">
+                天气怎么样？ 天气怎么样？
+                今天天气怎么样？
+                晴天。 今天晴天。今天晴天。
+                在游泳池玩吧！
+
+                天气怎么样？ 天气怎么样？
+                今天天气怎么样？
+                阴天。 今天阴天。今天阴天。
+                回屋子里去吧。
+                （继续添加更多歌曲）
+            </div>
+            
+        </div>
+
+    </div>
+
+</body>
+</html>
