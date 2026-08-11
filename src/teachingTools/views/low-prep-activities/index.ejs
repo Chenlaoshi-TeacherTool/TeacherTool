@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low-Prep Activities - Teacher Toolkit</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 64px 20px 54px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0 0 10px;
+            font-size: 2.4rem;
+        }
+        .header p {
+            max-width: 650px;
+            margin: 0 auto;
+            font-size: 1.08rem;
+            opacity: 0.94;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            color: white;
+            padding: 9px 14px;
+            text-decoration: none;
+            border-radius: 7px;
+            transition: background-color 0.2s;
+        }
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 42px 20px 56px;
+        }
+        .activity-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 270px;
+            padding: 28px;
+            background: white;
+            border: 1px solid #e6e8f0;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(44, 51, 73, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .activity-card:not(.coming-soon):hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(44, 51, 73, 0.13);
+        }
+        .activity-card h2 {
+            margin: 0 0 12px;
+            color: #5d6fd3;
+            font-size: 1.35rem;
+        }
+        .activity-card p {
+            margin: 0 0 18px;
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+        .tag {
+            padding: 4px 10px;
+            background-color: #eef0ff;
+            color: #5261bd;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .card-action {
+            margin-top: auto;
+        }
+        .open-btn {
+            display: inline-block;
+            padding: 10px 19px;
+            background-color: #667eea;
+            color: white;
+            border: 0;
+            border-radius: 6px;
+            text-decoration: none;
+            font: inherit;
+            font-weight: 600;
+        }
+        .open-btn:hover {
+            background-color: #5a67d8;
+        }
+        .coming-soon {
+            opacity: 0.72;
+        }
+        .coming-soon .open-btn {
+            background-color: #a8acb9;
+            cursor: not-allowed;
+        }
+        @media (max-width: 640px) {
+            .header {
+                padding-top: 82px;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+            .back-btn {
+                right: 20px;
+                text-align: center;
+            }
+            .activities-grid {
+                grid-template-columns: 1fr;
+                padding-top: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="/" class="back-btn">← Back to Homepage</a>
+        <h1>⚡ Low-Prep Activities</h1>
+        <p>Quick, classroom-ready activities for busy teaching days. Choose an activity and get started in minutes.</p>
+    </header>
+
+    <main class="activities-grid">
+        <article class="activity-card">
+            <h2>🧩 Word Sudoku Generator</h2>
+            <p>Enter 9 vocabulary words, match each word with a small picture, and generate a printable 9×9 Sudoku.</p>
+            <div class="tags">
+                <span class="tag">5–10 min</span>
+                <span class="tag">Printable</span>
+                <span class="tag">Vocabulary</span>
+            </div>
+            <div class="card-action">
+                <a href="/low-prep/word-sudoku/word-sudoku-widget.html" class="open-btn">Open Activity</a>
+            </div>
+        </article>
+
+        <article class="activity-card">
+            <h2>☁️ Word Cloud Game Generator</h2>
+            <p>Type in Chinese vocabulary (with optional English), then generate a printable word cloud showing Chinese, English, and/or Pinyin.</p>
+            <div class="tags">
+                <span class="tag">5 min</span>
+                <span class="tag">Printable</span>
+                <span class="tag">Vocabulary</span>
+            </div>
+            <div class="card-action">
+                <a href="/low-prep/word-cloud/word-cloud-widget.html" class="open-btn">Open Activity</a>
+            </div>
+        </article>
+
+        <article class="activity-card coming-soon">
+            <h2>📖 Independent Reading</h2>
+            <p>A quiet reading routine with simple response prompts students can complete independently.</p>
+            <div class="tags">
+                <span class="tag">10–20 min</span>
+                <span class="tag">Reading</span>
+            </div>
+            <div class="card-action">
+                <button class="open-btn" type="button" disabled>Coming Soon</button>
+            </div>
+        </article>
+
+        <article class="activity-card coming-soon">
+            <h2>💬 5-Minute Speaking Prompts</h2>
+            <p>Ready-to-use questions for partners, small groups, or a quick whole-class warm-up.</p>
+            <div class="tags">
+                <span class="tag">5 min</span>
+                <span class="tag">Speaking</span>
+            </div>
+            <div class="card-action">
+                <button class="open-btn" type="button" disabled>Coming Soon</button>
+            </div>
+        </article>
+
+        <article class="activity-card coming-soon">
+            <h2>✍️ Quick Write</h2>
+            <p>Short writing prompts that help students review vocabulary, sentence patterns, or lesson themes.</p>
+            <div class="tags">
+                <span class="tag">5–10 min</span>
+                <span class="tag">Writing</span>
+            </div>
+            <div class="card-action">
+                <button class="open-btn" type="button" disabled>Coming Soon</button>
+            </div>
+        </article>
+
+        <article class="activity-card coming-soon">
+            <h2>🎟️ Exit Ticket</h2>
+            <p>A fast end-of-class check for understanding, reflection, or one final language challenge.</p>
+            <div class="tags">
+                <span class="tag">3–5 min</span>
+                <span class="tag">Assessment</span>
+            </div>
+            <div class="card-action">
+                <button class="open-btn" type="button" disabled>Coming Soon</button>
+            </div>
+        </article>
+
+        <article class="activity-card coming-soon">
+            <h2>🔄 Think–Pair–Share</h2>
+            <p>A simple discussion routine with prompts that move students from thinking to speaking.</p>
+            <div class="tags">
+                <span class="tag">5–8 min</span>
+                <span class="tag">Discussion</span>
+            </div>
+            <div class="card-action">
+                <button class="open-btn" type="button" disabled>Coming Soon</button>
+            </div>
+        </article>
+    </main>
+</body>
+</html>

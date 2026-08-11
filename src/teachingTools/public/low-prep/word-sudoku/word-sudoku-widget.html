@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3f66e8">
+  <title>Word Sudoku Generator</title>
+  <link rel="stylesheet" href="./word-sudoku-widget.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="/low-prep-activities">← Back to Low-Prep Activities</a>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">🧩</div>
+        <div>
+          <h1>Word Sudoku Generator</h1>
+          <p class="tagline">9 words, one click, instant classroom practice</p>
+        </div>
+      </div>
+      <nav class="steps" aria-label="Generation steps">
+        <div class="step active"><span class="step-number">1</span><span>Enter Words</span></div>
+        <div class="step"><span class="step-number">2</span><span>Check Icons</span></div>
+        <div class="step"><span class="step-number">3</span><span>Generate</span></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <div class="columns">
+      <section class="card input-card" aria-labelledby="word-input-title">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">Step 1 · Words &amp; Icons</p>
+            <h2 id="word-input-title">Enter 9 Words</h2>
+            <p class="helper">Each word is auto-matched with a small icon; click an icon to change it anytime.</p>
+          </div>
+          <span class="count" id="wordCount">9/9 complete</span>
+        </div>
+
+        <div class="word-grid" id="wordGrid"></div>
+
+        <div class="icon-picker" id="iconPicker" hidden>
+          <div class="picker-heading">
+            <strong id="pickerTitle">Choose an Icon</strong>
+            <button class="picker-close" id="pickerClose" type="button" aria-label="Close icon picker">×</button>
+          </div>
+          <div class="picker-grid" id="pickerGrid"></div>
+          <label class="custom-icon">
+            <span>Or paste your own emoji:</span>
+            <input id="customIconInput" type="text" maxlength="12" placeholder="e.g. 🐼" aria-label="Enter a custom icon">
+            <button class="mini-button" id="applyCustomIcon" type="button">Use</button>
+          </label>
+        </div>
+
+        <div class="auto-match">
+          <span class="match-status"><span class="check">✓</span><span id="matchStatus">Auto-matching complete</span></span>
+          <button class="link-button" id="rematchAll" type="button">Re-match All</button>
+        </div>
+      </section>
+
+      <section class="card preview-card" aria-labelledby="preview-title">
+        <div class="card-heading">
+          <div class="preview-title">
+            <span class="step-chip">2–3</span>
+            <div>
+              <h2 id="preview-title">Check Icons &amp; Generate Preview</h2>
+              <p class="helper">The puzzle randomly mixes words and icons, and is guaranteed to have a single solution.</p>
+            </div>
+          </div>
+          <span class="ready-pill" id="readyPill">✓ Layout Ready</span>
+        </div>
+
+        <div class="worksheet-shell">
+          <article class="paper" id="worksheet" aria-label="Printable word sudoku worksheet">
+            <div class="paper-head">
+              <strong id="paperTitle">Word Sudoku</strong>
+              <span>Name: __________&nbsp;&nbsp; Date: __________</span>
+            </div>
+            <p class="instructions">Every row, column, and 3×3 box must contain all 9 words, each appearing exactly once. Fill in the blank cells.</p>
+            <div class="sudoku" id="sudoku" aria-label="9 by 9 word sudoku"></div>
+            <div class="print-legend" id="printLegend" aria-label="Printed icon legend"></div>
+          </article>
+
+          <aside class="screen-legend" aria-label="Word and icon legend">
+            <h3>Icon Legend</h3>
+            <p class="legend-note">Once every icon looks right, regenerate or print directly.</p>
+            <div class="legend-list" id="screenLegend"></div>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <section class="card toolbar" aria-label="Generate and print options">
+      <div class="difficulty">
+        <span class="toolbar-label">Difficulty</span>
+        <div class="segment" id="difficultyControls" role="group" aria-label="Select difficulty">
+          <button type="button" data-level="easy">Easy</button>
+          <button type="button" data-level="medium" class="active" aria-pressed="true">Medium</button>
+          <button type="button" data-level="hard">Hard</button>
+        </div>
+        <span class="clue-text" id="clueText">Currently keeping 36 hint cells</span>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" id="answerButton" type="button"><span aria-hidden="true">✓</span> Show Answer</button>
+        <button class="btn btn-secondary" id="generateButton" type="button"><span aria-hidden="true">↻</span> Regenerate</button>
+        <button class="btn btn-primary" id="printButton" type="button"><span aria-hidden="true">🖨</span> Print / Save PDF</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./word-sudoku-widget.js"></script>
+</body>
+</html>

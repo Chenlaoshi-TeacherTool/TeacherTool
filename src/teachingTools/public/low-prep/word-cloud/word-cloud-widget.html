@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3f66e8">
+  <title>Word Cloud Generator</title>
+  <link rel="stylesheet" href="./word-cloud-widget.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="/low-prep-activities">← Back to Low-Prep Activities</a>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">✨</div>
+        <div>
+          <h1>Word Cloud Generator</h1>
+          <p class="tagline">A creative tool for classroom games</p>
+        </div>
+      </div>
+      <nav class="steps" aria-label="Generation steps">
+        <div class="step active"><span class="step-number">1</span><span>Enter Words</span></div>
+        <div class="step"><span class="step-number">2</span><span>Display &amp; Colors</span></div>
+        <div class="step"><span class="step-number">3</span><span>Generate &amp; Print</span></div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <div class="columns">
+      <section class="card input-card" aria-labelledby="word-input-title">
+        <div class="card-heading">
+          <div>
+            <p class="eyebrow">Step 1 · Enter Words</p>
+            <h2 id="word-input-title">Enter Words</h2>
+          </div>
+          <button class="link-button" id="clearWords" type="button"><span aria-hidden="true">🗑</span> Clear</button>
+        </div>
+        <p class="helper">Enter words (Chinese or any language). Fill in English by hand, or use "Auto-Translate" below to generate it in bulk. Words listed earlier appear larger and more prominent in the cloud.</p>
+        <div class="word-rows-head">
+          <span>Source</span>
+          <span>English (optional)</span>
+        </div>
+        <div class="word-rows" id="wordRows"></div>
+        <button class="add-row-button" id="addRow" type="button">+ Add Word</button>
+
+        <div class="translate-bar">
+          <select id="sourceLangSelect" class="lang-select" aria-label="Select source language"></select>
+          <button class="link-button" id="translateAllButton" type="button"><span aria-hidden="true">🌐</span> Auto-Translate to English</button>
+          <button class="link-button" id="clearEnglishButton" type="button"><span aria-hidden="true">🗑</span> Clear All English</button>
+        </div>
+
+        <div class="word-meta">
+          <span id="wordCount">0 words entered</span>
+          <span class="helper-inline">Suggested: 5–40</span>
+        </div>
+
+        <div class="option-block">
+          <h3><span aria-hidden="true">🀄</span> Display Content (multi-select)</h3>
+          <div class="scheme-row" id="displayModeRow" role="group" aria-label="Select display content"></div>
+        </div>
+
+        <div class="option-block">
+          <h3><span aria-hidden="true">🎨</span> Color Scheme</h3>
+          <div class="scheme-row" id="schemeRow" role="group" aria-label="Select color scheme"></div>
+        </div>
+
+        <div class="option-row">
+          <div class="option-block half">
+            <h3>Font</h3>
+            <select id="fontSelect" class="font-select" aria-label="Select font"></select>
+          </div>
+          <div class="option-block half">
+            <h3>Background Color</h3>
+            <div class="bg-row" id="bgRow" role="group" aria-label="Select background color"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card preview-card" aria-labelledby="preview-title">
+        <div class="card-heading">
+          <div class="preview-title">
+            <span class="step-chip">2–3</span>
+            <div>
+              <h2 id="preview-title">Word Cloud Preview</h2>
+              <p class="helper">Adjusting any setting regenerates automatically. Click "Shuffle Layout" for a new arrangement.</p>
+            </div>
+          </div>
+          <span class="ready-pill" id="readyPill">✓ Generated</span>
+        </div>
+
+        <div class="worksheet-shell">
+          <article class="paper" id="worksheet" aria-label="Printable word cloud worksheet">
+            <div class="paper-head">
+              <input id="paperTitle" class="title-input" type="text" value="Vocabulary Practice" aria-label="Worksheet title">
+              <span>Name: ______&nbsp;&nbsp; Date: ______&nbsp;&nbsp; Class: ______</span>
+            </div>
+            <div class="canvas-wrap">
+              <canvas id="cloudCanvas" aria-label="Word cloud preview"></canvas>
+            </div>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <section class="card toolbar" aria-label="Generate and print options">
+      <div class="actions">
+        <button class="btn btn-secondary" id="shuffleButton" type="button"><span aria-hidden="true">↻</span> Shuffle Layout</button>
+        <button class="btn btn-primary" id="printButton" type="button"><span aria-hidden="true">🖨</span> Print / Save PDF</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro/dist/index.js" defer></script>
+  <script src="./word-cloud-widget.js" defer></script>
+</body>
+</html>

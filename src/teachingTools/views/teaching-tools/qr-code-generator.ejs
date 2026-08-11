@@ -75,21 +75,21 @@
 
 <section class="header">
     <h1>QR Worksheet Generator</h1>
-    <p>粘贴一组“Title - URL”，批量生成可打印的二维码工作表。</p>
+    <p>Paste a list of "Title - URL" pairs to generate a printable QR code worksheet in bulk.</p>
 </section>
 
 <div class="container">
     <div class="tool-card">
-        <label style="font-weight:bold;">批量链接输入（每行：Title - URL）</label>
+        <label style="font-weight:bold;">Batch link input (one per line: Title - URL)</label>
         <textarea id="batch-input"></textarea>
 
         <div class="page-actions">
-            <button class="btn" onclick="generateWorksheet()">Generate Worksheet</button>
+            <button class="btn" onclick="generateWorksheet()">Generate</button>
             <button class="btn" onclick="exportToWord()">Export to Word</button>
         </div>
 
         <div id="print-help">
-            ※ 生成后可导出 Word（含二维码 + 可点击链接）
+            ※ After generating, you can export to Word (includes QR codes + clickable links)
         </div>
     </div>
 
@@ -124,7 +124,7 @@ function generateWorksheet() {
     const items = parseBatchText(text);
 
     if (!items.length) {
-        alert('请输入至少一个有效 Title - URL');
+        alert('Please enter at least one valid Title - URL pair');
         return;
     }
 
@@ -156,13 +156,13 @@ function generateWorksheet() {
     });
 
     document.getElementById('print-help').innerText =
-        '生成完成 ✔ 可导出 Word（含二维码+链接）';
+        'Done ✔ You can now export to Word (includes QR codes + links)';
 }
 
 function exportToWord() {
     const grid = document.getElementById('worksheet-grid');
     if (!grid.innerHTML.trim()) {
-        alert('请先生成二维码');
+        alert('Please generate the QR codes first');
         return;
     }
 
