@@ -1,14 +1,14 @@
 (() => {
   const defaultItems = [
-    { word: "前面", icon: "🐧📦", manual: false },
-    { word: "后面", icon: "📦🐭", manual: false },
-    { word: "上面", icon: "🐟⬆️", manual: false },
-    { word: "下面", icon: "🦉⬇️", manual: false },
-    { word: "旁边", icon: "🦁📦", manual: false },
-    { word: "里面", icon: "📦🦉", manual: false },
-    { word: "之间", icon: "↔️", manual: false },
-    { word: "近", icon: "📍", manual: false },
-    { word: "远", icon: "🔭", manual: false }
+    { word: "苹果", icon: "🍎", manual: false },
+    { word: "香蕉", icon: "🍌", manual: false },
+    { word: "葡萄", icon: "🍇", manual: false },
+    { word: "西瓜", icon: "🍉", manual: false },
+    { word: "草莓", icon: "🍓", manual: false },
+    { word: "樱桃", icon: "🍒", manual: false },
+    { word: "桃子", icon: "🍑", manual: false },
+    { word: "橙子", icon: "🍊", manual: false },
+    { word: "菠萝", icon: "🍍", manual: false }
   ];
 
   const iconPalette = [
@@ -23,6 +23,109 @@
     "🏃", "🚶", "🧘", "💃", "🎨", "📖", "✍️", "👋", "👏", "💬",
     "⭐", "🎯", "🔔", "🎈", "🎁", "💡", "🧩", "🌱", "☂️", "⏰"
   ];
+
+  const emojiSearchTerms = {
+    "🐼": "panda 熊猫 animal 动物",
+    "🐧": "penguin 企鹅 animal 动物",
+    "🦁": "lion 狮子 animal 动物",
+    "🐭": "mouse 老鼠 animal 动物",
+    "🦉": "owl 猫头鹰 animal 动物",
+    "🐰": "rabbit 兔子 animal 动物",
+    "🐶": "dog 狗 animal 动物",
+    "🐱": "cat 猫 animal 动物",
+    "🐵": "monkey 猴子 animal 动物",
+    "🐟": "fish 鱼 animal 动物",
+    "🍎": "apple 苹果 fruit 水果 red",
+    "🍌": "banana 香蕉 fruit 水果 yellow",
+    "🍇": "grape 葡萄 fruit 水果 purple",
+    "🍉": "watermelon 西瓜 fruit 水果",
+    "🍓": "strawberry 草莓 fruit 水果 berry",
+    "🍒": "cherry 樱桃 fruit 水果",
+    "🍑": "peach 桃子 fruit 水果",
+    "🍊": "orange 橙子 桔子 fruit 水果",
+    "🍍": "pineapple 菠萝 凤梨 fruit 水果",
+    "🥕": "carrot 胡萝卜 vegetable 蔬菜 food 食物",
+    "📦": "box 箱子 package",
+    "🏠": "house home 家 房子",
+    "🏫": "school 学校 教室 classroom",
+    "📚": "books book 书 阅读 read",
+    "✏️": "pencil 笔 写字 write",
+    "🎒": "backpack school 书包 学校",
+    "🪑": "chair 椅子 classroom 教室",
+    "🧸": "teddy toy 玩具",
+    "⚽": "ball football soccer 球 足球",
+    "🎵": "music 音乐 song 唱歌",
+    "☀️": "sun sunny 太阳 晴天 weather 天气",
+    "🌧️": "rain 雨 weather 天气",
+    "❄️": "snow 雪 weather 天气",
+    "🌈": "rainbow 彩虹 weather 天气",
+    "🌳": "tree 树 plant 植物",
+    "🌸": "flower 花 plant 植物",
+    "🚗": "car 汽车 车 transport 交通",
+    "🚌": "bus 公交 巴士 transport 交通",
+    "🚲": "bike 自行车 单车 transport 交通",
+    "✈️": "airplane 飞机 transport 交通",
+    "🍚": "rice 米饭 food 食物",
+    "🍜": "noodles 面条 food 食物",
+    "🥟": "dumpling 饺子 food 食物",
+    "🍞": "bread 面包 food 食物",
+    "🥛": "milk 牛奶 drink 饮料",
+    "💧": "water 水 drink 饮料",
+    "🧃": "juice 果汁 drink 饮料",
+    "🎂": "cake 蛋糕 birthday 生日",
+    "🍦": "ice cream 冰淇淋 dessert 甜点",
+    "🍬": "candy 糖果 sweet 甜",
+    "👨": "man father 爸爸 男 人 family 家庭",
+    "👩": "woman mother 妈妈 女 人 family 家庭",
+    "👧": "girl 女孩 姐姐 妹妹 family 家庭",
+    "👦": "boy 男孩 哥哥 弟弟 family 家庭",
+    "👶": "baby 婴儿 宝宝 family 家庭",
+    "👵": "grandma 奶奶 祖母 family 家庭",
+    "👴": "grandpa 爷爷 祖父 family 家庭",
+    "👨‍🏫": "teacher 老师 男教师 school 学校",
+    "👩‍🏫": "teacher 老师 女教师 school 学校",
+    "👨‍👩‍👧": "family 家庭 家人",
+    "👀": "eyes eye 眼睛 身体",
+    "👂": "ear 耳朵 身体",
+    "👃": "nose 鼻子 身体",
+    "👄": "mouth 嘴巴 身体",
+    "✋": "hand 手 身体",
+    "🦶": "foot 脚 身体",
+    "❤️": "heart 爱 心 feeling",
+    "🧠": "brain 大脑 身体",
+    "🦷": "tooth 牙齿 身体",
+    "💪": "muscle 强壮 手臂 身体",
+    "⬆️": "up 上面 上方 direction 方向",
+    "⬇️": "down 下面 下方 direction 方向",
+    "⬅️": "left 左边 direction 方向",
+    "➡️": "right 右边 direction 方向",
+    "↔️": "between 之间 旁边 direction 方向",
+    "📍": "near 附近 近 location 地点",
+    "🔭": "far 远 telescope 望远镜",
+    "🚪": "door 门 outside 外面",
+    "🗺️": "map 地图 far 远",
+    "🧭": "compass 指南针 direction 方向",
+    "🏃": "run 跑 action 动作",
+    "🚶": "walk 走 action 动作",
+    "🧘": "yoga 瑜伽 action 动作",
+    "💃": "dance 跳舞 action 动作",
+    "🎨": "paint draw 画画 action 动作",
+    "📖": "read book 阅读 书",
+    "✍️": "write 写字 action 动作",
+    "👋": "hello wave 你好 挥手",
+    "👏": "clap 鼓掌",
+    "💬": "speak talk 说话 聊天",
+    "⭐": "star 星星 reward 奖励",
+    "🎯": "target 目标",
+    "🔔": "bell 铃铛",
+    "🎈": "balloon 气球",
+    "🎁": "gift 礼物",
+    "💡": "idea light 灯 想法",
+    "🧩": "puzzle 拼图",
+    "🌱": "plant seed 幼苗 植物",
+    "☂️": "umbrella 雨伞 weather 天气",
+    "⏰": "clock time 时间 钟"
+  };
 
   const iconRules = [
     { words: ["苹果", "apple"], icons: ["🍎", "🍏"] },
@@ -119,6 +222,8 @@
     pickerTitle: document.getElementById("pickerTitle"),
     pickerGrid: document.getElementById("pickerGrid"),
     pickerClose: document.getElementById("pickerClose"),
+    emojiSearchInput: document.getElementById("emojiSearchInput"),
+    emojiSearchStatus: document.getElementById("emojiSearchStatus"),
     customIconInput: document.getElementById("customIconInput"),
     applyCustomIcon: document.getElementById("applyCustomIcon"),
     rematchAll: document.getElementById("rematchAll"),
@@ -374,6 +479,7 @@
     });
 
     updateValidation();
+    renderTwemoji(elements.wordGrid);
   }
 
   function openPicker(index) {
@@ -382,6 +488,7 @@
     elements.pickerTitle.textContent =
       `Choose an icon for "${item.word || `word ${index + 1}`}"`;
     elements.customIconInput.value = item.icon;
+    elements.emojiSearchInput.value = "";
     elements.iconPicker.hidden = false;
     renderPickerOptions();
     elements.iconPicker.scrollIntoView({
@@ -397,7 +504,26 @@
 
   function renderPickerOptions() {
     elements.pickerGrid.replaceChildren();
-    iconPalette.forEach((icon) => {
+    const query = normalized(elements.emojiSearchInput.value);
+    const matches = iconPalette.filter((icon) => {
+      if (!query) return true;
+      const terms = `${icon} ${emojiSearchTerms[icon] || ""}`.toLocaleLowerCase();
+      return terms.includes(query);
+    });
+
+    elements.emojiSearchStatus.textContent = query
+      ? `${matches.length} Twemoji result${matches.length === 1 ? "" : "s"} for “${elements.emojiSearchInput.value.trim()}”`
+      : "Search in English or Chinese to find a classroom-ready emoji.";
+
+    if (!matches.length) {
+      const emptyState = document.createElement("p");
+      emptyState.className = "picker-empty";
+      emptyState.textContent = "No result yet — try another word or paste an emoji copied from the web.";
+      elements.pickerGrid.append(emptyState);
+      return;
+    }
+
+    matches.forEach((icon) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "picker-option";
@@ -412,6 +538,8 @@
       button.addEventListener("click", () => applyIcon(icon));
       elements.pickerGrid.append(button);
     });
+
+    renderTwemoji(elements.pickerGrid);
   }
 
   function applyIcon(icon) {
@@ -477,6 +605,8 @@
       elements.screenLegend.append(makeLegendItem(item));
       elements.printLegend.append(makeLegendItem(item));
     });
+    renderTwemoji(elements.screenLegend);
+    renderTwemoji(elements.printLegend);
   }
 
   function renderPuzzle() {
@@ -509,6 +639,46 @@
     elements.paperTitle.textContent = state.showAnswer
       ? "Word Sudoku (Answer)"
       : "Word Sudoku";
+    renderTwemoji(elements.sudoku);
+  }
+
+  function renderTwemoji(container) {
+    if (!container || !window.Intl?.Segmenter) return;
+    const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+    const emojiPattern = /\p{Extended_Pictographic}/u;
+    const textNodes = [];
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+
+    while (walker.nextNode()) {
+      if (walker.currentNode.parentElement?.closest("script, style")) continue;
+      if (emojiPattern.test(walker.currentNode.nodeValue)) textNodes.push(walker.currentNode);
+    }
+
+    textNodes.forEach((textNode) => {
+      const fragment = document.createDocumentFragment();
+      let changed = false;
+
+      for (const { segment } of segmenter.segment(textNode.nodeValue)) {
+        if (!emojiPattern.test(segment)) {
+          fragment.append(segment);
+          continue;
+        }
+
+        const image = document.createElement("img");
+        const codepoints = Array.from(segment)
+          .map((character) => character.codePointAt(0).toString(16))
+          .filter((codepoint) => codepoint !== "fe0f")
+          .join("-");
+        image.className = "twemoji";
+        image.alt = segment;
+        image.draggable = false;
+        image.src = `https://raw.githubusercontent.com/twitter/twemoji/master/assets/svg/${codepoints}.svg`;
+        fragment.append(image);
+        changed = true;
+      }
+
+      if (changed) textNode.replaceWith(fragment);
+    });
   }
 
   function renderControls() {
@@ -527,6 +697,7 @@
   }
 
   elements.pickerClose.addEventListener("click", closePicker);
+  elements.emojiSearchInput.addEventListener("input", renderPickerOptions);
   elements.applyCustomIcon.addEventListener("click", () =>
     applyIcon(elements.customIconInput.value)
   );

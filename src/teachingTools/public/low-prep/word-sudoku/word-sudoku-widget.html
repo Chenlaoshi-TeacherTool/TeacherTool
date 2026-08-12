@@ -40,12 +40,23 @@
         </div>
 
         <div class="word-grid" id="wordGrid"></div>
+        <p class="emoji-help">
+          <span aria-hidden="true">💡</span>
+          Need a different picture? Click any icon to search the
+          <a href="https://github.com/twitter/twemoji" target="_blank" rel="noopener noreferrer">open-source Twemoji collection</a>,
+          or copy an emoji you find online and paste it below.
+        </p>
 
         <div class="icon-picker" id="iconPicker" hidden>
           <div class="picker-heading">
             <strong id="pickerTitle">Choose an Icon</strong>
             <button class="picker-close" id="pickerClose" type="button" aria-label="Close icon picker">×</button>
           </div>
+          <label class="emoji-search" for="emojiSearchInput">
+            <span>Search Twemoji</span>
+            <input id="emojiSearchInput" type="search" placeholder="Try apple, fruit, 熊猫..." autocomplete="off" aria-describedby="emojiSearchStatus">
+          </label>
+          <p class="emoji-search-status" id="emojiSearchStatus">Search in English or Chinese to find a classroom-ready emoji.</p>
           <div class="picker-grid" id="pickerGrid"></div>
           <label class="custom-icon">
             <span>Or paste your own emoji:</span>
@@ -112,6 +123,7 @@
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- Twemoji artwork: Twitter, Inc. and contributors (CC-BY 4.0), loaded as SVGs from the official repository. -->
   <script src="./word-sudoku-widget.js"></script>
 </body>
 </html>

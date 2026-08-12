@@ -358,6 +358,22 @@ h2 {
 
 .word-input:focus { border-color: var(--blue); }
 
+.emoji-help {
+  margin: 12px 2px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.emoji-help a {
+  color: var(--blue-dark);
+  font-weight: 800;
+  text-decoration-color: rgba(53, 110, 87, .45);
+  text-underline-offset: 2px;
+}
+
+.emoji-help a:hover { color: var(--coral); }
+
 .auto-match {
   margin-top: 15px;
   padding: 11px 13px;
@@ -430,10 +446,51 @@ h2 {
   font-size: 17px;
 }
 
+.emoji-search {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 6px;
+  color: var(--blue-dark);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.emoji-search input {
+  width: 100%;
+  height: 35px;
+  padding: 6px 10px;
+  border: 1px solid #dce2f0;
+  border-radius: 9px;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.emoji-search input:focus { border-color: var(--sun-deep); }
+
+.emoji-search-status {
+  min-height: 18px;
+  margin: 0 0 9px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
 .picker-grid {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
   gap: 6px;
+}
+
+.picker-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px;
+  border: 1px dashed #d8e5c7;
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: center;
 }
 
 .picker-option {
@@ -449,6 +506,20 @@ h2 {
 .picker-option.selected {
   border-color: #8ba2fa;
   background: var(--soft-blue);
+}
+
+img.twemoji {
+  width: 1em;
+  height: 1em;
+  margin: 0 .04em;
+  vertical-align: -.12em;
+}
+
+.picture-box img.twemoji,
+.picker-option img.twemoji {
+  width: 1.08em;
+  height: 1.08em;
+  margin: 0;
 }
 
 .custom-icon {
@@ -917,7 +988,12 @@ h2 {
     overflow: visible;
   }
 
-  .paper { display: block; }
+  .paper {
+    width: 166mm;
+    margin: 0 auto;
+    display: block;
+    padding-top: 8mm;
+  }
   .paper-head { margin-bottom: 1.5mm; }
   .paper-head strong { font-size: 15pt; }
   .paper-head span { font-size: 8pt; }
