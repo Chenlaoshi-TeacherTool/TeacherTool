@@ -37,18 +37,13 @@
           </div>
           <button class="link-button" id="clearWords" type="button"><span aria-hidden="true">🗑</span> Clear</button>
         </div>
-        <p class="helper">Enter words (Chinese or any language). Fill in English by hand, or use "Auto-Translate" below to generate it in bulk. Words listed earlier appear larger and more prominent in the cloud.</p>
-        <div class="word-rows-head">
-          <span>Source</span>
-          <span>English (optional)</span>
-        </div>
-        <div class="word-rows" id="wordRows"></div>
-        <button class="add-row-button" id="addRow" type="button">+ Add Word</button>
-
-        <div class="translate-bar">
-          <select id="sourceLangSelect" class="lang-select" aria-label="Select source language"></select>
-          <button class="link-button" id="translateAllButton" type="button"><span aria-hidden="true">🌐</span> Auto-Translate to English</button>
-          <button class="link-button" id="clearEnglishButton" type="button"><span aria-hidden="true">🗑</span> Clear All English</button>
+        <p class="helper">Enter one word per line (Chinese or any language). Words listed earlier appear larger and more prominent in the cloud.</p>
+        <label class="word-list-label" for="wordInput">One word per line</label>
+        <textarea class="word-list-input" id="wordInput" rows="14" placeholder="苹果&#10;香蕉&#10;葡萄" spellcheck="false" aria-describedby="wordCount"></textarea>
+        <div class="translation-settings">
+          <label for="sourceLangSelect">Target language</label>
+          <select id="sourceLangSelect" class="lang-select" aria-describedby="translationHelp"></select>
+          <span id="translationHelp">Used to auto-translate when English is selected below.</span>
         </div>
 
         <div class="word-meta">
@@ -98,6 +93,7 @@
             </div>
             <div class="canvas-wrap">
               <canvas id="cloudCanvas" aria-label="Word cloud preview"></canvas>
+              <img id="cloudPrintImage" alt="Generated word cloud for printing">
             </div>
           </article>
         </div>

@@ -22,8 +22,7 @@
 
   var BACKGROUNDS = ['#ffffff', '#fdf6e3', '#fde2e4', '#e3f0ff', '#e6f6e9', '#efe6ff'];
 
-  // Each language is labeled in its own script (autonym), not translated,
-  // so teachers can recognize their target language at a glance.
+  // Labels use each language's own name so teachers can identify it quickly.
   var SOURCE_LANGUAGES = [
     { code: 'zh-CN', label: '中文' },
     { code: 'en', label: 'English' },
@@ -41,10 +40,8 @@
   var CANVAS_W = 600;
   var CANVAS_H = Math.round(CANVAS_W * (297 / 210));
 
-  var DEFAULT_ROWS = [
-    ['苹果', 'apple'], ['香蕉', 'banana'], ['葡萄', 'grape'], ['西瓜', 'watermelon'],
-    ['草莓', 'strawberry'], ['橙子', 'orange'], ['菠萝', 'pineapple'], ['芒果', 'mango'],
-    ['梨', 'pear'], ['桃子', 'peach']
+  var DEFAULT_WORDS = [
+    '苹果', '香蕉', '葡萄', '西瓜', '草莓', '橙子', '菠萝', '芒果', '梨', '桃子'
   ];
 
   var state = {
@@ -61,12 +58,12 @@
   var layoutMeta = { cx: CANVAS_W / 2, cy: CANVAS_H / 2, bounds: { left: 24, right: CANVAS_W - 24, top: 24, bottom: CANVAS_H - 24 } };
   var measureCtx = document.createElement('canvas').getContext('2d');
   var pinyinCache = {};
+  var translationCache = {};
 
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
-    els.wordRows = document.getElementById('wordRows');
-    els.addRow = document.getElementById('addRow');
+    els.wordInput = document.getElementById('wordInput');
     els.wordCount = document.getElementById('wordCount');
     els.clearWords = document.getElementById('clearWords');
     els.displayModeRow = document.getElementById('displayModeRow');
@@ -74,50 +71,34 @@
     els.fontSelect = document.getElementById('fontSelect');
     els.bgRow = document.getElementById('bgRow');
     els.canvas = document.getElementById('cloudCanvas');
+    els.printImage = document.getElementById('cloudPrintImage');
     els.paperTitle = document.getElementById('paperTitle');
     els.shuffleButton = document.getElementById('shuffleButton');
     els.printButton = document.getElementById('printButton');
     els.readyPill = document.getElementById('readyPill');
     els.toast = document.getElementById('toast');
     els.sourceLangSelect = document.getElementById('sourceLangSelect');
-    els.translateAllButton = document.getElementById('translateAllButton');
-    els.clearEnglishButton = document.getElementById('clearEnglishButton');
 
     buildDisplayModeRow();
     buildSchemeRow();
     buildFontSelect();
     buildBgRow();
     buildSourceLangSelect();
-
-    DEFAULT_ROWS.forEach(function (pair) { addRow(pair[0], pair[1]); });
-
-    els.addRow.addEventListener('click', function () {
-      addRow('', '');
-      var inputs = els.wordRows.querySelectorAll('.zh-input');
-      if (inputs.length) inputs[inputs.length - 1].focus();
+    els.wordInput.value = DEFAULT_WORDS.join('\n');
+    els.wordInput.addEventListener('input', function () {
+      updateWordCount();
+      scheduleRegenerate();
     });
 
     els.clearWords.addEventListener('click', function () {
-      els.wordRows.innerHTML = '';
-      addRow('', '');
+      els.wordInput.value = '';
       updateWordCount();
       regenerate();
-    });
-
-    els.translateAllButton.addEventListener('click', translateAllRows);
-    els.clearEnglishButton.addEventListener('click', function () {
-      var enInputs = els.wordRows.querySelectorAll('.en-input');
-      enInputs.forEach(function (input) { input.value = ''; });
-      regenerate();
+      els.wordInput.focus();
     });
 
     els.shuffleButton.addEventListener('click', regenerate);
-    els.printButton.addEventListener('click', function () { window.print(); });
-
-    // No resize/print listeners needed: the canvas's box size is driven
-    // entirely by CSS (#cloudCanvas is 100% of .canvas-wrap, which is sized
-    // responsively on screen and to an explicit A4 mm size when printing),
-    // so it always tracks the current layout automatically.
+    els.printButton.addEventListener('click', printWorksheet);
 
     updateWordCount();
     regenerate();
@@ -131,50 +112,7 @@
     };
   }
 
-  var scheduleRegenerate = debounce(regenerate, 500);
-
-  function addRow(zh, en) {
-    var row = document.createElement('div');
-    row.className = 'word-row';
-
-    var zhInput = document.createElement('input');
-    zhInput.type = 'text';
-    zhInput.className = 'zh-input';
-    zhInput.placeholder = 'Source word (Chinese or any language)';
-    zhInput.value = zh || '';
-    zhInput.spellcheck = false;
-
-    var enInput = document.createElement('input');
-    enInput.type = 'text';
-    enInput.className = 'en-input';
-    enInput.placeholder = 'English (optional)';
-    enInput.value = en || '';
-    enInput.spellcheck = false;
-
-    var removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'row-remove';
-    removeBtn.setAttribute('aria-label', 'Remove this word');
-    removeBtn.textContent = '×';
-
-    [zhInput, enInput].forEach(function (input) {
-      input.addEventListener('input', function () {
-        updateWordCount();
-        scheduleRegenerate();
-      });
-    });
-
-    removeBtn.addEventListener('click', function () {
-      row.remove();
-      updateWordCount();
-      regenerate();
-    });
-
-    row.appendChild(zhInput);
-    row.appendChild(enInput);
-    row.appendChild(removeBtn);
-    els.wordRows.appendChild(row);
-  }
+  var scheduleRegenerate = debounce(regenerateWithTranslations, 500);
 
   function buildDisplayModeRow() {
     els.displayModeRow.innerHTML = '';
@@ -193,7 +131,11 @@
         }
         state.displayModes[mode.id] = willBeOn;
         btn.classList.toggle('active', willBeOn);
-        regenerate();
+        if (mode.id === 'en' && willBeOn) {
+          translateCurrentEntries(true).then(regenerate);
+        } else {
+          regenerate();
+        }
       });
       els.displayModeRow.appendChild(btn);
     });
@@ -253,74 +195,75 @@
 
   function buildSourceLangSelect() {
     els.sourceLangSelect.innerHTML = '';
-    SOURCE_LANGUAGES.forEach(function (lang) {
-      var opt = document.createElement('option');
-      opt.value = lang.code;
-      opt.textContent = lang.label;
-      els.sourceLangSelect.appendChild(opt);
+    SOURCE_LANGUAGES.forEach(function (language) {
+      var option = document.createElement('option');
+      option.value = language.code;
+      option.textContent = language.label;
+      els.sourceLangSelect.appendChild(option);
     });
     els.sourceLangSelect.value = state.sourceLang;
     els.sourceLangSelect.addEventListener('change', function () {
       state.sourceLang = els.sourceLangSelect.value;
+      if (state.displayModes.en) translateCurrentEntries(true).then(regenerate);
     });
   }
 
-  // Free, no-key translation via MyMemory. Best-effort only: never blocks
-  // page load, only runs when the teacher explicitly clicks "Auto-Translate".
-  function translateOne(text, sourceCode) {
-    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) +
-      '&langpair=' + encodeURIComponent(sourceCode) + '|en';
+  function translationKey(word) {
+    return state.sourceLang + '|' + word;
+  }
+
+  function translateOne(word) {
+    if (state.sourceLang === 'en') return Promise.resolve(word);
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(word) +
+      '&langpair=' + encodeURIComponent(state.sourceLang) + '|en';
     return fetch(url)
-      .then(function (r) { return r.json(); })
+      .then(function (response) { return response.json(); })
       .then(function (data) {
-        var translated = data && data.responseData && data.responseData.translatedText;
-        if (!translated || /INVALID|MYMEMORY WARNING/i.test(translated)) return null;
-        return translated;
+        var translation = data && data.responseData && data.responseData.translatedText;
+        if (!translation || /INVALID|MYMEMORY WARNING/i.test(translation)) return '';
+        return translation;
       })
-      .catch(function () { return null; });
+      .catch(function () { return ''; });
   }
 
-  function translateAllRows() {
-    var rows = Array.prototype.slice.call(els.wordRows.querySelectorAll('.word-row'));
-    var pending = rows.filter(function (row) {
-      return row.querySelector('.zh-input').value.trim() && !row.querySelector('.en-input').value.trim();
+  function translateCurrentEntries(announce) {
+    var entries = parseEntries();
+    var pending = entries.filter(function (entry) {
+      return !Object.prototype.hasOwnProperty.call(translationCache, translationKey(entry.zh));
     });
-    if (!pending.length) {
-      showToast('Nothing to translate (English already filled in, or source is empty)');
-      return;
+    if (!pending.length) return Promise.resolve();
+
+    if (announce) {
+      els.readyPill.textContent = 'Translating…';
+      showToast('Translating words to English…');
     }
 
-    els.translateAllButton.disabled = true;
-    els.translateAllButton.textContent = 'Translating…';
-    var sourceCode = state.sourceLang;
-    var successCount = 0;
-    var failCount = 0;
-
-    function next(index) {
-      if (index >= pending.length) {
-        els.translateAllButton.disabled = false;
-        els.translateAllButton.innerHTML = '<span aria-hidden="true">🌐</span> Auto-Translate to English';
-        regenerate();
-        if (failCount) {
-          showToast('Translated ' + successCount + ', ' + failCount + ' failed (possibly a network issue — try again)');
-        } else {
-          showToast('Auto-translated ' + successCount + ' word' + (successCount === 1 ? '' : 's'));
-        }
-        return;
-      }
-      var row = pending[index];
-      var zh = row.querySelector('.zh-input').value.trim();
-      translateOne(zh, sourceCode).then(function (result) {
-        if (result) {
-          row.querySelector('.en-input').value = result;
-          successCount++;
-        } else {
-          failCount++;
-        }
-        setTimeout(function () { next(index + 1); }, 200);
+    var succeeded = 0;
+    var failed = 0;
+    return pending.reduce(function (chain, entry) {
+      return chain.then(function () {
+        return translateOne(entry.zh).then(function (translation) {
+          if (translation) {
+            translationCache[translationKey(entry.zh)] = translation;
+            succeeded++;
+          } else {
+            failed++;
+          }
+        });
       });
+    }, Promise.resolve()).then(function () {
+      if (announce && failed) {
+        showToast('Translated ' + succeeded + '; ' + failed + ' could not be translated. Try again later.');
+      }
+    });
+  }
+
+  function regenerateWithTranslations() {
+    if (state.displayModes.en) {
+      translateCurrentEntries(false).then(regenerate);
+    } else {
+      regenerate();
     }
-    next(0);
   }
 
   function getPinyin(zh) {
@@ -337,9 +280,8 @@
     return py;
   }
 
-  // Each row can expand into up to 3 independent chips (Chinese / Pinyin /
-  // English) that are scattered separately across the cloud, rather than
-  // being glued together into one combined chunk of text.
+  // A word can expand into target language, English, and pinyin chips that
+  // are scattered separately across the cloud, rather than being glued together.
   function expandEntries(entries) {
     var n = entries.length;
     var chips = [];
@@ -358,15 +300,16 @@
   }
 
   function parseEntries() {
-    var rows = els.wordRows.querySelectorAll('.word-row');
     var seen = {};
     var entries = [];
-    rows.forEach(function (row) {
-      var zh = row.querySelector('.zh-input').value.trim();
-      var en = row.querySelector('.en-input').value.trim();
-      if (!zh || seen[zh]) return;
-      seen[zh] = true;
-      entries.push({ zh: zh, en: en });
+    els.wordInput.value.split(/\r?\n/).forEach(function (word) {
+      var cleanWord = word.trim();
+      if (!cleanWord || seen[cleanWord]) return;
+      seen[cleanWord] = true;
+      entries.push({
+        zh: cleanWord,
+        en: translationCache[translationKey(cleanWord)] || ''
+      });
     });
     return entries;
   }
@@ -534,16 +477,31 @@
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    if (!placements || !placements.length) return;
+    if (placements && placements.length) {
+      var fontFamily = fontFamilyFor(state.font);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      placements.forEach(function (p) {
+        ctx.font = '700 ' + p.fontSize + 'px ' + fontFamily;
+        ctx.fillStyle = p.color;
+        ctx.fillText(p.word, p.x, p.y);
+      });
+    }
 
-    var fontFamily = fontFamilyFor(state.font);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    placements.forEach(function (p) {
-      ctx.font = '700 ' + p.fontSize + 'px ' + fontFamily;
-      ctx.fillStyle = p.color;
-      ctx.fillText(p.word, p.x, p.y);
-    });
+    // Browsers can omit a live canvas when generating a PDF. Keep a PNG copy
+    // in sync so the print stylesheet can use a reliably printable image.
+    els.printImage.src = canvas.toDataURL('image/png');
+  }
+
+  function printWorksheet() {
+    render(lastPlacements);
+    var printNow = function () { window.print(); };
+
+    if (els.printImage.decode) {
+      els.printImage.decode().catch(function () {}).then(printNow);
+    } else {
+      window.setTimeout(printNow, 80);
+    }
   }
 
   function fontFamilyFor(fontId) {

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#194f45">
+  <title>Sunflower Spinner · Chen Laoshi's Teaching Toolkit</title>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="./sunflower-spinner.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="/teaching-tools">← Back to Teaching Tools</a>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">🌻</div>
+        <div>
+          <h1>Sunflower Spinner</h1>
+          <p>Give your classroom choices a little sunshine.</p>
+        </div>
+      </div>
+      <div class="hero-note">Words · Sentences · Names</div>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="intro card">
+      <div>
+        <p class="eyebrow">A cheerful classroom picker</p>
+        <h2>One line, one sunflower petal.</h2>
+        <p>Enter names, vocabulary, or prompts. Add up to four independent wheels, then spin one—or spin them all together.</p>
+      </div>
+      <div class="limits" aria-label="Spinner limits">
+        <span>2–16 petals per wheel</span>
+        <span>Up to 4 wheels</span>
+      </div>
+    </section>
+
+    <div class="layout">
+      <aside class="editor card" aria-label="Sunflower wheel editor">
+        <div class="editor-heading">
+          <div>
+            <p class="eyebrow">Step 1</p>
+            <h2>Set up your wheels</h2>
+          </div>
+          <span class="wheel-count" id="wheelCount">1 wheel</span>
+        </div>
+
+        <div id="wheelEditors" class="wheel-editors"></div>
+
+        <div class="wheel-controls">
+          <button class="btn btn-primary" id="addWheelButton" type="button">+ Add wheel</button>
+          <button class="btn btn-secondary" id="removeWheelButton" type="button">− Remove last</button>
+          <p id="wheelLimitMessage" class="control-help" aria-live="polite">You can add up to 4 wheels.</p>
+        </div>
+      </aside>
+
+      <section class="stage card" aria-labelledby="stage-title">
+        <div class="stage-heading">
+          <div>
+            <p class="eyebrow">Step 2</p>
+            <h2 id="stage-title">Spin a sunflower</h2>
+          </div>
+          <button class="btn btn-all" id="spinAllButton" type="button">↻ Spin all wheels</button>
+        </div>
+
+        <div class="wheel-stage" id="wheelStage"></div>
+      </section>
+    </div>
+  </main>
+
+  <div class="petal-decision-modal" id="petalDecisionModal" hidden>
+    <div class="petal-decision-backdrop" aria-hidden="true"></div>
+    <section class="petal-decision-dialog" role="dialog" aria-modal="true" aria-labelledby="petalDecisionTitle" aria-describedby="petalDecisionMessage">
+      <span class="decision-sunflower" aria-hidden="true">🌻</span>
+      <p class="eyebrow">A petal was selected</p>
+      <h2 id="petalDecisionTitle">Keep this petal?</h2>
+      <p class="decision-message" id="petalDecisionMessage"></p>
+      <p class="decision-note" id="petalDecisionNote"></p>
+      <div class="decision-actions">
+        <button class="btn btn-secondary" id="keepPetalButton" type="button">Keep petal</button>
+        <button class="btn btn-primary" id="removePetalButton" type="button">Remove petal</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./sunflower-spinner.js"></script>
+</body>
+</html>

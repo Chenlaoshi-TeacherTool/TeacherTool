@@ -294,92 +294,49 @@ h2 {
   font-weight: 800;
 }
 
-.word-rows-head {
-  margin: 2px 2px 6px;
-  padding: 0 68px 0 4px;
-  display: flex;
-  color: #9aa2b8;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.word-rows-head span:first-child { flex: 0 0 38%; }
-.word-rows-head span:last-child { flex: 1; }
-
-.word-rows {
-  max-height: 320px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.word-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.word-row .zh-input,
-.word-row .en-input {
-  min-width: 0;
-  height: 38px;
-  padding: 6px 10px;
-  border: 1px solid #dce2f0;
-  border-radius: 10px;
-  outline: none;
-  background: #fbfcff;
-  color: var(--ink);
-  font-size: 14px;
-}
-
-.word-row .zh-input { flex: 0 0 38%; }
-.word-row .en-input { flex: 1; }
-
-.word-row .zh-input:focus,
-.word-row .en-input:focus { border-color: var(--blue); }
-
-.word-row .row-remove {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 auto;
-  border: 0;
-  border-radius: 8px;
-  background: #f4f0fb;
-  color: #9096ab;
-  font-size: 15px;
-  line-height: 1;
-}
-
-.word-row .row-remove:hover {
-  background: #fde2e4;
-  color: var(--danger);
-}
-
-.add-row-button {
-  width: 100%;
-  margin-top: 9px;
-  padding: 9px;
-  border: 1px dashed #cbd6f5;
-  border-radius: 10px;
-  background: transparent;
+.word-list-label {
+  display: block;
+  margin: 13px 2px 6px;
   color: var(--blue-dark);
   font-size: 12px;
   font-weight: 800;
 }
 
-.add-row-button:hover {
-  border-color: var(--blue);
-  background: var(--soft-blue);
+.word-list-input {
+  width: 100%;
+  min-height: 286px;
+  padding: 11px 12px;
+  resize: vertical;
+  border: 1px solid #dce2f0;
+  border-radius: 12px;
+  outline: none;
+  background: #fbfcff;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.65;
 }
 
-.translate-bar {
-  margin-top: 12px;
+.word-list-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(53, 110, 87, .12);
+}
+
+.translation-settings {
+  margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 7px 9px;
+  color: var(--muted);
+  font-size: 12px;
 }
+
+.translation-settings label {
+  color: var(--blue-dark);
+  font-weight: 800;
+}
+
+.translation-settings span { flex: 1 0 100%; }
 
 .lang-select {
   height: 32px;
@@ -389,11 +346,6 @@ h2 {
   background: var(--white);
   color: var(--ink);
   font-size: 12px;
-}
-
-.translate-bar .link-button:disabled {
-  cursor: not-allowed;
-  opacity: .55;
 }
 
 .word-meta {
@@ -569,6 +521,8 @@ h2 {
   border-radius: 4px;
 }
 
+#cloudPrintImage { display: none; }
+
 .toolbar {
   min-height: 74px;
   margin-top: 17px;
@@ -695,7 +649,6 @@ h2 {
   }
   .card-heading { flex-direction: column; }
   .preview-card .card-heading { align-items: flex-start; }
-  .word-row .zh-input { flex: 0 0 34%; }
   .option-row { grid-template-columns: 1fr; }
   .toolbar { padding: 15px; }
   .actions {
@@ -756,17 +709,35 @@ h2 {
     box-shadow: none;
   }
 
+  .preview-card::before { display: none !important; }
+
   .worksheet-shell { display: block; }
 
-  .paper { max-width: 100%; }
+  .paper {
+    max-width: 100%;
+    padding-top: 7mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
   .paper-head { margin-bottom: 3mm; }
   .title-input { font-size: 15pt; border: 0 !important; }
   .paper-head span { font-size: 8pt; }
 
   .canvas-wrap {
-    width: 190mm;
-    height: 268mm;
+    width: 180mm;
+    height: 250mm;
     margin: 0 auto;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #cloudCanvas { display: none !important; }
+
+  #cloudPrintImage {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill;
   }
 }
 
@@ -803,12 +774,7 @@ h2 {
     color: var(--leaf);
   }
 
-  .word-rows-head,
   .helper-inline { color: #7d8f84; }
-
-  .word-row .row-remove { background: #f5f1e4; color: #7d8f84; }
-  .add-row-button { border-color: #c7dcc1; color: var(--blue-dark); }
-  .add-row-button:hover { border-color: var(--sun-deep); background: #fff2c6; }
   .option-block h3 { color: var(--blue-dark); }
 
   .scheme-btn { background: #fffef9; color: var(--muted); }
