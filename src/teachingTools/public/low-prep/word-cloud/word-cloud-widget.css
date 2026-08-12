@@ -1,16 +1,16 @@
 :root {
-  --blue: #3f66e8;
-  --blue-dark: #294fcf;
-  --purple: #7956e8;
-  --ink: #1f2a44;
-  --muted: #6f7892;
-  --line: #dfe5f4;
-  --soft: #f4f7ff;
-  --soft-blue: #edf2ff;
-  --success: #16875f;
-  --danger: #c5465b;
-  --white: #fff;
-  --shadow: 0 18px 46px rgba(48, 66, 125, .12);
+  --blue: #356e57;
+  --blue-dark: #194f45;
+  --purple: #6f9e72;
+  --ink: #193d38;
+  --muted: #5d7168;
+  --line: #e5ddc9;
+  --soft: #fff9e9;
+  --soft-blue: #edf5df;
+  --success: #356e57;
+  --danger: #c9503f;
+  --white: #fffdf7;
+  --shadow: 0 18px 46px rgba(24, 66, 55, .12);
 }
 
 * { box-sizing: border-box; }
@@ -27,8 +27,8 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at 10% 12%, rgba(151, 181, 255, .32), transparent 25%),
-    radial-gradient(circle at 94% 76%, rgba(184, 158, 255, .2), transparent 28%),
+    radial-gradient(circle at 10% 12%, rgba(248, 198, 63, .22), transparent 25%),
+    radial-gradient(circle at 94% 76%, rgba(111, 158, 114, .19), transparent 28%),
     var(--soft);
   font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif;
 }
@@ -768,4 +768,88 @@ h2 {
     height: 268mm;
     margin: 0 auto;
   }
+}
+
+/* Match the Chen Laoshi classroom palette without changing the cloud controls. */
+@media screen {
+  .hero {
+    background: linear-gradient(120deg, var(--blue-dark) 0%, var(--blue) 54%, var(--purple) 100%);
+  }
+
+  .hero::before,
+  .hero::after { background: rgba(255, 249, 233, .1); }
+
+  .back-link {
+    border-radius: 999px;
+    border-color: rgba(255, 249, 233, .7);
+    background: rgba(255, 253, 247, .12);
+  }
+
+  .step.active {
+    color: var(--blue-dark);
+    border-color: var(--white);
+    background: var(--white);
+    box-shadow: 0 10px 26px rgba(16, 62, 55, .18);
+  }
+
+  .step.active .step-number,
+  .step-chip {
+    background: linear-gradient(135deg, var(--leaf), var(--leaf-light));
+  }
+
+  .ready-pill {
+    border: 1px solid #d8e5c7;
+    background: #edf5df;
+    color: var(--leaf);
+  }
+
+  .word-rows-head,
+  .helper-inline { color: #7d8f84; }
+
+  .word-row .row-remove { background: #f5f1e4; color: #7d8f84; }
+  .add-row-button { border-color: #c7dcc1; color: var(--blue-dark); }
+  .add-row-button:hover { border-color: var(--sun-deep); background: #fff2c6; }
+  .option-block h3 { color: var(--blue-dark); }
+
+  .scheme-btn { background: #fffef9; color: var(--muted); }
+  .scheme-btn:hover { border-color: var(--sun-deep); }
+  .scheme-btn.active {
+    border-color: var(--leaf);
+    background: #edf5df;
+    color: var(--blue-dark);
+    box-shadow: 0 6px 14px rgba(53, 110, 87, .14);
+  }
+
+  .bg-swatch { box-shadow: 0 0 0 1px #fffdf7, 0 2px 6px rgba(24, 66, 55, .12); }
+  .bg-swatch.active { outline-color: var(--sun-deep); }
+
+  .worksheet-shell {
+    border-color: var(--line);
+    background: #f5f1e4;
+  }
+
+  .paper-head,
+  .title-input { color: var(--ink); }
+
+  .title-input:hover,
+  .title-input:focus { border-bottom-color: var(--sun-deep); }
+
+  .toolbar { background: #fffdf7; }
+
+  .btn-secondary {
+    border-color: #d8e5c7 !important;
+    background: #fffef9 !important;
+    box-shadow: none !important;
+    color: var(--blue-dark) !important;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--sun-deep) !important;
+    background: #fff2c6 !important;
+    box-shadow: 0 7px 18px rgba(53, 110, 87, .12) !important;
+  }
+
+  .btn-primary { box-shadow: 0 9px 20px rgba(157, 57, 47, .25); }
+  .btn-primary:hover:not(:disabled) { box-shadow: 0 11px 24px rgba(157, 57, 47, .32); }
+  .toast { background: var(--blue-dark); }
 }

@@ -28,6 +28,10 @@ router.get('/low-prep-activities/independent-reading', function(req, res, next) 
   res.render('low-prep-activities/independent-reading', { title: 'Independent Reading Builder' });
 });
 
+router.get('/low-prep-activities/tear-paper-bingo', function(req, res, next) {
+  res.render('low-prep-activities/tear-paper-bingo', { title: 'Tear-Paper Bingo' });
+});
+
 // Theme Activities Routes
 router.get('/theme-activities', function(req, res, next) {
   res.render('theme-activities/index', { title: 'Theme Activities' });

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#194f45">
+    <title>Tear-Paper Bingo - Chen Laoshi's Teaching Toolkit</title>
+    <link rel="stylesheet" href="/stylesheets/site-theme.css">
+    <style>
+        .bingo-header { text-align: center; }
+        .bingo-header .back-btn { position: absolute; top: 20px; left: 20px; }
+        .bingo-header h1 { margin: 0 0 10px; font-size: clamp(2.2rem, 5vw, 3.4rem); }
+        .bingo-header p { max-width: 640px; margin: 0 auto; font-size: 1.08rem; }
+        .bingo-main { max-width: 1120px; margin: 0 auto; padding: 44px 20px 64px; }
+        .bingo-overview { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 22px; align-items: start; margin-bottom: 26px; padding: 28px 30px; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); box-shadow: var(--shadow); }
+        .bingo-icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 19px; background: #fff0c5; font-size: 2rem; }
+        .bingo-overview h2 { margin: 0 0 7px; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.8rem; font-weight: 400; }
+        .bingo-overview p { max-width: 730px; margin: 0; color: var(--muted); }
+        .bingo-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+        .how-to { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin: 0 0 26px; }
+        .how-to-step { padding: 21px; border: 1px solid #dce7cf; border-radius: 17px; background: #f3f8e9; }
+        .how-to-step span { display: grid; place-items: center; width: 30px; height: 30px; margin-bottom: 11px; border-radius: 50%; background: var(--sun); color: var(--chalk-deep); font-weight: 900; }
+        .how-to-step p { margin: 0; color: var(--ink); font-size: .96rem; }
+        .preview-card { overflow: hidden; border: 1px solid var(--line); border-radius: 22px; background: var(--paper); box-shadow: var(--shadow); }
+        .preview-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--line); background: #fff8df; }
+        .preview-toolbar h2 { margin: 0; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.5rem; font-weight: 400; }
+        .preview-toolbar p { margin: 2px 0 0; color: var(--muted); font-size: .9rem; }
+        .download-btn { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 8px; padding: 10px 17px; text-decoration: none; }
+        .pdf-frame { display: block; width: 100%; height: min(76vh, 880px); min-height: 610px; border: 0; background: #edf1e9; }
+        .pdf-fallback { margin: 0; padding: 30px; color: var(--muted); text-align: center; }
+        .pdf-fallback a { color: var(--coral); font-weight: 800; }
+        @media (max-width: 760px) {
+            .bingo-header .back-btn { top: 16px; left: 16px; }
+            .bingo-main { padding: 30px 16px 46px; }
+            .bingo-overview { grid-template-columns: 1fr; padding: 24px; }
+            .how-to { grid-template-columns: 1fr; }
+            .preview-toolbar { align-items: flex-start; flex-direction: column; padding: 20px; }
+            .pdf-frame { height: 68vh; min-height: 520px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header bingo-header">
+        <a href="/low-prep-activities" class="back-btn">← Back to Low-Prep Activities</a>
+        <h1>🟨 Tear-Paper Bingo</h1>
+        <p>A quick listening and reading game with an activity guide and reusable blank word strips.</p>
+    </header>
+
+    <main class="bingo-main">
+        <section class="bingo-overview" aria-labelledby="activity-overview-title">
+            <div class="bingo-icon" aria-hidden="true">✂️</div>
+            <div>
+                <h2 id="activity-overview-title">A little listening game with big energy</h2>
+                <p>Write eight target words in each blank strip, then read each word or clue aloud. Students listen and tear a matching word only from either end of their strip. The first player to tear away all eight words wins!</p>
+                <div class="bingo-tags" aria-label="Activity details">
+                    <span class="tag">8–12 min</span>
+                    <span class="tag">Listening</span>
+                    <span class="tag">Reading</span>
+                    <span class="tag">Printable</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-to" aria-label="How to use Tear-Paper Bingo">
+            <article class="how-to-step">
+                <span>1</span>
+                <p>Add eight familiar vocabulary words, characters, Pinyin, or pictures to each blank strip.</p>
+            </article>
+            <article class="how-to-step">
+                <span>2</span>
+                <p>Read a word, sentence, or clue aloud for students to listen and check both ends of their strip.</p>
+            </article>
+            <article class="how-to-step">
+                <span>3</span>
+                <p>Students may tear a match only from either end. The first player to tear all eight words wins!</p>
+            </article>
+        </section>
+
+        <section class="preview-card" aria-labelledby="preview-title">
+            <div class="preview-toolbar">
+                <div>
+                    <h2 id="preview-title">Printable template preview</h2>
+                    <p>Preview the activity guide and blank word strips below, or save a copy for class.</p>
+                </div>
+                <a class="btn download-btn" href="/pdf/tear-paper-bingo-listening-reading.pdf" download="tear-paper-bingo-listening-reading.pdf">↓ Download PDF</a>
+            </div>
+            <iframe class="pdf-frame" src="/pdf/tear-paper-bingo-listening-reading.pdf#view=FitH" title="Tear-Paper Bingo PDF resource preview">
+                <p class="pdf-fallback">Your browser cannot show the PDF preview. <a href="/pdf/tear-paper-bingo-listening-reading.pdf" download="tear-paper-bingo-listening-reading.pdf">Download the Tear-Paper Bingo PDF</a>.</p>
+            </iframe>
+        </section>
+    </main>
+</body>
+</html>

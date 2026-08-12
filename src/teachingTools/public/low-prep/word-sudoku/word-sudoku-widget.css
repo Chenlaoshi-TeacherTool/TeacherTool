@@ -1,16 +1,16 @@
 :root {
-  --blue: #3f66e8;
-  --blue-dark: #294fcf;
-  --purple: #7956e8;
-  --ink: #1f2a44;
-  --muted: #6f7892;
-  --line: #dfe5f4;
-  --soft: #f4f7ff;
-  --soft-blue: #edf2ff;
-  --success: #16875f;
-  --danger: #c5465b;
-  --white: #fff;
-  --shadow: 0 18px 46px rgba(48, 66, 125, .12);
+  --blue: #356e57;
+  --blue-dark: #194f45;
+  --purple: #6f9e72;
+  --ink: #193d38;
+  --muted: #5d7168;
+  --line: #e5ddc9;
+  --soft: #fff9e9;
+  --soft-blue: #edf5df;
+  --success: #356e57;
+  --danger: #c9503f;
+  --white: #fffdf7;
+  --shadow: 0 18px 46px rgba(24, 66, 55, .12);
 }
 
 * { box-sizing: border-box; }
@@ -27,8 +27,8 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at 10% 12%, rgba(151, 181, 255, .32), transparent 25%),
-    radial-gradient(circle at 94% 76%, rgba(184, 158, 255, .2), transparent 28%),
+    radial-gradient(circle at 10% 12%, rgba(248, 198, 63, .22), transparent 25%),
+    radial-gradient(circle at 94% 76%, rgba(111, 158, 114, .19), transparent 28%),
     var(--soft);
   font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", "Segoe UI", sans-serif;
 }
@@ -954,4 +954,112 @@ h2 {
     height: 8mm;
     font-size: 15pt;
   }
+}
+
+/* Match the Chen Laoshi classroom palette without changing the worksheet layout. */
+@media screen {
+  .hero {
+    background: linear-gradient(120deg, var(--blue-dark) 0%, var(--blue) 54%, var(--purple) 100%);
+  }
+
+  .hero::before,
+  .hero::after { background: rgba(255, 249, 233, .1); }
+
+  .back-link {
+    border-radius: 999px;
+    border-color: rgba(255, 249, 233, .7);
+    background: rgba(255, 253, 247, .12);
+  }
+
+  .step.active {
+    color: var(--blue-dark);
+    border-color: var(--white);
+    background: var(--white);
+    box-shadow: 0 10px 26px rgba(16, 62, 55, .18);
+  }
+
+  .step.active .step-number,
+  .step-chip {
+    background: linear-gradient(135deg, var(--leaf), var(--leaf-light));
+  }
+
+  .count,
+  .ready-pill {
+    border: 1px solid #d8e5c7;
+    background: #edf5df;
+    color: var(--leaf);
+  }
+
+  .count.warning { background: #fff0e8; }
+
+  .word-item { background: #fffef9; }
+
+  .word-item:focus-within {
+    border-color: var(--sun-deep);
+    box-shadow: 0 0 0 3px rgba(248, 198, 63, .2);
+  }
+
+  .item-number { background: #f5f1e4; color: var(--muted); }
+
+  .picture-box {
+    background: linear-gradient(145deg, #edf5df, #fff2c6);
+  }
+
+  .picture-box:hover { box-shadow: 0 7px 14px rgba(53, 110, 87, .16); }
+
+  .auto-match { background: #edf5df; color: var(--muted); }
+
+  .icon-picker {
+    border-color: #d8e5c7;
+    background: #fffdf7;
+    box-shadow: 0 12px 28px rgba(24, 66, 55, .11);
+  }
+
+  .picker-close { background: #f5f1e4; color: var(--muted); }
+
+  .picker-option:hover,
+  .picker-option.selected {
+    border-color: var(--sun-deep);
+    background: #fff2c6;
+  }
+
+  .mini-button,
+  .segment button.active {
+    background: linear-gradient(135deg, var(--coral), #d96d50);
+    box-shadow: 0 4px 11px rgba(157, 57, 47, .22);
+  }
+
+  .worksheet-shell {
+    border-color: var(--line);
+    background: #f5f1e4;
+  }
+
+  .sudoku { border-color: var(--blue-dark); }
+  .cell { border-color: #aebcae; color: var(--ink); }
+  .cell.block-right { border-right-color: var(--blue-dark); }
+  .cell.block-bottom { border-bottom-color: var(--blue-dark); }
+  .cell.picture { background: #fff7dd; }
+  .cell.answer { background: #edf5df; color: var(--blue-dark); }
+
+  .legend-item { border-color: #d8e5c7; background: #fffef9; color: var(--ink); }
+  .legend-emoji { background: #edf5df; }
+  .segment { background: #f5f1e4; }
+  .toolbar-label { color: var(--blue-dark); }
+
+  .btn-secondary {
+    border-color: #d8e5c7 !important;
+    background: #fffef9 !important;
+    box-shadow: none !important;
+    color: var(--blue-dark) !important;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--sun-deep) !important;
+    background: #fff2c6 !important;
+    box-shadow: 0 7px 18px rgba(53, 110, 87, .12) !important;
+  }
+
+  .btn-primary { box-shadow: 0 9px 20px rgba(157, 57, 47, .25); }
+  .btn-primary:hover:not(:disabled) { box-shadow: 0 11px 24px rgba(157, 57, 47, .32); }
+  .toast { background: var(--blue-dark); }
 }

@@ -529,6 +529,136 @@
         }
     </style>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
+    <style>
+        /* Chen Laoshi visual language: chalkboard green, cream paper, sunflower gold. */
+        :root {
+            --ink: #193d38;
+            --muted: #5d7168;
+            --deep-blue: #194f45;
+            --paper: #fffdf7;
+            --mist: #fff9e9;
+            --line: #e5ddc9;
+            --soft-purple: #edf5df;
+            --success: #356e57;
+            --danger: #c9503f;
+        }
+
+        .page-header {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #103e37, #194f45 58%, #2e7258);
+        }
+        .page-header::before,
+        .page-header::after {
+            position: absolute;
+            content: "";
+            border: 1px solid rgba(255, 249, 233, 0.25);
+            border-radius: 50%;
+        }
+        .page-header::before { width: 330px; height: 330px; top: -210px; right: -70px; }
+        .page-header::after { width: 190px; height: 190px; bottom: -135px; left: 12%; }
+        .header-inner { position: relative; z-index: 1; }
+        .back-link {
+            border-color: rgba(255, 249, 233, 0.72);
+            background: rgba(255, 253, 247, 0.12);
+            font-family: 'Nunito', 'Noto Sans SC', 'Segoe UI', sans-serif;
+            font-weight: 800;
+        }
+        .back-link:hover { background: rgba(255, 253, 247, 0.24); }
+        h1,
+        .card-heading h2,
+        .packet-preview h2,
+        .sample-preview-header h2 {
+            font-family: 'DM Serif Display', 'Noto Sans SC', serif;
+            letter-spacing: 0.01em;
+        }
+
+        .builder-card,
+        .packet-preview,
+        .sample-preview {
+            position: relative;
+            overflow: hidden;
+            border-color: var(--line);
+            background: var(--paper);
+            box-shadow: 0 14px 30px rgba(24, 66, 55, 0.12);
+        }
+        .builder-card::before,
+        .packet-preview::before,
+        .sample-preview::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            content: "";
+            background: linear-gradient(90deg, #f8c63f, #f5dc7d, #6f9e72);
+        }
+
+        .card-heading h2,
+        .packet-preview h2,
+        .sample-preview-header h2,
+        .section-label h3,
+        label { color: var(--deep-blue); }
+        .example-button {
+            border-color: #d8e5c7;
+            background: #edf5df;
+            color: #356e57;
+        }
+        .example-button:hover,
+        .small-button:hover { background: #fff2c6; }
+        .small-button {
+            border-color: #d8e5c7;
+            background: #fffef9;
+            color: var(--deep-blue);
+        }
+        input,
+        textarea { border-color: #cfd8c5; background: #fffef9; }
+        input:focus,
+        textarea:focus {
+            border-color: #e7a81f;
+            box-shadow: 0 0 0 3px rgba(248, 198, 63, 0.25);
+        }
+        .question-count { color: #356e57; }
+        .output-note {
+            border: 1px solid #d8e5c7;
+            background: #edf5df;
+            color: #426353;
+        }
+        .output-note strong { color: var(--deep-blue); }
+        .generate-button {
+            border-radius: 999px;
+            background: #c9503f;
+            box-shadow: 0 5px 0 #9d392f;
+        }
+        .generate-button:hover:not(:disabled) {
+            background: #d75d49;
+            box-shadow: 0 7px 0 #9d392f;
+        }
+
+        .packet-preview-header {
+            background: linear-gradient(150deg, #fff9e9, #edf5df);
+        }
+        .packet-map li::before {
+            background: #fff2c6;
+            color: #194f45;
+        }
+        .packet-map strong { color: #193d38; }
+        .preview-eyebrow { color: #356e57; }
+        .mini-page { border-color: #d7d5c8; color: #193d38; }
+        .mini-page.is-featured { border-color: #d4b760; }
+        .mini-page-label,
+        .mini-page-title,
+        .mini-reading-title,
+        .mini-question-heading,
+        .mini-storyboard-grid span { color: #356e57; }
+        .mini-rule { background: #c9503f; }
+        .mini-story-box {
+            border-color: #356e57;
+            background: #edf5df;
+        }
+        .mini-story-box span { background: #6f9e72; }
+        .mini-storyboard-grid { border-color: #5d7168; background: #5d7168; }
+    </style>
 </head>
 <body>
     <header class="page-header">
