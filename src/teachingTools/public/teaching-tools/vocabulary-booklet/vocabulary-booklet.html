@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#194f45">
+  <title>Vocabulary Mini Booklet · Chen Laoshi's Teaching Toolkit</title>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="./vocabulary-booklet.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="/teaching-tools">← Back to Teaching Tools</a>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">📖</div>
+        <div>
+          <h1>Vocabulary Mini Booklet</h1>
+          <p>Give every learner a little book for independent practice.</p>
+        </div>
+      </div>
+      <div class="hero-note">Up to 100 words · 10 words per page</div>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="intro card">
+      <div>
+        <p class="eyebrow">A self-paced vocabulary routine</p>
+        <h2>One list becomes a folded progress booklet.</h2>
+        <p>Each numbered booklet page holds ten terms. Students can work through the pages at their own speed and mark the matching circle on the cover.</p>
+      </div>
+      <div class="intro-badges" aria-label="Booklet features">
+        <span>1–100 terms</span>
+        <span>Browser PDF</span>
+        <span>Double-sided A4</span>
+      </div>
+    </section>
+
+    <div class="setup-layout">
+      <section class="builder card" aria-labelledby="builderTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Step 1</p>
+            <h2 id="builderTitle">Choose your vocabulary</h2>
+          </div>
+          <span class="item-total" id="itemTotal">0 / 100 terms</span>
+        </div>
+
+        <div class="library-source" id="librarySource">
+          <div>
+            <strong>Vocabulary Library</strong>
+            <p id="librarySourceMessage">Open this tool from Vocabulary Library to bring your current list here.</p>
+          </div>
+          <a class="small-link" href="/teaching-tools/word-list-library/word-list-library.html">Open library</a>
+        </div>
+
+        <div class="saved-source">
+          <label for="savedListSelect">Or load a saved browser list</label>
+          <div class="saved-controls">
+            <select id="savedListSelect" aria-label="Saved vocabulary lists"></select>
+            <button class="btn btn-secondary" id="loadSavedButton" type="button" disabled>Load list</button>
+          </div>
+        </div>
+
+        <label class="field-label" for="bookletTitle">Booklet title</label>
+        <input id="bookletTitle" maxlength="70" value="My vocabulary booklet">
+
+        <label class="field-label" for="wordSource">Vocabulary</label>
+        <textarea id="wordSource" rows="14" spellcheck="false" placeholder="苹果 | píng guǒ | apple&#10;香蕉 | xiāng jiāo | banana">你好
+谢谢
+苹果
+香蕉
+草莓
+西瓜
+老师
+学生
+朋友
+再见</textarea>
+        <p class="field-help">One item per line. You can paste Chinese, or use 中文 | 拼音 | English. The first 100 unique terms will be used.</p>
+
+        <div class="button-row">
+          <button class="btn btn-primary" id="buildButton" type="button">Build booklet</button>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+      </section>
+
+      <section class="options card" aria-labelledby="optionsTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Step 2</p>
+            <h2 id="optionsTitle">Choose what students see</h2>
+          </div>
+          <span class="ready-badge">10 terms per page</span>
+        </div>
+
+        <fieldset class="display-options">
+          <legend>Display languages <small>Select one or more</small></legend>
+          <label><input type="checkbox" name="displayLanguage" value="zh" checked> <span>中文</span><small>Chinese</small></label>
+          <label><input type="checkbox" name="displayLanguage" value="py"> <span>拼音</span><small>Pinyin</small></label>
+          <label><input type="checkbox" name="displayLanguage" value="en"> <span>English</span><small>English</small></label>
+        </fieldset>
+
+        <div class="font-option">
+          <label for="fontSelect">Vocabulary font <small>Applied to the printed word lists</small></label>
+          <select id="fontSelect">
+            <option value="kaiti" selected>楷体 KaiTi for Chinese</option>
+            <option value="serif">Textbook serif</option>
+            <option value="sans">Clean sans-serif</option>
+          </select>
+          <p class="font-preview" id="fontPreview"><span class="term-zh">你好</span> · <span class="term-py">nǐ hǎo</span> · <span class="term-en">hello</span></p>
+        </div>
+
+        <div class="print-guide">
+          <span aria-hidden="true">🖨️</span>
+          <div>
+            <strong>Ready for a real booklet</strong>
+            <p>Print double-sided, choose <em>flip on short edge</em>, then fold each A4 sheet down the middle and staple the fold.</p>
+          </div>
+        </div>
+
+        <div class="booklet-summary" id="bookletSummary">Add words to see your booklet plan.</div>
+      </section>
+    </div>
+
+    <section class="preview card" aria-labelledby="previewTitle">
+      <div class="section-heading preview-heading">
+        <div>
+          <p class="eyebrow">Step 3</p>
+          <h2 id="previewTitle">Preview your print-ready booklet</h2>
+        </div>
+        <button class="btn btn-primary print-button" id="printButton" type="button" disabled>Print / Save PDF</button>
+      </div>
+      <p class="preview-note">Each preview card is one side of an A4 sheet. Keep the pages in order when printing double-sided.</p>
+      <div class="booklet-pages" id="bookletPages" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="./vocabulary-booklet.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+</body>
+</html>

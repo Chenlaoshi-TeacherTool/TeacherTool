@@ -18,6 +18,7 @@
     els.saveButton = document.getElementById('saveButton');
     els.downloadButton = document.getElementById('downloadButton');
     els.printButton = document.getElementById('printButton');
+    els.bookletButton = document.getElementById('bookletButton');
     els.printListTitle = document.getElementById('printListTitle');
     els.printListMeta = document.getElementById('printListMeta');
     els.savedLists = document.getElementById('savedLists');
@@ -36,6 +37,7 @@
     els.saveButton.addEventListener('click', saveList);
     els.downloadButton.addEventListener('click', downloadCurrentList);
     els.printButton.addEventListener('click', printCurrentList);
+    els.bookletButton.addEventListener('click', openBooklet);
     els.savedLists.addEventListener('click', handleSavedListAction);
     els.presetLists.addEventListener('click', handlePresetAction);
     els.storageNote.textContent = window.ChenWordlist.hasStorage
@@ -61,6 +63,7 @@
     els.saveButton.disabled = !currentList.items.length || !window.ChenWordlist.hasStorage;
     els.downloadButton.disabled = !currentList.items.length;
     els.printButton.disabled = !currentList.items.length;
+    els.bookletButton.disabled = !currentList.items.length;
     setStatus(currentList.items.length
       ? currentList.items.length + ' terms are ready for classroom activities.'
       : 'Add at least one vocabulary item to build a list.');
@@ -118,6 +121,16 @@
     if (!currentList || !currentList.items.length) return;
     setStatus('Your print dialog is ready. Choose "Save as PDF" to download a PDF copy.');
     window.print();
+  }
+
+  function openBooklet() {
+    if (!currentList || !currentList.items.length) return;
+    try {
+      sessionStorage.setItem('chenlaoshi-wordlist-booklet-draft', JSON.stringify(currentList));
+      window.location.href = '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html';
+    } catch (error) {
+      setStatus('This browser could not pass the list to the booklet tool. Save the list in this browser first, then open the booklet generator.');
+    }
   }
 
   function renderSavedLists() {
@@ -201,6 +214,7 @@
         els.saveButton.disabled = !currentList.items.length || !window.ChenWordlist.hasStorage;
         els.downloadButton.disabled = !currentList.items.length;
         els.printButton.disabled = !currentList.items.length;
+        els.bookletButton.disabled = !currentList.items.length;
         setStatus('Loaded “' + list.name + '”. You can adapt it, then save your own copy.');
         document.getElementById('builderTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
       })
@@ -264,6 +278,7 @@
     els.saveButton.disabled = !list.items.length || !window.ChenWordlist.hasStorage;
     els.downloadButton.disabled = !list.items.length;
     els.printButton.disabled = !list.items.length;
+    els.bookletButton.disabled = !list.items.length;
     setStatus('Loaded “' + list.name + '”.');
   }
 
