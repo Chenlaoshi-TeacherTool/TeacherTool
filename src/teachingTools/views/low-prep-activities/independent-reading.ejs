@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Independent Reading Builder - Teacher Toolkit</title>
+    <style>
+        :root {
+            --ink: #202c3a;
+            --muted: #647285;
+            --blue: #5067c8;
+            --deep-blue: #2f438e;
+            --purple: #7048a4;
+            --paper: #ffffff;
+            --mist: #f4f6fb;
+            --line: #dce2ef;
+            --soft-purple: #f0edff;
+            --success: #236a45;
+            --danger: #b44141;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: var(--mist);
+            color: var(--ink);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.55;
+        }
+        .page-header {
+            background: linear-gradient(132deg, #5e78e4 0%, #744aa4 100%);
+            color: #fff;
+            padding: 24px 20px 56px;
+        }
+        .header-inner,
+        .builder-shell {
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: #fff;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            padding: 7px 13px;
+            font-size: 0.92rem;
+            transition: background 0.2s ease;
+        }
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+        .eyebrow {
+            margin: 46px 0 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.11em;
+            text-transform: uppercase;
+            opacity: 0.86;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 5vw, 3.1rem);
+            letter-spacing: -0.03em;
+        }
+        .header-copy {
+            max-width: 710px;
+            margin: 12px 0 0;
+            font-size: 1.1rem;
+            opacity: 0.94;
+        }
+        .builder-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1.38fr) minmax(285px, 0.62fr);
+            align-items: start;
+            gap: 28px;
+            padding: 0 20px 64px;
+            margin-top: -28px;
+        }
+        .builder-card,
+        .packet-preview,
+        .sample-preview {
+            border: 1px solid var(--line);
+            background: var(--paper);
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(41, 51, 78, 0.1);
+        }
+        .builder-card {
+            padding: clamp(24px, 4vw, 42px);
+        }
+        .card-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card-heading h2,
+        .packet-preview h2 {
+            margin: 0;
+            color: var(--deep-blue);
+            font-size: 1.38rem;
+        }
+        .card-heading p {
+            max-width: 470px;
+            margin: 6px 0 0;
+            color: var(--muted);
+        }
+        .example-button,
+        .small-button,
+        .remove-question,
+        .generate-button {
+            font: inherit;
+            cursor: pointer;
+        }
+        .example-button {
+            flex: 0 0 auto;
+            border: 1px solid #c9cff5;
+            background: #f3f4ff;
+            color: #4058bd;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 0.9rem;
+            font-weight: 650;
+        }
+        .example-button:hover,
+        .small-button:hover {
+            background: #e8eaff;
+        }
+        .form-section {
+            padding: 0 0 28px;
+            margin: 0 0 28px;
+            border-bottom: 1px solid var(--line);
+        }
+        .form-section:last-of-type {
+            margin-bottom: 0;
+            border-bottom: 0;
+        }
+        .section-label {
+            display: flex;
+            align-items: baseline;
+            gap: 9px;
+            margin-bottom: 16px;
+        }
+        .section-label h3 {
+            margin: 0;
+            color: #34465f;
+            font-size: 1.05rem;
+        }
+        .section-label span {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .field {
+            display: grid;
+            gap: 7px;
+        }
+        label {
+            color: #34465f;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .label-note {
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
+        input,
+        textarea {
+            width: 100%;
+            border: 1px solid #cbd3e1;
+            border-radius: 9px;
+            background: #fff;
+            color: var(--ink);
+            font: inherit;
+            padding: 11px 12px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input:focus,
+        textarea:focus {
+            outline: 0;
+            border-color: #6374d4;
+            box-shadow: 0 0 0 3px rgba(99, 116, 212, 0.15);
+        }
+        textarea {
+            min-height: 220px;
+            resize: vertical;
+            line-height: 1.7;
+        }
+        .field-help {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.84rem;
+        }
+        .questions-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .questions-heading p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .small-button {
+            border: 1px solid #cfd6e5;
+            border-radius: 7px;
+            background: #fff;
+            color: #4b5b73;
+            padding: 8px 11px;
+            font-size: 0.86rem;
+            font-weight: 650;
+        }
+        .questions-textarea {
+            min-height: 210px;
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+            line-height: 1.8;
+        }
+        .question-count {
+            min-height: 1.3em;
+            margin: 2px 0 0;
+            color: #5165b9;
+            font-size: 0.84rem;
+            font-weight: 650;
+        }
+        .output-note {
+            display: flex;
+            gap: 11px;
+            padding: 15px 16px;
+            border-radius: 10px;
+            background: var(--soft-purple);
+            color: #4c4f76;
+            font-size: 0.9rem;
+        }
+        .output-note strong {
+            color: #454478;
+        }
+        .form-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-top: 28px;
+        }
+        .generate-button {
+            border: 0;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #5a70d6, #6948ae);
+            color: #fff;
+            padding: 13px 19px;
+            box-shadow: 0 7px 15px rgba(86, 88, 178, 0.24);
+            font-weight: 750;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .generate-button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(86, 88, 178, 0.32);
+        }
+        .generate-button:disabled {
+            cursor: wait;
+            opacity: 0.72;
+        }
+        #generation-status {
+            flex: 1 1 250px;
+            min-height: 1.4em;
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        #generation-status[data-state="success"] {
+            color: var(--success);
+        }
+        #generation-status[data-state="error"] {
+            color: var(--danger);
+        }
+        .preview-column {
+            position: sticky;
+            top: 22px;
+            display: grid;
+            gap: 22px;
+        }
+        .packet-preview,
+        .sample-preview {
+            overflow: hidden;
+        }
+        .packet-preview-header {
+            padding: 25px 25px 20px;
+            background: linear-gradient(150deg, #f8f9ff, #f1edfb);
+            border-bottom: 1px solid var(--line);
+        }
+        .packet-preview-header p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 0.91rem;
+        }
+        .packet-map {
+            display: grid;
+            gap: 15px;
+            margin: 0;
+            padding: 24px 25px 27px;
+            list-style: none;
+            counter-reset: packet-page;
+        }
+        .packet-map li {
+            position: relative;
+            min-height: 42px;
+            padding-left: 54px;
+            counter-increment: packet-page;
+        }
+        .packet-map li::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: #edf0ff;
+            color: #4f60bd;
+            content: counter(packet-page);
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+        .packet-map strong,
+        .packet-map span {
+            display: block;
+        }
+        .packet-map strong {
+            color: #33415a;
+            font-size: 0.94rem;
+        }
+        .packet-map span {
+            margin-top: 1px;
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+        .sample-preview-header {
+            padding: 22px 24px 16px;
+        }
+        .preview-eyebrow {
+            display: block;
+            margin-bottom: 5px;
+            color: #6477cf;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+        }
+        .sample-preview-header h2 {
+            margin: 0;
+            color: var(--deep-blue);
+            font-size: 1.14rem;
+        }
+        .sample-preview-header p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .sample-pages {
+            display: grid;
+            grid-template-columns: 1fr 1.35fr 1fr;
+            align-items: end;
+            gap: 8px;
+            padding: 0 17px 17px;
+        }
+        .mini-page {
+            position: relative;
+            min-height: 172px;
+            overflow: hidden;
+            padding: 9px;
+            border: 1px solid #cbd4e4;
+            border-radius: 3px;
+            background: #fff;
+            box-shadow: 0 6px 12px rgba(41, 51, 78, 0.12);
+            color: #34465f;
+            font-family: Cambria, Georgia, serif;
+        }
+        .mini-page.is-featured {
+            min-height: 202px;
+            transform: translateY(-2px);
+            border-color: #a9b7d4;
+            box-shadow: 0 9px 18px rgba(41, 51, 78, 0.16);
+        }
+        .mini-page-label {
+            display: block;
+            color: #1f5f99;
+            font-family: "Segoe UI", sans-serif;
+            font-size: 0.52rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .mini-page-title {
+            display: block;
+            margin-top: 5px;
+            color: #1f5f99;
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1.05;
+        }
+        .mini-rule {
+            height: 1px;
+            margin: 6px 0 8px;
+            background: #1f5f99;
+        }
+        .mini-copy {
+            display: grid;
+            gap: 4px;
+        }
+        .mini-copy span,
+        .mini-question-lines span {
+            display: block;
+            height: 2px;
+            border-radius: 20px;
+            background: #aeb8c5;
+        }
+        .mini-copy span:nth-child(2n),
+        .mini-question-lines span:nth-child(2n) {
+            width: 78%;
+        }
+        .mini-reading-title {
+            margin-top: 5px;
+            color: #1f5f99;
+            font-size: 0.72rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        .mini-story-box {
+            display: grid;
+            gap: 4px;
+            margin-top: 8px;
+            padding: 7px;
+            border: 1px solid #1f5f99;
+            background: #eaf3f9;
+        }
+        .mini-story-box span {
+            display: block;
+            height: 3px;
+            background: #70879a;
+        }
+        .mini-story-box span:nth-child(2n) {
+            width: 82%;
+        }
+        .mini-question-heading {
+            margin-top: 8px;
+            color: #1f5f99;
+            font-family: "Segoe UI", sans-serif;
+            font-size: 0.5rem;
+            font-weight: 800;
+        }
+        .mini-question-lines {
+            display: grid;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .mini-storyboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(3, 1fr);
+            gap: 1px;
+            height: 113px;
+            margin-top: 8px;
+            border: 1px solid #46586d;
+            background: #46586d;
+        }
+        .mini-storyboard-grid span {
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 3px;
+            background: #fff;
+            color: #1f5f99;
+            font-family: "Segoe UI", sans-serif;
+            font-size: 0.54rem;
+            font-weight: 800;
+        }
+        .sample-caption {
+            margin: 0;
+            padding: 0 24px 22px;
+            color: var(--muted);
+            font-size: 0.8rem;
+        }
+        @media (max-width: 880px) {
+            .builder-shell {
+                grid-template-columns: 1fr;
+            }
+            .preview-column {
+                position: static;
+                order: -1;
+            }
+            .packet-map {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 620px) {
+            .page-header {
+                padding-bottom: 48px;
+            }
+            .eyebrow {
+                margin-top: 35px;
+            }
+            .builder-shell {
+                padding-right: 14px;
+                padding-left: 14px;
+            }
+            .builder-card {
+                padding: 22px 18px;
+            }
+            .card-heading,
+            .questions-heading {
+                display: grid;
+            }
+            .form-grid,
+            .packet-map {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <div class="header-inner">
+            <a class="back-link" href="/low-prep-activities">← Low-Prep Activities</a>
+            <p class="eyebrow">Printable reading routine</p>
+            <h1>Independent Reading Builder</h1>
+            <p class="header-copy">Create a ready-to-print Chinese reading storyboard in a few minutes. Add your story and questions, then download a complete Word packet for students and substitutes.</p>
+        </div>
+    </header>
+
+    <main class="builder-shell">
+        <section class="builder-card" aria-labelledby="builder-heading">
+            <div class="card-heading">
+                <div>
+                    <h2 id="builder-heading">Build your packet</h2>
+                    <p>Your content stays in this browser. Nothing is sent to a server.</p>
+                </div>
+                <button id="load-example" class="example-button" type="button">Load example</button>
+            </div>
+
+            <form id="packet-form">
+                <section class="form-section" aria-labelledby="story-details-heading">
+                    <div class="section-label">
+                        <h3 id="story-details-heading">Story details</h3>
+                        <span>故事资料</span>
+                    </div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="title">Story title <span class="label-note">故事标题</span></label>
+                            <input id="title" name="title" type="text" required placeholder="e.g. 小猫要吃鱼">
+                        </div>
+                        <div class="field">
+                            <label for="englishTitle">English title <span class="label-note">optional</span></label>
+                            <input id="englishTitle" name="englishTitle" type="text" placeholder="e.g. The Kitten Wants Fish">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section" aria-labelledby="story-text-heading">
+                    <div class="section-label">
+                        <h3 id="story-text-heading">Story text</h3>
+                        <span>故事内容</span>
+                    </div>
+                    <div class="field">
+                        <label for="story">Paste or type the story <span class="label-note">one sentence or paragraph per line works best</span></label>
+                        <textarea id="story" name="story" required placeholder="小猫很饿。小猫想吃鱼。&#10;&#10;小猫去河边。河里有很多鱼。"></textarea>
+                        <p class="field-help">The story will appear in a shaded reading box at the start of the student packet.</p>
+                    </div>
+                </section>
+
+                <section class="form-section" aria-labelledby="questions-heading">
+                    <div class="questions-heading">
+                        <div>
+                            <div class="section-label">
+                                <h3 id="questions-heading">Comprehension questions</h3>
+                                <span>理解问题</span>
+                            </div>
+                            <p>Use a number at the start of each question. The builder will recognize the numbered questions automatically.</p>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="questionsText">Type your numbered questions <span class="label-note">one question on each new line</span></label>
+                        <textarea id="questionsText" class="questions-textarea" name="questionsText" required aria-describedby="questions-help question-count" placeholder="1. 小猫想吃什么？&#10;2. 小猫去了哪里？&#10;3. 河里有什么？"></textarea>
+                        <p id="questions-help" class="field-help">Please begin every question with a number, such as <strong>1.</strong>, <strong>2.</strong>, or <strong>3.</strong>. The number will not appear twice in the Word document.</p>
+                        <p id="question-count" class="question-count" aria-live="polite"></p>
+                    </div>
+                </section>
+
+                <div class="output-note">
+                    <span aria-hidden="true">✦</span>
+                    <div><strong>Your downloadable Word packet includes all five pages:</strong> Teacher Notes, Instructions for the Substitute, Did you understand?, Write a new version, and a Six-scene storyboard.</div>
+                </div>
+
+                <div class="form-footer">
+                    <button class="generate-button" type="submit">Generate Word document (.docx)</button>
+                    <p id="generation-status" aria-live="polite"></p>
+                </div>
+            </form>
+        </section>
+
+        <aside class="preview-column">
+            <section class="packet-preview" aria-labelledby="packet-preview-heading">
+                <div class="packet-preview-header">
+                    <h2 id="packet-preview-heading">What your packet includes</h2>
+                    <p>A consistent routine students can complete without extra materials.</p>
+                </div>
+                <ol class="packet-map">
+                    <li><strong>Teacher Notes</strong><span>Set-up ideas and optional support</span></li>
+                    <li><strong>Instructions for the Substitute</strong><span>Clear, no-Chinese-needed directions</span></li>
+                    <li><strong>Did you understand?</strong><span>Story reading and answer lines</span></li>
+                    <li><strong>Write a new version</strong><span>Space to rewrite the story</span></li>
+                    <li><strong>Six-scene storyboard</strong><span>Six numbered boxes for drawing</span></li>
+                </ol>
+            </section>
+
+            <section class="sample-preview" aria-labelledby="sample-preview-heading">
+                <div class="sample-preview-header">
+                    <span class="preview-eyebrow">Word document preview</span>
+                    <h2 id="sample-preview-heading">See the finished packet</h2>
+                    <p>A snapshot of the printable pages your students will receive.</p>
+                </div>
+                <div class="sample-pages" aria-label="Sample pages from the generated Word document">
+                    <article class="mini-page">
+                        <span class="mini-page-label">Page 1</span>
+                        <strong class="mini-page-title">Teacher Notes</strong>
+                        <div class="mini-rule"></div>
+                        <div class="mini-copy" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    </article>
+                    <article class="mini-page is-featured">
+                        <span class="mini-page-label">Page 3 · Storyboard 1</span>
+                        <strong class="mini-reading-title">小猫要吃鱼<br><em>The Kitten Wants Fish</em></strong>
+                        <div class="mini-story-box" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                        <div class="mini-question-heading">你理解了吗？</div>
+                        <div class="mini-question-lines" aria-hidden="true"><span></span><span></span><span></span></div>
+                    </article>
+                    <article class="mini-page">
+                        <span class="mini-page-label">Page 5</span>
+                        <strong class="mini-page-title">Six-scene<br>storyboard</strong>
+                        <div class="mini-storyboard-grid" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+                    </article>
+                </div>
+                <p class="sample-caption">The generated file contains five clean, classroom-ready pages with your own story and questions.</p>
+            </section>
+        </aside>
+    </main>
+
+    <script src="/vendor/docx.iife.js" defer></script>
+    <script src="/javascripts/independent-reading-docx.js" defer></script>
+    <script src="/javascripts/independent-reading.js" defer></script>
+</body>
+</html>

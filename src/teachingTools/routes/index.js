@@ -24,6 +24,10 @@ router.get('/low-prep-activities', function(req, res, next) {
   res.render('low-prep-activities/index', { title: 'Low-Prep Activities' });
 });
 
+router.get('/low-prep-activities/independent-reading', function(req, res, next) {
+  res.render('low-prep-activities/independent-reading', { title: 'Independent Reading Builder' });
+});
+
 // Theme Activities Routes
 router.get('/theme-activities', function(req, res, next) {
   res.render('theme-activities/index', { title: 'Theme Activities' });

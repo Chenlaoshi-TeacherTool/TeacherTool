@@ -16,8 +16,29 @@
         .hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 60px 20px;
-            text-align: center;
+            padding: 48px 20px;
+            overflow: hidden;
+        }
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+        .teacher-avatar {
+            flex: 0 0 auto;
+        }
+        .teacher-avatar img {
+            display: block;
+            width: 190px;
+            max-width: 42vw;
+            height: auto;
+            filter: drop-shadow(0 10px 16px rgba(31, 22, 60, 0.35));
+        }
+        .hero-copy {
+            text-align: left;
         }
         .hero h1 {
             font-size: 3em;
@@ -29,7 +50,7 @@
         }
         .hero-buttons {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 20px;
             flex-wrap: wrap;
         }
@@ -138,12 +159,24 @@
             padding: 20px;
         }
         @media (max-width: 768px) {
+            .hero {
+                padding: 34px 20px 40px;
+            }
+            .hero-content {
+                flex-direction: column;
+                gap: 14px;
+            }
+            .teacher-avatar img {
+                width: 155px;
+            }
+            .hero-copy {
+                text-align: center;
+            }
             .hero h1 {
                 font-size: 2em;
             }
             .hero-buttons {
-                flex-direction: column;
-                align-items: center;
+                justify-content: center;
             }
             .main-sections {
                 grid-template-columns: 1fr;
@@ -153,12 +186,19 @@
 </head>
 <body>
     <section class="hero">
+        <div class="hero-content">
+            <div class="teacher-avatar">
+                <img src="/images/chen-laoshi-avatar.png" alt="陈老师">
+            </div>
+            <div class="hero-copy">
         <h1>Teacher Toolkit</h1>
         <p>A simple toolkit for Chinese language teachers — lesson ideas, low-prep activities, and classroom tools.</p>
         <div class="hero-buttons">
             <a href="/theme-activities" class="btn">🎯 Theme Activities</a>
             <a href="/low-prep-activities" class="btn">⚡ Low-Prep Activities</a>
             <a href="/teaching-tools" class="btn">🧰 Teaching Tools</a>
+        </div>
+            </div>
         </div>
     </section>
 
