@@ -30,6 +30,39 @@ body {
 
 body::selection { background: #ffe08b; color: var(--chalk-deep); }
 
+.account-header-host { position: relative; }
+.account-coming-soon {
+  min-height: 31px;
+  padding: 6px 9px;
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 249, 233, 0.42);
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.12);
+  color: #fffdf7;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  opacity: 0.8;
+}
+.account-coming-soon:disabled { cursor: not-allowed; }
+.account-coming-soon-icon { color: #ffe49a; font-size: 12px; }
+.account-coming-soon-status {
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: rgba(248, 198, 63, 0.2);
+  color: #ffe49a;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .header {
   position: relative;
   overflow: hidden;
@@ -188,6 +221,8 @@ footer { background: var(--chalk-deep) !important; color: #fff9e9 !important; }
 @media (max-width: 640px) {
   .header { padding: 82px 20px 42px; }
   .back-btn { top: 16px; left: 16px; }
+  .account-coming-soon { top: 12px; right: 12px; font-size: 10px; }
+  .account-coming-soon-status { display: none; }
   .tools-grid,
   .activities-grid { padding: 30px 16px 46px; }
 }

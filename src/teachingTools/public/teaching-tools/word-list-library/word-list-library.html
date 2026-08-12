@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#194f45">
+  <title>Vocabulary Library · Chen Laoshi's Teaching Toolkit</title>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="./word-list-library.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="/teaching-tools">← Back to Teaching Tools</a>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">🗂️</div>
+        <div>
+          <h1>Vocabulary Library</h1>
+          <p>Build one word list, then reuse it across classroom activities.</p>
+        </div>
+      </div>
+      <div class="hero-note">Chinese · Pinyin · English</div>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="intro card">
+      <div>
+        <p class="eyebrow">Your shared vocabulary foundation</p>
+        <h2>Turn a simple list into reusable classroom data.</h2>
+        <p>Paste Chinese words or use <strong>中文, English</strong> / <strong>中文 | 拼音 | English</strong>. Pinyin and common English meanings fill in automatically when available.</p>
+      </div>
+      <div class="intro-badges" aria-label="Vocabulary library features">
+        <span>Works offline</span>
+        <span>Saves in this browser</span>
+      </div>
+    </section>
+
+    <section class="preset-library card" aria-labelledby="presetTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Start with a ready-made list</p>
+          <h2 id="presetTitle">Classroom starter packs</h2>
+        </div>
+        <span class="preset-note">Use, adapt, then save your copy</span>
+      </div>
+      <div class="preset-lists" id="presetLists" aria-live="polite">
+        <p class="saved-empty">Loading starter packs…</p>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="builder card" aria-labelledby="builderTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Step 1</p>
+            <h2 id="builderTitle">Create a word list</h2>
+          </div>
+          <span class="item-total" id="itemTotal">0 terms</span>
+        </div>
+
+        <div class="metadata-grid">
+          <label>List name<input id="listName" value="My classroom vocabulary" maxlength="70"></label>
+          <label>Theme<input id="listTheme" placeholder="e.g. Food"></label>
+          <label>Level<input id="listLevel" placeholder="e.g. Novice"></label>
+        </div>
+
+        <label class="source-label" for="wordSource">Vocabulary</label>
+        <textarea id="wordSource" rows="13" spellcheck="false" placeholder="苹果, apple&#10;香蕉&#10;谢谢 | xiè xie | thank you">你好
+谢谢
+苹果
+香蕉
+草莓
+西瓜</textarea>
+        <p class="field-help">One item per line. The library keeps Chinese, pinyin, English, theme, level, image, and notes ready for future tools.</p>
+
+        <div class="button-row">
+          <button class="btn btn-primary" id="buildButton" type="button">Build preview</button>
+          <button class="btn btn-secondary" id="saveButton" type="button" disabled>Save in this browser</button>
+          <button class="text-button" id="downloadButton" type="button" disabled>Download JSON</button>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+      </section>
+
+      <section class="preview card" aria-labelledby="previewTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Step 2</p>
+            <h2 id="previewTitle">Preview your reusable data</h2>
+          </div>
+          <div class="preview-actions">
+            <span class="ready-badge">Future-tool ready</span>
+            <button class="btn btn-secondary print-button" id="printButton" type="button" disabled>Print / Save PDF</button>
+          </div>
+        </div>
+
+        <div class="print-list-heading" aria-hidden="true">
+          <p>Chen Laoshi's Teaching Toolkit</p>
+          <h1 id="printListTitle">My classroom vocabulary</h1>
+          <span id="printListMeta"></span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Chinese</th><th>Pinyin</th><th>English</th></tr></thead>
+            <tbody id="previewRows"><tr class="empty-row"><td colspan="3">Build a list to see its vocabulary here.</td></tr></tbody>
+          </table>
+        </div>
+
+        <div class="uses-panel">
+          <p class="eyebrow">One list, many activities</p>
+          <ul>
+            <li><strong>Chinese Poker / UNO:</strong> card fronts, pinyin, translations, or picture prompts.</li>
+            <li><strong>Jigsaw worksheets:</strong> cut-apart matches and clue pieces.</li>
+            <li><strong>Wordwall-style games:</strong> shuffled terms, pairs, timers, and random draws.</li>
+            <li><strong>Jeopardy &amp; Would You Rather:</strong> reusable question prompts and vocabulary banks.</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <section class="saved card" aria-labelledby="savedTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Saved on this device</p>
+          <h2 id="savedTitle">Your vocabulary library</h2>
+        </div>
+        <span class="storage-note" id="storageNote"></span>
+      </div>
+      <div class="saved-lists" id="savedLists"></div>
+    </section>
+
+    <section class="account card" aria-labelledby="accountTitle">
+      <div>
+        <p class="eyebrow">Coming next</p>
+        <h2 id="accountTitle">Your cloud vocabulary library</h2>
+        <p id="accountStatus">Checking account-sync setup…</p>
+      </div>
+      <div class="account-actions" id="accountActions">
+        <span class="coming-soon-label">Coming soon</span>
+        <button class="account-link" id="googleSignInButton" type="button" disabled>G&nbsp; Continue with Google</button>
+        <button class="account-link microsoft" id="microsoftSignInButton" type="button" disabled>▣&nbsp; Continue with Microsoft</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="./word-list-library.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+</body>
+</html>
