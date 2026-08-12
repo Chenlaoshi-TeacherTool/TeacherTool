@@ -87,6 +87,17 @@
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
     }
 
+    .tool-card:has(.btn:disabled) {
+        background: #f3f4f6;
+        box-shadow: none;
+        opacity: 0.68;
+    }
+
+    .tool-card:has(.btn:disabled):hover {
+        transform: none;
+        box-shadow: none;
+    }
+
     .tool-card h3 {
         color: #667eea;
         margin-bottom: 10px;
@@ -113,6 +124,12 @@
 
     .btn:hover {
         background-color: #5a67d8;
+    }
+
+    .btn:disabled {
+        background-color: #aab1bf;
+        color: #f8fafc;
+        cursor: not-allowed;
     }
 
     /* 🌤️ OPTIONAL: Weather color tags（小亮点） */
@@ -147,21 +164,21 @@
         <div class="tag">Vocabulary</div>
         <h3>Weather Vocabulary</h3>
         <p>Learn weather words like 晴天、下雨、下雪</p>
-        <a href="#" class="btn">Open</a>
+        <button class="btn" type="button" disabled>Coming Soon</button>
     </div>
 
     <div class="tool-card">
         <div class="tag">Practice</div>
         <h3>Sentence Pattern Practice</h3>
         <p>Practice “今天天气怎么样？”</p>
-        <a href="#" class="btn">Open</a>
+        <button class="btn" type="button" disabled>Coming Soon</button>
     </div>
 
     <div class="tool-card">
         <div class="tag">Game</div>
         <h3>Weather Mini-Games</h3>
         <p>Interactive classroom activities</p>
-        <a href="#" class="btn">Open</a>
+        <button class="btn" type="button" disabled>Coming Soon</button>
     </div>
 
     <div class="tool-card">
@@ -175,7 +192,7 @@
         <div class="tag">Hands-on Activity</div>
         <h3>Weather Crafts &amp; Activities</h3>
         <p>Weather-themed hands-on activities for classroom use</p>
-        <a href="theme-weather-handsonActivities.ejs" class="btn">Open</a>
+        <button class="btn" type="button" disabled>Coming Soon</button>
     </div>
 </div>
 </body>
