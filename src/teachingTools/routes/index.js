@@ -19,6 +19,10 @@ router.get('/teaching-tools/random-group-generator', function(req, res, next) {
   res.render('teaching-tools/random-group-generator', { title: 'Random Group Generator' });
 });
 
+router.get('/classroom-shop', function(req, res, next) {
+  res.render('classroom-shop', { title: 'Classroom Shop' });
+});
+
 // Low-Prep Activities Routes
 router.get('/low-prep-activities', function(req, res, next) {
   res.render('low-prep-activities/index', { title: 'Low-Prep Activities' });

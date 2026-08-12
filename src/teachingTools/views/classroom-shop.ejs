@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#194f45">
+    <title>Classroom Shop · Chen Laoshi's Teaching Toolkit</title>
+    <link rel="stylesheet" href="/stylesheets/site-theme.css">
+    <style>
+        :root { --ink:#194f45; --leaf:#356e57; --paper:#fffdf7; --cream:#fff9e9; --sun:#f8c63f; --coral:#c9503f; --muted:#5d7168; }
+        * { box-sizing:border-box; }
+        body { margin:0; background:var(--cream); color:var(--ink); }
+        .shop-hero { position:relative; overflow:hidden; padding:23px 20px 58px; background:linear-gradient(135deg,#103e37,#194f45 58%,#39745a); color:#fffdf7; }
+        .shop-hero::after { position:absolute; right:-90px; bottom:-180px; width:430px; height:430px; border:2px solid rgba(255,255,255,.13); border-radius:50%; content:""; }
+        .hero-inner,.shop-main { width:min(1140px,calc(100% - 40px)); margin:0 auto; }
+        .back-link { display:inline-flex; align-items:center; min-height:38px; padding:8px 13px; border:1px solid rgba(255,249,233,.55); border-radius:999px; color:#fffdf7; font-size:.88rem; font-weight:800; text-decoration:none; }
+        .back-link:hover { background:rgba(255,255,255,.12); }
+        .hero-content { display:grid; grid-template-columns:minmax(0,1fr) minmax(220px,.56fr); align-items:end; gap:32px; margin-top:38px; }
+        .eyebrow { margin:0 0 12px; color:#f8dc81; font-size:.78rem; font-weight:900; letter-spacing:.13em; text-transform:uppercase; }
+        h1,h2,h3 { font-family:'DM Serif Display','Noto Serif SC',serif; font-weight:400; }
+        h1 { max-width:720px; margin:0; font-size:clamp(2.8rem,6vw,5rem); letter-spacing:-.035em; line-height:.98; }
+        .hero-content p { max-width:650px; margin:18px 0 0; color:rgba(255,253,247,.88); font-size:1.08rem; line-height:1.65; }
+        .hero-badges { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:9px; }
+        .hero-badges span { padding:9px 12px; border:1px solid rgba(255,249,233,.26); border-radius:999px; background:rgba(255,255,255,.1); color:#ffe49a; font-size:.82rem; font-weight:800; white-space:nowrap; }
+        .shop-main { padding:48px 0 72px; }
+        .shop-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr); gap:32px; align-items:start; }
+        .gallery { display:grid; gap:15px; }
+        .gallery-main { position:relative; min-height:390px; overflow:hidden; border:1px solid #e4ddca; border-radius:24px; background:white; box-shadow:0 13px 28px rgba(24,66,55,.11); }
+        .gallery-main img { display:block; width:100%; height:100%; min-height:390px; object-fit:cover; object-position:center; }
+        .gallery-control { position:absolute; top:50%; z-index:2; display:grid; place-items:center; width:45px; height:45px; padding:0; border:1px solid rgba(25,79,69,.22); border-radius:50%; background:rgba(255,253,247,.92); box-shadow:0 5px 14px rgba(24,66,55,.17); color:var(--ink); cursor:pointer; font-size:1.7rem; font-weight:900; line-height:1; transform:translateY(-50%); transition:transform .18s ease,background-color .18s ease; }
+        .gallery-control:hover { background:#fff2c5; transform:translateY(-50%) scale(1.06); }
+        .gallery-control:focus-visible { outline:3px solid #1d6ed8; outline-offset:3px; }
+        .gallery-control.previous { left:15px; }
+        .gallery-control.next { right:15px; }
+        .gallery-status { position:absolute; right:16px; bottom:15px; margin:0; padding:6px 10px; border-radius:999px; background:rgba(25,79,69,.82); color:#fffdf7; font-size:.76rem; font-weight:900; letter-spacing:.04em; }
+        .gallery-note { display:flex; align-items:center; gap:10px; padding:13px 15px; border:1px solid #d7e3c7; border-radius:14px; background:#f4f8eb; color:var(--leaf); font-size:.9rem; font-weight:800; }
+        .product-panel { padding:30px; border:1px solid #e5ddc9; border-radius:24px; background:var(--paper); box-shadow:0 13px 28px rgba(24,66,55,.1); }
+        .product-status { display:inline-flex; margin:0 0 13px; padding:7px 11px; border:1px solid #f0d187; border-radius:999px; background:#fff2c5; color:#805512; font-size:.8rem; font-weight:900; }
+        .product-panel h2 { margin:0; font-size:clamp(2rem,3.4vw,2.8rem); line-height:1.05; }
+        .product-subtitle { margin:10px 0 0; color:var(--muted); font-weight:700; }
+        .product-details { margin:22px 0; padding:0; list-style:none; }
+        .product-details li { display:flex; gap:9px; padding:9px 0; border-bottom:1px solid #e8e5d9; color:#49655b; }
+        .product-details li:last-child { border-bottom:0; }
+        .product-details strong { color:var(--ink); }
+        .bundle-title { margin:24px 0 11px; color:var(--ink); font-size:1.12rem; font-weight:900; }
+        .bundle-list { display:grid; gap:9px; }
+        .bundle { display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; padding:13px 14px; border:1px solid #d7e3c7; border-radius:14px; background:#fff; }
+        .bundle strong { display:block; color:var(--ink); }
+        .bundle span { color:var(--muted); font-size:.83rem; }
+        .price { color:#9b3e30; font-size:1.22rem; font-weight:900; white-space:nowrap; }
+        .buy-button { display:flex; justify-content:center; align-items:center; min-height:45px; margin-top:20px; padding:10px 13px; border-radius:12px; background:var(--coral); box-shadow:0 5px 0 #9d392f; color:#fff; font-weight:900; text-align:center; text-decoration:none; transition:transform .18s ease; }
+        .buy-button:hover { transform:translateY(-2px); }
+        .order-note { margin:17px 0 0; padding:13px 14px; border:1px solid #d7e3c7; border-radius:14px; background:#f4f8eb; color:#46675a; font-size:.89rem; line-height:1.5; }
+        .order-note a { color:#1f6550; font-weight:900; }
+        .section-heading { margin:68px 0 22px; text-align:center; }
+        .section-heading .eyebrow { color:#356e57; }
+        .section-heading h2 { margin:0; font-size:clamp(2rem,4vw,3rem); }
+        .section-heading p { max-width:670px; margin:12px auto 0; color:var(--muted); line-height:1.6; }
+        .how-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+        .how-card { padding:24px; border:1px solid #e5ddc9; border-radius:20px; background:var(--paper); }
+        .step-number { display:grid; place-items:center; width:38px; height:38px; margin-bottom:14px; border-radius:50%; background:#fff2c5; color:#805512; font-weight:900; }
+        .how-card h3 { margin:0; font-size:1.4rem; }
+        .how-card p { margin:8px 0 0; color:var(--muted); line-height:1.6; }
+        footer { padding:25px 20px; background:#0f463c; color:#fffdf7; } footer p { width:min(1140px,calc(100% - 40px)); margin:0 auto; }
+        @media (max-width:850px) { .hero-content,.shop-layout { grid-template-columns:1fr; } .hero-badges { justify-content:flex-start; } .how-grid { grid-template-columns:1fr; } .gallery-main,.gallery-main img { min-height:310px; } }
+        @media (max-width:520px) { .shop-hero { padding-bottom:42px; } .hero-inner,.shop-main { width:min(100% - 28px,1140px); } .shop-main { padding-top:30px; } .product-panel { padding:22px; } .gallery-main,.gallery-main img { min-height:240px; } .gallery-control { width:40px; height:40px; } .gallery-control.previous { left:10px; } .gallery-control.next { right:10px; } .bundle { grid-template-columns:1fr; gap:4px; } }
+    </style>
+</head>
+<body>
+    <header class="shop-hero">
+        <div class="hero-inner">
+            <a class="back-link" href="/">← Back to home</a>
+            <div class="hero-content">
+                <div>
+                    <p class="eyebrow">Chen Laoshi's Classroom Shop</p>
+                    <h1>Small finds for bright classrooms.</h1>
+                    <p>Occasional teaching supplies looking for a new classroom home—simple to order, clearly priced, and ready for creative language practice.</p>
+                </div>
+                <div class="hero-badges" aria-label="Shop highlights"><span>Open-box finds</span><span>Free U.S. shipping*</span><span>Small-batch stock</span></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="shop-main">
+        <section class="shop-layout" aria-labelledby="magnetic-people-title">
+            <div class="gallery">
+                <div class="gallery-main" data-gallery>
+                    <img data-gallery-image src="/images/magnetic-people-set.png" alt="Thirty colorful bendable magnetic people in different poses">
+                    <button class="gallery-control previous" data-gallery-previous type="button" aria-label="Show previous product image">‹</button>
+                    <button class="gallery-control next" data-gallery-next type="button" aria-label="Show next product image">›</button>
+                    <p class="gallery-status" data-gallery-status aria-live="polite">Image 1 of 2</p>
+                </div>
+                <div class="gallery-note">🧲 Bend them into cute poses and place them on magnetic surfaces to brighten your classroom displays. They’re also perfect as fidgets or little gifts for your students.</div>
+            </div>
+            <article class="product-panel">
+                <p class="product-status">Open-box · Like new</p>
+                <h2 id="magnetic-people-title">Magnetic People</h2>
+                <p class="product-subtitle">30 colorful magnetic figures per set</p>
+                <ul class="product-details">
+                    <li><span>✨</span><span><strong>1 set = 30 pieces.</strong> Bend, pose, connect, and use for imaginative classroom play.</span></li>
+                    <li><span>🖍️</span><span>Great for magnetic boards, storytelling prompts, quick rewards, names, and small-group games.</span></li>
+                    <li><span>📦</span><span><strong>Every listed price includes free standard shipping to the contiguous U.S.</strong></span></li>
+                </ul>
+                <p class="bundle-title">Choose your bundle</p>
+                <div class="bundle-list">
+                    <div class="bundle"><div><strong>1 set</strong><span>30 magnetic people</span></div><span class="price">$16.99</span></div>
+                    <div class="bundle"><div><strong>2 sets</strong><span>60 magnetic people</span></div><span class="price">$30</span></div>
+                    <div class="bundle"><div><strong>3 sets</strong><span>90 magnetic people</span></div><span class="price">$40</span></div>
+                    <div class="bundle"><div><strong>4 sets</strong><span>120 magnetic people</span></div><span class="price">$48</span></div>
+                    <div class="bundle"><div><strong>5 sets</strong><span>150 magnetic people</span></div><span class="price">$50</span></div>
+                </div>
+                <a class="buy-button" href="https://paypal.me/chenlaoshitoolkit" target="_blank" rel="noopener noreferrer">Pay with PayPal →</a>
+                <p class="order-note"><strong>Before paying:</strong> <a href="/#feedback">send an order note</a> with your name, quantity, mailing address, and the PayPal transaction number after payment. Please do not include payment-card details.<br><br><strong>*Free U.S. shipping:</strong> included for the contiguous 48 states and Washington, D.C. Alaska, Hawaii, U.S. territories, and APO/FPO/DPO addresses are not included—please contact me before purchasing for a shipping quote.</p>
+            </article>
+        </section>
+
+        <section aria-labelledby="ordering-heading">
+            <div class="section-heading">
+                <p class="eyebrow">Simple first-round ordering</p>
+                <h2 id="ordering-heading">Three small steps.</h2>
+                <p>This keeps stock and shipping personal while the classroom shop is still growing.</p>
+            </div>
+            <div class="how-grid">
+                <article class="how-card"><div class="step-number">1</div><h3>Choose a bundle</h3><p>Pick the quantity that suits your classroom. Each set includes 30 magnetic people, with free standard shipping in the contiguous U.S.</p></article>
+                <article class="how-card"><div class="step-number">2</div><h3>Send the details</h3><p>Use the feedback form to share your name, quantity, full mailing address, and any question before or after payment.</p></article>
+                <article class="how-card"><div class="step-number">3</div><h3>Pay securely</h3><p>Use the PayPal button to send payment. I will match it with your note and confirm your order personally.</p></article>
+            </div>
+        </section>
+
+    </main>
+    <footer><p>© 2026 Chen Laoshi's Teaching Toolkit · Made with care for curious classrooms.</p></footer>
+    <script src="/javascripts/account-coming-soon.js"></script>
+    <script src="/javascripts/milk-tea-footer.js"></script>
+    <script>
+        (function () {
+            var gallery = document.querySelector('[data-gallery]');
+            if (!gallery) return;
+
+            var images = [
+                { src: '/images/magnetic-people-set.png', alt: 'Thirty colorful bendable magnetic people in different poses' },
+                { src: '/images/magnetic-people-classroom.png', alt: 'Colorful magnetic people arranged around classroom artwork on a magnetic board' }
+            ];
+            var currentIndex = 0;
+            var image = gallery.querySelector('[data-gallery-image]');
+            var status = gallery.querySelector('[data-gallery-status]');
+
+            function showImage(nextIndex) {
+                currentIndex = (nextIndex + images.length) % images.length;
+                image.src = images[currentIndex].src;
+                image.alt = images[currentIndex].alt;
+                status.textContent = 'Image ' + (currentIndex + 1) + ' of ' + images.length;
+            }
+
+            gallery.querySelector('[data-gallery-previous]').addEventListener('click', function () { showImage(currentIndex - 1); });
+            gallery.querySelector('[data-gallery-next]').addEventListener('click', function () { showImage(currentIndex + 1); });
+        }());
+    </script>
+</body>
+</html>

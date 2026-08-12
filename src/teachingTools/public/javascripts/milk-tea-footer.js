@@ -1,0 +1,88 @@
+(function () {
+  'use strict';
+
+  function createFooter() {
+    if (document.getElementById('milkTeaFooter')) return;
+
+    var style = document.createElement('style');
+    style.textContent = [
+      '.milk-tea-site-footer { margin: 0; padding: 30px 20px; background: #eef5df; border-top: 1px solid #d4e1c1; color: #194f45; }',
+      '.milk-tea-site-footer * { box-sizing: border-box; }',
+      '.milk-tea-footer-inner { width: min(1140px, calc(100% - 40px)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 22px; }',
+      '.milk-tea-footer-copy { display: flex; align-items: center; gap: 13px; }',
+      '.milk-tea-footer-icon { display: grid; place-items: center; flex: 0 0 auto; width: 43px; height: 43px; border-radius: 14px; background: #fff2c5; font-size: 1.5rem; }',
+      '.milk-tea-footer-copy p { margin: 0; }',
+      '.milk-tea-footer-kicker { color: #356e57; font-size: .72rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }',
+      '.milk-tea-footer-title { margin-top: 3px !important; color: #194f45; font-size: .98rem; font-weight: 800; line-height: 1.45; }',
+      '.milk-tea-footer-actions { position: relative; flex: 0 0 auto; }',
+      '.milk-tea-footer-toggle { display: inline-flex; align-items: center; justify-content: center; min-height: 43px; padding: 10px 16px; border: 0; border-radius: 999px; background: #bf7f35; box-shadow: 0 4px 0 #8d5420; color: #fff; cursor: pointer; font: inherit; font-weight: 900; transition: transform .18s ease, box-shadow .18s ease; }',
+      '.milk-tea-footer-toggle:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #8d5420; }',
+      '.milk-tea-footer-toggle:focus-visible, .milk-tea-option:focus-visible, .milk-tea-close:focus-visible { outline: 3px solid #1d6ed8; outline-offset: 3px; }',
+      '.milk-tea-menu { position: absolute; z-index: 30; right: 0; bottom: calc(100% + 14px); width: min(360px, calc(100vw - 32px)); padding: 19px; border: 1px solid #d3c079; border-radius: 18px; background: #fffdf7; box-shadow: 0 16px 36px rgba(33, 74, 55, .22); }',
+      '.milk-tea-menu[hidden] { display: none; }',
+      '.milk-tea-menu-header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }',
+      '.milk-tea-menu h2 { margin: 0; color: #194f45; font-family: Georgia, "Noto Serif SC", serif; font-size: 1.38rem; line-height: 1.1; }',
+      '.milk-tea-menu p { margin: 7px 0 15px; color: #5d7168; font-size: .87rem; line-height: 1.48; }',
+      '.milk-tea-close { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid #d7e3c7; border-radius: 50%; background: #fff; color: #194f45; cursor: pointer; font: inherit; font-size: 1.15rem; line-height: 1; }',
+      '.milk-tea-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }',
+      '.milk-tea-option { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 9px 10px; border: 1px solid #d1b459; border-radius: 10px; background: #fffdf7; color: #805512; font-size: .88rem; font-weight: 900; text-align: center; text-decoration: none; }',
+      '.milk-tea-option:hover { background: #fff2c5; }',
+      '.milk-tea-option.primary { border-color: transparent; background: #bf7f35; color: #fff; }',
+      '.milk-tea-option.primary:hover { background: #a96828; }',
+      '@media (max-width: 640px) { .milk-tea-site-footer { padding: 24px 14px; } .milk-tea-footer-inner { width: min(100%, 1140px); align-items: stretch; flex-direction: column; gap: 15px; } .milk-tea-footer-actions, .milk-tea-footer-toggle { width: 100%; } .milk-tea-menu { right: 0; left: 0; width: 100%; } }',
+      '@media print { .milk-tea-site-footer { display: none !important; } }'
+    ].join('\n');
+    document.head.appendChild(style);
+
+    var footer = document.createElement('aside');
+    footer.id = 'milkTeaFooter';
+    footer.className = 'milk-tea-site-footer';
+    footer.setAttribute('aria-label', 'Optional support');
+    footer.innerHTML = [
+      '<div class="milk-tea-footer-inner">',
+      '  <div class="milk-tea-footer-copy">',
+      '    <span class="milk-tea-footer-icon" aria-hidden="true">🧋</span>',
+      '    <div><p class="milk-tea-footer-kicker">Optional support</p><p class="milk-tea-footer-title">Enjoying the toolkit? Buy Chen Laoshi a milk tea.</p></div>',
+      '  </div>',
+      '  <div class="milk-tea-footer-actions">',
+      '    <div class="milk-tea-menu" id="milkTeaMenu" hidden>',
+      '      <div class="milk-tea-menu-header"><div><h2>Buy me a milk tea 🧋</h2><p>A small, optional treat helps support new classroom resources. Thank you—there is never any pressure.</p></div><button class="milk-tea-close" type="button" aria-label="Close support options">×</button></div>',
+      '      <div class="milk-tea-options">',
+      '        <a class="milk-tea-option primary" href="https://paypal.me/chenlaoshitoolkit/1.99USD" target="_blank" rel="noopener noreferrer">$1.99</a>',
+      '        <a class="milk-tea-option" href="https://paypal.me/chenlaoshitoolkit/4.99USD" target="_blank" rel="noopener noreferrer">$4.99</a>',
+      '        <a class="milk-tea-option" href="https://paypal.me/chenlaoshitoolkit/9.99USD" target="_blank" rel="noopener noreferrer">$9.99</a>',
+      '        <a class="milk-tea-option" href="https://paypal.me/chenlaoshitoolkit" target="_blank" rel="noopener noreferrer">Choose an amount</a>',
+      '      </div>',
+      '    </div>',
+      '    <button class="milk-tea-footer-toggle" type="button" aria-expanded="false" aria-controls="milkTeaMenu">Buy me a milk tea 🧋</button>',
+      '  </div>',
+      '</div>'
+    ].join('');
+
+    var existingFooter = document.querySelector('body > footer:last-of-type');
+    if (existingFooter) existingFooter.before(footer);
+    else document.body.appendChild(footer);
+
+    var toggle = footer.querySelector('.milk-tea-footer-toggle');
+    var menu = footer.querySelector('.milk-tea-menu');
+    var close = footer.querySelector('.milk-tea-close');
+
+    function setOpen(open) {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) close.focus();
+    }
+
+    toggle.addEventListener('click', function () { setOpen(menu.hidden); });
+    close.addEventListener('click', function () { setOpen(false); toggle.focus(); });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && !menu.hidden) { setOpen(false); toggle.focus(); }
+    });
+    document.addEventListener('click', function (event) {
+      if (!menu.hidden && !footer.contains(event.target)) setOpen(false);
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', createFooter);
+  else createFooter();
+}());
