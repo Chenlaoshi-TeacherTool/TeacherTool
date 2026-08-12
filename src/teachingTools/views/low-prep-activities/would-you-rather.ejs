@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title>Would You Rather Generator - Chen Laoshi's Teaching Toolkit</title>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/would-you-rather/would-you-rather.css">
+</head>
+<body class="wyr-page">
+  <header class="header wyr-header">
+    <a href="/low-prep-activities" class="back-btn">← Back to Low-Prep Activities</a>
+    <div class="wyr-header-inner">
+      <div class="wyr-header-icon" aria-hidden="true">🤔</div>
+      <div>
+        <p class="wyr-kicker">A QUICK CLASSROOM CONVERSATION</p>
+        <h1>Would You Rather?</h1>
+        <p>Turn paired ideas into bright, ready-to-present speaking prompts.</p>
+      </div>
+      <div class="wyr-header-badge">Pairs · Prompts · Vocabulary</div>
+    </div>
+  </header>
+
+  <main class="wyr-main">
+    <section class="wyr-intro" aria-labelledby="wyr-intro-title">
+      <div>
+        <p class="wyr-kicker">ONE PAIR, ONE CONVERSATION</p>
+        <h2 id="wyr-intro-title">Build a deck in a few friendly steps.</h2>
+        <p>Add your own either-or choices, select a question style, or turn a saved Vocabulary Library list into quick pairings. Then present, print, or export your slides.</p>
+      </div>
+      <div class="wyr-intro-tags" aria-label="Activity features">
+        <span>Saved list ready</span><span>Print friendly</span><span>PPTX &amp; PDF</span>
+      </div>
+    </section>
+
+    <section class="wyr-workspace" aria-label="Would You Rather deck builder">
+      <article class="wyr-panel wyr-template-panel">
+        <div class="wyr-step"><span>1</span><p>Question template</p></div>
+        <div class="wyr-template-layout">
+          <div>
+            <h2>Write the question once.</h2>
+            <p class="wyr-help">Use <strong>{A}</strong> and <strong>{B}</strong> for the two choices. You can still edit each individual question below.</p>
+            <label for="questionTemplate">Question template</label>
+            <input id="questionTemplate" value="你喜欢{A}还是{B}？" maxlength="90">
+            <p class="wyr-sample" id="templateSample">现在会生成：你喜欢唱歌还是跳舞？</p>
+          </div>
+          <div>
+            <p class="wyr-label">Common templates</p>
+            <div class="wyr-template-grid">
+              <button class="wyr-template active" type="button" data-template="你喜欢{A}还是{B}？">你喜欢 A 还是 B？</button>
+              <button class="wyr-template" type="button" data-template="你想要{A}还是{B}？">你想要 A 还是 B？</button>
+              <button class="wyr-template" type="button" data-template="你想{A}还是{B}？">你想 A 还是 B？</button>
+              <button class="wyr-template" type="button" data-template="{A}和{B}，你选哪个？">A 和 B，你选哪个？</button>
+              <button class="wyr-template" type="button" data-template="如果只能选一个，你选{A}还是{B}？">如果只能选一个…</button>
+              <button class="wyr-template" type="button" data-template="你觉得{A}还是{B}更有意思？">你觉得哪个更有意思？</button>
+              <button class="wyr-template" type="button" data-template="周末你想{A}还是{B}？">周末你想…？</button>
+            </div>
+            <button class="wyr-secondary-btn wyr-apply-all" id="applyTemplate" type="button">Apply to all cards</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="wyr-panel wyr-vocabulary-panel">
+        <div class="wyr-step"><span>2</span><p>Vocabulary</p></div>
+        <div class="wyr-vocabulary-layout">
+          <div>
+            <h2>Build your choices.</h2>
+            <p class="wyr-help">Use one line per slide. Separate the two choices with a slash, vertical bar, comma, or Chinese comma.</p>
+            <label for="pairInput">Pairs</label>
+            <textarea id="pairInput" rows="7" spellcheck="false" aria-describedby="pairInputHelp">吃火锅 / 吃披萨
+去海边 / 去山上
+养一只猫 / 养一只狗
+早起 / 晚睡
+喝奶茶 / 喝果汁</textarea>
+            <p id="pairInputHelp" class="wyr-small">Up to 30 prompts per deck. Example: 苹果 / 香蕉</p>
+          </div>
+          <div class="wyr-vocabulary-actions">
+            <button class="btn wyr-generate" id="generateDeck" type="button">✨ Generate cards</button>
+            <button class="wyr-secondary-btn" id="appendDeck" type="button">＋ Add to deck</button>
+            <button class="wyr-secondary-btn" id="shuffleDeck" type="button">↻ Shuffle order</button>
+            <button class="wyr-secondary-btn wyr-danger-button" id="clearDeck" type="button">Clear deck</button>
+            <button class="wyr-secondary-btn" id="addBlankCard" type="button">＋ Add one card</button>
+            <button class="wyr-secondary-btn" id="loadExample" type="button">Load example</button>
+            <div class="wyr-library-box">
+              <p class="wyr-library-title">🗂️ Vocabulary Library</p>
+              <p>Make random pairs from a saved browser list.</p>
+              <label class="sr-only" for="librarySelect">Choose a saved word list</label>
+              <select id="librarySelect"><option value="">Choose a saved word list…</option></select>
+              <button class="wyr-secondary-btn" id="useLibrary" type="button">Make pairs from list</button>
+            </div>
+          </div>
+        </div>
+        <p class="wyr-status" id="statusMessage" role="status">5 prompts are ready to preview.</p>
+        <p class="wyr-editing-help">Click a thumbnail to change its offline icon or upload a photo. Each question can be edited on its own. Click a card to preview it below.</p>
+        <div class="wyr-card-editor-heading"><strong id="cardCount">5 slides</strong><span>Editing each card</span></div>
+        <div id="cardList" class="wyr-card-list wyr-card-editor" aria-label="Generated prompt list"></div>
+      </article>
+
+      <section class="wyr-deck-panel" aria-labelledby="preview-title">
+        <div class="wyr-deck-toolbar">
+          <div>
+            <p class="wyr-kicker">STEP 3</p>
+            <h2 id="preview-title">Preview your speaking deck</h2>
+            <p>Choose a slide to edit it, or start presenting straight away.</p>
+          </div>
+          <div class="wyr-deck-actions">
+            <button class="wyr-secondary-btn" id="printDeck" type="button">🖨 Print</button>
+            <button class="wyr-secondary-btn" id="exportPdf" type="button">↓ PDF</button>
+            <button class="wyr-secondary-btn" id="exportPptx" type="button">↓ PPTX</button>
+            <button class="btn" id="presentDeck" type="button">▶ Present deck</button>
+          </div>
+        </div>
+        <div class="wyr-preview-area"><div id="slidePreview" class="wyr-slide-preview" aria-label="Selected generated slide"></div></div>
+      </section>
+    </section>
+  </main>
+
+  <div id="presentation" class="wyr-presentation" hidden aria-modal="true" role="dialog" aria-label="Would You Rather presentation">
+    <div class="wyr-presentation-bar">
+      <span id="presentationCount">1 / 5</span>
+      <button id="closePresentation" type="button">× Close</button>
+    </div>
+    <div id="presentationSlide" class="wyr-presentation-slide"></div>
+    <div class="wyr-presentation-controls">
+      <button id="previousSlide" type="button">← Previous</button>
+      <span>Click a side to vote, then ask: 为什么？</span>
+      <button id="nextSlide" type="button">Next →</button>
+    </div>
+  </div>
+  <div id="printArea" aria-hidden="true"></div>
+  <div id="artPicker" class="wyr-art-picker" hidden role="dialog" aria-modal="true" aria-labelledby="artPickerTitle">
+    <div class="wyr-picker-card">
+      <div class="wyr-picker-heading"><div><p class="wyr-kicker">OFFLINE MATERIAL SYMBOLS</p><h2 id="artPickerTitle">Choose an image</h2></div><button id="closePicker" type="button" aria-label="Close image picker">×</button></div>
+      <div class="wyr-picker-actions"><input id="iconSearch" type="search" placeholder="Search icons: 唱歌, 足球, sun, food…"><label class="wyr-upload-label" for="imageUpload">Upload a photo<input id="imageUpload" type="file" accept="image/*"></label></div>
+      <p class="wyr-small">139 Material Symbols are included offline. Uploaded images stay in this browser for this deck only (3 MB maximum).</p>
+      <div id="iconGrid" class="wyr-icon-grid" aria-label="Searchable icon choices"></div>
+    </div>
+  </div>
+
+  <footer><p>© 2026 Chen Laoshi's Teaching Toolkit · Made with care for curious classrooms.</p></footer>
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/deck-export.js"></script>
+  <script src="/low-prep/would-you-rather/material-symbols-catalog.js"></script>
+  <script src="/low-prep/would-you-rather/would-you-rather.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

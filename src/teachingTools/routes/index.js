@@ -36,6 +36,18 @@ router.get('/low-prep-activities/tear-paper-bingo', function(req, res, next) {
   res.render('low-prep-activities/tear-paper-bingo', { title: 'Tear-Paper Bingo' });
 });
 
+router.get('/low-prep-activities/would-you-rather', function(req, res, next) {
+  res.render('low-prep-activities/would-you-rather', { title: 'Would You Rather Generator' });
+});
+
+router.get('/low-prep-activities/jeopardy', function(req, res, next) {
+  res.render('low-prep-activities/jeopardy', { title: 'Jeopardy 抢答赛' });
+});
+
+router.get('/low-prep-activities/character-race', function(req, res, next) {
+  res.render('low-prep-activities/character-race', { title: 'Character Race' });
+});
+
 // Theme Activities Routes
 router.get('/theme-activities', function(req, res, next) {
   res.render('theme-activities/index', { title: 'Theme Activities' });

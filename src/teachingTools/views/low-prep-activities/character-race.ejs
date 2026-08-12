@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#35604C">
+<title>Character Race - Chen Laoshi's Teaching Toolkit</title>
+<link rel="stylesheet" href="/stylesheets/site-theme.css">
+<link rel="stylesheet" href="/low-prep/character-race/character-race.css">
+</head>
+<body class="cr-page">
+<div class="cr-wrap">
+  <header class="cr-header">
+    <a href="/low-prep-activities" class="back-btn">← Back to Low-Prep Activities</a>
+    <div class="fl"><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg></div>
+    <h1>Character Race</h1>
+    <p>Arrange characters into a wheel — one partner calls out a word, the other finds it, then marks an X on the grid sheet.</p>
+  </header>
+
+  <div id="coreWarn" class="warn" style="display:none">
+    Vocabulary core module not found. Pinyin display and pulling from a saved word list won't be available, but manual entry still works.
+  </div>
+
+  <section>
+    <h2><span class="num">1</span>Add your characters <span style="font-size:14px;font-weight:400;color:#5A6B57">Total <b id="count">0</b></span></h2>
+    <p class="hint">Separate with a <b>space</b> to make each word its own tile: <code>你好 谢谢 一心一意</code>. Paste without spaces and it splits into <b>single characters</b> instead: <code>你我他是不有</code>. Duplicates are removed automatically.</p>
+    <textarea id="src" placeholder="你好 谢谢 老师 一心一意&#10;(no spaces = split into single characters: 你我他是不有)"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button id="btnMake" class="primary">Build the wheel</button>
+      <button id="btnFromList">Use a saved word list</button>
+      <button id="btnDemo" class="ghost">Load a sample</button>
+      <button id="btnShuffle">Shuffle positions</button>
+      <button id="btnClear" class="mini">Clear</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <input type="text" id="title" placeholder="Title, e.g. Lesson 3 · New Words" style="flex:1 1 240px">
+    </div>
+    <div id="chips" class="chips" style="margin-top:12px"></div>
+    <p class="hint" id="empty" style="margin:8px 0 0">No characters yet — paste some Chinese text above, or click "Load a sample".</p>
+  </section>
+
+  <section>
+    <h2><span class="num">2</span>Layout</h2>
+    <p class="hint">A single ring is easiest to read; 12–20 characters works best. Over 30 automatically splits into three rings, but text gets smaller — for younger grades, print two sheets instead.</p>
+    <div class="row">
+      <label class="check"><input type="checkbox" id="optPy" checked> Show pinyin</label>
+      <label class="check"><input type="checkbox" id="optFlower" checked> Sunflower style</label>
+      <span class="field">Rings
+        <select id="optRings"><option value="auto">Auto</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select>
+      </span>
+      <span class="field">Text size
+        <select id="optSize"><option value="auto">Auto</option><option value="34">Small</option><option value="46">Medium</option><option value="60">Large</option></select>
+      </span>
+      <span class="field">Grid squares
+        <select id="optGrid"><option value="16">16</option><option value="20" selected>20</option><option value="25">25</option></select>
+      </span>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">3</span>Preview</h2>
+    <div id="preview"></div>
+  </section>
+
+  <section>
+    <h2><span class="num">4</span>Play &amp; export</h2>
+    <div class="row">
+      <button id="btnGame" class="dark">▶ Big-screen finding game</button>
+      <button id="btnPrint1" class="primary">Print one (wheel + grid)</button>
+      <button id="btnPrint4">Print four</button>
+      <button id="btnPPTX">Export PPTX</button>
+      <button id="btnPDF">PDF</button>
+      <button id="btnPNG">Image</button>
+    </div>
+    <p class="hint" style="margin-top:10px">
+      Each printed A4 sheet has the wheel on top and a grid sheet below — one sheet per pair. The big-screen mode works well for a whole-class warm-up or game.
+    </p>
+  </section>
+
+  <footer>Chen Laoshi's Teaching Toolkit · Character Race v1.0</footer>
+  <div id="printArea"></div>
+</div>
+
+<div id="game">
+  <div id="gstage"></div>
+  <div id="gbar">
+    <button id="gNext" class="primary">Draw a character (Space)</button>
+    <button id="gSay" class="mini">Say it again</button>
+    <label class="check" style="color:#F2F6EF"><input type="checkbox" id="optSpeak" checked> Read aloud</label>
+    <span style="width:16px"></span>
+    <span class="big">Correct <span id="gscore">0</span></span>
+    <span class="big">Missed <span id="gmiss">0</span></span>
+    <span class="big">Time left <span id="gleft">60</span>s</span>
+    <span class="field" style="color:#F2F6EF">Duration
+      <select id="gtime"><option value="30">30</option><option value="60" selected>60</option><option value="120">120</option></select>
+    </span>
+    <button id="gStart">Start timer</button>
+    <button id="gStop" class="mini">Pause</button>
+    <button id="gAgain" class="mini">Reset</button>
+    <button id="gExit">Exit</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="/shared/wordlist-core.js"></script>
+<script src="/shared/deck-export.js"></script>
+<script src="/low-prep/character-race/character-race.js"></script>
+<script src="/javascripts/account-coming-soon.js"></script>
+<script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
