@@ -6,6 +6,10 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Home' });
 });
 
+router.get('/privacy', function(req, res, next) {
+  res.render('privacy', { title: 'Privacy Policy' });
+});
+
 // Teaching Tools Routes
 router.get('/teaching-tools', function(req, res, next) {
   res.render('teaching-tools/index', { title: 'Teaching Tools' });
