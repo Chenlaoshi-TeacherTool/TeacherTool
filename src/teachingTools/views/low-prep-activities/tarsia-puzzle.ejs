@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#35604C">
+<title>三角拼图配对 · 陈老师教学工具</title>
+<link rel="stylesheet" href="/stylesheets/site-theme.css">
+<link rel="stylesheet" href="/low-prep/tarsia-puzzle/tarsia-puzzle.css">
+</head>
+<body class="tp-page">
+<div class="tp-wrap">
+  <header class="tp-header">
+    <a href="/low-prep-activities" class="back-btn">← Back to Low-Prep Activities</a>
+    <div class="fl"><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg></div>
+    <h1>三角拼图配对 (Tarsia Puzzle)</h1>
+    <p>把中英词对排成一整张三角拼图 —— 打印后剪开、打乱，学生靠拼对边找回中英配对</p>
+  </header>
+
+  <div id="coreWarn" class="warn" style="display:none">
+    没找到词表核心模块。手动输入词对不受影响，「从已存词表取词」需要先在词汇库里保存过带英文翻译的词表。
+  </div>
+
+  <section>
+    <h2><span class="num">1</span>输入词对 <span style="font-size:14px;font-weight:400;color:#5A6B57">共 <b id="count">0</b> 对</span></h2>
+    <p class="hint">每行一对，用<b>斜杠 /</b> 分开中文和英文，第三个用 / 隔开的词会当拼音（可选）：<code>你好 / hello / nǐ hǎo</code></p>
+    <textarea id="src" placeholder="你好 / hello&#10;谢谢 / thank you&#10;老师 / teacher"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button id="btnMake" class="primary">生成拼图</button>
+      <button id="btnFromList">从已存词表取词</button>
+      <button id="btnDemo" class="ghost">放个示例</button>
+      <button id="btnShuffle">打乱配对顺序</button>
+      <button id="btnClear" class="mini">清空</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <input type="text" id="title" placeholder="标题，例如：第一课 · 常用词" style="flex:1 1 240px">
+    </div>
+    <div id="pairList" class="chips" style="margin-top:12px"></div>
+    <p class="hint" id="empty" style="margin:8px 0 0">还没有词对 —— 上面按格式粘贴，或者点「放个示例」。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">2</span>拼图大小</h2>
+    <p class="hint">格子数决定能放多少词对：<code>行数 × (列数-1) + (行数-1) × 列数</code>。词对不够会留空三角，词太多会用不完，右下角会提示。</p>
+    <div class="row">
+      <span class="field">行数
+        <select id="optRows"><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select>
+      </span>
+      <span class="field">列数
+        <select id="optCols"><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select>
+      </span>
+      <fieldset class="language-options">
+        <legend>显示语言 <small>至少选择两种，用来做拼图配对</small></legend>
+        <label><input type="checkbox" name="displayLanguage" value="zh" checked> <span>中文</span><small>Chinese</small></label>
+        <label><input type="checkbox" name="displayLanguage" value="py"> <span>拼音</span><small>Pinyin</small></label>
+        <label><input type="checkbox" name="displayLanguage" value="en" checked> <span>English</span><small>English</small></label>
+      </fieldset>
+    </div>
+    <p class="hint" style="margin:8px 0 0">选择三种语言时，中文和 English 会作为配对边；拼音会以较小文字沿第三条边显示。没有手动输入拼音时，工具会自动从中文生成。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">3</span>预览</h2>
+    <div id="preview"></div>
+    <p class="slotinfo" id="slotinfo"></p>
+  </section>
+
+  <section>
+    <h2><span class="num">4</span>打印与导出</h2>
+    <div class="row">
+      <button id="btnPrint" class="dark">🖨 打印</button>
+      <button id="btnPNG" class="primary">导出图片</button>
+      <button id="btnPDF">导出 PDF</button>
+    </div>
+    <p class="hint" style="margin-top:10px">
+      打印出来后沿着黑色线剪成一个个小三角，打乱顺序发给学生，让他们靠"边对边"把中英配对重新拼回大长方形。
+    </p>
+  </section>
+
+  <footer>陈老师教学工具 · 三角拼图配对 v1.0</footer>
+  <div id="printArea"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="/shared/wordlist-core.js"></script>
+<script src="/shared/deck-export.js"></script>
+<script src="/low-prep/tarsia-puzzle/tarsia-puzzle.js"></script>
+<script src="/javascripts/account-coming-soon.js"></script>
+<script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

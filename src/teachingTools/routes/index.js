@@ -52,6 +52,10 @@ router.get('/low-prep-activities/character-race', function(req, res, next) {
   res.render('low-prep-activities/character-race', { title: 'Character Race' });
 });
 
+router.get('/low-prep-activities/tarsia-puzzle', function(req, res, next) {
+  res.render('low-prep-activities/tarsia-puzzle', { title: '三角拼图配对' });
+});
+
 // Theme Activities Routes
 router.get('/theme-activities', function(req, res, next) {
   res.render('theme-activities/index', { title: 'Theme Activities' });
