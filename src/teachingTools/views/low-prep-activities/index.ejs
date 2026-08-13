@@ -54,7 +54,54 @@
             gap: 22px;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 42px 20px 56px;
+            padding: 24px 20px 56px;
+        }
+        .activity-search {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 28px 20px 0;
+        }
+        .activity-search label {
+            display: block;
+            margin-bottom: 8px;
+            color: #243553;
+            font-weight: 700;
+        }
+        .activity-search-field {
+            position: relative;
+        }
+        .activity-search-icon {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            color: #667eea;
+            font-size: 1.25rem;
+            line-height: 1;
+            pointer-events: none;
+            transform: translateY(-50%);
+        }
+        #activitySearch {
+            width: 100%;
+            min-height: 50px;
+            padding: 12px 16px 12px 48px;
+            border: 1px solid #d4d9eb;
+            border-radius: 10px;
+            font: inherit;
+        }
+        .activity-search-status {
+            min-height: 1.5em;
+            margin: 7px 0 0;
+            color: #65718b;
+            font-size: 0.9rem;
+        }
+        .no-activity-results {
+            grid-column: 1 / -1;
+            margin: 0;
+            padding: 30px;
+            border: 1px dashed #c7cde5;
+            border-radius: 14px;
+            color: #5261bd;
+            text-align: center;
         }
         .activity-card {
             display: flex;
@@ -66,6 +113,9 @@
             border-radius: 14px;
             box-shadow: 0 4px 12px rgba(44, 51, 73, 0.08);
             transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .activity-card[hidden] {
+            display: none !important;
         }
         .activity-card:not(.coming-soon):hover {
             transform: translateY(-4px);
@@ -143,6 +193,15 @@
         <p>Quick, classroom-ready activities for busy teaching days. Choose an activity and get started in minutes.</p>
     </header>
 
+    <section class="activity-search" aria-label="Search activities">
+        <label for="activitySearch">Find an activity</label>
+        <div class="activity-search-field">
+            <span class="activity-search-icon" aria-hidden="true">⌕</span>
+            <input id="activitySearch" type="search" placeholder="Search by keyword, skill, or topic" autocomplete="off">
+        </div>
+        <p class="activity-search-status" id="activitySearchStatus" aria-live="polite">Search by title, skill, or topic.</p>
+    </section>
+
     <main class="activities-grid">
         <article class="activity-card">
             <h2>🧩 Word Sudoku Generator</h2>
@@ -209,8 +268,8 @@
         </article>
 
         <article class="activity-card">
-            <h2>🏆 Jeopardy 抢答赛</h2>
-            <p>出题、存题库、全屏开赛——计时抢答、Daily Double、自动计分，一场热闹的复习竞赛。</p>
+            <h2>🏆 Jeopardy</h2>
+            <p>Create a lively review game with timed questions, buzzing answers, and automatic scoring—perfect for energizing any vocabulary or grammar review.</p>
             <div class="tags">
                 <span class="tag">15–25 min</span>
                 <span class="tag">Review Game</span>
@@ -235,7 +294,7 @@
         </article>
 
         <article class="activity-card coming-soon">
-            <h2>🧩 Tarsia Puzzle (三角拼图配对)</h2>
+            <h2>🧩 Tarsia Puzzle</h2>
             <p>Turn word pairs into a printable triangle-matching puzzle — cut it apart, shuffle, and students rebuild it by matching edges.</p>
             <div class="tags">
                 <span class="tag">10–15 min</span>
@@ -246,6 +305,20 @@
                 <button class="open-btn" type="button" disabled>Coming Soon</button>
             </div>
         </article>
+
+        <article class="activity-card coming-soon">
+            <h2>🧭 Maze Generator</h2>
+            <p>Create a printable word maze from your own sentences, questions, and connector words. Students follow the correct words from START to the finish.</p>
+            <div class="tags">
+                <span class="tag">10–15 min</span>
+                <span class="tag">Printable</span>
+                <span class="tag">Grammar &amp; Vocabulary</span>
+            </div>
+            <div class="card-action">
+                <button class="open-btn" type="button" disabled>Coming Soon</button>
+            </div>
+        </article>
+
         <article class="activity-card coming-soon">
             <h2>💬 5-Minute Speaking Prompts</h2>
             <p>Ready-to-use questions for partners, small groups, or a quick whole-class warm-up.</p>
@@ -293,7 +366,34 @@
                 <button class="open-btn" type="button" disabled>Coming Soon</button>
             </div>
         </article>
+        <p class="no-activity-results" id="noActivityResults" hidden>No activities match that search yet. Try another keyword.</p>
     </main>
+    <script>
+        (function () {
+            var search = document.getElementById('activitySearch');
+            var status = document.getElementById('activitySearchStatus');
+            var empty = document.getElementById('noActivityResults');
+            var cards = Array.prototype.slice.call(document.querySelectorAll('.activity-card'));
+
+            function filterActivities() {
+                var query = search.value.trim().toLocaleLowerCase();
+                var visible = 0;
+
+                cards.forEach(function (card) {
+                    var matches = !query || card.textContent.toLocaleLowerCase().indexOf(query) !== -1;
+                    card.hidden = !matches;
+                    if (matches) visible += 1;
+                });
+
+                empty.hidden = visible !== 0;
+                status.textContent = query
+                    ? 'Showing ' + visible + ' ' + (visible === 1 ? 'activity' : 'activities') + ' for “' + search.value.trim() + '”.'
+                    : 'Search by title, skill, or topic.';
+            }
+
+            search.addEventListener('input', filterActivities);
+        }());
+    </script>
     <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

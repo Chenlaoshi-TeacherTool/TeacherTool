@@ -4,7 +4,8 @@ var DE = window.DeckExport || null;
 var S = {
   chars: [],
   order: [],
-  opts: { pinyin: true, rings: 'auto', size: 'auto', grid: 20, flower: true },
+  terms: {},
+  opts: { targetLanguage: 'pinyin', rings: 'auto', size: 'auto', grid: 20, flower: true },
   title: ''
 };
 var $ = function (s) { return document.querySelector(s); };
@@ -14,6 +15,26 @@ function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('sho
 function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function isHan(ch) { return ch >= '一' && ch <= '龥'; }
 function pinyinOf(t) { return CW ? CW.toPinyin(t, { spaced: (t || '').length >= 4 }) : ''; }
+function englishOf(t) { return CW && typeof CW.toEnglish === 'function' ? CW.toEnglish(t) : ''; }
+
+function targetText(t) {
+  var term = S.terms[t] || {};
+  return S.opts.targetLanguage === 'english'
+    ? (term.en || englishOf(t))
+    : (term.py || pinyinOf(t));
+}
+
+function targetLanguageName() {
+  return S.opts.targetLanguage === 'english' ? 'English' : 'Pinyin';
+}
+
+function updateTargetLanguageHint() {
+  var hint = $('#targetLanguageHint');
+  if (!hint) return;
+  var missing = S.order.filter(function (term) { return !targetText(term); }).length;
+  hint.textContent = 'Chinese stays on each tile. ' + targetLanguageName() + ' is shown as the target language.' +
+    (missing ? ' ' + missing + ' term' + (missing === 1 ? '' : 's') + ' need ' + targetLanguageName() + ' added in Step 1.' : '');
+}
 
 /* ---------- input ---------- */
 // space / comma / newline present -> split by word; otherwise split by single character
@@ -36,14 +57,56 @@ function parseChars(text) {
   });
   return out;
 }
-function setChars(list) {
-  S.chars = list;
-  S.order = list.slice();
-  renderChips(); renderPreview();
+function parseTerms(text) {
+  var raw = String(text || '');
+  var terms = [];
+  if (/[|｜]/.test(raw)) {
+    raw.split(/\r?\n/).forEach(function (line) {
+      var parts = line.split(/\s*[|｜]\s*/).map(function (part) { return part.trim(); });
+      if (parts.length < 2) {
+        parseChars(line).forEach(function (zh) { terms.push({ zh: zh }); });
+        return;
+      }
+      var zh = (parts[0] || '').replace(/[^一-龥]/g, '');
+      if (!zh) return;
+      terms.push({
+        zh: zh,
+        py: parts.length >= 3 ? parts[1] : '',
+        en: parts.length >= 3 ? parts[2] : parts[1]
+      });
+    });
+  } else {
+    parseChars(raw).forEach(function (zh) { terms.push({ zh: zh }); });
+  }
+  return terms;
+}
+
+function setTerms(list) {
+  var seen = {}, order = [], terms = {};
+  list.forEach(function (item) {
+    var zh = String(item && item.zh || '').replace(/[^一-龥]/g, '');
+    if (!zh || seen[zh]) return;
+    seen[zh] = true;
+    terms[zh] = {
+      zh: zh,
+      py: String(item.py || pinyinOf(zh) || '').trim(),
+      en: String(item.en || englishOf(zh) || '').trim()
+    };
+    order.push(zh);
+  });
+  S.terms = terms;
+  S.chars = order.slice();
+  S.order = order;
+  renderChips(); renderPreview(); updateTargetLanguageHint();
 }
 function renderChips() {
   var box = $('#chips'); box.innerHTML = '';
-  S.order.forEach(function (ch) { var c = el('span', 'chip'); c.textContent = ch; box.appendChild(c); });
+  S.order.forEach(function (ch) {
+    var c = el('span', 'chip');
+    var target = targetText(ch);
+    c.textContent = ch + (target ? ' · ' + target : '');
+    box.appendChild(c);
+  });
   $('#count').textContent = S.order.length;
   $('#empty').style.display = S.order.length ? 'none' : '';
 }
@@ -65,11 +128,11 @@ function layout() {
   return out.filter(function (ring) { return ring.chars.length; });
 }
 // Font size is chosen from the chord length between adjacent characters so tiles never overlap
-function fitFontSize(R, rings, centerR, withPinyin) {
+function fitFontSize(R, rings, centerR, withTarget) {
   var maxLen = 1;
   S.order.forEach(function (t) { if (t.length > maxLen) maxLen = t.length; });
   var padW = 0.9;
-  var hFactor = 1.55 + (withPinyin ? 0.52 : 0);
+  var hFactor = 1.55 + (withTarget ? 0.52 : 0);
   var chordFactor = 0.9, radialFactor = 0.92;
   var best = 1e9, i;
   rings.forEach(function (ring) {
@@ -119,12 +182,12 @@ function circleSVG(w, h, opt) {
   var basePad = opt.pad || 70;
   var R = Math.min(w, h) / 2 - basePad;
   var cr0 = Math.max(42, R * 0.16);
-  var fs = fitFontSize(R, rings, cr0, S.opts.pinyin);
-  var need = fs * (S.opts.pinyin ? 1.32 : 0.95) + 10;
+  var fs = fitFontSize(R, rings, cr0, true);
+  var need = fs * 1.32 + 10;
   if (need > basePad) {
     R = Math.min(w, h) / 2 - need;
     cr0 = Math.max(38, R * 0.16);
-    fs = fitFontSize(R, rings, cr0, S.opts.pinyin);
+    fs = fitFontSize(R, rings, cr0, true);
   }
   if (S.opts.size !== 'auto') fs = Math.min(+S.opts.size, fs * 1.3);
   var pillH = fs * 1.5;
@@ -149,8 +212,10 @@ function circleSVG(w, h, opt) {
   }
 
   if (opt.centerChar) {
+    var centerText = opt.centerTarget ? (targetText(opt.centerChar) || opt.centerChar) : opt.centerChar;
+    var centerFont = Math.max(13, Math.min(cr0 * 0.9, cr0 * 3.2 / Math.max(1, centerText.length)));
     g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (cr0 * 0.98) + '" fill="#35604C" stroke="#1B2A47" stroke-width="5"/>';
-    g += '<text x="' + cx + '" y="' + (cy + cr0 * 0.34) + '" font-size="' + (cr0 * 0.9) + '" font-weight="700" fill="#F6C43C" text-anchor="middle">' + esc(opt.centerChar) + '</text>';
+    g += '<text x="' + cx + '" y="' + (cy + centerFont * 0.34) + '" font-size="' + centerFont + '" font-weight="700" fill="#F6C43C" text-anchor="middle">' + esc(centerText) + '</text>';
   } else if (!flower || petalOuter <= cr0 * 1.3) {
     g += '<text x="' + cx + '" y="' + (cy - 2) + '" font-size="' + (cr0 * 0.42) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">汉字</text>';
     g += '<text x="' + cx + '" y="' + (cy + cr0 * 0.5) + '" font-size="' + (cr0 * 0.42) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">快跑</text>';
@@ -167,13 +232,12 @@ function circleSVG(w, h, opt) {
       g += '<g class="hz" data-ch="' + esc(tk) + '" data-i="' + idx + '">';
       g += '<rect x="' + (x - pw / 2) + '" y="' + (y - pillH / 2) + '" width="' + pw + '" height="' + pillH + '" rx="' + (pillH / 2) + '" fill="#fff" stroke="#1B2A47" stroke-width="' + Math.max(2.5, fs * 0.09) + '"/>';
       g += '<text x="' + x + '" y="' + (y + fs * 0.35) + '" font-size="' + fs + '" font-weight="700" fill="#1B2A47" text-anchor="middle">' + esc(tk) + '</text>';
-      if (S.opts.pinyin) {
-        var pyv = pinyinOf(tk);
-        if (pyv) {
+      var target = targetText(tk);
+      if (target) {
+          var targetFont = Math.max(8, Math.min(fs * 0.34, fs * 2.7 / Math.max(1, target.length)));
           var outward = (y >= cy) ? 1 : -1;
-          var pyY = outward > 0 ? (y + pillH / 2 + fs * 0.38) : (y - pillH / 2 - fs * 0.14);
-          g += '<text x="' + x + '" y="' + pyY + '" font-size="' + (fs * 0.33) + '" fill="#3E6E58" text-anchor="middle">' + esc(pyv) + '</text>';
-        }
+          var targetY = outward > 0 ? (y + pillH / 2 + fs * 0.38) : (y - pillH / 2 - fs * 0.14);
+          g += '<text x="' + x + '" y="' + targetY + '" font-size="' + targetFont + '" fill="#3E6E58" text-anchor="middle">' + esc(target) + '</text>';
       }
       g += '</g>';
       idx++;
@@ -243,7 +307,7 @@ function closeGame() {
   if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
 }
 function drawGame() {
-  $('#gstage').innerHTML = circleSVG(1000, 700, { centerChar: G.target });
+  $('#gstage').innerHTML = circleSVG(1000, 700, { centerChar: G.target, centerTarget: true });
   $('#gscore').textContent = G.score;
   $('#gmiss').textContent = G.miss;
   $('#gleft').textContent = G.left;
@@ -338,15 +402,15 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!window.speechSynthesis) { $('#optSpeak').checked = false; $('#optSpeak').disabled = true; }
 
   $('#btnMake').addEventListener('click', function () {
-    var got = parseChars($('#src').value);
-    if (!got.length) { toast('No characters found'); return; }
-    setChars(got); toast('Loaded ' + got.length + ' characters');
+    var got = parseTerms($('#src').value);
+    if (!got.length) { toast('No Chinese terms found'); return; }
+    setTerms(got); toast('Loaded ' + got.length + ' terms');
   });
   $('#btnDemo').addEventListener('click', function () {
-    $('#src').value = '你好 谢谢 老师 同学 学校 朋友 高兴 一心一意 马马虎虎';
+    $('#src').value = '你好 | nǐ hǎo | hello\n谢谢 | xiè xie | thank you\n老师 | lǎo shī | teacher\n同学 | tóng xué | classmate\n学校 | xué xiào | school\n朋友 | péng you | friend\n高兴 | gāo xìng | happy\n一心一意 | yī xīn yī yì | wholeheartedly\n马马虎虎 | mǎ ma hū hū | so-so';
     $('#title').value = 'Lesson 1 · Common Words';
     S.title = $('#title').value;
-    setChars(parseChars($('#src').value));
+    setTerms(parseTerms($('#src').value));
   });
   $('#btnFromList').addEventListener('click', function () {
     if (!CW) { toast('Needs wordlist-core.js'); return; }
@@ -357,10 +421,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (isNaN(k) || !all[k]) return;
     var list = CW.load(all[k].id);
     if (!list) return;
-    var text = list.items.map(function (it) { return it.zh; }).join('');
-    $('#src').value = text;
+    var terms = list.items.map(function (it) { return { zh: it.zh || '', py: it.py || '', en: it.en || '' }; });
+    $('#src').value = terms.map(function (item) { return item.zh + ' | ' + item.py + ' | ' + item.en; }).join('\n');
     if (!$('#title').value) { $('#title').value = list.name; S.title = list.name; }
-    setChars(parseChars(text));
+    setTerms(terms);
   });
   $('#btnShuffle').addEventListener('click', function () {
     for (var i = S.order.length - 1; i > 0; i--) {
@@ -369,10 +433,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     renderChips(); renderPreview(); toast('Positions shuffled');
   });
-  $('#btnClear').addEventListener('click', function () { setChars([]); });
+  $('#btnClear').addEventListener('click', function () { setTerms([]); });
   $('#title').addEventListener('input', function () { S.title = this.value; });
 
-  $('#optPy').addEventListener('change', function () { S.opts.pinyin = this.checked; renderPreview(); });
+  $('#optTargetLanguage').addEventListener('change', function () {
+    S.opts.targetLanguage = this.value;
+    renderChips(); renderPreview(); updateTargetLanguageHint();
+  });
   $('#optFlower').addEventListener('change', function () { S.opts.flower = this.checked; renderPreview(); });
   $('#optRings').addEventListener('change', function () { S.opts.rings = this.value; renderPreview(); });
   $('#optSize').addEventListener('change', function () { S.opts.size = this.value; renderPreview(); });
@@ -399,5 +466,5 @@ document.addEventListener('DOMContentLoaded', function () {
     else if (e.key === ' ') { e.preventDefault(); nextTarget(); }
   });
 
-  renderChips(); renderPreview();
+  renderChips(); renderPreview(); updateTargetLanguageHint();
 });

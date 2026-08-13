@@ -25,6 +25,7 @@
     <h2><span class="num">1</span>Add your characters <span style="font-size:14px;font-weight:400;color:#5A6B57">Total <b id="count">0</b></span></h2>
     <p class="hint">Separate with a <b>space</b> to make each word its own tile: <code>你好 谢谢 一心一意</code>. Paste without spaces and it splits into <b>single characters</b> instead: <code>你我他是不有</code>. Duplicates are removed automatically.</p>
     <textarea id="src" placeholder="你好 谢谢 老师 一心一意&#10;(no spaces = split into single characters: 你我他是不有)"></textarea>
+    <p class="hint">For your own English labels, enter one item per line as <code>中文 | 拼音 | English</code>.</p>
     <div class="row" style="margin-top:10px">
       <button id="btnMake" class="primary">Build the wheel</button>
       <button id="btnFromList">Use a saved word list</button>
@@ -43,7 +44,12 @@
     <h2><span class="num">2</span>Layout</h2>
     <p class="hint">A single ring is easiest to read; 12–20 characters works best. Over 30 automatically splits into three rings, but text gets smaller — for younger grades, print two sheets instead.</p>
     <div class="row">
-      <label class="check"><input type="checkbox" id="optPy" checked> Show pinyin</label>
+      <span class="field">Target language
+        <select id="optTargetLanguage" aria-label="Target language">
+          <option value="pinyin" selected>Pinyin</option>
+          <option value="english">English</option>
+        </select>
+      </span>
       <label class="check"><input type="checkbox" id="optFlower" checked> Sunflower style</label>
       <span class="field">Rings
         <select id="optRings"><option value="auto">Auto</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select>
@@ -55,6 +61,7 @@
         <select id="optGrid"><option value="16">16</option><option value="20" selected>20</option><option value="25">25</option></select>
       </span>
     </div>
+    <p class="hint" id="targetLanguageHint" aria-live="polite" style="margin:8px 0 0">Chinese stays on each tile. Pinyin is shown as the target language.</p>
   </section>
 
   <section>
