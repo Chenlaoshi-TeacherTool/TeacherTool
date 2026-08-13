@@ -19,7 +19,8 @@
 .wyr-setup { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(340px, .88fr); gap: 22px; }
 .wyr-panel { padding: 27px; }
 .wyr-template-panel, .wyr-vocabulary-panel { margin-bottom: 23px; }
-.wyr-template-layout, .wyr-vocabulary-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 25px; align-items: start; }
+.wyr-template-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 25px; align-items: start; }
+.wyr-vocabulary-layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(350px, .95fr); gap: 25px; align-items: start; }
 .wyr-template-layout > div + div, .wyr-vocabulary-layout > div + div { padding-left: 25px; border-left: 1px solid #e0e7d9; }
 .wyr-template-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .wyr-template-grid .wyr-template:last-child { grid-column: 1 / -1; }
@@ -44,9 +45,9 @@
 .wyr-chip, .wyr-secondary-btn, .wyr-card-list-heading button { border: 1px solid #cfdcbf; border-radius: 999px; background: #eef6e4; color: var(--chalk); cursor: pointer; font: inherit; font-size: .84rem; font-weight: 900; }
 .wyr-chip { padding: 8px 11px; }
 .wyr-chip:hover, .wyr-secondary-btn:hover, .wyr-card-list-heading button:hover { background: #fff0bf; border-color: #e4b744; }
-.wyr-library-box { display: grid; grid-template-columns: 1fr auto; gap: 10px 12px; align-items: center; margin-top: 19px; padding: 16px; border: 1px solid #d8e4ca; border-radius: 15px; background: #f4f9ed; }
+.wyr-library-box { display: grid; grid-column: 1 / -1; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 12px; align-items: center; margin-top: 19px; padding: 16px; border: 1px solid #d8e4ca; border-radius: 15px; background: #f4f9ed; }
 .wyr-library-box p { margin: 0; color: var(--muted); font-size: .82rem; }
-.wyr-library-box .wyr-library-title { color: var(--chalk); font-weight: 900; }
+.wyr-library-box .wyr-library-title { color: var(--chalk); font-weight: 900; white-space: nowrap; }
 .wyr-library-box select { grid-column: 1 / -1; padding: 9px 10px; font-size: .88rem; }
 .wyr-library-box .wyr-secondary-btn { justify-self: start; padding: 8px 11px; }
 .wyr-options fieldset { margin: 20px 0 0; padding: 0; border: 0; }
