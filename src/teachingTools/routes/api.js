@@ -2,6 +2,7 @@
 
 var express = require('express');
 var presetWordlists = require('../data/preset-wordlists');
+var presetQuestionBanks = require('../data/preset-questionbanks');
 var router = express.Router();
 
 function publicList(list) {
@@ -24,6 +25,19 @@ function publicList(list) {
         note: ''
       };
     })
+  };
+}
+
+function publicQuestionBank(bank) {
+  return {
+    id: bank.id,
+    name: bank.name,
+    description: bank.description,
+    theme: bank.theme,
+    level: bank.level,
+    curriculum: bank.curriculum,
+    count: bank.questions.length,
+    questions: bank.questions
   };
 }
 
@@ -53,6 +67,29 @@ router.get('/wordlists/presets/:id', function (req, res) {
   var match = presetWordlists.find(function (list) { return list.id === req.params.id; });
   if (!match) return res.status(404).json({ error: 'Preset word list not found.' });
   res.json(publicList(match));
+});
+
+router.get('/questionbanks/presets', function (req, res) {
+  res.json({
+    version: 1,
+    banks: presetQuestionBanks.map(function (bank) {
+      return {
+        id: bank.id,
+        name: bank.name,
+        description: bank.description,
+        theme: bank.theme,
+        level: bank.level,
+        curriculum: bank.curriculum,
+        count: bank.questions.length
+      };
+    })
+  });
+});
+
+router.get('/questionbanks/presets/:id', function (req, res) {
+  var match = presetQuestionBanks.find(function (bank) { return bank.id === req.params.id; });
+  if (!match) return res.status(404).json({ error: 'Preset question bank not found.' });
+  res.json(publicQuestionBank(match));
 });
 
 router.get('/auth/me', function (req, res) {

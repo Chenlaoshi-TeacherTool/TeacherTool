@@ -1,6 +1,27 @@
 var CW = window.ChenWordlist || null;
 var DE = window.DeckExport || null;
 var PRE = 'cljp:';
+var presetQuestionBanks = [];
+var selectedPresetBankIds = [];
+var PRESET_BANK_ICONS = {
+  'chenlaoshi-seasons-weather': 0x1f326,
+  'chenlaoshi-animals': 0x1f43e,
+  'chenlaoshi-numbers': 0x1f522,
+  'chenlaoshi-body-parts': 0x1f9cd,
+  'chenlaoshi-colors': 0x1f3a8,
+  'chenlaoshi-family': 0x1f46a,
+  'chenlaoshi-rooms': 0x1f3e0,
+  'chenlaoshi-clothing': 0x1f455,
+  'chenlaoshi-jobs': 0x1f4bc,
+  'chenlaoshi-countries': 0x1f5fa,
+  'chenlaoshi-hobbies': 0x26bd,
+  'chenlaoshi-school': 0x1f3eb,
+  'chenlaoshi-back-to-school': 0x1f392,
+  'chenlaoshi-festivals': 0x1f389,
+  'chenlaoshi-self-introduction': 0x1f4ac,
+  'chenlaoshi-pinyin': 0x1f524,
+  'chenlaoshi-core-high-frequency': 0x2b50
+};
 
 function blankGame(cats, rows, base, step) {
   cats = cats || 5; rows = rows || 5; base = base || 100; step = step || 100;
@@ -27,6 +48,7 @@ function valueOf(r) { return G.base + r * G.step; }
 /* ---------------- editor ---------------- */
 function renderEditor() {
   $('#gname').value = G.name;
+  $('#optCats').value = G.categories.length;
   $('#optRows').value = G.rows;
   $('#optBase').value = G.base;
   $('#optStep').value = G.step;
@@ -112,10 +134,13 @@ function genFromList() {
     cat.clues.forEach(function (cl, ri) {
       var it = items[i++];
       if (!it) return;
-      if (mode === 'py2zh') { cl.q = '这个拼音是什么字？\n' + (it.py || ''); cl.a = it.zh; }
-      else if (mode === 'en2zh') { cl.q = '用中文怎么说？\n' + (it.en || it.zh); cl.a = it.zh; }
-      else if (mode === 'zh2en') { cl.q = it.zh + '\n英文是什么？'; cl.a = it.en || ''; }
-      else if (mode === 'zh2py') { cl.q = it.zh + '\n拼音怎么写？'; cl.a = it.py || ''; }
+      var itemMode = mode === 'mixed'
+        ? ['py2zh', 'en2zh', 'zh2en', 'zh2py', 'sentence'][(i - 1) % 5]
+        : mode;
+      if (itemMode === 'py2zh') { cl.q = '这个拼音是什么字？\n' + (it.py || ''); cl.a = it.zh; }
+      else if (itemMode === 'en2zh') { cl.q = '用中文怎么说？\n' + (it.en || it.zh); cl.a = it.zh; }
+      else if (itemMode === 'zh2en') { cl.q = it.zh + '\n英文是什么？'; cl.a = it.en || ''; }
+      else if (itemMode === 'zh2py') { cl.q = it.zh + '\n拼音怎么写？'; cl.a = it.py || ''; }
       else { cl.q = '用「' + it.zh + '」说一个完整的句子'; cl.a = '（老师判断：句子完整、用对词就算过）'; }
       cl.used = false;
     });
@@ -123,6 +148,148 @@ function genFromList() {
   if (!G.name) G.name = list.name + ' · 抢答赛';
   renderEditor();
   toast('用「' + list.name + '」出好题了');
+}
+
+/* ---------------- from Chen Laoshi question banks ---------------- */
+function questionBankIcon(id) {
+  return String.fromCodePoint(PRESET_BANK_ICONS[id] || 0x1f4dd);
+}
+function shuffleQuestions(items) {
+  var copy = (items || []).slice();
+  for (var i = copy.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;
+  }
+  return copy;
+}
+function questionToClue(question) {
+  var prompt = String(question.prompt || '').trim();
+  var options = Array.isArray(question.options) ? question.options : [];
+  var visibleOptions = options.map(function (option, index) {
+    var value = String(option || '').trim();
+    return value ? String.fromCharCode(65 + index) + '. ' + value : '';
+  }).filter(Boolean);
+  if (visibleOptions.length) prompt += '\n\n' + visibleOptions.join('\n');
+
+  var answer = String(question.answer || '').trim();
+  if (/^[A-D]$/i.test(answer)) {
+    var optionIndex = answer.toUpperCase().charCodeAt(0) - 65;
+    if (options[optionIndex]) answer = answer.toUpperCase() + '. ' + options[optionIndex];
+  }
+  return { q: prompt, a: answer, dd: false, used: false };
+}
+function selectedPresetBanks() {
+  return selectedPresetBankIds.map(function (id) {
+    return presetQuestionBanks.find(function (bank) { return bank.id === id; });
+  }).filter(Boolean);
+}
+function renderQuestionBankChoices() {
+  var choices = $('#bankChoices');
+  var status = $('#bankStatus');
+  var note = $('#bankSelectionNote');
+  var importButton = $('#btnImportBanks');
+  choices.innerHTML = '';
+
+  if (!presetQuestionBanks.length) {
+    status.textContent = '公开题库暂时无法载入。请稍后再试。';
+    note.textContent = '题库载入后即可选择主题';
+    importButton.disabled = true;
+    return;
+  }
+
+  presetQuestionBanks.forEach(function (bank) {
+    var button = el('button', 'bank-choice');
+    var chosen = selectedPresetBankIds.indexOf(bank.id) !== -1;
+    button.type = 'button';
+    button.dataset.bankId = bank.id;
+    button.setAttribute('aria-pressed', chosen ? 'true' : 'false');
+    button.setAttribute('aria-label', (chosen ? 'Remove ' : 'Select ') + bank.name);
+    var icon = el('span', 'bank-choice-icon');
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = questionBankIcon(bank.id);
+    var label = el('span');
+    label.textContent = bank.theme || bank.name;
+    button.appendChild(icon); button.appendChild(label);
+    button.addEventListener('click', function () { togglePresetBank(bank.id); });
+    choices.appendChild(button);
+  });
+
+  status.textContent = presetQuestionBanks.length + ' 个公开题库主题可选。';
+  note.textContent = selectedPresetBankIds.length
+    ? '已选 ' + selectedPresetBankIds.length + ' 个主题 · 每个主题会成为一栏'
+    : '选择 2–6 个主题';
+  importButton.disabled = selectedPresetBankIds.length < 2;
+}
+function togglePresetBank(id) {
+  var selectedIndex = selectedPresetBankIds.indexOf(id);
+  if (selectedIndex !== -1) {
+    selectedPresetBankIds.splice(selectedIndex, 1);
+  } else {
+    if (selectedPresetBankIds.length >= 6) {
+      toast('最多选择 6 个主题');
+      return;
+    }
+    selectedPresetBankIds.push(id);
+  }
+  renderQuestionBankChoices();
+}
+function loadPresetQuestionBanks() {
+  fetch('/api/questionbanks/presets')
+    .then(function (response) {
+      if (!response.ok) throw new Error('Question bank list unavailable');
+      return response.json();
+    })
+    .then(function (payload) {
+      presetQuestionBanks = payload.banks || [];
+      renderQuestionBankChoices();
+    })
+    .catch(function () {
+      presetQuestionBanks = [];
+      renderQuestionBankChoices();
+    });
+}
+function importPresetBanks() {
+  var selected = selectedPresetBanks();
+  if (selected.length < 2) {
+    toast('请选择至少 2 个主题');
+    return;
+  }
+  var importButton = $('#btnImportBanks');
+  importButton.disabled = true;
+  $('#bankStatus').textContent = '正在抽取所选主题的题目…';
+  Promise.all(selected.map(function (bank) {
+    return fetch('/api/questionbanks/presets/' + encodeURIComponent(bank.id)).then(function (response) {
+      if (!response.ok) throw new Error('Question bank unavailable');
+      return response.json();
+    });
+  })).then(function (banks) {
+    var old = G;
+    var rows = old.rows;
+    var nextGame = blankGame(banks.length, rows, old.base, old.step);
+    nextGame.id = old.id;
+    nextGame.name = old.name || banks.map(function (bank) { return bank.theme; }).join(' · ') + ' · Jeopardy';
+    nextGame.seconds = old.seconds;
+    nextGame.teams = old.teams.map(function (team) { return { name: team.name, score: team.score }; });
+
+    banks.forEach(function (bank, categoryIndex) {
+      var category = nextGame.categories[categoryIndex];
+      var questions = shuffleQuestions(bank.questions);
+      category.name = bank.theme || bank.name;
+      category.clues = category.clues.map(function (clue, rowIndex) {
+        return questions[rowIndex] ? questionToClue(questions[rowIndex]) : clue;
+      });
+    });
+
+    G = nextGame;
+    renderEditor();
+    renderQuestionBankChoices();
+    $('#bankStatus').textContent = '已从 ' + banks.length + ' 个主题抽取题目。你仍可点任意格子编辑。';
+    toast('公开题库已加入 Jeopardy 游戏板');
+  }).catch(function () {
+    $('#bankStatus').textContent = '题库载入失败，请稍后重试。';
+    renderQuestionBankChoices();
+    toast('题库载入失败');
+  });
 }
 
 /* ---------------- storage ---------------- */
@@ -433,6 +600,7 @@ document.addEventListener('DOMContentLoaded', function () {
     G.teams.push({ name: n, score: 0 }); $('#teamName').value = ''; renderTeams();
   });
   $('#btnGen').addEventListener('click', genFromList);
+  $('#btnImportBanks').addEventListener('click', importPresetBanks);
   $('#btnBlank').addEventListener('click', function () {
     if (!confirm('清空所有题目？')) return;
     var t = G.teams, n = G.name;
@@ -481,5 +649,5 @@ document.addEventListener('DOMContentLoaded', function () {
     if ($('#game').classList.contains('open') && e.key === 'Escape') exitGame();
   });
 
-  renderEditor(); renderSaved();
+  renderEditor(); renderSaved(); loadPresetQuestionBanks();
 });

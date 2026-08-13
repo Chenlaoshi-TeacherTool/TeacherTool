@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#35604C">
-<title>Jeopardy 抢答赛 - Chen Laoshi's Teaching Toolkit</title>
+<title>Jeopardy - Chen Laoshi's Teaching Toolkit</title>
 <link rel="stylesheet" href="/stylesheets/site-theme.css">
 <link rel="stylesheet" href="/low-prep/jeopardy/jeopardy.css">
 </head>
@@ -13,8 +13,8 @@
   <header class="jp-header">
     <a href="/low-prep-activities" class="back-btn">← Back to Low-Prep Activities</a>
     <div class="fl"><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg></div>
-    <h1>Jeopardy 抢答赛</h1>
-    <p>出题 → 存题库 → 全屏开赛　·　计时抢答、Daily Double、自动计分</p>
+    <h1>Jeopardy</h1>
+    <p>Build your board, save a game, then play live with timed clues, Daily Doubles, and automatic scoring.</p>
   </header>
 
   <div id="coreWarn" class="warn" style="display:none">
@@ -22,21 +22,13 @@
   </div>
 
   <section>
-    <h2><span class="num">1</span>这一套的设置</h2>
+    <h2><span class="num">1</span>游戏名称与保存</h2>
     <div class="row">
       <input type="text" id="gname" class="grow" placeholder="题库名字，例如：第三单元 · 复习赛">
-      <span class="field">类别 <select id="optCats"><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
-      <span class="field">每类题数 <select id="optRows"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
-      <span class="field">起始分 <input type="number" id="optBase" value="100" step="50" style="width:88px"></span>
-      <span class="field">每级加 <input type="number" id="optStep" value="100" step="50" style="width:88px"></span>
-      <span class="field">抢答秒数 <input type="number" id="optSec" value="20" min="5" style="width:74px"></span>
     </div>
     <div class="row" style="margin-top:10px">
       <button id="btnSave" class="primary">保存题库</button>
       <button id="btnNew">新建一套</button>
-      <button id="btnBlank" class="ghost">清空题目</button>
-      <button id="btnImport" class="ghost">导入 JSON</button>
-      <input type="file" id="file" accept=".json" style="display:none">
     </div>
     <p class="hint" style="margin:12px 0 6px">已保存的题库：</p>
     <div id="saved" class="saved"></div>
@@ -45,10 +37,21 @@
   <section>
     <h2><span class="num">2</span>出题 <span style="font-size:14px;font-weight:400;color:#5A6B57">已填 <b id="fillinfo">0 / 0</b></span></h2>
     <p class="hint">点任意一格填题目和答案。想设 Daily Double 就在弹窗里勾一下（一场只留一个）。</p>
+    <div class="row" style="margin-bottom:10px">
+      <span class="field">类别 <select id="optCats"><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
+      <span class="field">每类题数 <select id="optRows"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
+      <span class="field">起始分 <input type="number" id="optBase" value="100" step="50" style="width:88px"></span>
+      <span class="field">每级加 <input type="number" id="optStep" value="100" step="50" style="width:88px"></span>
+      <span class="field">抢答秒数 <input type="number" id="optSec" value="20" min="5" style="width:74px"></span>
+      <button id="btnBlank" class="ghost">清空题目</button>
+      <button id="btnImport" class="ghost">导入 JSON</button>
+      <input type="file" id="file" accept=".json" style="display:none">
+    </div>
     <div class="row" style="margin-bottom:12px">
       <button id="btnGen" class="dark">用词表自动出题</button>
       <span class="field">题型
         <select id="genMode" style="min-width:170px">
+          <option value="mixed" selected>混合题型</option>
           <option value="py2zh">看拼音写汉字</option>
           <option value="en2zh">看英文说中文</option>
           <option value="zh2en">看中文说英文</option>
@@ -56,6 +59,22 @@
           <option value="sentence">用这个词造句</option>
         </select>
       </span>
+    </div>
+    <div class="bank-source" id="bankSource">
+      <div class="bank-source-head">
+        <div>
+          <p class="bank-source-kicker">Chen Laoshi Question Banks</p>
+          <h3>从公开题库创建游戏板</h3>
+          <p class="hint">选择 2–6 个主题。每个主题会成为一栏，并随机抽取每栏所需数量的题目。</p>
+        </div>
+        <a class="bank-library-link" href="/teaching-tools/question-bank-library/question-bank-library.html">浏览完整题库</a>
+      </div>
+      <p class="bank-status" id="bankStatus" aria-live="polite">正在载入题库主题…</p>
+      <div class="bank-choices" id="bankChoices" aria-label="Choose question-bank topics"></div>
+      <div class="row bank-source-actions">
+        <button id="btnImportBanks" class="primary" type="button" disabled>用所选主题创建游戏板</button>
+        <span class="bank-selection-note" id="bankSelectionNote">选择 2–6 个主题</span>
+      </div>
     </div>
     <div id="cats" class="cats"></div>
   </section>
