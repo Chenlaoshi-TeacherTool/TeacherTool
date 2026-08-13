@@ -23,6 +23,41 @@
         .header h1 {
             margin-bottom: 10px;
         }
+        .tool-search {
+            width: min(650px, calc(100% - 40px));
+            margin: 30px auto -14px;
+        }
+        .tool-search label {
+            display: block;
+            margin: 0 0 8px;
+            color: #194f45;
+            font-weight: 800;
+        }
+        .tool-search-input {
+            position: relative;
+        }
+        .tool-search-input span {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #356e57;
+            pointer-events: none;
+        }
+        .tool-search input {
+            width: 100%;
+            padding: 13px 16px 13px 42px;
+            font-size: 1rem;
+        }
+        .tool-search-status {
+            min-height: 1.6em;
+            margin: 7px 0 0;
+            color: #5d7168;
+            font-size: .9rem;
+        }
+        .tool-card[hidden] {
+            display: none;
+        }
         .back-btn {
             position: absolute;
             top: 20px;
@@ -36,7 +71,7 @@
         }
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             padding: 40px 20px;
             max-width: 1200px;
@@ -111,6 +146,15 @@
         <p>Simple tools to save teachers time in the classroom.</p>
     </section>
 
+    <section class="tool-search" aria-labelledby="tool-search-label">
+        <label id="tool-search-label" for="toolSearch">Find a tool</label>
+        <div class="tool-search-input">
+            <span aria-hidden="true">⌕</span>
+            <input id="toolSearch" type="search" placeholder="Search by tool name or keyword" autocomplete="off" aria-describedby="toolSearchStatus">
+        </div>
+        <p id="toolSearchStatus" class="tool-search-status" role="status">Showing all 8 tools.</p>
+    </section>
+
     <section class="tools-grid">
         <div class="tool-card">
             <h3>📌 QR Code Generator</h3>
@@ -158,6 +202,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
     <script>
         // Removed QR generator functionality as it's now on a separate page
+    </script>
+    <script>
+        (function () {
+            var search = document.getElementById('toolSearch');
+            var status = document.getElementById('toolSearchStatus');
+            var cards = Array.prototype.slice.call(document.querySelectorAll('.tools-grid .tool-card'));
+
+            function updateToolResults() {
+                var query = search.value.trim().toLocaleLowerCase();
+                var matches = 0;
+
+                cards.forEach(function (card) {
+                    var isMatch = !query || card.textContent.toLocaleLowerCase().indexOf(query) !== -1;
+                    card.hidden = !isMatch;
+                    if (isMatch) matches += 1;
+                });
+
+                if (!query) {
+                    status.textContent = 'Showing all ' + cards.length + ' tools.';
+                } else if (matches === 1) {
+                    status.textContent = 'Showing 1 tool for “' + search.value.trim() + '”.';
+                } else {
+                    status.textContent = 'Showing ' + matches + ' tools for “' + search.value.trim() + '”.';
+                }
+            }
+
+            search.addEventListener('input', updateToolResults);
+        })();
     </script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
