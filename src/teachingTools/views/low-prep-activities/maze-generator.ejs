@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>Maze Generator - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Create a printable, editable PowerPoint maze from eight questions and answers for your Chinese language classroom.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/maze-generator/maze-generator.css">
+</head>
+<body class="maze-page">
+  <main class="maze-wrap">
+    <header class="maze-header">
+      <div class="maze-header-content">
+        <a href="/low-prep-activities" class="back-btn">← Back to Low-Prep Activities</a>
+        <p class="maze-eyebrow">Editable PowerPoint worksheet</p>
+        <h1>🧭 Maze Generator</h1>
+        <p>Build a ready-to-print maze from eight questions and answers. Your answers are placed along one complete route, then exported in the Chen Laoshi editable PowerPoint template.</p>
+      </div>
+      <figure class="maze-header-sample">
+        <img src="/images/maze-generator-sample.png" alt="Sample four seasons vocabulary maze worksheet">
+        <figcaption>Sample worksheet</figcaption>
+      </figure>
+    </header>
+
+    <div class="maze-layout">
+      <section class="maze-builder" aria-label="Build your maze">
+        <section class="maze-panel maze-intro">
+          <div>
+            <span class="maze-step">1</span>
+            <p class="maze-kicker">Worksheet details</p>
+            <h2>Name your maze</h2>
+          </div>
+          <label class="maze-title-field" for="mazeTitle">Worksheet title
+            <input id="mazeTitle" type="text" maxlength="60" placeholder="e.g. Unit 3 Vocabulary Maze">
+          </label>
+          <p class="maze-help">The title appears on all three editable PowerPoint pages.</p>
+        </section>
+
+        <section class="maze-panel">
+          <div class="maze-panel-heading">
+            <div>
+              <span class="maze-step">2</span>
+              <p class="maze-kicker">Question &amp; answer pairs</p>
+              <h2>Add eight questions</h2>
+            </div>
+            <button id="loadMazeSample" class="maze-secondary" type="button">Load a sample</button>
+          </div>
+          <p class="maze-help">Each large box holds one question. Keep answers short—one word or a brief phrase works best. The other answer boxes become shuffled choices.</p>
+          <div class="maze-library" aria-labelledby="mazeLibraryHeading">
+            <div class="maze-library-heading">
+              <div>
+                <p class="maze-kicker">Chen Laoshi Library</p>
+                <h3 id="mazeLibraryHeading">Use preset question banks</h3>
+                <p class="maze-help">Choose up to eight topics, then bring in a balanced set of eight questions and answers. You can edit every pair afterward.</p>
+              </div>
+              <a class="maze-library-link" href="/teaching-tools/question-bank-library/question-bank-library.html">Browse Library</a>
+            </div>
+            <p id="mazeBankStatus" class="maze-bank-status" aria-live="polite">Loading question-bank topics…</p>
+            <div id="mazeBankChoices" class="maze-bank-choices" aria-label="Choose up to eight question-bank topics"></div>
+            <div class="maze-bank-actions">
+              <button id="importMazeBank" class="maze-secondary" type="button" disabled>Use 8 questions from selected topics</button>
+              <span id="mazeBankSelectionNote" class="maze-bank-selection-note">Choose up to eight topics to begin</span>
+            </div>
+          </div>
+          <div id="mazePairs" class="maze-pairs"></div>
+          <div class="maze-generate-row">
+            <button id="generateMaze" class="maze-primary" type="button">Generate &amp; download PowerPoint</button>
+            <span>Ready when you are—your editable worksheet includes student pages and an answer key.</span>
+          </div>
+        </section>
+        <section class="maze-panel maze-actions-panel">
+          <div>
+            <p class="maze-kicker">Start over</p>
+            <h2>Make another maze</h2>
+            <p class="maze-help">Clear the title and all eight pairs when you are ready for a new worksheet.</p>
+          </div>
+          <div class="maze-actions">
+            <button id="clearMaze" class="maze-secondary" type="button">Clear all</button>
+          </div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <div id="mazeToast" class="maze-toast" role="status" aria-live="polite"></div>
+
+  <script src="/vendor/jszip.min.js"></script>
+  <script src="/low-prep/maze-generator/maze-generator.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

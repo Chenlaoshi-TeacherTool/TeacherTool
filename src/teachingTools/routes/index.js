@@ -52,8 +52,8 @@ router.get('/low-prep-activities/character-race', function(req, res, next) {
   res.render('low-prep-activities/character-race', { title: 'Character Race' });
 });
 
-router.get('/low-prep-activities/tarsia-puzzle', function(req, res, next) {
-  res.render('low-prep-activities/tarsia-puzzle', { title: '三角拼图配对' });
+router.get('/low-prep-activities/maze-generator', function(req, res, next) {
+  res.render('low-prep-activities/maze-generator', { title: 'Maze Generator' });
 });
 
 // Theme Activities Routes

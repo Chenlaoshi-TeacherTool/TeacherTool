@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Chen Laoshi Teaching Toolkit">
+  <rect width="64" height="64" rx="15" fill="#103e37"/>
+  <g fill="#f8c63f">
+    <ellipse cx="32" cy="14" rx="7" ry="13"/>
+    <ellipse cx="50" cy="24" rx="13" ry="7" transform="rotate(45 50 24)"/>
+    <ellipse cx="50" cy="42" rx="13" ry="7" transform="rotate(-45 50 42)"/>
+    <ellipse cx="32" cy="50" rx="7" ry="13"/>
+    <ellipse cx="14" cy="42" rx="13" ry="7" transform="rotate(45 14 42)"/>
+    <ellipse cx="14" cy="24" rx="13" ry="7" transform="rotate(-45 14 24)"/>
+  </g>
+  <circle cx="32" cy="32" r="11" fill="#7a4b27"/>
+  <text x="32" y="38" text-anchor="middle" fill="#fff9e9" font-family="Arial, sans-serif" font-size="19" font-weight="700">陈</text>
+</svg>

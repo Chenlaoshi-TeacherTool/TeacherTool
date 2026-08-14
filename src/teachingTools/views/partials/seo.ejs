@@ -1,0 +1,28 @@
+<%
+  var seoBrand = "Chen Laoshi's Teaching Toolkit";
+  var seoRawTitle = typeof pageTitle !== 'undefined' ? pageTitle : (typeof title !== 'undefined' ? title : seoBrand);
+  var seoTitle = seoRawTitle === 'Home' ? seoBrand : seoRawTitle;
+  if (seoTitle !== seoBrand && seoTitle.indexOf(seoBrand) === -1) seoTitle += ' · ' + seoBrand;
+  var seoDescription = typeof pageDescription !== 'undefined'
+    ? pageDescription
+    : 'Ready-to-use Chinese language teaching activities, printable games, and practical classroom tools from Chen Laoshi.';
+  var seoBaseUrl = typeof siteUrl !== 'undefined' ? siteUrl.replace(/\/$/, '') : 'https://chenlaoshi-teachingtools.azurewebsites.net';
+  var seoPath = typeof requestPath !== 'undefined' ? requestPath : '/';
+  var seoCanonical = seoBaseUrl + seoPath;
+  var seoImage = seoBaseUrl + '/images/chen-laoshi-toolkit-og.png';
+%>
+<meta name="description" content="<%= seoDescription %>">
+<link rel="canonical" href="<%= seoCanonical %>">
+<link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/images/chen-laoshi-avatar.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="<%= seoBrand %>">
+<meta property="og:title" content="<%= seoTitle %>">
+<meta property="og:description" content="<%= seoDescription %>">
+<meta property="og:url" content="<%= seoCanonical %>">
+<meta property="og:image" content="<%= seoImage %>">
+<meta property="og:image:alt" content="Chen Laoshi holding a book in a sunflower classroom">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= seoTitle %>">
+<meta name="twitter:description" content="<%= seoDescription %>">
+<meta name="twitter:image" content="<%= seoImage %>">

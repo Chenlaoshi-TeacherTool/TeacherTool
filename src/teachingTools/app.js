@@ -13,11 +13,20 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('trust proxy', 1);
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(function(req, res, next) {
+  var forwardedProto = (req.get('x-forwarded-proto') || '').split(',')[0].trim();
+  var forwardedHost = (req.get('x-forwarded-host') || req.get('host') || '').split(',')[0].trim();
+  var protocol = forwardedProto || req.protocol || 'https';
+  res.locals.siteUrl = process.env.SITE_URL || (forwardedHost ? protocol + '://' + forwardedHost : 'https://chenlaoshi-teachingtools.azurewebsites.net');
+  res.locals.requestPath = req.path || '/';
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
