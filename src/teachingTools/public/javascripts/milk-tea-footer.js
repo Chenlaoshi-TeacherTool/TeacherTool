@@ -6,6 +6,11 @@
 
     var style = document.createElement('style');
     style.textContent = [
+      '.site-legal-footer { margin: 0; padding: 24px 20px; background: #0f4b43; color: #fffdf7; }',
+      '.site-legal-footer, .site-legal-footer * { box-sizing: border-box; }',
+      '.site-legal-footer-inner { width: min(1140px, calc(100% - 40px)); margin: 0 auto; }',
+      '.site-legal-footer p { margin: 0; color: inherit; font-size: .92rem; line-height: 1.6; }',
+      '.site-legal-footer a { color: #fff2c5; font-weight: 900; text-underline-offset: 3px; }',
       '.milk-tea-site-footer { margin: 0; padding: 30px 20px; background: #eef5df; border-top: 1px solid #d4e1c1; color: #194f45; }',
       '.milk-tea-site-footer * { box-sizing: border-box; }',
       '.milk-tea-footer-inner { width: min(1140px, calc(100% - 40px)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 22px; }',
@@ -29,10 +34,22 @@
       '.milk-tea-option:hover { background: #fff2c5; }',
       '.milk-tea-option.primary { border-color: transparent; background: #bf7f35; color: #fff; }',
       '.milk-tea-option.primary:hover { background: #a96828; }',
-      '@media (max-width: 640px) { .milk-tea-site-footer { padding: 24px 14px; } .milk-tea-footer-inner { width: min(100%, 1140px); align-items: stretch; flex-direction: column; gap: 15px; } .milk-tea-footer-actions, .milk-tea-footer-toggle { width: 100%; } .milk-tea-menu { right: 0; left: 0; width: 100%; } }',
-      '@media print { .milk-tea-site-footer { display: none !important; } }'
+      '@media (max-width: 640px) { .site-legal-footer { padding: 22px 18px; } .site-legal-footer-inner { width: min(100%, 1140px); } .milk-tea-site-footer { padding: 24px 14px; } .milk-tea-footer-inner { width: min(100%, 1140px); align-items: stretch; flex-direction: column; gap: 15px; } .milk-tea-footer-actions, .milk-tea-footer-toggle { width: 100%; } .milk-tea-menu { right: 0; left: 0; width: 100%; } }',
+      '@media print { .milk-tea-site-footer, .site-legal-footer { display: none !important; } }'
     ].join('\n');
     document.head.appendChild(style);
+
+    var legalFooters = document.querySelectorAll('footer');
+    var legalFooter = legalFooters.length ? legalFooters[legalFooters.length - 1] : document.createElement('footer');
+    legalFooter.id = 'siteLegalFooter';
+    legalFooter.className = 'site-legal-footer';
+    legalFooter.setAttribute('aria-label', 'Site information');
+    legalFooter.innerHTML = [
+      '<div class="site-legal-footer-inner">',
+      '  <p>&copy; 2026 Chen Laoshi\'s Teaching Tools &middot; Made with care for curious classrooms. &middot; <a href="/privacy">Privacy Policy</a> &middot; <a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a></p>',
+      '</div>'
+    ].join('');
+    if (legalFooter.parentElement !== document.body) document.body.appendChild(legalFooter);
 
     var footer = document.createElement('aside');
     footer.id = 'milkTeaFooter';
@@ -59,9 +76,7 @@
       '</div>'
     ].join('');
 
-    var existingFooter = document.querySelector('body > footer:last-of-type');
-    if (existingFooter) existingFooter.before(footer);
-    else document.body.appendChild(footer);
+    legalFooter.before(footer);
 
     var toggle = footer.querySelector('.milk-tea-footer-toggle');
     var menu = footer.querySelector('.milk-tea-menu');
