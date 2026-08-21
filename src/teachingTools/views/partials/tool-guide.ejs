@@ -1,0 +1,37 @@
+<% if (typeof toolGuide !== 'undefined' && toolGuide) { %>
+<section class="tool-learning-guide" aria-labelledby="tool-learning-guide-title">
+  <div class="tool-learning-guide__inner">
+    <p class="content-kicker"><%= toolGuide.eyebrow %></p>
+    <h2 id="tool-learning-guide-title">怎样把 <%= toolGuide.title %> 用进课堂</h2>
+    <p class="tool-learning-guide__summary"><%= toolGuide.summary %></p>
+
+    <div class="tool-learning-guide__facts" aria-label="适用信息">
+      <span><strong>适合：</strong><%= toolGuide.grades %></span>
+      <span><strong>时间：</strong><%= toolGuide.duration %></span>
+    </div>
+
+    <div class="tool-learning-guide__grid">
+      <article>
+        <h3>这个工具是什么？</h3>
+        <p><%= toolGuide.whatItIs %></p>
+      </article>
+      <article>
+        <h3>怎么使用</h3>
+        <ol>
+          <% toolGuide.steps.forEach(function(step) { %><li><%= step %></li><% }) %>
+        </ol>
+      </article>
+      <article class="tool-learning-guide__example">
+        <h3><%= toolGuide.exampleTitle %></h3>
+        <p><%= toolGuide.example %></p>
+      </article>
+      <article>
+        <h3>教师使用建议</h3>
+        <ul>
+          <% toolGuide.tips.forEach(function(tip) { %><li><%= tip %></li><% }) %>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+<% } %>

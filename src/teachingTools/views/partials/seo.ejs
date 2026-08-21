@@ -6,16 +6,19 @@
   var seoDescription = typeof pageDescription !== 'undefined'
     ? pageDescription
     : 'Ready-to-use Chinese language teaching activities, printable games, and practical classroom tools from Chen Laoshi.';
-  var seoBaseUrl = typeof siteUrl !== 'undefined' ? siteUrl.replace(/\/$/, '') : 'https://chenlaoshi-teachingtools.azurewebsites.net';
+  var seoBaseUrl = typeof siteUrl !== 'undefined' ? siteUrl.replace(/\/$/, '') : 'https://clsteachingtools.com';
   var seoPath = typeof requestPath !== 'undefined' ? requestPath : '/';
   var seoCanonical = seoBaseUrl + seoPath;
   var seoImage = seoBaseUrl + '/images/chen-laoshi-toolkit-og.png';
+  var seoPageType = typeof pageType !== 'undefined' ? pageType : 'website';
+  var seoNoindex = typeof noindex !== 'undefined' && noindex;
 %>
 <meta name="description" content="<%= seoDescription %>">
+<% if (seoNoindex) { %><meta name="robots" content="noindex, nofollow"><% } else { %><meta name="robots" content="index, follow, max-image-preview:large"><% } %>
 <link rel="canonical" href="<%= seoCanonical %>">
 <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/images/chen-laoshi-avatar.png">
-<meta property="og:type" content="website">
+<meta property="og:type" content="<%= seoPageType %>">
 <meta property="og:site_name" content="<%= seoBrand %>">
 <meta property="og:title" content="<%= seoTitle %>">
 <meta property="og:description" content="<%= seoDescription %>">

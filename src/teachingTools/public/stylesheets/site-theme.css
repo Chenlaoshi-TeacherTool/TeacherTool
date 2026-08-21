@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&family=ZCOOL+QingKe+HuangYou&display=swap');
+@import url('/stylesheets/content-pages.css');
 
 :root {
   --chalk: #194f45;

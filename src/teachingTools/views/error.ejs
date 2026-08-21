@@ -1,3 +1,27 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title><%= status === 404 ? 'Page not found' : 'Website error' %> - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('partials/seo', { pageDescription: 'This page is not available. Return to Chen Laoshi’s published teaching resources and classroom tools.', noindex: true }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/stylesheets/content-pages.css">
+</head>
+<body>
+  <main class="content-hero" style="min-height:66vh; display:grid; align-items:center;">
+    <div class="content-shell">
+      <p class="content-kicker"><%= status === 404 ? '404 · Page not found' : 'Something went wrong' %></p>
+      <h1><%= status === 404 ? '这张资源卡暂时找不到。' : '网站刚刚遇到一个问题。' %></h1>
+      <p><%= status === 404 ? '这个网址可能已经更改，或资源还没有正式发布。你可以回到首页、教学资源或工具目录继续浏览。' : '请稍后重试；如果问题持续出现，欢迎把页面网址发送给陈老师。' %></p>
+      <div class="content-actions">
+        <a class="btn" href="/">返回首页</a>
+        <a class="text-link" href="/resources">查看教学资源</a>
+        <a class="text-link" href="/contact">联系陈老师</a>
+      </div>
+    </div>
+  </main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

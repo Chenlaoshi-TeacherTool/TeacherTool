@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title><%= toolGuide.title %> - 陈老师中文教学工具</title>
+  <%- include('partials/seo', { pageDescription: toolGuide.summary }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/stylesheets/content-pages.css">
+</head>
+<body>
+  <header class="content-hero content-hero--tool">
+    <div class="content-shell">
+      <p class="content-kicker"><%= toolGuide.eyebrow %></p>
+      <h1><%= toolGuide.title %></h1>
+      <p><%= toolGuide.summary %></p>
+      <div class="content-actions">
+        <a class="btn" href="<%= toolGuide.appUrl %>">打开工具 →</a>
+        <a class="text-link" href="<%= sectionPath %>">查看全部<%= sectionLabel %></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <%- include('partials/tool-guide', { toolGuide: toolGuide }) %>
+    <section class="content-section content-section--soft">
+      <div class="content-shell content-cta">
+        <div>
+          <p class="content-kicker">开始准备</p>
+          <h2>先读活动目标，再打开生成器</h2>
+          <p>生成器负责排版和随机化；词汇选择、难度与课堂互动仍由教师决定。制作完成后请先用学生视角测试一次。</p>
+        </div>
+        <a class="btn" href="<%= toolGuide.appUrl %>">现在打开工具</a>
+      </div>
+    </section>
+  </main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

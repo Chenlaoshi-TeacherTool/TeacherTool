@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var apiRouter = require('./routes/api');
 
 var app = express();
@@ -23,14 +22,15 @@ app.use(function(req, res, next) {
   var forwardedProto = (req.get('x-forwarded-proto') || '').split(',')[0].trim();
   var forwardedHost = (req.get('x-forwarded-host') || req.get('host') || '').split(',')[0].trim();
   var protocol = forwardedProto || req.protocol || 'https';
-  res.locals.siteUrl = process.env.SITE_URL || (forwardedHost ? protocol + '://' + forwardedHost : 'https://chenlaoshi-teachingtools.azurewebsites.net');
+  res.locals.siteUrl = process.env.SITE_URL || (forwardedHost ? protocol + '://' + forwardedHost : 'https://clsteachingtools.com');
   res.locals.requestPath = req.path || '/';
   next();
 });
-app.use(express.static(path.join(__dirname, 'public')));
+// Let application routes own clean directory-style URLs instead of having
+// express.static add a trailing-slash redirect before the router can respond.
+app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
@@ -43,6 +43,8 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.status = err.status || 500;
+  res.locals.noindex = true;
 
   // render the error page
   res.status(err.status || 500);

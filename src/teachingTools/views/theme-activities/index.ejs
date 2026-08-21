@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <%- include('../partials/adsense') %>
     <title>Theme Activities - Teacher Toolkit</title>
     <%- include('../partials/seo', { pageDescription: 'Browse Chinese language lessons, games, songs, and classroom-ready activities by theme.' }) %>
 
@@ -134,7 +133,7 @@
 
     <section class="header">
         <h1>Theme Activities</h1>
-        <p>Explore ready-to-use classroom activities by topic.</p>
+        <p>Explore published classroom activities by topic. New themes appear here only after the lesson notes and materials have been reviewed.</p>
     </section>
 
     <!-- 🔍 SEARCH BOX -->
@@ -142,101 +141,29 @@
         <input 
             type="text" 
             id="searchBox" 
-            placeholder="🔍 Search themes (e.g. animals, family, colors...)"
+            placeholder="🔍 Search published themes"
             onkeyup="filterThemes()"
         >
     </div>
 
     <section class="tools-grid">
 
-        <div class="tool-card" data-tags="body parts 身体 部位">
-            <h3>🧍 Body Parts</h3>
-            <p>Body parts vocabulary and games</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="animals 动物">
-            <h3>🐶 Animals</h3>
-            <p>Animals vocabulary & fun activities</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
         <div class="tool-card" data-tags="weather seasons 四季 天气">
             <h3>🌦 Seasons &amp; Weather</h3>
-            <p>Seasons and weather practice</p>
-            <a href="/theme-activities/weather" class="btn">Open</a>
+            <p>Weather words, seasonal questions, songs, and a suggested lesson sequence for Chinese learners.</p>
+            <a href="/theme-activities/weather" class="btn">Open theme</a>
         </div>
 
-        <div class="tool-card" data-tags="countries 国家">
-            <h3>🌍 Countries</h3>
-            <p>Countries and cultural connections</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
+        <div class="tool-card" data-tags="festivals holidays mid autumn 中秋节 节日">
+            <h3>🥮 Mid-Autumn Festival</h3>
+            <p>A 35-minute Grade 1 lesson with four core words, movement, picture sequencing, and a take-home card.</p>
+            <a href="/resources/teaching-mid-autumn-festival-grade-one" class="btn">Read lesson</a>
         </div>
 
-        <div class="tool-card" data-tags="family 家人">
-            <h3>👨‍👩‍👧 Family</h3>
-            <p>Family members vocabulary practice</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="rooms house 房间">
-            <h3>🏠 Rooms</h3>
-            <p>House and rooms vocabulary</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="clothing 服饰 clothes">
-            <h3>👕 Clothing</h3>
-            <p>Clothing vocabulary activities</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="jobs occupations 职业">
-            <h3>👩‍🏫 Jobs &amp; Occupations</h3>
-            <p>Jobs and occupations practice</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="self introduction 自我介绍">
-            <h3>🙋 Self-Introduction</h3>
-            <p>Introduce yourself in Chinese</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="colors 颜色">
-            <h3>🎨 Colors</h3>
-            <p>Colors vocabulary games</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="pinyin 拼音">
-            <h3>🔤 Pinyin</h3>
-            <p>Pinyin practice activities</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="numbers 数字">
-            <h3>🔢 Numbers</h3>
-            <p>Numbers practice and games</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="back to school 返校">
-            <h3>🏫 Back-to-School</h3>
-            <p>Back-to-school activities</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
-
-        <div class="tool-card" data-tags="festivals holidays 节日">
-            <h3>🎉 Festivals</h3>
-            <p>Festivals and cultural holidays</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
-        </div>
- 
-        <div class="tool-card" data-tags="festivals school 学校">
-            <h3>🏫 School</h3>
-            <p>School-related activities</p>
-            <button class="btn" type="button" disabled>Coming Soon</button>
+        <div class="tool-card" data-tags="games vocabulary classroom 中文 游戏 词汇">
+            <h3>🎲 Theme Game Ideas</h3>
+            <p>Ten short games that can be adapted to animals, family, food, colors, school, and other vocabulary themes.</p>
+            <a href="/resources/ten-games-for-chinese-beginners" class="btn">Read game guide</a>
         </div>
     </section>
 

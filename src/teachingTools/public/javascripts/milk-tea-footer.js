@@ -7,6 +7,15 @@
     var style = document.createElement('style');
     style.textContent = [
       '.site-legal-footer { margin: 0; padding: 24px 20px; background: #0f4b43; color: #fffdf7; }',
+      '.site-main-nav { position: relative; z-index: 100; padding: 12px 20px; border-bottom: 1px solid #d7e3c7; background: #fffdf7; color: #194f45; }',
+      '.site-main-nav, .site-main-nav * { box-sizing: border-box; }',
+      '.site-main-nav-inner { width: min(1160px, calc(100% - 16px)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 22px; }',
+      '.site-main-nav-brand { display: inline-flex; align-items: center; gap: 10px; color: #194f45; font-weight: 900; line-height: 1.15; text-decoration: none; }',
+      '.site-main-nav-brand img { width: 42px; height: 42px; border: 2px solid #f8c63f; border-radius: 50%; background: #edf5df; }',
+      '.site-main-nav-brand small { display: block; margin-top: 2px; color: #6a7d74; font-size: .68rem; font-weight: 800; letter-spacing: .04em; }',
+      '.site-main-nav-links { display: flex; align-items: center; justify-content: flex-end; gap: 3px; margin: 0; padding: 0; list-style: none; }',
+      '.site-main-nav-links a { display: block; padding: 8px 10px; border-radius: 999px; color: #29463d; font-size: .85rem; font-weight: 900; text-decoration: none; white-space: nowrap; }',
+      '.site-main-nav-links a:hover, .site-main-nav-links a[aria-current="page"] { background: #edf5df; color: #194f45; }',
       '.site-legal-footer, .site-legal-footer * { box-sizing: border-box; }',
       '.site-legal-footer-inner { width: min(1140px, calc(100% - 40px)); margin: 0 auto; }',
       '.site-legal-footer p { margin: 0; color: inherit; font-size: .92rem; line-height: 1.6; }',
@@ -34,10 +43,38 @@
       '.milk-tea-option:hover { background: #fff2c5; }',
       '.milk-tea-option.primary { border-color: transparent; background: #bf7f35; color: #fff; }',
       '.milk-tea-option.primary:hover { background: #a96828; }',
-      '@media (max-width: 640px) { .site-legal-footer { padding: 22px 18px; } .site-legal-footer-inner { width: min(100%, 1140px); } .milk-tea-site-footer { padding: 24px 14px; } .milk-tea-footer-inner { width: min(100%, 1140px); align-items: stretch; flex-direction: column; gap: 15px; } .milk-tea-footer-actions, .milk-tea-footer-toggle { width: 100%; } .milk-tea-menu { right: 0; left: 0; width: 100%; } }',
-      '@media print { .milk-tea-site-footer, .site-legal-footer { display: none !important; } }'
+      '@media (max-width: 860px) { .site-main-nav-inner { align-items: flex-start; flex-direction: column; gap: 9px; } .site-main-nav-links { width: 100%; justify-content: flex-start; flex-wrap: wrap; overflow: visible; padding-bottom: 3px; } }',
+      '@media (max-width: 640px) { .site-main-nav { padding: 10px 12px; } .site-main-nav-inner { width: 100%; } .site-main-nav-brand img { width: 36px; height: 36px; } .site-main-nav-links a { padding: 7px 9px; font-size: .78rem; } .site-legal-footer { padding: 22px 18px; } .site-legal-footer-inner { width: min(100%, 1140px); } .milk-tea-site-footer { padding: 24px 14px; } .milk-tea-footer-inner { width: min(100%, 1140px); align-items: stretch; flex-direction: column; gap: 15px; } .milk-tea-footer-actions, .milk-tea-footer-toggle { width: 100%; } .milk-tea-menu { right: 0; left: 0; width: 100%; } }',
+      '@media print { .site-main-nav, .milk-tea-site-footer, .site-legal-footer { display: none !important; } }'
     ].join('\n');
     document.head.appendChild(style);
+
+    if (!document.getElementById('siteMainNav')) {
+      var nav = document.createElement('nav');
+      nav.id = 'siteMainNav';
+      nav.className = 'site-main-nav';
+      nav.setAttribute('aria-label', 'Main navigation');
+      nav.innerHTML = [
+        '<div class="site-main-nav-inner">',
+        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" alt=""><span>陈老师中文教学工具<small>Chen Laoshi\'s Teaching Toolkit</small></span></a>',
+        '  <ul class="site-main-nav-links">',
+        '    <li><a href="/">首页</a></li>',
+        '    <li><a href="/teaching-tools">教学工具</a></li>',
+        '    <li><a href="/resources">教学资源</a></li>',
+        '    <li><a href="/recommendations">好物推荐</a></li>',
+        '    <li><a href="/about">关于陈老师</a></li>',
+        '    <li><a href="/contact">联系我</a></li>',
+        '  </ul>',
+        '</div>'
+      ].join('');
+      var currentPath = window.location.pathname;
+      Array.prototype.forEach.call(nav.querySelectorAll('.site-main-nav-links a'), function(link) {
+        var path = link.getAttribute('href');
+        var active = path === '/' ? currentPath === '/' : currentPath === path || currentPath.indexOf(path + '/') === 0;
+        if (active) link.setAttribute('aria-current', 'page');
+      });
+      document.body.prepend(nav);
+    }
 
     var legalFooters = document.querySelectorAll('footer');
     var legalFooter = legalFooters.length ? legalFooters[legalFooters.length - 1] : document.createElement('footer');
@@ -46,7 +83,7 @@
     legalFooter.setAttribute('aria-label', 'Site information');
     legalFooter.innerHTML = [
       '<div class="site-legal-footer-inner">',
-      '  <p>&copy; 2026 Chen Laoshi\'s Teaching Tools &middot; Made with care for curious classrooms. &middot; <a href="/privacy">Privacy Policy</a> &middot; <a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a></p>',
+      '  <p>&copy; 2026 Chen Laoshi\'s Teaching Toolkit &middot; <a href="/about">About</a> &middot; <a href="/resources">Teaching Resources</a> &middot; <a href="/recommendations">Recommendations</a> &middot; <a href="/contact">Contact</a> &middot; <a href="/privacy">Privacy Policy</a></p>',
       '</div>'
     ].join('');
     if (legalFooter.parentElement !== document.body) document.body.appendChild(legalFooter);

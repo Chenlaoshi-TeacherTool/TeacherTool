@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title>教学资源与教师博客 - 陈老师中文教学工具</title>
+  <%- include('../partials/adsense') %>
+  <%- include('../partials/seo', { pageDescription: '陈老师整理的中文课堂游戏、节日教学、拼音与汉字教学方法，以及可打印活动。每篇资源都给出可直接使用的课堂流程。' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/stylesheets/content-pages.css">
+</head>
+<body>
+  <header class="content-hero">
+    <div class="content-shell">
+      <p class="content-kicker">教学资源 · 教师博客</p>
+      <h1>真正能带进中文课堂的教学方法</h1>
+      <p>这里记录怎样组织游戏、解释文化、复习词汇和使用本站工具。每篇文章围绕一个清楚的学习目标，给出课堂步骤、例子和教师判断。</p>
+    </div>
+  </header>
+  <main class="content-section">
+    <div class="content-shell">
+      <nav class="filter-chips" aria-label="资源分类">
+        <a href="/resources" class="<%= !activeCategory ? 'active' : '' %>">全部</a>
+        <% categories.forEach(function(category) { %>
+          <a href="/resources?category=<%= encodeURIComponent(category) %>" class="<%= activeCategory === category ? 'active' : '' %>"><%= category %></a>
+        <% }) %>
+      </nav>
+      <div class="resource-grid">
+        <% articles.forEach(function(article) { %>
+          <article class="resource-card">
+            <p class="resource-card__meta"><%= article.category %> · <%= article.readTime %></p>
+            <h2><a href="/resources/<%= article.slug %>"><%= article.title %></a></h2>
+            <p><%= article.description %></p>
+            <a class="resource-card__link" href="/resources/<%= article.slug %>">阅读完整课堂方法 →</a>
+          </article>
+        <% }) %>
+      </div>
+      <% if (!articles.length) { %><p class="empty-state">这个分类的资源正在整理中。你可以先查看全部文章。</p><% } %>
+    </div>
+  </main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
