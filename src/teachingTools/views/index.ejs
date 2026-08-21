@@ -180,21 +180,17 @@
         .grade-btn { border: 1px solid #cbdac2; border-radius: 999px; background: #fffdf7; color: #356e57; font-family: inherit; font-weight: 800; transition: transform .15s ease, background-color .15s ease; }
         .grade-btn:hover { transform: translateY(-2px); background: #356e57; color: white; }
         .feedback-section {
-            display: grid;
-            grid-template-columns: minmax(220px, .58fr) minmax(0, 1fr);
-            gap: 34px;
             max-width: 1120px;
             margin: 0 auto;
-            padding: 64px 20px 70px;
-            align-items: start;
+            padding: 54px 20px 60px;
         }
-        .feedback-copy { padding: 24px 0; }
+        .feedback-copy { max-width: 560px; padding: 24px 0; }
         .feedback-copy .eyebrow { margin-bottom: 15px; border-color: #d7e3c7; background: #edf5df; color: #356e57; }
         .feedback-copy h2 { margin: 0; color: #194f45; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: clamp(2rem, 3.6vw, 2.8rem); font-weight: 400; line-height: 1.08; }
         .feedback-copy p { max-width: 390px; margin: 16px 0 0; color: #5d7168; line-height: 1.65; }
-        .feedback-note { display: inline-flex; margin-top: 20px; padding: 8px 12px; border: 1px solid #d7e3c7; border-radius: 999px; background: #fffdf7; color: #356e57; font-size: .82rem; font-weight: 800; }
-        .feedback-form-wrap { min-height: 530px; overflow: hidden; padding: 0 clamp(24px, 2.6vw, 40px); border: 1px solid #e5ddc9; border-radius: 22px; background: #fffdf7; box-shadow: 0 10px 26px rgba(24, 66, 55, .1); }
-        .feedback-form-wrap iframe { display: block; width: 100%; min-height: 530px; border: 0; }
+        .feedback-note { display: inline-flex; align-items: center; gap: 9px; margin-top: 20px; padding: 10px 14px; border: 1px solid #d7e3c7; border-radius: 999px; background: #fffdf7; color: #356e57; font-size: .82rem; font-weight: 800; text-decoration: none; transition: transform .15s ease, border-color .15s ease, background-color .15s ease; }
+        .feedback-note:hover { transform: translateY(-2px); border-color: #6f9e72; background: #edf5df; }
+        .feedback-note span { font-size: 1rem; }
         footer { padding: 25px 20px; }
         footer p { margin: 0; }
         footer a { color: #fff2c5; font-weight: 800; }
@@ -204,7 +200,7 @@
             .hero-content { gap: 36px; margin-top: 8px; }
             .hero-avatar-wrap { width: min(320px, 78vw); padding: 10px; }
         }
-        @media (max-width: 820px) { .hero-content { grid-template-columns: 1fr; gap: 24px; text-align: center; } .hero-copy { margin: 0 auto; } .hero-buttons { justify-content: center; } .hero-avatar-wrap { grid-row: 1; } .home-paths-header, .home-paths-grid, .featured-items, .feedback-section, .shop-preview { grid-template-columns: 1fr; max-width: 540px; margin-right: auto; margin-left: auto; } .home-path-card--tools, .home-path-card--resources, .home-path-card--recommendations { grid-column: auto; grid-row: auto; } .home-path-card--tools { min-height: 440px; } .shop-preview-copy { padding: 32px; } .shop-preview img { min-height: 245px; max-height: 320px; } .feedback-section { gap: 10px; padding-top: 46px; padding-bottom: 52px; } .feedback-copy { padding-top: 0; } }
+        @media (max-width: 820px) { .hero-content { grid-template-columns: 1fr; gap: 24px; text-align: center; } .hero-copy { margin: 0 auto; } .hero-buttons { justify-content: center; } .hero-avatar-wrap { grid-row: 1; } .home-paths-header, .home-paths-grid, .featured-items, .feedback-section, .shop-preview { grid-template-columns: 1fr; max-width: 540px; margin-right: auto; margin-left: auto; } .home-path-card--tools, .home-path-card--resources, .home-path-card--recommendations { grid-column: auto; grid-row: auto; } .home-path-card--tools { min-height: 440px; } .shop-preview-copy { padding: 32px; } .shop-preview img { min-height: 245px; max-height: 320px; } .feedback-section { padding-top: 46px; padding-bottom: 52px; } .feedback-copy { padding-top: 0; } }
         @media (max-width: 520px) { .home-hero { padding: 22px 16px 44px; } .top-note { max-width: 520px; font-size: .65rem; letter-spacing: .08em; line-height: 1.45; } .hero-avatar-wrap { width: min(280px, 80vw); } .home-paths-section { padding: 50px 16px 54px; } .home-paths-header { gap: 18px; } .home-paths-grid { margin-top: 26px; } .home-path-card { padding: 24px; border-radius: 20px; } .home-path-card--tools { min-height: 405px; } .home-path-card--recommendations { grid-template-columns: 1fr; } .home-path-card__product-image { width: min(190px, 70%); margin: 0 auto; } .home-paths-about { align-items: flex-start; flex-direction: column; gap: 8px; } .featured { padding: 49px 16px; } .shop-preview { margin: 0 16px; } .shop-preview-copy { padding: 28px; } }
     </style>
 </head>
@@ -366,10 +362,7 @@
             <div class="eyebrow">💌 Your voice matters</div>
             <h2 id="feedback-heading">Help this toolkit grow.</h2>
             <p>What would make your teaching day easier? Share a feature idea, suggestion, or bug you found. I read every message.</p>
-            <span class="feedback-note">🌻 Feedback goes directly to Chen Laoshi</span>
-        </div>
-        <div class="feedback-form-wrap">
-            <iframe data-tally-src="https://tally.so/embed/GxEBPk?alignLeft=1&amp;hideTitle=1&amp;transparentBackground=1&amp;dynamicHeight=1" loading="lazy" title="Share feedback with Chen Laoshi"></iframe>
+            <a class="feedback-note" href="/feedback">🌻 Feedback goes directly to Chen Laoshi <span aria-hidden="true">→</span></a>
         </div>
     </section>
 
@@ -378,6 +371,5 @@
     </footer>
     <script src="/javascripts/account-coming-soon.js"></script>
     <script src="/javascripts/milk-tea-footer.js"></script>
-    <script async src="https://tally.so/widgets/embed.js"></script>
 </body>
 </html>

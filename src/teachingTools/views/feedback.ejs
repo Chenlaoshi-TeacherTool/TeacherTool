@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title>Share Feedback - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('partials/seo', { pageDescription: 'Share a feature idea, report a problem, ask an order question, or send classroom feedback directly to Chen Laoshi.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/stylesheets/content-pages.css">
+  <style>
+    .feedback-page { background: #fff9e9; }
+    .feedback-page-main { padding: 54px 0 80px; }
+    .feedback-page-shell { width: min(820px, calc(100% - 40px)); margin: 0 auto; }
+    .feedback-form-card { overflow: hidden; min-height: 620px; padding: 0 clamp(20px, 4vw, 42px); border: 1px solid #e5ddc9; border-radius: 24px; background: #fffdf7; box-shadow: 0 12px 30px rgba(24, 66, 55, .1); }
+    .feedback-form-card iframe { display: block; width: 100%; min-height: 620px; border: 0; }
+    .feedback-privacy-note { margin: 20px 0 0; color: #5d7168; font-size: .9rem; line-height: 1.7; }
+    .feedback-privacy-note a { color: #27664f; font-weight: 800; }
+    @media (max-width: 600px) { .feedback-page-shell { width: min(820px, calc(100% - 28px)); } .feedback-form-card { padding: 0 14px; border-radius: 18px; } }
+  </style>
+</head>
+<body class="feedback-page">
+  <header class="content-hero">
+    <div class="content-shell">
+      <p class="content-kicker">Your voice matters</p>
+      <h1>Share feedback with Chen Laoshi</h1>
+      <p>Suggest a feature, report a problem, ask an order question, or tell me how you use a tool in your classroom. Please do not include student information.</p>
+    </div>
+  </header>
+  <main class="feedback-page-main">
+    <div class="feedback-page-shell">
+      <div class="feedback-form-card">
+        <iframe data-tally-src="https://tally.so/embed/GxEBPk?alignLeft=1&amp;hideTitle=1&amp;transparentBackground=1&amp;dynamicHeight=1" loading="eager" title="Share feedback with Chen Laoshi"></iframe>
+      </div>
+      <p class="feedback-privacy-note">Your response is sent through Tally. Do not submit student records, sensitive personal information, or payment-card details. Read the <a href="/privacy">Privacy Policy</a> for more information.</p>
+    </div>
+  </main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+  <script async src="https://tally.so/widgets/embed.js"></script>
+</body>
+</html>

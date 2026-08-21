@@ -21,6 +21,10 @@ router.get('/contact', function(req, res, next) {
   res.render('contact', { title: 'Contact Chen Laoshi' });
 });
 
+router.get('/feedback', function(req, res, next) {
+  res.render('feedback', { title: 'Share Feedback' });
+});
+
 router.get('/recommendations', function(req, res, next) {
   res.render('recommendations', { title: 'Classroom Recommendations' });
 });
@@ -140,7 +144,7 @@ router.get('/sitemap.xml', function(req, res) {
   var paths = [
     '/', '/teaching-tools', '/low-prep-activities', '/theme-activities', '/theme-activities/weather', '/theme-activities/weather/songs',
     '/classroom-shop',
-    '/resources', '/recommendations', '/about', '/contact', '/privacy',
+    '/resources', '/recommendations', '/about', '/contact', '/feedback', '/privacy',
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator',
     '/teaching-tools/sunflower-spinner', '/teaching-tools/word-list-library',
     '/teaching-tools/question-bank-library', '/teaching-tools/vocabulary-booklet',
