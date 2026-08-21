@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title>Class Pet Points · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'A colorful, teacher-managed classroom points tool with 24 original pets, six growth forms, optional holiday skins, private browser storage, and simple backups.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/teaching-tools/class-pet-points/class-pet-points.css">
+</head>
+<body>
+  <header class="pet-hero account-header-host">
+    <div class="hero-shell">
+      <a class="back-btn" href="/teaching-tools">← All teaching tools</a>
+      <div class="hero-copy">
+        <p class="eyebrow">A cheerful classroom motivator</p>
+        <h1>Class Pet Points</h1>
+        <p>Celebrate positive classroom moments as every pet hatches, grows, sparkles, and dresses up for teacher-chosen holidays.</p>
+        <div class="hero-badges" aria-label="Tool highlights">
+          <span>24 original pets</span>
+          <span>6 growth forms</span>
+          <span>Holiday skins</span>
+          <span>Saved on this device</span>
+        </div>
+      </div>
+      <div class="hero-pets" aria-hidden="true">
+        <div class="hero-pet hero-pet-one"></div>
+        <div class="hero-pet hero-pet-two"></div>
+        <div class="hero-pet hero-pet-three"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pet-app" id="petApp">
+    <section class="privacy-note" aria-label="Student privacy reminder">
+      <span aria-hidden="true">🔒</span>
+      <p><strong>Teacher-managed and private by design.</strong> This version saves only in this browser. Use nicknames, initials, or student numbers instead of full student names.</p>
+    </section>
+
+    <section class="class-dashboard app-card" aria-labelledby="classSettingsTitle">
+      <div class="class-name-control">
+        <label id="classSettingsTitle" for="className">Class name</label>
+        <input id="className" maxlength="60" value="My Class" autocomplete="off">
+        <p id="saveStatus">Saved on this device</p>
+      </div>
+      <div class="class-stats" aria-live="polite">
+        <div><strong id="studentTotal">0</strong><span>students</span></div>
+        <div><strong id="classPointsTotal">0</strong><span>class points</span></div>
+        <div><strong id="topStageTotal">0</strong><span>200-point pets</span></div>
+      </div>
+      <div class="dashboard-actions">
+        <button class="utility-button" id="privacyToggle" type="button" aria-pressed="false">◉ Privacy display</button>
+        <button class="utility-button" id="exportButton" type="button">↓ Export backup</button>
+        <button class="utility-button" id="importButton" type="button">↑ Import backup</button>
+        <button class="utility-button danger-button" id="resetButton" type="button">Reset class</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+      </div>
+    </section>
+
+    <div class="pet-workspace">
+      <aside class="pet-sidebar">
+        <section class="app-card add-students-card" aria-labelledby="addStudentsTitle">
+          <p class="section-kicker">Set up your roster</p>
+          <h2 id="addStudentsTitle">Add students</h2>
+          <form id="addStudentsForm">
+            <label for="studentNames">One nickname, initial, or number per line</label>
+            <textarea id="studentNames" rows="7" maxlength="1600" placeholder="Student 01&#10;Student 02&#10;Student 03"></textarea>
+            <p class="field-note">New students receive different pets until all 24 have been used.</p>
+            <button class="primary-button" type="submit">Add students &amp; assign pets</button>
+          </form>
+        </section>
+
+        <section class="app-card growth-guide" aria-labelledby="growthGuideTitle">
+          <p class="section-kicker">Hatch, grow, and sparkle</p>
+          <h2 id="growthGuideTitle">Growth stages</h2>
+          <ol>
+            <li><span>🥚</span><div><strong>Egg</strong><small>0–9 points</small></div></li>
+            <li><span>🐣</span><div><strong>Cracked Egg</strong><small>10–19 points</small></div></li>
+            <li><span>🐾</span><div><strong>Baby</strong><small>20–49 points</small></div></li>
+            <li><span>💛</span><div><strong>Chubby Form</strong><small>50–99 points</small></div></li>
+            <li><span>🌟</span><div><strong>Cute Adult</strong><small>100–149 points</small></div></li>
+            <li><span>✨</span><div><strong>Sparkle Form</strong><small>150–199 · complete at 200</small></div></li>
+            <li><span>🎁</span><div><strong>Holiday Skin</strong><small>Teacher-selected anytime</small></div></li>
+          </ol>
+        </section>
+
+        <section class="app-card history-card" aria-labelledby="historyTitle">
+          <div class="section-heading-row">
+            <div>
+              <p class="section-kicker">Easy to review</p>
+              <h2 id="historyTitle">Recent activity</h2>
+            </div>
+            <button class="text-button" id="clearHistoryButton" type="button">Clear</button>
+          </div>
+          <div id="historyList" class="history-list"></div>
+        </section>
+      </aside>
+
+      <section class="roster-panel app-card" aria-labelledby="rosterTitle">
+        <div class="roster-heading">
+          <div>
+            <p class="section-kicker">Your class</p>
+            <h2 id="rosterTitle">Pet roster <span id="visibleCount"></span></h2>
+          </div>
+          <button class="undo-button" id="undoButton" type="button" disabled>↶ Undo last points change</button>
+        </div>
+
+        <div class="roster-toolbar">
+          <label class="search-field">
+            <span class="sr-only">Search students</span>
+            <span aria-hidden="true">⌕</span>
+            <input id="studentSearch" type="search" placeholder="Find a student" autocomplete="off">
+          </label>
+          <label class="sort-field">
+            <span>Sort</span>
+            <select id="studentSort">
+              <option value="added">Recently added</option>
+              <option value="name">Name A–Z</option>
+              <option value="points-high">Points: high to low</option>
+              <option value="points-low">Points: low to high</option>
+              <option value="stage">Growth form</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+          <div class="empty-pet" aria-hidden="true"></div>
+          <h3>Your pet class is ready to begin!</h3>
+          <p>Add nicknames or student numbers on the left. Each student will receive one of 24 original pets.</p>
+        </div>
+
+        <div class="pet-grid" id="petGrid" aria-live="polite"></div>
+        <p class="no-results" id="noResults" hidden>No students match that search.</p>
+      </section>
+    </div>
+
+    <section class="teacher-tips app-card" aria-labelledby="teacherTipsTitle">
+      <div>
+        <p class="section-kicker">Keep rewards meaningful</p>
+        <h2 id="teacherTipsTitle">A simple classroom rhythm</h2>
+      </div>
+      <ol>
+        <li><strong>Name the behavior.</strong><span>“You earned a point for helping your group get started.”</span></li>
+        <li><strong>Use small changes.</strong><span>Give +1 most often so each growth stage feels earned.</span></li>
+        <li><strong>Celebrate growth.</strong><span>Pause when a pet reaches a new form; avoid comparing students publicly.</span></li>
+      </ol>
+    </section>
+  </main>
+
+  <dialog class="pet-picker" id="petPicker" aria-labelledby="petPickerTitle">
+    <div class="dialog-heading">
+      <div>
+        <p class="section-kicker">24 original companions</p>
+        <h2 id="petPickerTitle">Choose a pet</h2>
+        <p id="petPickerStudent"></p>
+      </div>
+      <button class="dialog-close" id="closePetPicker" type="button" aria-label="Close pet picker">×</button>
+    </div>
+    <div class="pet-picker-grid" id="petPickerGrid"></div>
+  </dialog>
+
+  <dialog class="pet-picker skin-picker" id="skinPicker" aria-labelledby="skinPickerTitle">
+    <div class="dialog-heading">
+      <div>
+        <p class="section-kicker">The animal stays the same</p>
+        <h2 id="skinPickerTitle">Choose a holiday skin</h2>
+        <p id="skinPickerStudent"></p>
+      </div>
+      <button class="dialog-close" id="closeSkinPicker" type="button" aria-label="Close holiday skin picker">×</button>
+    </div>
+    <p class="skin-picker-note">Add or remove a seasonal decoration whenever it fits your class calendar. Holiday skins do not change points or growth.</p>
+    <div class="skin-picker-grid" id="skinPickerGrid"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p class="noscript-note">Class Pet Points needs JavaScript enabled to save and update the roster.</p></noscript>
+  <script src="/teaching-tools/class-pet-points/class-pet-points.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

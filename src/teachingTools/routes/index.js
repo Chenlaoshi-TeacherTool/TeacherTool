@@ -68,6 +68,10 @@ router.get('/teaching-tools/random-group-generator', function(req, res, next) {
   res.render('teaching-tools/random-group-generator', { title: 'Random Group Generator', toolGuide: toolGuides['random-group-generator'] });
 });
 
+router.get('/teaching-tools/class-pet-points', function(req, res, next) {
+  res.render('teaching-tools/class-pet-points', { title: 'Class Pet Points' });
+});
+
 [
   ['sunflower-spinner', 'Teaching Tools', '/teaching-tools'],
   ['word-list-library', 'Teaching Tools', '/teaching-tools'],
@@ -145,7 +149,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/', '/teaching-tools', '/low-prep-activities', '/theme-activities', '/theme-activities/weather', '/theme-activities/weather/songs',
     '/classroom-shop',
     '/resources', '/recommendations', '/about', '/contact', '/feedback', '/privacy',
-    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator',
+    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points',
     '/teaching-tools/sunflower-spinner', '/teaching-tools/word-list-library',
     '/teaching-tools/question-bank-library', '/teaching-tools/vocabulary-booklet',
     '/low-prep-activities/word-sudoku', '/low-prep-activities/word-cloud',
