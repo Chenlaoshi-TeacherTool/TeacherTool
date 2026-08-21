@@ -42,16 +42,16 @@
   ];
 
   var sample = {
-    title: '四季词语迷宫',
+    title: 'Fraction Equivalence Maze',
     pairs: [
-      { question: '春天到了，小草和小树在做什么？', answer: '发芽' },
-      { question: '秋天到了，树叶的颜色会有什么变化？', answer: '变黄' },
-      { question: '冬天到了，天气变得怎么样？', answer: '寒冷' },
-      { question: '春雨过后，花园里的花儿都怎么样了？', answer: '开花' },
-      { question: '秋天到了，农民伯伯在田地里忙着做什么？', answer: '丰收' },
-      { question: '下雪天，小朋友们喜欢在雪地里做什么好玩的事？', answer: '堆雪人' },
-      { question: '夏天到了，天气变得怎么样？', answer: '炎热' },
-      { question: '天气太热了，小朋友们喜欢做什么运动来消暑？', answer: '游泳' }
+      { question: 'Which fraction is equivalent to one half?', answer: '2/4' },
+      { question: 'Which fraction is equivalent to three fourths?', answer: '6/8' },
+      { question: 'Which fraction is equivalent to two thirds?', answer: '4/6' },
+      { question: 'Which fraction is equivalent to one third?', answer: '3/9' },
+      { question: 'Which fraction is equivalent to four fifths?', answer: '8/10' },
+      { question: 'Which fraction is equivalent to three tenths?', answer: '6/20' },
+      { question: 'Which fraction is equivalent to five sixths?', answer: '10/12' },
+      { question: 'Which fraction is equivalent to seven eighths?', answer: '14/16' }
     ]
   };
 
@@ -333,9 +333,9 @@
       if (original === '四季词语迷宫') {
         setShapeText(shape, data.title);
       } else if (original === '四季词语迷宫：参考答案') {
-        setShapeText(shape, data.title + '：参考答案');
+        setShapeText(shape, data.title + ': Answer Key');
       } else if (original.indexOf('从开始出发') === 0) {
-        setShapeText(shape, '从开始出发，选出每道题的正确答案，一路连到终点吧！');
+        setShapeText(shape, 'Start at the beginning, choose each correct answer, and follow the path to the finish.');
       } else if (original.indexOf('开始') === 0 && original.indexOf(sourceQuestions[0]) !== -1) {
         setStartQuestionText(shape, data.pairs[0].question);
       } else if (Object.prototype.hasOwnProperty.call(questionMap, original)) {

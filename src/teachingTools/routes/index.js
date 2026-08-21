@@ -65,12 +65,12 @@ router.get('/teaching-tools/random-group-generator', function(req, res, next) {
 });
 
 [
-  ['sunflower-spinner', '教学工具', '/teaching-tools'],
-  ['word-list-library', '教学工具', '/teaching-tools'],
-  ['question-bank-library', '教学工具', '/teaching-tools'],
-  ['vocabulary-booklet', '教学工具', '/teaching-tools'],
-  ['word-sudoku', '低准备活动', '/low-prep-activities'],
-  ['word-cloud', '低准备活动', '/low-prep-activities']
+  ['sunflower-spinner', 'Teaching Tools', '/teaching-tools'],
+  ['word-list-library', 'Teaching Tools', '/teaching-tools'],
+  ['question-bank-library', 'Teaching Tools', '/teaching-tools'],
+  ['vocabulary-booklet', 'Teaching Tools', '/teaching-tools'],
+  ['word-sudoku', 'Low-Prep Activities', '/low-prep-activities'],
+  ['word-cloud', 'Low-Prep Activities', '/low-prep-activities']
 ].forEach(function(config) {
   var slug = config[0];
   var basePath = config[2] === '/teaching-tools' ? '/teaching-tools/' : '/low-prep-activities/';
@@ -106,7 +106,7 @@ router.get('/low-prep-activities/would-you-rather', function(req, res, next) {
 });
 
 router.get('/low-prep-activities/jeopardy', function(req, res, next) {
-  res.render('low-prep-activities/jeopardy', { title: 'Jeopardy 抢答赛', toolGuide: toolGuides.jeopardy });
+  res.render('low-prep-activities/jeopardy', { title: 'Jeopardy Review Game', toolGuide: toolGuides.jeopardy });
 });
 
 router.get('/low-prep-activities/character-race', function(req, res, next) {

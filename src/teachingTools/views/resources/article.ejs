@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#194f45">
-  <title><%= article.title %> - 陈老师教学资源</title>
+  <title><%= article.title %> - Chen Laoshi's Teaching Resources</title>
   <%- include('../partials/adsense') %>
   <%- include('../partials/seo', { pageDescription: article.description, pageType: 'article' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
@@ -16,7 +16,7 @@
       <p class="content-kicker"><%= article.category %> · <%= article.readTime %></p>
       <h1><%= article.title %></h1>
       <p><%= article.description %></p>
-      <p class="article-byline">陈老师教学资源 · 最后更新：2026 年 8 月 20 日</p>
+      <p class="article-byline">Chen Laoshi's Teaching Resources · Last updated August 20, 2026</p>
     </div>
   </header>
 
@@ -28,22 +28,22 @@
           <h2><%= section.heading %></h2>
           <% (section.paragraphs || []).forEach(function(paragraph) { %><p><%= paragraph %></p><% }) %>
           <% if (section.list) { %><ul><% section.list.forEach(function(item) { %><li><%= item %></li><% }) %></ul><% } %>
-          <% if (section.callout) { %><aside class="article-callout"><strong>陈老师的课堂提醒：</strong> <%= section.callout %></aside><% } %>
+          <% if (section.callout) { %><aside class="article-callout"><strong>Classroom note:</strong> <%= section.callout %></aside><% } %>
         </section>
       <% }) %>
       <section class="article-tool-cta">
-        <div><p class="content-kicker">把方法带进课堂</p><h2>相关工具与资源</h2><p>先确定本课学习目标，再选择工具；工具负责节省准备时间，教师负责教学判断。</p></div>
+        <div><p class="content-kicker">Put the method into practice</p><h2>Related tool or resource</h2><p>Choose the learning goal before the tool. The tool can save preparation time; the teacher still makes the instructional decisions.</p></div>
         <a class="btn" href="<%= article.relatedTool.href %>"><%= article.relatedTool.label %> →</a>
       </section>
-      <p class="article-editorial-note"><strong>内容说明：</strong>本站不以批量文章为目标，每篇资源都围绕明确的课堂任务与教师判断整理。课堂情况不同，请根据学生年龄、语言程度、特殊学习需要和学校政策调整。</p>
+      <p class="article-editorial-note"><strong>Editorial note:</strong> This site does not publish articles for volume. Each resource is organized around a clear classroom task and teacher judgment. Adapt the ideas for student age, subject knowledge, language proficiency, learning needs, and school policy.</p>
     </article>
-    <aside class="article-sidebar" aria-label="更多教学资源">
-      <p class="content-kicker">继续阅读</p>
-      <h2>更多课堂方法</h2>
+    <aside class="article-sidebar" aria-label="More teaching resources">
+      <p class="content-kicker">Keep reading</p>
+      <h2>More classroom methods</h2>
       <% relatedArticles.forEach(function(item) { %>
         <a href="/resources/<%= item.slug %>"><span><%= item.category %></span><strong><%= item.title %></strong></a>
       <% }) %>
-      <a class="article-sidebar__all" href="/resources">查看全部教学资源 →</a>
+      <a class="article-sidebar__all" href="/resources">View all teaching resources →</a>
     </aside>
   </main>
   <script src="/javascripts/milk-tea-footer.js"></script>

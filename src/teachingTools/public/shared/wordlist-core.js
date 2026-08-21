@@ -208,7 +208,7 @@
   }
 
   function toCSV(list) {
-    var head = ['中文', '拼音', '英文', '主题', '级别', '图片', '备注'];
+    var head = ['Term', 'Pronunciation', 'Definition', 'Topic', 'Level', 'Image', 'Notes'];
     var rows = [head.join(',')];
     (list.items || []).forEach(function (it) {
       rows.push([it.zh, it.py, it.en, it.theme || list.theme || '', it.level || list.level || '', it.img, it.note]
@@ -236,7 +236,7 @@
   function fromCSV(text) {
     var lines = String(text).replace(/^\uFEFF/, '').split(/\r?\n/).filter(function (l) { return l.trim(); });
     if (!lines.length) return [];
-    var start = /中文|zh|word/i.test(lines[0]) ? 1 : 0;
+    var start = /中文|zh|word|term|pronunciation|definition/i.test(lines[0]) ? 1 : 0;
     var items = [];
     for (var i = start; i < lines.length; i++) {
       var c = splitCSVLine(lines[i]);
@@ -288,14 +288,14 @@
 
   /** 保存一个词表；没有 id 就新建一个。返回保存后的对象 */
   function save(list) {
-    if (!list || !list.items) throw new Error('save(): 需要 {name, items}');
+    if (!list || !list.items) throw new Error('A list name and items are required.');
     list.id = list.id || newId();
-    list.name = list.name || '未命名词表';
+    list.name = list.name || 'Untitled vocabulary list';
     list.updated = Date.now();
     var body = JSON.stringify(list);
     if (HAS_STORE) {
       try { global.localStorage.setItem(PREFIX + list.id, body); }
-      catch (e) { throw new Error('浏览器存储已满或被禁用，请改用「下载 JSON」备份。'); }
+      catch (e) { throw new Error('Browser storage is full or unavailable. Download a JSON backup instead.'); }
     } else {
       MEM[list.id] = body;
     }

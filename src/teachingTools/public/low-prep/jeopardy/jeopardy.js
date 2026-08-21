@@ -31,7 +31,7 @@ function blankGame(cats, rows, base, step) {
     for (var r = 0; r < rows; r++) cat.clues.push({ q: '', a: '', dd: false, used: false });
     g.categories.push(cat);
   }
-  g.teams = [{ name: '第一组', score: 0 }, { name: '第二组', score: 0 }];
+  g.teams = [{ name: 'Team 1', score: 0 }, { name: 'Team 2', score: 0 }];
   return g;
 }
 var G = blankGame();
@@ -60,14 +60,14 @@ function renderEditor() {
   G.categories.forEach(function (cat, ci) {
     var d = el('div', 'cat');
     var name = el('input', 'cname');
-    name.type = 'text'; name.value = cat.name; name.placeholder = '类别 ' + (ci + 1);
+    name.type = 'text'; name.value = cat.name; name.placeholder = 'Category ' + (ci + 1);
     name.addEventListener('input', function () { cat.name = name.value; });
     d.appendChild(name);
     cat.clues.forEach(function (cl, ri) {
       var s = el('div', 'slot');
       var v = el('span', 'val'); v.textContent = valueOf(ri); s.appendChild(v);
       var q = el('span', 'q' + (cl.q ? '' : ' empty'));
-      q.textContent = cl.q || '（空）点一下填题';
+      q.textContent = cl.q || 'Empty · select to add a question';
       s.appendChild(q);
       if (cl.dd) { var dd = el('span', 'dd'); dd.textContent = 'DD'; s.appendChild(dd); }
       s.addEventListener('click', function () { openEdit(ci, ri); });
@@ -97,7 +97,7 @@ function renderTeams() {
 function openEdit(c, r) {
   edit.c = c; edit.r = r;
   var cl = G.categories[c].clues[r];
-  $('#mTitle').textContent = (G.categories[c].name || ('类别 ' + (c + 1))) + ' · ' + valueOf(r) + ' 分';
+  $('#mTitle').textContent = (G.categories[c].name || ('Category ' + (c + 1))) + ' · ' + valueOf(r) + ' points';
   $('#mQ').value = cl.q; $('#mA').value = cl.a; $('#mDD').checked = !!cl.dd;
   $('#modal').classList.add('open');
   setTimeout(function () { $('#mQ').focus(); }, 40);
@@ -105,7 +105,7 @@ function openEdit(c, r) {
 function saveEdit() {
   var cl = G.categories[edit.c].clues[edit.r];
   cl.q = $('#mQ').value.trim(); cl.a = $('#mA').value.trim(); cl.dd = $('#mDD').checked;
-  if (cl.dd) { // 一场只留一个 Daily Double
+  if (cl.dd) { // Keep only one Daily Double per game.
     G.categories.forEach(function (cat, ci) {
       cat.clues.forEach(function (x, ri) { if (!(ci === edit.c && ri === edit.r)) x.dd = false; });
     });
@@ -116,18 +116,18 @@ function saveEdit() {
 
 /* ---------------- from wordlist ---------------- */
 function genFromList() {
-  if (!CW) { toast('需要 wordlist-core.js'); return; }
+  if (!CW) { toast('The vocabulary library is unavailable.'); return; }
   var all = CW.listAll();
-  if (!all.length) { toast('词表核心模块里还没有词表'); return; }
-  var names = all.map(function (r, i) { return (i + 1) + '. ' + r.name + '（' + r.count + '）'; }).join('\n');
-  var k = parseInt(prompt('用哪个词表出题？输入编号：\n' + names, '1'), 10) - 1;
+  if (!all.length) { toast('No saved vocabulary lists are available yet.'); return; }
+  var names = all.map(function (r, i) { return (i + 1) + '. ' + r.name + ' (' + r.count + ')'; }).join('\n');
+  var k = parseInt(prompt('Which vocabulary list should create the questions? Enter a number:\n' + names, '1'), 10) - 1;
   if (isNaN(k) || !all[k]) return;
   var list = CW.load(all[k].id);
-  if (!list || !list.items.length) { toast('这个词表是空的'); return; }
+  if (!list || !list.items.length) { toast('That vocabulary list is empty.'); return; }
   var mode = $('#genMode').value;
   var items = CW.shuffle(list.items);
   var need = G.categories.length * G.rows;
-  if (items.length < need) toast('词不够 ' + need + ' 个，能填多少填多少');
+  if (items.length < need) toast('This list has fewer than ' + need + ' terms. The available terms will be used.');
   var i = 0;
   G.categories.forEach(function (cat, ci) {
     if (!cat.name) cat.name = list.name.length > 8 ? list.name.slice(0, 8) : list.name;
@@ -137,17 +137,17 @@ function genFromList() {
       var itemMode = mode === 'mixed'
         ? ['py2zh', 'en2zh', 'zh2en', 'zh2py', 'sentence'][(i - 1) % 5]
         : mode;
-      if (itemMode === 'py2zh') { cl.q = '这个拼音是什么字？\n' + (it.py || ''); cl.a = it.zh; }
-      else if (itemMode === 'en2zh') { cl.q = '用中文怎么说？\n' + (it.en || it.zh); cl.a = it.zh; }
-      else if (itemMode === 'zh2en') { cl.q = it.zh + '\n英文是什么？'; cl.a = it.en || ''; }
-      else if (itemMode === 'zh2py') { cl.q = it.zh + '\n拼音怎么写？'; cl.a = it.py || ''; }
-      else { cl.q = '用「' + it.zh + '」说一个完整的句子'; cl.a = '（老师判断：句子完整、用对词就算过）'; }
+      if (itemMode === 'py2zh') { cl.q = 'Which Chinese characters match this pinyin?\n' + (it.py || ''); cl.a = it.zh; }
+      else if (itemMode === 'en2zh') { cl.q = 'How do you say this in Chinese?\n' + (it.en || it.zh); cl.a = it.zh; }
+      else if (itemMode === 'zh2en') { cl.q = it.zh + '\nWhat does this mean in English?'; cl.a = it.en || ''; }
+      else if (itemMode === 'zh2py') { cl.q = it.zh + '\nWrite the pinyin.'; cl.a = it.py || ''; }
+      else { cl.q = 'Use “' + it.zh + '” in a complete sentence.'; cl.a = 'Teacher check: the sentence is complete and uses the term accurately.'; }
       cl.used = false;
     });
   });
-  if (!G.name) G.name = list.name + ' · 抢答赛';
+  if (!G.name) G.name = list.name + ' · Jeopardy Review';
   renderEditor();
-  toast('用「' + list.name + '」出好题了');
+  toast('Questions created from “' + list.name + '.”');
 }
 
 /* ---------------- from Chen Laoshi question banks ---------------- */
@@ -191,8 +191,8 @@ function renderQuestionBankChoices() {
   choices.innerHTML = '';
 
   if (!presetQuestionBanks.length) {
-    status.textContent = '公开题库暂时无法载入。请稍后再试。';
-    note.textContent = '题库载入后即可选择主题';
+    status.textContent = 'Published question banks are unavailable right now. Please try again later.';
+    note.textContent = 'Topics will appear when the library loads.';
     importButton.disabled = true;
     return;
   }
@@ -214,10 +214,10 @@ function renderQuestionBankChoices() {
     choices.appendChild(button);
   });
 
-  status.textContent = presetQuestionBanks.length + ' 个公开题库主题可选。';
+  status.textContent = presetQuestionBanks.length + ' published question bank topics are available.';
   note.textContent = selectedPresetBankIds.length
-    ? '已选 ' + selectedPresetBankIds.length + ' 个主题 · 每个主题会成为一栏'
-    : '选择 2–6 个主题';
+    ? selectedPresetBankIds.length + ' topics selected · each topic will become a category'
+    : 'Choose 2–6 topics';
   importButton.disabled = selectedPresetBankIds.length < 2;
 }
 function togglePresetBank(id) {
@@ -226,7 +226,7 @@ function togglePresetBank(id) {
     selectedPresetBankIds.splice(selectedIndex, 1);
   } else {
     if (selectedPresetBankIds.length >= 6) {
-      toast('最多选择 6 个主题');
+      toast('Choose no more than 6 topics.');
       return;
     }
     selectedPresetBankIds.push(id);
@@ -251,12 +251,12 @@ function loadPresetQuestionBanks() {
 function importPresetBanks() {
   var selected = selectedPresetBanks();
   if (selected.length < 2) {
-    toast('请选择至少 2 个主题');
+    toast('Choose at least 2 topics.');
     return;
   }
   var importButton = $('#btnImportBanks');
   importButton.disabled = true;
-  $('#bankStatus').textContent = '正在抽取所选主题的题目…';
+  $('#bankStatus').textContent = 'Selecting questions from the chosen topics…';
   Promise.all(selected.map(function (bank) {
     return fetch('/api/questionbanks/presets/' + encodeURIComponent(bank.id)).then(function (response) {
       if (!response.ok) throw new Error('Question bank unavailable');
@@ -283,12 +283,12 @@ function importPresetBanks() {
     G = nextGame;
     renderEditor();
     renderQuestionBankChoices();
-    $('#bankStatus').textContent = '已从 ' + banks.length + ' 个主题抽取题目。你仍可点任意格子编辑。';
-    toast('公开题库已加入 Jeopardy 游戏板');
+    $('#bankStatus').textContent = 'Questions were added from ' + banks.length + ' topics. You can still edit any cell.';
+    toast('Published questions were added to the Jeopardy board.');
   }).catch(function () {
-    $('#bankStatus').textContent = '题库载入失败，请稍后重试。';
+    $('#bankStatus').textContent = 'The question banks could not be loaded. Please try again later.';
     renderQuestionBankChoices();
-    toast('题库载入失败');
+    toast('The question banks could not be loaded.');
   });
 }
 
@@ -296,7 +296,7 @@ function importPresetBanks() {
 function index() { try { return JSON.parse(localStorage.getItem(PRE + 'index') || '[]'); } catch (e) { return []; } }
 function saveGame() {
   var name = $('#gname').value.trim();
-  if (!name) { toast('先给这套题起个名字'); $('#gname').focus(); return; }
+  if (!name) { toast('Give this board a name first.'); $('#gname').focus(); return; }
   G.name = name;
   G.id = G.id || (PRE + Date.now());
   try {
@@ -304,21 +304,21 @@ function saveGame() {
     var idx = index().filter(function (r) { return r.id !== G.id; });
     idx.unshift({ id: G.id, name: name, updated: Date.now(), cats: G.categories.length, rows: G.rows });
     localStorage.setItem(PRE + 'index', JSON.stringify(idx));
-    renderSaved(); toast('已保存「' + name + '」');
-  } catch (e) { toast('保存失败，浏览器存储可能被禁用'); }
+    renderSaved(); toast('Saved “' + name + '.”');
+  } catch (e) { toast('Save failed. Browser storage may be unavailable.'); }
 }
 function renderSaved() {
   var box = $('#saved'); box.innerHTML = '';
   var idx = index();
-  if (!idx.length) { box.innerHTML = '<p class="hint" style="margin:0">还没有保存过题库。</p>'; return; }
+  if (!idx.length) { box.innerHTML = '<p class="hint" style="margin:0">No boards have been saved yet.</p>'; return; }
   idx.forEach(function (r) {
     var g = el('span'); g.style.marginRight = '8px';
     var b = el('button', 'mini');
-    b.textContent = r.name + '（' + r.cats + '×' + r.rows + '）';
+    b.textContent = r.name + ' (' + r.cats + '×' + r.rows + ')';
     b.addEventListener('click', function () { loadGame(r.id); });
     var d = el('button', 'mini danger'); d.textContent = '✕';
     d.addEventListener('click', function () {
-      if (!confirm('删除「' + r.name + '」？')) return;
+      if (!confirm('Delete “' + r.name + '”?')) return;
       localStorage.removeItem(r.id);
       localStorage.setItem(PRE + 'index', JSON.stringify(index().filter(function (x) { return x.id !== r.id; })));
       renderSaved();
@@ -329,9 +329,9 @@ function renderSaved() {
 function loadGame(id) {
   try {
     var g = JSON.parse(localStorage.getItem(id));
-    if (!g) { toast('打不开'); return; }
-    G = g; renderEditor(); toast('已打开「' + g.name + '」');
-  } catch (e) { toast('打不开'); }
+    if (!g) { toast('This board could not be opened.'); return; }
+    G = g; renderEditor(); toast('Opened “' + g.name + '.”');
+  } catch (e) { toast('This board could not be opened.'); }
 }
 function resetSizes() {
   var cats = Math.max(2, Math.min(6, +$('#optCats').value || 5));
@@ -353,8 +353,8 @@ function resetSizes() {
 function startGame() {
   var ready = 0;
   G.categories.forEach(function (c) { c.clues.forEach(function (x) { if (x.q) ready++; }); });
-  if (!ready) { toast('还没有题目'); return; }
-  if (!G.teams.length) { toast('至少要有一个队伍'); return; }
+  if (!ready) { toast('Add at least one question first.'); return; }
+  if (!G.teams.length) { toast('Add at least one team first.'); return; }
   $('#game').classList.add('open');
   $('#gtitle').textContent = G.name || 'Jeopardy';
   renderBoard(); renderScores();
@@ -394,9 +394,9 @@ function renderScores() {
     var v = el('span', 'v'); v.textContent = t.score; d.appendChild(v);
     box.appendChild(d);
   });
-  var b = el('button', 'mini'); b.textContent = '分数清零';
+  var b = el('button', 'mini'); b.textContent = 'Reset scores';
   b.addEventListener('click', function () {
-    if (!confirm('所有队伍分数清零？')) return;
+    if (!confirm('Reset every team score?')) return;
     G.teams.forEach(function (t) { t.score = 0; }); renderScores();
   });
   box.appendChild(b);
@@ -405,8 +405,8 @@ function openClue(c, r) {
   live.c = c; live.r = r;
   var cl = G.categories[c].clues[r];
   live.dd = !!cl.dd;
-  $('#chead').innerHTML = '<b>' + esc(G.categories[c].name || '') + '</b><span>' + valueOf(r) + ' 分</span>' +
-    (cl.dd ? '<span style="color:#F6C43C;font-weight:700">Daily Double · 双倍</span>' : '');
+  $('#chead').innerHTML = '<b>' + esc(G.categories[c].name || '') + '</b><span>' + valueOf(r) + ' points</span>' +
+    (cl.dd ? '<span style="color:#F6C43C;font-weight:700">Daily Double</span>' : '');
   $('#ca').textContent = cl.a || '';
   $('#ca').classList.remove('show');
   $('#clue').classList.add('open');
@@ -416,7 +416,7 @@ function openClue(c, r) {
   $('#tleft').textContent = G.seconds;
   renderClueTeams();
   if (cl.dd) {
-    $('#cq').innerHTML = '<div class="dd-splash">DAILY DOUBLE<br>双 倍 分 数</div>';
+    $('#cq').innerHTML = '<div class="dd-splash">DAILY DOUBLE</div>';
     setTimeout(function () { showQuestion(); }, 1400);
   } else {
     showQuestion();
@@ -491,7 +491,7 @@ function slideSVG(kind, cat, val, text, dd) {
   g += '<rect x="26" y="26" width="' + (W - 52) + '" height="' + (H - 52) + '" rx="24" fill="none" stroke="#1B2A47" stroke-width="8"/>';
   g += '<rect x="70" y="62" width="' + (W - 140) + '" height="96" rx="18" fill="#35604C" stroke="#1B2A47" stroke-width="6"/>';
   g += '<text x="110" y="126" font-size="42" font-weight="700" fill="#F2F6EF">' + esc(cat || '') + '</text>';
-  g += '<text x="' + (W - 110) + '" y="126" font-size="42" font-weight="700" fill="#F6C43C" text-anchor="end">' + val + ' 分' + (dd ? '　·　DD' : '') + '</text>';
+  g += '<text x="' + (W - 110) + '" y="126" font-size="42" font-weight="700" fill="#F6C43C" text-anchor="end">' + val + ' pts' + (dd ? ' · DD' : '') + '</text>';
   var lines = wrapText(text || '', 16);
   var fs = lines.length > 4 ? 56 : lines.length > 2 ? 70 : 84;
   var startY = H / 2 - (lines.length - 1) * fs * 0.62 + 20;
@@ -500,18 +500,18 @@ function slideSVG(kind, cat, val, text, dd) {
       (kind === 'a' ? '#F6C43C' : '#F2F6EF') + '" text-anchor="middle">' + esc(ln) + '</text>';
   });
   g += '<text x="' + (W / 2) + '" y="' + (H - 60) + '" font-size="30" fill="#9FBDAD" text-anchor="middle">' +
-    (kind === 'a' ? '答案' : '题目') + '</text>';
+    (kind === 'a' ? 'ANSWER' : 'QUESTION') + '</text>';
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif">' + g + '</svg>';
 }
 function bankPages() {
   var W = 794, H = 1123, perPage = 26;
   var rows = [];
   G.categories.forEach(function (cat, ci) {
-    rows.push({ head: true, text: (cat.name || ('类别 ' + (ci + 1))) });
+    rows.push({ head: true, text: (cat.name || ('Category ' + (ci + 1))) });
     cat.clues.forEach(function (cl, ri) {
       if (!cl.q) return;
       rows.push({ text: valueOf(ri) + '　' + cl.q.replace(/\n/g, ' ') + (cl.dd ? '　[DD]' : '') });
-      rows.push({ ans: true, text: '答：' + (cl.a || '') });
+      rows.push({ ans: true, text: 'Answer: ' + (cl.a || '') });
     });
     rows.push({ text: '' });
   });
@@ -521,7 +521,7 @@ function bankPages() {
     var g = '<rect width="' + W + '" height="' + H + '" fill="#FBF6E9"/>';
     g += '<rect x="24" y="24" width="' + (W - 48) + '" height="54" rx="12" fill="#35604C" stroke="#1B2A47" stroke-width="4"/>';
     g += '<text x="' + (W / 2) + '" y="60" font-size="26" font-weight="700" fill="#F2F6EF" text-anchor="middle">' +
-      esc(G.name || 'Jeopardy 题库') + '　（第 ' + (pi + 1) + ' 页）</text>';
+      esc(G.name || 'Jeopardy Question Set') + ' · Page ' + (pi + 1) + '</text>';
     var y = 116;
     pg.forEach(function (row) {
       if (row.head) {
@@ -538,9 +538,9 @@ function bankPages() {
   });
 }
 function renderAll(svgs, w, h, cb) {
-  if (!DE) { toast('缺少 deck-export.js'); return; }
+  if (!DE) { toast('The export helper is unavailable.'); return; }
   var out = [], i = 0;
-  toast('正在生成，请稍等…');
+  toast('Generating your file…');
   (function next() {
     if (i >= svgs.length) { cb(out); return; }
     var k = i++;
@@ -557,19 +557,19 @@ function exportPPTX() {
       svgs.push(slideSVG('a', cat.name, valueOf(ri), cl.a, cl.dd));
     });
   });
-  if (!svgs.length) { toast('还没有题目'); return; }
+  if (!svgs.length) { toast('Add at least one question first.'); return; }
   renderAll(svgs, 1600, 900, function (imgs) {
     DE.download((G.name || 'Jeopardy') + '.pptx', DE.buildPPTX(imgs),
       'application/vnd.openxmlformats-officedocument.presentationml.presentation');
-    toast('PPTX 好了（' + imgs.length + ' 页，题目和答案各一页）');
+    toast('PPTX ready: ' + imgs.length + ' slides with separate question and answer pages.');
   });
 }
 function exportPDF() {
   var svgs = bankPages();
-  if (!svgs.length) { toast('还没有题目'); return; }
+  if (!svgs.length) { toast('Add at least one question first.'); return; }
   renderAll(svgs, 794, 1123, function (imgs) {
-    DE.download((G.name || 'Jeopardy') + ' 题库.pdf', DE.buildPDF(imgs, { pageWidth: 595, pageHeight: 842 }), 'application/pdf');
-    toast('PDF 题库好了（' + imgs.length + ' 页）');
+    DE.download((G.name || 'Jeopardy') + ' Question Set.pdf', DE.buildPDF(imgs, { pageWidth: 595, pageHeight: 842 }), 'application/pdf');
+    toast('PDF ready: ' + imgs.length + ' pages.');
   });
 }
 function exportJSON() {
@@ -579,9 +579,9 @@ function exportJSON() {
 function importJSON(text) {
   try {
     var g = JSON.parse(text);
-    if (!g.categories) throw new Error('格式不对');
-    g.id = null; G = g; renderEditor(); toast('导入好了');
-  } catch (e) { alert('导入失败：' + e.message); }
+    if (!g.categories) throw new Error('The file format is not valid.');
+    g.id = null; G = g; renderEditor(); toast('Board imported.');
+  } catch (e) { alert('Import failed: ' + e.message); }
 }
 
 /* ---------------- boot ---------------- */
@@ -596,13 +596,13 @@ document.addEventListener('DOMContentLoaded', function () {
   $('#optCats').value = G.categories.length;
 
   $('#btnAddTeam').addEventListener('click', function () {
-    var n = $('#teamName').value.trim() || ('第' + (G.teams.length + 1) + '组');
+    var n = $('#teamName').value.trim() || ('Team ' + (G.teams.length + 1));
     G.teams.push({ name: n, score: 0 }); $('#teamName').value = ''; renderTeams();
   });
   $('#btnGen').addEventListener('click', genFromList);
   $('#btnImportBanks').addEventListener('click', importPresetBanks);
   $('#btnBlank').addEventListener('click', function () {
-    if (!confirm('清空所有题目？')) return;
+    if (!confirm('Clear every question?')) return;
     var t = G.teams, n = G.name;
     G = blankGame(G.categories.length, G.rows, G.base, G.step);
     G.teams = t; G.name = n; renderEditor();
@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', function () {
   $('#btnSave').addEventListener('click', saveGame);
   $('#btnNew').addEventListener('click', function () {
     G = blankGame(+$('#optCats').value || 5, +$('#optRows').value || 5, +$('#optBase').value || 100, +$('#optStep').value || 100);
-    renderEditor(); toast('新建了一套');
+    renderEditor(); toast('New board created.');
   });
   $('#btnStart').addEventListener('click', startGame);
   $('#btnPPTX').addEventListener('click', exportPPTX);

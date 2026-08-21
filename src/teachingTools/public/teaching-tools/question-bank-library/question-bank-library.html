@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#194f45">
   <title>Question Banks · Chen Laoshi's Teaching Toolkit</title>
-  <meta name="description" content="Browse Chen Laoshi's preset question banks and quickly find classroom-ready Chinese language questions.">
+  <meta name="description" content="Browse teacher-curated question banks and organize reusable questions for classroom activities across subjects.">
   <meta name="robots" content="noindex, follow">
   <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/question-bank-library">
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Question Banks · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Browse Chen Laoshi's preset question banks and quickly find classroom-ready Chinese language questions."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/question-bank-library"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Question Banks · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Browse teacher-curated question banks and organize reusable questions for classroom activities across subjects."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/question-bank-library"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="./question-bank-library.css">
 </head>
@@ -38,8 +38,8 @@
     <section class="intro card">
       <div>
         <p class="eyebrow">Your shared question foundation</p>
-        <h2>Choose a Chen Laoshi question bank, then find the right question in seconds.</h2>
-        <p>These teacher-curated question banks are ready for everyone to browse, filter, and use in future classroom activities.</p>
+        <h2>Choose a question bank, then find the right prompt in seconds.</h2>
+        <p>The current teacher-curated starter banks focus on Chinese language learning. The question format, filters, and upcoming personal uploads are designed for any subject.</p>
       </div>
       <div class="intro-badges" aria-label="Question bank features">
         <span>Teacher curated</span>
@@ -61,7 +61,7 @@
           <span>Find a topic</span>
           <span class="preset-search-input">
             <span aria-hidden="true">&#128269;</span>
-            <input id="presetSearch" type="search" placeholder="Search animals, weather, 学校..." autocomplete="off">
+            <input id="presetSearch" type="search" placeholder="Search animals, weather, school..." autocomplete="off">
           </span>
         </label>
         <p class="preset-search-status" id="presetSearchStatus" aria-live="polite"></p>
@@ -103,9 +103,9 @@
           <p class="eyebrow">Your format is ready</p>
           <h3 id="formatGuideTitle">How imported questions are organized</h3>
           <dl>
-            <div><dt>主题</dt><dd>Becomes the topic filter, such as 季节天气 or 动物.</dd></div>
-            <div><dt>难度 + 标签</dt><dd>Make it easy to narrow a bank for one class.</dd></div>
-            <div><dt>题型 + 答案</dt><dd>Keep question types and answer keys ready for future activities.</dd></div>
+            <div><dt>Topic</dt><dd>Becomes the subject or unit filter, such as Weather or Animals.</dd></div>
+            <div><dt>Level + tags</dt><dd>Make it easy to narrow a bank for one class or learning goal.</dd></div>
+            <div><dt>Question type + answer</dt><dd>Keep formats and answer keys ready for future activities.</dd></div>
           </dl>
         </section>
       </section>
@@ -122,7 +122,7 @@
         <div class="bank-bar">
           <label for="bankSelect">Question bank
             <select id="bankSelect" disabled>
-              <option value="">Import or choose a saved bank</option>
+              <option value="">Choose a preset question bank</option>
             </select>
           </label>
           <button class="text-button" id="downloadButton" type="button" disabled>Download JSON backup</button>
@@ -139,7 +139,7 @@
           <label>Type<select id="typeFilter"></select></label>
         </div>
 
-        <p class="results-note" id="resultsNote">Import a question bank to see its questions here.</p>
+        <p class="results-note" id="resultsNote">Choose a question bank to see its questions here.</p>
         <div class="question-list" id="questionList"></div>
       </section>
     </div>
@@ -161,7 +161,7 @@
       <div>
         <p class="eyebrow">Designed to grow with your toolkit</p>
         <h2 id="nextUsesTitle">One bank, many future activities.</h2>
-        <p>Your imported questions will be ready to connect to review games, exit tickets, and printable worksheets. This first version focuses on importing, organizing, and safely saving your content.</p>
+        <p>Reusable questions can connect to review games, exit tickets, and printable worksheets. This first version offers curated starter banks while the personal library is being prepared.</p>
       </div>
       <div class="use-chips" aria-label="Future uses">
         <span>🏆 Jeopardy</span>

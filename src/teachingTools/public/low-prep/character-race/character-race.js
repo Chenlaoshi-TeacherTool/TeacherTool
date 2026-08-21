@@ -5,7 +5,7 @@ var S = {
   chars: [],
   order: [],
   terms: {},
-  opts: { targetLanguage: 'pinyin', rings: 'auto', size: 'auto', grid: 20, flower: true },
+  opts: { targetLanguage: 'english', rings: 'auto', size: 'auto', grid: 20, flower: true },
   title: ''
 };
 var $ = function (s) { return document.querySelector(s); };
@@ -25,31 +25,34 @@ function targetText(t) {
 }
 
 function targetLanguageName() {
-  return S.opts.targetLanguage === 'english' ? 'English' : 'Pinyin';
+  return S.opts.targetLanguage === 'english' ? 'definition' : 'pinyin';
 }
 
 function updateTargetLanguageHint() {
   var hint = $('#targetLanguageHint');
   if (!hint) return;
   var missing = S.order.filter(function (term) { return !targetText(term); }).length;
-  hint.textContent = 'Chinese stays on each tile. ' + targetLanguageName() + ' is shown as the target language.' +
-    (missing ? ' ' + missing + ' term' + (missing === 1 ? '' : 's') + ' need ' + targetLanguageName() + ' added in Step 1.' : '');
+  hint.textContent = 'Each tile shows the term with its optional ' + targetLanguageName() + ' underneath.' +
+    (missing ? ' ' + missing + ' term' + (missing === 1 ? '' : 's') + ' do not have that support line yet.' : '');
 }
 
 /* ---------- input ---------- */
-// space / comma / newline present -> split by word; otherwise split by single character
+// Split subject terms by line, delimiter, or whitespace; keep unspaced Chinese text compatible.
 function parseChars(text) {
-  var raw = String(text).replace(/　/g, ' ');
-  var hasSep = /[\s、，,；;\/|]/.test(raw.trim());
+  var raw = String(text).replace(/　/g, ' ').trim();
   var tokens;
-  if (hasSep) {
-    tokens = raw.split(/[\s、，,；;\/|]+/);
-  } else {
+  if (/\r?\n/.test(raw)) {
+    tokens = raw.split(/\r?\n/);
+  } else if (/[、，,；;\/]/.test(raw)) {
+    tokens = raw.split(/[、，,；;\/]+/);
+  } else if (/^[一-龥]+$/.test(raw)) {
     tokens = raw.split('');
+  } else {
+    tokens = raw.split(/\s+/);
   }
   var out = [], seen = {};
   tokens.forEach(function (tk) {
-    var t = tk.replace(/[^一-龥]/g, '');
+    var t = String(tk || '').trim().replace(/\s+/g, ' ');
     if (!t) return;
     if (seen[t]) return;
     seen[t] = 1;
@@ -67,7 +70,7 @@ function parseTerms(text) {
         parseChars(line).forEach(function (zh) { terms.push({ zh: zh }); });
         return;
       }
-      var zh = (parts[0] || '').replace(/[^一-龥]/g, '');
+      var zh = String(parts[0] || '').trim().replace(/\s+/g, ' ');
       if (!zh) return;
       terms.push({
         zh: zh,
@@ -84,7 +87,7 @@ function parseTerms(text) {
 function setTerms(list) {
   var seen = {}, order = [], terms = {};
   list.forEach(function (item) {
-    var zh = String(item && item.zh || '').replace(/[^一-龥]/g, '');
+    var zh = String(item && item.zh || '').trim().replace(/\s+/g, ' ');
     if (!zh || seen[zh]) return;
     seen[zh] = true;
     terms[zh] = {
@@ -127,7 +130,7 @@ function layout() {
   });
   return out.filter(function (ring) { return ring.chars.length; });
 }
-// Font size is chosen from the chord length between adjacent characters so tiles never overlap
+// Font size is chosen from the chord length between adjacent terms so tiles never overlap.
 function fitFontSize(R, rings, centerR, withTarget) {
   var maxLen = 1;
   S.order.forEach(function (t) { if (t.length > maxLen) maxLen = t.length; });
@@ -217,8 +220,8 @@ function circleSVG(w, h, opt) {
     g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (cr0 * 0.98) + '" fill="#35604C" stroke="#1B2A47" stroke-width="5"/>';
     g += '<text x="' + cx + '" y="' + (cy + centerFont * 0.34) + '" font-size="' + centerFont + '" font-weight="700" fill="#F6C43C" text-anchor="middle">' + esc(centerText) + '</text>';
   } else if (!flower || petalOuter <= cr0 * 1.3) {
-    g += '<text x="' + cx + '" y="' + (cy - 2) + '" font-size="' + (cr0 * 0.42) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">汉字</text>';
-    g += '<text x="' + cx + '" y="' + (cy + cr0 * 0.5) + '" font-size="' + (cr0 * 0.42) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">快跑</text>';
+    g += '<text x="' + cx + '" y="' + (cy - 2) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">TERM</text>';
+    g += '<text x="' + cx + '" y="' + (cy + cr0 * 0.45) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">RACE</text>';
   }
 
   var idx = 0;
@@ -254,7 +257,7 @@ function gridSVG(w, h, cells, label) {
   var cw = (w - pad * 2) / cols, chh = (h - pad * 2 - 34) / rows;
   var g = '<rect width="' + w + '" height="' + h + '" fill="#fff"/>';
   g += '<text x="' + pad + '" y="' + (pad + 4) + '" font-size="22" font-weight="700" fill="#1B2A47">' + esc(label || 'Grid') + '</text>';
-  g += '<text x="' + (w - pad) + '" y="' + (pad + 4) + '" font-size="16" fill="#5A6B57" text-anchor="end">Mark an X here each time your partner finds a character</text>';
+  g += '<text x="' + (w - pad) + '" y="' + (pad + 4) + '" font-size="16" fill="#5A6B57" text-anchor="end">Mark an X here each time your partner finds a term</text>';
   for (var i = 0; i < cells; i++) {
     var r = Math.floor(i / cols), c = i % cols;
     var x = pad + c * cw, y = pad + 22 + r * chh;
@@ -268,18 +271,18 @@ function sheetSVG() {
   var W = 794, H = 1123;
   var g = '<rect width="' + W + '" height="' + H + '" fill="#fff"/>';
   g += '<rect x="24" y="24" width="' + (W - 48) + '" height="54" rx="12" fill="#35604C" stroke="#1B2A47" stroke-width="4"/>';
-  g += '<text x="' + (W / 2) + '" y="60" font-size="28" font-weight="700" fill="#F2F6EF" text-anchor="middle">Character Race　' + esc(S.title || '') + '</text>';
+  g += '<text x="' + (W / 2) + '" y="60" font-size="28" font-weight="700" fill="#F2F6EF" text-anchor="middle">Term Race · ' + esc(S.title || '') + '</text>';
   g += '<text x="30" y="102" font-size="15" fill="#1B2A47">Name ＿＿＿＿＿＿＿＿　Partner ＿＿＿＿＿＿＿＿　Date ＿＿＿＿＿＿</text>';
   var cW = W - 48, cH = 672;
   g += '<g transform="translate(24,116)">' + circleSVG(cW, cH, { pad: 46 }).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + '</g>';
   g += '<g transform="translate(24,800)">' + gridSVG(cW, 262, S.opts.grid, 'Grid').replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + '</g>';
-  g += '<text x="' + (W / 2) + '" y="1092" font-size="14" fill="#5A6B57" text-anchor="middle">One partner calls out a character while the other finds it on the wheel. The caller marks an X on the grid each round, then switch.</text>';
+  g += '<text x="' + (W / 2) + '" y="1092" font-size="14" fill="#5A6B57" text-anchor="middle">One partner gives a clue while the other finds the term on the wheel. Mark an X on the grid each round, then switch.</text>';
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif">' + g + '</svg>';
 }
 
 function renderPreview() {
   $('#preview').innerHTML = S.order.length ? circleSVG(900, 640) :
-    '<div style="padding:50px;text-align:center;color:#9AA79E">No characters yet</div>';
+    '<div style="padding:50px;text-align:center;color:#9AA79E">No terms yet</div>';
 }
 
 /* ---------- game ---------- */
@@ -289,13 +292,13 @@ function speak(ch) {
   try {
     if (!window.speechSynthesis) return;
     var u = new SpeechSynthesisUtterance(ch);
-    u.lang = 'zh-CN'; u.rate = 0.85;
+    u.lang = /[\u3400-\u9fff]/.test(ch) ? 'zh-CN' : 'en-US'; u.rate = 0.85;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   } catch (e) {}
 }
 function openGame() {
-  if (S.order.length < 4) { toast('Add at least 4 characters'); return; }
+  if (S.order.length < 4) { toast('Add at least 4 terms'); return; }
   $('#game').classList.add('open');
   G.score = 0; G.miss = 0; G.left = +$('#gtime').value || 60; G.running = false; G.target = '';
   drawGame();
@@ -362,31 +365,31 @@ function svgToJpegLocal(svg, w, h, cb) {
   DE.svgToJpeg(svg, w, h, 2).then(cb).catch(function () { toast('Export failed'); });
 }
 function exportPNG() {
-  if (!S.order.length) { toast('Add some characters first'); return; }
+  if (!S.order.length) { toast('Add some terms first'); return; }
   var svg = sheetSVG();
   svgToJpegLocal(svg, 794, 1123, function (im) {
-    DE.download((S.title || 'character-race') + '.jpg', im.bytes, 'image/jpeg');
+    DE.download((S.title || 'term-race') + '.jpg', im.bytes, 'image/jpeg');
   });
 }
 function exportPDF() {
-  if (!S.order.length) { toast('Add some characters first'); return; }
+  if (!S.order.length) { toast('Add some terms first'); return; }
   svgToJpegLocal(sheetSVG(), 794, 1123, function (im) {
     var bytes = DE.buildPDF([im], { pageWidth: 595, pageHeight: 842 });
-    DE.download((S.title || 'character-race') + '.pdf', bytes, 'application/pdf');
+    DE.download((S.title || 'term-race') + '.pdf', bytes, 'application/pdf');
     toast('PDF ready');
   });
 }
 function exportPPTX() {
-  if (!S.order.length) { toast('Add some characters first'); return; }
+  if (!S.order.length) { toast('Add some terms first'); return; }
   svgToJpegLocal(circleSVG(1600, 900), 1600, 900, function (im) {
     var bytes = DE.buildPPTX([im]);
-    DE.download((S.title || 'character-race') + '.pptx', bytes,
+    DE.download((S.title || 'term-race') + '.pptx', bytes,
       'application/vnd.openxmlformats-officedocument.presentationml.presentation');
     toast('PPTX ready (for screen display)');
   });
 }
 function doPrint(copies) {
-  if (!S.order.length) { toast('Add some characters first'); return; }
+  if (!S.order.length) { toast('Add some terms first'); return; }
   var area = $('#printArea'); area.innerHTML = '';
   for (var i = 0; i < copies; i++) {
     var d = el('div', 'psheet');
@@ -403,12 +406,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   $('#btnMake').addEventListener('click', function () {
     var got = parseTerms($('#src').value);
-    if (!got.length) { toast('No Chinese terms found'); return; }
+    if (!got.length) { toast('No terms found.'); return; }
     setTerms(got); toast('Loaded ' + got.length + ' terms');
   });
   $('#btnDemo').addEventListener('click', function () {
-    $('#src').value = '你好 | nǐ hǎo | hello\n谢谢 | xiè xie | thank you\n老师 | lǎo shī | teacher\n同学 | tóng xué | classmate\n学校 | xué xiào | school\n朋友 | péng you | friend\n高兴 | gāo xìng | happy\n一心一意 | yī xīn yī yì | wholeheartedly\n马马虎虎 | mǎ ma hū hū | so-so';
-    $('#title').value = 'Lesson 1 · Common Words';
+    $('#src').value = 'hypothesis | | a testable explanation\nevidence | | information that supports a claim\nvariable | | a factor that can change\nobserve | | notice and record\nmeasure | | find a quantity\ncompare | | find similarities and differences\npattern | | something that repeats\nresult | | what happened\nrevise | | improve after reviewing';
+    $('#title').value = 'Scientific Thinking · Core Terms';
     S.title = $('#title').value;
     setTerms(parseTerms($('#src').value));
   });

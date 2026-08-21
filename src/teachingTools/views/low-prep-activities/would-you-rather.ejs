@@ -43,19 +43,19 @@
             <h2>Write the question once.</h2>
             <p class="wyr-help">Use <strong>{A}</strong> and <strong>{B}</strong> for the two choices. You can still edit each individual question below.</p>
             <label for="questionTemplate">Question template</label>
-            <input id="questionTemplate" value="你喜欢{A}还是{B}？" maxlength="90">
-            <p class="wyr-sample" id="templateSample">现在会生成：你喜欢唱歌还是跳舞？</p>
+            <input id="questionTemplate" value="Would you rather {A} or {B}?" maxlength="90">
+            <p class="wyr-sample" id="templateSample">Sample: Would you rather explain with a diagram or a table?</p>
           </div>
           <div>
             <p class="wyr-label">Common templates</p>
             <div class="wyr-template-grid">
-              <button class="wyr-template active" type="button" data-template="你喜欢{A}还是{B}？">你喜欢 A 还是 B？</button>
-              <button class="wyr-template" type="button" data-template="你想要{A}还是{B}？">你想要 A 还是 B？</button>
-              <button class="wyr-template" type="button" data-template="你想{A}还是{B}？">你想 A 还是 B？</button>
-              <button class="wyr-template" type="button" data-template="{A}和{B}，你选哪个？">A 和 B，你选哪个？</button>
-              <button class="wyr-template" type="button" data-template="如果只能选一个，你选{A}还是{B}？">如果只能选一个…</button>
-              <button class="wyr-template" type="button" data-template="你觉得{A}还是{B}更有意思？">你觉得哪个更有意思？</button>
-              <button class="wyr-template" type="button" data-template="周末你想{A}还是{B}？">周末你想…？</button>
+              <button class="wyr-template active" type="button" data-template="Would you rather {A} or {B}?">Would you rather A or B?</button>
+              <button class="wyr-template" type="button" data-template="Which would you choose: {A} or {B}?">Which would you choose?</button>
+              <button class="wyr-template" type="button" data-template="Which is more useful: {A} or {B}?">Which is more useful?</button>
+              <button class="wyr-template" type="button" data-template="Which is a better strategy: {A} or {B}?">Which is a better strategy?</button>
+              <button class="wyr-template" type="button" data-template="If you could choose only one, would you pick {A} or {B}?">If you could choose only one…</button>
+              <button class="wyr-template" type="button" data-template="Which is more interesting: {A} or {B}?">Which is more interesting?</button>
+              <button class="wyr-template" type="button" data-template="For this task, would you prefer {A} or {B}?">For this task…?</button>
             </div>
             <button class="wyr-secondary-btn wyr-apply-all" id="applyTemplate" type="button">Apply to all cards</button>
           </div>
@@ -69,12 +69,12 @@
             <h2>Build your choices.</h2>
             <p class="wyr-help">Use one line per slide. Separate the two choices with a slash, vertical bar, comma, or Chinese comma.</p>
             <label for="pairInput">Pairs</label>
-            <textarea id="pairInput" rows="7" spellcheck="false" aria-describedby="pairInputHelp">吃火锅 / 吃披萨
-去海边 / 去山上
-养一只猫 / 养一只狗
-早起 / 晚睡
-喝奶茶 / 喝果汁</textarea>
-            <p id="pairInputHelp" class="wyr-small">Up to 30 prompts per deck. Example: 苹果 / 香蕉</p>
+            <textarea id="pairInput" rows="7" spellcheck="false" aria-describedby="pairInputHelp">explain with a diagram / explain with a table
+read a biography / read historical fiction
+work alone / work with a partner
+show your answer in writing / explain it aloud
+start with an example / start with a rule</textarea>
+            <p id="pairInputHelp" class="wyr-small">Up to 30 prompts per deck. Example: use a model / write an equation</p>
           </div>
           <div class="wyr-vocabulary-actions">
             <button class="btn wyr-generate" id="generateDeck" type="button">✨ Generate cards</button>
@@ -127,7 +127,7 @@
     <div id="presentationSlide" class="wyr-presentation-slide"></div>
     <div class="wyr-presentation-controls">
       <button id="previousSlide" type="button">← Previous</button>
-      <span>Click a side to vote, then ask: 为什么？</span>
+      <span>Click a side to vote, then ask: Why?</span>
       <button id="nextSlide" type="button">Next →</button>
     </div>
   </div>
@@ -135,7 +135,7 @@
   <div id="artPicker" class="wyr-art-picker" hidden role="dialog" aria-modal="true" aria-labelledby="artPickerTitle">
     <div class="wyr-picker-card">
       <div class="wyr-picker-heading"><div><p class="wyr-kicker">OFFLINE MATERIAL SYMBOLS</p><h2 id="artPickerTitle">Choose an image</h2></div><button id="closePicker" type="button" aria-label="Close image picker">×</button></div>
-      <div class="wyr-picker-actions"><input id="iconSearch" type="search" placeholder="Search icons: 唱歌, 足球, sun, food…"><label class="wyr-upload-label" for="imageUpload">Upload a photo<input id="imageUpload" type="file" accept="image/*"></label></div>
+      <div class="wyr-picker-actions"><input id="iconSearch" type="search" placeholder="Search icons: book, sun, science, food…"><label class="wyr-upload-label" for="imageUpload">Upload a photo<input id="imageUpload" type="file" accept="image/*"></label></div>
       <p class="wyr-small">139 Material Symbols are included offline. Uploaded images stay in this browser for this deck only (3 MB maximum).</p>
       <div id="iconGrid" class="wyr-icon-grid" aria-label="Searchable icon choices"></div>
     </div>

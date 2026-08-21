@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#194f45">
   <title>My Library · Chen Laoshi's Teaching Toolkit</title>
-  <meta name="description" content="Create and save reusable Chinese, pinyin, and English vocabulary lists for classroom activities.">
+  <meta name="description" content="Create reusable term, pronunciation, and definition lists for classroom activities in any subject.">
   <meta name="robots" content="noindex, follow">
   <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/word-list-library">
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="My Library · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Create and save reusable Chinese, pinyin, and English vocabulary lists for classroom activities."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/word-list-library"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="My Library · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Create reusable term, pronunciation, and definition lists for classroom activities in any subject."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/word-list-library"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="./word-list-library.css">
 </head>
@@ -39,7 +39,7 @@
       <div>
         <p class="eyebrow">Your shared vocabulary foundation</p>
         <h2>Turn a simple list into reusable classroom data.</h2>
-        <p>Paste Chinese words or use <strong>中文, English</strong> / <strong>中文 | 拼音 | English</strong>. Pinyin and common English meanings fill in automatically when available.</p>
+        <p>Enter one term per line, or use <strong>term | pronunciation | definition</strong>. Use the same flexible format for science concepts, math vocabulary, historical terms, literary language, or a world-language unit.</p>
       </div>
       <div class="intro-badges" aria-label="Vocabulary library features">
         <span>Works offline</span>
@@ -77,13 +77,13 @@
         </div>
 
         <label class="source-label" for="wordSource">Vocabulary</label>
-        <textarea id="wordSource" rows="13" spellcheck="false" placeholder="苹果, apple&#10;香蕉&#10;谢谢 | xiè xie | thank you">你好
-谢谢
-苹果
-香蕉
-草莓
-西瓜</textarea>
-        <p class="field-help">One item per line. The library keeps Chinese, pinyin, English, theme, level, image, and notes ready for future tools.</p>
+        <textarea id="wordSource" rows="13" spellcheck="false" placeholder="evaporation | | liquid changing into gas&#10;variable | | a factor that can change">hypothesis | | a testable explanation
+evidence | | information that supports a claim
+variable | | a factor that can change
+observe | | notice and record
+measure | | find a quantity
+conclusion | | an explanation based on results</textarea>
+        <p class="field-help">One item per line. The library keeps each term, optional pronunciation, definition, theme, level, image, and note ready for future tools.</p>
 
         <div class="button-row">
           <button class="btn btn-primary" id="buildButton" type="button">Build preview</button>
@@ -114,7 +114,7 @@
 
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Chinese</th><th>Pinyin</th><th>English</th></tr></thead>
+            <thead><tr><th>Term</th><th>Pronunciation</th><th>Definition</th></tr></thead>
             <tbody id="previewRows"><tr class="empty-row"><td colspan="3">Build a list to see its vocabulary here.</td></tr></tbody>
           </table>
         </div>
@@ -122,7 +122,7 @@
         <div class="uses-panel">
           <p class="eyebrow">One list, many activities</p>
           <ul>
-            <li><strong>Chinese Poker / UNO:</strong> card fronts, pinyin, translations, or picture prompts.</li>
+            <li><strong>Matching cards:</strong> pair terms with definitions, pronunciations, formulas, or picture prompts.</li>
             <li><strong>Jigsaw worksheets:</strong> cut-apart matches and clue pieces.</li>
             <li><strong>Wordwall-style games:</strong> shuffled terms, pairs, timers, and random draws.</li>
             <li><strong>Jeopardy &amp; Would You Rather:</strong> reusable question prompts and vocabulary banks.</li>

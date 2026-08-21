@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#194f45">
   <title>Word Cloud Generator</title>
-  <meta name="description" content="Generate printable word clouds using Chinese, English, and pinyin vocabulary.">
+  <meta name="description" content="Generate printable word clouds from vocabulary, concepts, and key terms in any subject or language.">
   <meta name="robots" content="noindex, follow">
   <link rel="canonical" href="https://clsteachingtools.com/low-prep-activities/word-cloud">
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Word Cloud Generator · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Generate printable word clouds using Chinese, English, and pinyin vocabulary."><meta property="og:url" content="https://clsteachingtools.com/low-prep-activities/word-cloud"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Word Cloud Generator · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Generate printable word clouds from vocabulary, concepts, and key terms in any subject or language."><meta property="og:url" content="https://clsteachingtools.com/low-prep-activities/word-cloud"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="./word-cloud-widget.css">
 </head>
@@ -42,13 +42,13 @@
           </div>
           <button class="link-button" id="clearWords" type="button"><span aria-hidden="true">🗑</span> Clear</button>
         </div>
-        <p class="helper">Enter one word per line (Chinese or any language). Words listed earlier appear larger and more prominent in the cloud.</p>
+        <p class="helper">Enter one term per line from any subject or language. Terms listed earlier appear larger and more prominent in the cloud.</p>
         <label class="word-list-label" for="wordInput">One word per line</label>
-        <textarea class="word-list-input" id="wordInput" rows="14" placeholder="苹果&#10;香蕉&#10;葡萄" spellcheck="false" aria-describedby="wordCount"></textarea>
+        <textarea class="word-list-input" id="wordInput" rows="14" placeholder="hypothesis&#10;evidence&#10;variable" spellcheck="false" aria-describedby="wordCount"></textarea>
         <div class="translation-settings">
-          <label for="sourceLangSelect">Target language</label>
+          <label for="sourceLangSelect">Source language</label>
           <select id="sourceLangSelect" class="lang-select" aria-describedby="translationHelp"></select>
-          <span id="translationHelp">Used to auto-translate when English is selected below.</span>
+          <span id="translationHelp">Used when English Translation is selected below.</span>
         </div>
 
         <div class="word-meta">
@@ -57,7 +57,7 @@
         </div>
 
         <div class="option-block">
-          <h3><span aria-hidden="true">🀄</span> Display Content (multi-select)</h3>
+          <h3><span aria-hidden="true">🔤</span> Display Content (multi-select)</h3>
           <div class="scheme-row" id="displayModeRow" role="group" aria-label="Select display content"></div>
         </div>
 

@@ -2,21 +2,21 @@
 <section class="tool-learning-guide" aria-labelledby="tool-learning-guide-title">
   <div class="tool-learning-guide__inner">
     <p class="content-kicker"><%= toolGuide.eyebrow %></p>
-    <h2 id="tool-learning-guide-title">怎样把 <%= toolGuide.title %> 用进课堂</h2>
+    <h2 id="tool-learning-guide-title">How to use <%= toolGuide.title %> in class</h2>
     <p class="tool-learning-guide__summary"><%= toolGuide.summary %></p>
 
-    <div class="tool-learning-guide__facts" aria-label="适用信息">
-      <span><strong>适合：</strong><%= toolGuide.grades %></span>
-      <span><strong>时间：</strong><%= toolGuide.duration %></span>
+    <div class="tool-learning-guide__facts" aria-label="Recommended use">
+      <span><strong>Best for:</strong> <%= toolGuide.grades %></span>
+      <span><strong>Prep time:</strong> <%= toolGuide.duration %></span>
     </div>
 
     <div class="tool-learning-guide__grid">
       <article>
-        <h3>这个工具是什么？</h3>
+        <h3>What is this tool?</h3>
         <p><%= toolGuide.whatItIs %></p>
       </article>
       <article>
-        <h3>怎么使用</h3>
+        <h3>How to use it</h3>
         <ol>
           <% toolGuide.steps.forEach(function(step) { %><li><%= step %></li><% }) %>
         </ol>
@@ -26,7 +26,7 @@
         <p><%= toolGuide.example %></p>
       </article>
       <article>
-        <h3>教师使用建议</h3>
+        <h3>Teacher tips</h3>
         <ul>
           <% toolGuide.tips.forEach(function(tip) { %><li><%= tip %></li><% }) %>
         </ul>

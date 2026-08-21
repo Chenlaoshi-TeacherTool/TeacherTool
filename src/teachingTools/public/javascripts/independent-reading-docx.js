@@ -330,36 +330,36 @@
       bulletParagraph("Testing days and early finishers"),
       sectionHeading("Student workflow"),
       numberedParagraph("teacher-workflow", "Read the story carefully."),
-      numberedParagraph("teacher-workflow", "Answer the comprehension questions (你理解了吗？)."),
-      numberedParagraph("teacher-workflow", "Write a new version of the story (改写故事)."),
-      numberedParagraph("teacher-workflow", "Illustrate the six-scene storyboard (六格故事)."),
+      numberedParagraph("teacher-workflow", "Answer the comprehension questions."),
+      numberedParagraph("teacher-workflow", "Write a new version of the text or story."),
+      numberedParagraph("teacher-workflow", "Illustrate the six-scene storyboard."),
       paragraph(
         "Optional support: preview the story, add a small word bank, or invite advanced learners to expand the rewrite with dialogue and detail.",
         { spacing: { before: 160 } }
       ),
       pageBreak(),
       paragraph("Instructions for the Substitute", { style: "PacketTitle" }),
-      paragraph("No Chinese needed · Fully independent · No prep", { style: "PacketSubtitle" }),
+      paragraph("Clear student directions · Independent practice · Low prep", { style: "PacketSubtitle" }),
       paragraph(
         "Welcome! Each student receives one storyboard packet and works through it independently from start to finish. The pages include the story, questions, a rewrite page, and a drawing page."
       ),
       sectionHeading("What students do (in order)"),
       numberedParagraph("substitute-steps", "Read the story. Students read the short Chinese story silently or quietly to themselves."),
-      numberedParagraph("substitute-steps", "Answer the questions — 你理解了吗？ Students write short answers on the lines. Chinese answers are expected."),
-      numberedParagraph("substitute-steps", "Rewrite the story — 改写故事. Students write their own new version and may change the ending."),
-      numberedParagraph("substitute-steps", "Illustrate — 六格故事. Students draw the story across six numbered boxes, like a comic strip."),
+      numberedParagraph("substitute-steps", "Answer the questions. Students write short responses on the provided lines."),
+      numberedParagraph("substitute-steps", "Rewrite the text. Students create a new version and may change the ending or conclusion."),
+      numberedParagraph("substitute-steps", "Illustrate. Students represent the reading across six numbered boxes, like a storyboard or comic."),
       sectionHeading("Housekeeping"),
       bulletParagraph("Students may work at their own pace. One complete packet is a strong day’s work."),
       bulletParagraph("Fast finishers may start a second packet or add detail to their rewrite."),
       bulletParagraph("Please collect the packets at the end of class and leave them on the teacher’s desk."),
       pageBreak(),
-      paragraph("故事 1 · Storyboard 1", { style: "StoryLabel" }),
+      paragraph("Reading 1 · Storyboard 1", { style: "StoryLabel" }),
       paragraph(title, { style: "StoryTitle" }),
       paragraph(englishTitle || "Independent Reading", { style: "StorySubtitle" }),
-      instructionalText("说明：请先认真读下面的故事。", "Instructions: Read the story below carefully."),
+      instructionalText("Instructions: Read the text below carefully.", ""),
       storyTable(story),
-      sectionHeading("你理解了吗？ · Did you understand?"),
-      instructionalText("说明：请用中文回答下面的问题。", "Answer the questions in Chinese."),
+      sectionHeading("Check Your Understanding"),
+      instructionalText("Answer the questions using evidence from the reading.", ""),
     ];
 
     questions.forEach((question) => {
@@ -370,13 +370,13 @@
     children.push(
       pageBreak(),
       paragraph(storyReference, { style: "StoryLabel" }),
-      sectionHeading("改写故事 · Write a new version"),
-      instructionalText("说明：请用你自己的话，把这个故事重新写一遍。你可以改变故事的结尾。", "Rewrite the story in your own words. You may change the ending."),
+      sectionHeading("Write a New Version"),
+      instructionalText("Rewrite the text in your own words. You may change the ending or conclusion.", ""),
       ...Array.from({ length: 11 }, answerLine),
       pageBreak(),
       paragraph(storyReference, { style: "StoryLabel" }),
-      sectionHeading("六格故事 · Six-scene storyboard"),
-      instructionalText("说明：读上面的故事，在六个方框里把故事画出来。", "Draw the story across the six boxes, like a comic strip."),
+      sectionHeading("Six-Scene Storyboard"),
+      instructionalText("Represent the reading across the six boxes, like a storyboard or comic strip.", ""),
       storyboardTable()
     );
 

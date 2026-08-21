@@ -5,7 +5,7 @@
   var MAX_ITEMS = 16;
   var MAX_WHEELS = 4;
   var MAX_ITEM_LENGTH = 45;
-  var DEFAULT_ITEMS = ['你好', '谢谢', '再见', '请坐', '请听', '请说', '请看', '很好'];
+  var DEFAULT_ITEMS = ['Explain', 'Compare', 'Sketch', 'Solve', 'Define', 'Predict', 'Question', 'Connect'];
   var PETAL_COLORS = ['#f8c63f', '#ffd86a', '#f4b942', '#ffe796', '#e7a81f', '#ffd259', '#f5ce52', '#fff0aa'];
 
   var state = {

@@ -29,6 +29,8 @@ function publicList(list) {
 }
 
 function publicQuestionBank(bank) {
+  var levelLabels = { '初级': 'Beginner', '中级': 'Intermediate', '高级': 'Advanced' };
+  var typeLabels = { '单选题': 'Multiple Choice', '填空题': 'Fill in the Blank', '情境题': 'Scenario' };
   return {
     id: bank.id,
     name: bank.name,
@@ -37,7 +39,13 @@ function publicQuestionBank(bank) {
     level: bank.level,
     curriculum: bank.curriculum,
     count: bank.questions.length,
-    questions: bank.questions
+    questions: bank.questions.map(function (question) {
+      return Object.assign({}, question, {
+        theme: bank.theme,
+        level: levelLabels[question.level] || question.level,
+        type: typeLabels[question.type] || question.type
+      });
+    })
   };
 }
 

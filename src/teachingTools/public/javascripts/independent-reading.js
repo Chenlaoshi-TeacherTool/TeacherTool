@@ -45,23 +45,22 @@
   }
 
   function loadExample() {
-    form.elements.title.value = "小猫要吃鱼";
+    form.elements.title.value = "The Missing Seed";
     form.elements.englishTitle.value = "The Kitten Wants Fish";
     form.elements.story.value = [
-      "小猫很饿。小猫想吃鱼。",
-      "小猫去河边。河里有很多鱼。",
-      "小猫要吃鱼，可是小猫怕水。",
-      "一只鸟说：“我可以帮你。”",
-      "鸟从河里拿出一条大鱼。",
-      "小猫很高兴，说：“谢谢你！”",
-      "小猫和鸟一起吃鱼。",
+      "Maya planted three sunflower seeds in small cups by the window.",
+      "Each morning, she measured the water carefully and recorded what she saw.",
+      "After one week, two green shoots appeared, but the third cup looked empty.",
+      "Maya wanted to throw the soil away, yet her partner asked her to wait.",
+      "Two days later, a tiny shoot pushed through the surface.",
+      "Maya added the new measurement to her chart and wrote that living things do not always grow at the same rate.",
     ].join("\n");
     questionsInput.value = [
-      "1. 小猫想吃什么？",
-      "2. 小猫去了哪里？",
-      "3. 河里有什么？",
-      "4. 小猫怕什么？",
-      "5. 谁帮了小猫？",
+      "1. What did Maya plant?",
+      "2. What did she record each morning?",
+      "3. Why did Maya want to throw away the third cup?",
+      "4. What advice did her partner give?",
+      "5. What conclusion did Maya write?",
     ].join("\n");
     updateQuestionCount();
     status.dataset.state = "";

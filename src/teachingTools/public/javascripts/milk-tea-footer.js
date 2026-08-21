@@ -56,14 +56,14 @@
       nav.setAttribute('aria-label', 'Main navigation');
       nav.innerHTML = [
         '<div class="site-main-nav-inner">',
-        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" alt=""><span>陈老师中文教学工具<small>Chen Laoshi\'s Teaching Toolkit</small></span></a>',
+        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" alt=""><span>Chen Laoshi\'s Teaching Toolkit<small>Practical tools for every classroom</small></span></a>',
         '  <ul class="site-main-nav-links">',
-        '    <li><a href="/">首页</a></li>',
-        '    <li><a href="/teaching-tools">教学工具</a></li>',
-        '    <li><a href="/resources">教学资源</a></li>',
-        '    <li><a href="/recommendations">好物推荐</a></li>',
-        '    <li><a href="/about">关于陈老师</a></li>',
-        '    <li><a href="/contact">联系我</a></li>',
+        '    <li><a href="/">Home</a></li>',
+        '    <li><a href="/teaching-tools">Teaching Tools</a></li>',
+        '    <li><a href="/resources">Teaching Resources</a></li>',
+        '    <li><a href="/recommendations">Classroom Finds</a></li>',
+        '    <li><a href="/about">About</a></li>',
+        '    <li><a href="/contact">Contact</a></li>',
         '  </ul>',
         '</div>'
       ].join('');

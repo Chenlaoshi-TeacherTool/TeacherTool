@@ -1,245 +1,285 @@
 const toolGuides = {
-  'qr-code-generator': {
-    title: '课堂 QR Code Generator',
-    eyebrow: '数字课堂工具',
-    grades: 'K–12（教师设置）',
-    duration: '准备 2–5 分钟',
-    summary: '把网址、短句或任务说明变成可扫描的二维码，让学生从纸面材料快速进入听力、视频或自选任务。',
-    whatItIs: '这个工具一次可以制作多个二维码，适合放在任务卡、学习站、教室公告和家庭作业上。二维码只是入口；真正的教学价值来自教师为每一个入口设计的语言任务。',
+  "qr-code-generator": {
+    title: "Classroom QR Code Generator",
+    eyebrow: "Digital classroom tool",
+    grades: "K–12 · teacher directed",
+    duration: "2–5 minutes",
+    summary: "Turn links, short text, or task directions into printable QR codes for stations, choice boards, research, review, and family communication.",
+    whatItIs: "This tool creates several QR codes at once. It works in any subject because the code can point to a video, article, audio clip, simulation, form, or teacher-created direction. The QR code is only the doorway; the learning value comes from the task you place beside it.",
     steps: [
-      '先确定学生扫码后要完成的动作，例如听一句话、找出关键词或录制回答。',
-      '输入网址或文字并生成二维码，下载前先用另一台设备逐个测试。',
-      '打印时在二维码旁写清任务、预计时间和完成标准，不让学生只停留在“扫码”。'
+      "Decide what students should do after scanning, such as collect evidence, compare two sources, listen for a detail, or submit an explanation.",
+      "Enter the link or text, generate the code, and test every code on a second device before printing.",
+      "Print a clear task, expected time, and success criteria beside each code so the activity does not stop at scanning."
     ],
-    exampleTitle: '课堂案例：天气学习站',
-    example: '为“晴天、下雨、刮风、下雪”准备四段 15 秒音频，每段各生成一个二维码。学生两人一组轮流扫码，听完后把天气词和图片配对，再用“今天……，我想……”说一句完整的话。',
-    tips: ['二维码至少打印成 2.5 厘米见方并保留四周空白。', '准备一个短网址或纸面替代任务，避免网络问题让活动中断。', '不要把学生姓名、成绩或其他个人信息直接写进二维码。']
+    exampleTitle: "Classroom example: ecosystem stations",
+    example: "Create four QR codes that open a short video, a diagram, a vocabulary page, and a data table about one ecosystem. Student teams rotate, record one piece of evidence at each station, and finish by explaining how two organisms depend on each other.",
+    tips: ["Print codes at least one inch square and leave white space around them.", "Prepare a short URL or paper alternative in case a device or network is unavailable.", "Do not place student names, grades, or other personal information directly inside a QR code."]
   },
-  'random-group-generator': {
-    title: 'Random Group Generator 随机分组器',
-    eyebrow: '课堂管理工具',
-    grades: '1–12 年级',
-    duration: '准备 1–3 分钟',
-    summary: '快速把学生分成搭档或小组，适合口语轮换、合作阅读、复习竞赛和学习站。',
-    whatItIs: '随机分组可以减少每次点名和排组的时间，也让学生有机会和不同同学合作。它不是教学分组判断的替代品：需要语言支持或特殊照顾时，教师仍应手动微调。',
-    steps: ['粘贴学生名字并选择每组人数。', '生成后快速检查人数、支持需求和课堂关系，再做必要调整。', '把每组的任务角色一并投影，例如朗读者、记录员、计时员和汇报员。'],
-    exampleTitle: '课堂案例：三轮口语采访',
-    example: '第一轮随机两人练习“你周末喜欢做什么？”，第二轮重新分组并转述上一位同学的答案，第三轮四人一组找出共同爱好。这样随机分组不仅换座位，也推动信息重复和句型迁移。',
-    tips: ['第一次合作时用两人组，任务复杂后再扩大到四人。', '对听力或表达需要支持的学生预先安排可靠搭档。', '不要公开保存完整学生名单；用名字缩写或座位号也可以。']
+  "random-group-generator": {
+    title: "Random Group Generator",
+    eyebrow: "Classroom management tool",
+    grades: "Grades 1–12",
+    duration: "1–3 minutes",
+    summary: "Create partners or groups quickly for discussion, problem solving, labs, reading, review, and learning stations.",
+    whatItIs: "Random grouping reduces the time spent assigning teams and gives students opportunities to work with different classmates. It is not a replacement for teacher judgment. You can still adjust a result when students need language support, accessibility accommodations, or a safer working relationship.",
+    steps: ["Paste student names and choose group size or number of groups.", "Review the result for support needs, group balance, and classroom dynamics before displaying it.", "Assign useful roles such as facilitator, recorder, materials manager, checker, and reporter."],
+    exampleTitle: "Classroom example: three-round evidence exchange",
+    example: "In round one, pairs compare their answers to one problem. Regroup students for round two so each person explains a previous partner’s strategy. In round three, groups of four decide which strategy is clearest and prepare one shared explanation.",
+    tips: ["Begin with pairs when a routine is new, then increase group size for a more complex task.", "Pre-assign a reliable partner when a student needs extra communication or emotional support.", "Avoid saving or projecting full student names when initials, first names, or seat numbers are enough."]
   },
-  'sunflower-spinner': {
-    title: 'Sunflower Spinner 向日葵转盘',
-    eyebrow: '随机抽取与口语练习',
-    grades: 'K–8 年级',
-    duration: '准备 3–5 分钟',
-    summary: '把词语、句子、问题或学生代号放进向日葵转盘，用随机结果启动复习、造句和课堂选择。',
-    whatItIs: '这是一个可自定义的随机转盘。与只抽一个单词不同，教师可以规定抽中后必须完成的语言动作，例如认读、翻译、造句、表演或追问同伴。',
-    steps: ['每次输入 8–16 个同一主题的项目，避免转盘文字过小。', '先示范“抽到以后怎么回答”，并把句型支架写在屏幕旁。', '转动后给学生 5–10 秒思考，再邀请全班补充或追问。'],
-    exampleTitle: '课堂案例：食物单元句型复习',
-    example: '转盘放入“饺子、米饭、面条、苹果”等词。抽到一个词后，学生先读词，再用“我喜欢吃……，因为……”回答；同桌必须追问“你什么时候吃？”一轮就同时练到认读、理由和追问。',
-    tips: ['用学生编号代替全名，减少公开个人信息。', '把简单词和挑战词用符号区分，让不同程度学生都有入口。', '随机抽取之后仍允许学生说“我需要帮助”，建立安全的参与规则。'],
-    appUrl: '/teaching-tools/sunflower-spinner/sunflower-spinner.html'
+  "sunflower-spinner": {
+    title: "Sunflower Classroom Spinner",
+    eyebrow: "Random selection and practice",
+    grades: "K–12",
+    duration: "3–5 minutes",
+    summary: "Add terms, questions, student numbers, topics, or challenge levels to a sunflower wheel and use the result to begin a classroom task.",
+    whatItIs: "This is a customizable random spinner for any subject. A spin should lead to a clear action: define, solve, compare, sketch, justify, demonstrate, or ask a follow-up question.",
+    steps: ["Add 8–16 items from one lesson or review goal so the labels stay readable.", "Model exactly what students do after the wheel stops.", "Give quiet thinking time before asking for an answer, then invite a second student to add evidence or another method."],
+    exampleTitle: "Classroom example: math representation review",
+    example: "Add “number line,” “equation,” “table,” “diagram,” and “words” to the wheel. After a spin, students represent the same problem in the selected form and explain what the representation makes easier to see.",
+    tips: ["Use student numbers instead of full names when the wheel is projected.", "Mark easier and stretch items so students can enter the task at different levels.", "Allow students to request a hint or a partner after a random selection so participation stays safe."],
+    appUrl: "/teaching-tools/sunflower-spinner/sunflower-spinner.html"
   },
-  'word-list-library': {
-    title: 'Vocabulary Library 中文词汇库',
-    eyebrow: '备课资料管理',
-    grades: '教师工具 · K–12',
-    duration: '每个词表 5–10 分钟',
-    summary: '把中文、拼音和英文整理成可重复使用的词表，之后可直接带入小游戏、卡片和练习单。',
-    whatItIs: '词汇库把“每次重新输入同一组词”的重复工作变成一次整理、反复调用。资料保存在当前浏览器中，适合按单元、主题或学习目标建立小而清楚的列表。',
-    steps: ['每个词表只围绕一个明确目标，例如“天气核心词 12 个”。', '检查汉字、声调和英文释义，再为需要的词添加图片提示。', '命名时写上单元与程度，例如“Grade 2 · Family · Recognition”。'],
-    exampleTitle: '课堂案例：同一词表三次使用',
-    example: '周一建立“家庭成员”词表并做快速认读；周三把同一列表导入 Would You Rather 练口语；周五再做 Mini Booklet 让学生带回家。词汇不变，任务从辨认逐步走向表达。',
-    tips: ['核心词表保持在 8–16 个词，学习负担更可控。', '将认读词和会写词分成不同列表。', '浏览器资料可能被清除，重要词表请定期导出或另存备份。'],
-    appUrl: '/teaching-tools/word-list-library/word-list-library.html'
+  "word-list-library": {
+    title: "Multilingual Vocabulary Library",
+    eyebrow: "Reusable planning library",
+    grades: "Teacher tool · K–12",
+    duration: "5–10 minutes per list",
+    summary: "Save focused vocabulary lists for later use in games, cards, booklets, and printable activities. Chinese, pinyin, and English fields are supported.",
+    whatItIs: "The library turns repeated typing into a reusable collection. It is especially useful for language teaching, but any teacher can store terms, optional pronunciation notes, and short definitions. Lists are saved in the current browser.",
+    steps: ["Keep each list connected to one clear goal, such as “Cell Structure: 12 Core Terms.”", "Check spelling, pronunciation, and definitions before saving.", "Use a name that includes the course, unit, and level so the list is easy to find later."],
+    exampleTitle: "Classroom example: one list, three uses",
+    example: "On Monday, build a twelve-term unit list and run a quick recognition check. On Wednesday, use the same terms in a spinner or review game. On Friday, turn them into a mini booklet for retrieval practice.",
+    tips: ["Keep a core list to 8–16 terms when students are new to the topic.", "Separate words students should recognize from terms they must spell or define precisely.", "Browser data can be cleared, so export or back up important lists."],
+    appUrl: "/teaching-tools/word-list-library/word-list-library.html"
   },
-  'question-bank-library': {
-    title: 'Question Bank Library 中文题库',
-    eyebrow: '可重复使用的课堂题目',
-    grades: '2–12 年级',
-    duration: '每组题 10–15 分钟',
-    summary: '按主题保存题目、答案与提示，让复习游戏、口语活动和代课计划可以重复使用。',
-    whatItIs: '题库适合保存经过教师检查的课堂问题，而不是临时堆放大量题目。每一组题最好对应一个学习目标，并同时包含基础认读、句型应用和开放表达。',
-    steps: ['先写学习目标，再准备 8–15 道真正能检查目标的题。', '为初学者补充拼音或句型开头，为进阶学生增加“为什么”。', '使用前抽查答案、难度和文化表述，课堂后根据学生反应修改。'],
-    exampleTitle: '课堂案例：天气单元分层题库',
-    example: '第一层看图说“下雨”；第二层回答“今天的天气怎么样？”；第三层比较两个城市并说明喜欢哪一种天气。游戏抽题时可以由教师指定层级，让同一活动服务不同程度。',
-    tips: ['一道题只检查一个主要目标。', '避免只有翻译题，加入听辨、排序、解释和真实选择。', '不要输入学生姓名、成绩或其他个人资料。'],
-    appUrl: '/teaching-tools/question-bank-library/question-bank-library.html'
+  "question-bank-library": {
+    title: "Question Bank Library",
+    eyebrow: "Reusable classroom questions",
+    grades: "Grades 2–12",
+    duration: "10–15 minutes per set",
+    summary: "Save reviewed questions, answers, choices, and tags for discussions, quizzes, review games, and formative checks.",
+    whatItIs: "A question bank is a home for teacher-reviewed prompts, not a pile of unexamined questions. A strong bank is tied to one learning goal and mixes recall, application, explanation, and open response.",
+    steps: ["Write the learning goal first, then create 8–15 questions that genuinely check it.", "Add hints, sentence starters, diagrams, or challenge prompts for different learners.", "Check answers, difficulty, wording, and cultural context before use; revise after seeing student responses."],
+    exampleTitle: "Classroom example: layered science review",
+    example: "Level one asks students to identify a cell structure. Level two asks for its function. Level three asks students to predict what would happen if it stopped working. One game board can then serve several readiness levels.",
+    tips: ["Let one question measure one main target.", "Mix retrieval with sorting, explaining, comparing, and applying.", "Never add student names, grades, or other personal information to a shared question bank."],
+    appUrl: "/teaching-tools/question-bank-library/question-bank-library.html"
   },
-  'vocabulary-booklet': {
-    title: 'Vocabulary Mini Booklet 词汇小书',
-    eyebrow: '可打印的独立练习',
-    grades: '1–8 年级',
-    duration: '制作 5–10 分钟',
-    summary: '把一个主题词表变成可折叠的小书，用于认读、配图、抄写、家庭复习或学习站。',
-    whatItIs: '小书把零散词汇变成学生可以翻阅、标记和带走的个人学习材料。它最适合少量高频词，不建议一次塞入整个单元的所有生词。',
-    steps: ['选择 6–12 个本周真正需要掌握的词。', '决定每个词的任务：读、描、画、配对或写一句话。', '打印一份样张并实际折叠，确认页面方向和字体大小。'],
-    exampleTitle: '课堂案例：我的教室小书',
-    example: '每页放一个词：老师、学生、书、笔、桌子、椅子。初学者给物品涂色并圈出听到的词；程度较高的学生在页底补写“这是我的……”。最后两人交换小书互相读。',
-    tips: ['低年级使用大字体与少量文字。', '把小书留到周末再读一次，形成间隔复习。', '下载前检查多音字拼音和英文释义是否符合本课语境。'],
-    appUrl: '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html'
+  "vocabulary-booklet": {
+    title: "Vocabulary Mini Booklet",
+    eyebrow: "Printable independent practice",
+    grades: "Grades 1–8",
+    duration: "5–10 minutes",
+    summary: "Turn a short term list into a foldable booklet for reading, sketching, defining, matching, or home review.",
+    whatItIs: "The booklet turns loose terms into a personal material students can mark, revisit, and carry. It works best with a small number of high-value words instead of every term in a unit.",
+    steps: ["Choose 6–12 terms students truly need this week.", "Assign a useful action for each term: read, trace, sketch, match, define, or use in a sentence.", "Print and fold one sample before making a class set so you can check page direction and type size."],
+    exampleTitle: "Classroom example: landform field guide",
+    example: "Each page includes one landform term. Beginning students match a picture and definition; more independent students add a real location and one comparison sentence. Partners trade booklets and quiz each other at the end.",
+    tips: ["Use large type and limited text for younger students.", "Bring the booklet back several days later for spaced review.", "Check that every definition matches the exact meaning used in the current unit."],
+    appUrl: "/teaching-tools/vocabulary-booklet/vocabulary-booklet.html"
   },
-  'word-sudoku': {
-    title: 'Word Sudoku 中文词汇数独',
-    eyebrow: '认读与逻辑练习',
-    grades: '3–9 年级',
-    duration: '制作 8–12 分钟',
-    summary: '把九个目标词变成 9×9 可打印数独，让学生在逻辑推理中反复辨认汉字与词义。',
-    whatItIs: '词汇数独保留传统数独“每行、每列、每宫不重复”的规则，但把数字换成词语或图片。它适合已经初步见过词汇的学生，用作复习而不是第一次教授。',
-    steps: ['选择九个外形差异清楚、学生已经学过的词。', '为初学者使用图片或中英对照，熟练后只显示汉字。', '先用一个 3×3 宫示范规则，再让学生独立或两人合作。'],
-    exampleTitle: '课堂案例：动物词汇安静学习站',
-    example: '使用猫、狗、鸟、鱼、马、牛、羊、兔、熊九个词。学生完成后随机圈三个词，用“我喜欢……，不喜欢……”写两句；这样逻辑任务会回到真实语言输出。',
-    tips: ['易混淆汉字可以练辨认，但不要九个都过于相似。', '给第一次玩数独的学生准备已完成一半的版本。', '把答案页留给学生自查，教师用时间帮助真正卡住的学生。'],
-    appUrl: '/low-prep/word-sudoku/word-sudoku-widget.html'
+  "word-sudoku": {
+    title: "Vocabulary Sudoku",
+    eyebrow: "Recognition and logic practice",
+    grades: "Grades 3–9",
+    duration: "8–12 minutes",
+    summary: "Turn nine words or concepts into a printable 9×9 Sudoku for repeated recognition during logical problem solving.",
+    whatItIs: "Vocabulary Sudoku keeps the familiar rule that each item appears once in every row, column, and box, but replaces numbers with words or icons. It is best for reviewing terms students have already met.",
+    steps: ["Choose nine visually distinct terms students already recognize.", "Use icons or short definitions for support, then remove those supports as students become fluent.", "Model one smaller section before students work independently or with a partner."],
+    exampleTitle: "Classroom example: geometry review station",
+    example: "Use nine shape names with simple icons. After solving, students circle three terms and write one accurate property for each. The logic puzzle ends with evidence of subject understanding.",
+    tips: ["Do not introduce nine unfamiliar terms through the puzzle.", "Offer a partially completed version to students new to Sudoku.", "Provide an answer key for self-checking so teacher time goes to students who are genuinely stuck."],
+    appUrl: "/low-prep/word-sudoku/word-sudoku-widget.html"
   },
-  'word-cloud': {
-    title: 'Word Cloud 中文词云游戏',
-    eyebrow: '快速认读与分类',
-    grades: '1–9 年级',
-    duration: '制作 5 分钟',
-    summary: '用中文、拼音和英文生成可打印词云，适合找词、分类、听力圈词和单元预习。',
-    whatItIs: '词云把词汇放进一个非线性的视觉空间，学生必须主动扫描和辨认。它不是单纯装饰；配上清楚的寻找、分类或造句任务，才会成为有效活动。',
-    steps: ['输入 10–25 个同一单元的词，并选择要显示中文、拼音或英文。', '告诉学生寻找规则，例如“圈出所有食物，再给饮料画星号”。', '活动结尾要求学生用找到的词说或写一句话。'],
-    exampleTitle: '课堂案例：一分钟天气侦探',
-    example: '词云混合天气、季节和衣服词。学生一分钟内用三种颜色分类，然后和同桌比较；最后抽一个季节说“冬天很冷，我穿外套”。速度只是开场，分类理由与句子才是学习证据。',
-    tips: ['初学者不要同时显示太多拼音与英文，以免视觉拥挤。', '打印黑白版时用圈、框、下划线等不同符号代替颜色。', '让学生解释分类标准，避免活动只变成找字比赛。'],
-    appUrl: '/low-prep/word-cloud/word-cloud-widget.html'
+  "word-cloud": {
+    title: "Classroom Word Cloud",
+    eyebrow: "Quick recognition and sorting",
+    grades: "Grades 1–9",
+    duration: "5 minutes",
+    summary: "Generate a printable word cloud for term hunts, sorting, listening checks, unit previews, and retrieval practice.",
+    whatItIs: "A word cloud places vocabulary in a non-linear visual space, which asks students to scan and recognize actively. It becomes an instructional activity when you add a clear task such as find, classify, connect, or explain.",
+    steps: ["Enter 10–25 terms from one unit.", "Give students a rule, such as “circle causes, underline effects, and box evidence.”", "Finish by asking students to speak or write with selected terms."],
+    exampleTitle: "Classroom example: one-minute concept sort",
+    example: "Mix vocabulary from solids, liquids, gases, and changes of state. Students mark each category with a different symbol, compare with a partner, and explain one term they found difficult to place.",
+    tips: ["Avoid too many labels or translations on one page.", "For black-and-white printing, use circles, boxes, and underlines instead of color alone.", "Ask students to explain a category decision so the task is more than a speed search."],
+    appUrl: "/low-prep/word-cloud/word-cloud-widget.html"
   },
-  'independent-reading': {
-    title: 'Independent Reading Builder 独立阅读包',
-    eyebrow: '阅读与代课资源', grades: '3–12 年级', duration: '制作 10–20 分钟',
-    summary: '把教师选择的短文与问题整理成可打印阅读包，包括理解、复述和绘图任务。',
-    whatItIs: '这个工具帮助教师排版材料，但文本难度、文化背景和问题质量仍由教师决定。最合适的材料是学生能独立读懂大约八成、同时有少量挑战的短文。',
-    steps: ['粘贴经过教师检查、拥有使用权的短文。', '问题从找信息逐步走向推断与个人回应。', '下载后通读整份材料，确认分页、答案空间和字体。'],
-    exampleTitle: '课堂案例：代课日的三遍阅读',
-    example: '学生第一遍圈出人物和地点，第二遍按顺序写三件事，第三遍选择一个场景重新画并配两句话。代课老师只需按页面提示推进，学生仍有明确的阅读目标。',
-    tips: ['不要输入受版权保护的整本书或未经允许的长篇材料。', '为汉字阅读初学者保留适量拼音，而不是给每个字加拼音。', '开放题要提供句型开头与合理的书写空间。']
+  "independent-reading": {
+    title: "Independent Reading Packet Builder",
+    eyebrow: "Reading and substitute-ready resource",
+    grades: "Grades 3–12",
+    duration: "10–20 minutes",
+    summary: "Turn a teacher-selected text and questions into a printable packet with comprehension, rewriting, and storyboard tasks.",
+    whatItIs: "The tool formats the packet, while the teacher remains responsible for text difficulty, copyright, background knowledge, and question quality. Choose a text students can understand mostly on their own with a manageable stretch.",
+    steps: ["Paste a teacher-reviewed text that you have permission to use.", "Order questions from finding information to inference and personal response.", "Read the downloaded packet from beginning to end and check page breaks, answer space, and type size."],
+    exampleTitle: "Classroom example: three-pass reading",
+    example: "On the first pass, students mark people, places, or key terms. On the second, they sequence three events or ideas. On the third, they redraw one section and add a two-sentence caption. A substitute can follow the same page sequence without inventing new directions.",
+    tips: ["Do not paste a copyrighted full book or an unauthorized long text.", "Provide vocabulary or sentence support only where it helps students work independently.", "Give open questions enough writing space and a clear success criterion."]
   },
-  'tear-paper-bingo': {
-    title: 'Tear-Paper Bingo 撕纸宾果', eyebrow: '听力与认读游戏', grades: '1–8 年级', duration: '8–12 分钟',
-    summary: '学生只能从纸条两端撕掉听到的词，在等待目标词出现时持续进行听辨与认读。',
-    whatItIs: '与普通 Bingo 不同，词序和“两端才能撕”的规则制造了策略性。教师可以读词、给中文线索、说英文意思或把词放进句子，让同一张纸条支持不同难度。',
-    steps: ['每位学生把八个熟悉词按自己的顺序写在纸条上。', '教师先读两次示范词，确认学生理解只能从两端撕。', '第二轮改读句子或解释，让学生从声音与语境判断目标词。'],
-    exampleTitle: '课堂案例：从听词升级到听句子',
-    example: '第一轮教师直接读“苹果”；第二轮说“这是一种红色或绿色的水果”；第三轮说“我早餐吃了一个……”。同一组词逐步增加听力负担，不需要重新准备材料。',
-    tips: ['只使用已经学过的词，让难点来自听辨而不是猜生词。', '提醒学生把碎纸集中放好，结束后用一分钟整理。', '不给速度快的学生额外优势：胜出后请他负责读下一题。']
+  "tear-paper-bingo": {
+    title: "Tear-Paper Bingo",
+    eyebrow: "Listening and recognition game",
+    grades: "Grades 1–8",
+    duration: "8–12 minutes",
+    summary: "Students tear a term only when it appears at one end of their paper strip, combining listening, recognition, and simple strategy.",
+    whatItIs: "Unlike regular Bingo, the order of the terms and the “tear from an end” rule create a small strategy problem. Read a term, give a definition, show an example, or place the answer inside a question so one strip supports several levels.",
+    steps: ["Have each student write eight familiar terms in a different order on a paper strip.", "Model two calls and confirm that students may tear only from either end.", "In a later round, replace direct terms with definitions, examples, equations, or clues."],
+    exampleTitle: "Classroom example: from answer to clue",
+    example: "In round one, call “evaporation.” In round two, say “liquid water changes into a gas.” In round three, describe a wet sidewalk drying after the sun appears. The same terms now require deeper recognition.",
+    tips: ["Use content students have already learned so the challenge comes from retrieval.", "Collect torn paper in one place and reserve one minute for cleanup.", "After a student wins, let that student read or create the next clue so the game continues to serve learning."]
   },
-  'would-you-rather': {
-    title: 'Would You Rather 二选一口语卡', eyebrow: '低压力口语活动', grades: '2–12 年级', duration: '5–15 分钟',
-    summary: '用两项选择快速制造真实意见差异，练习“还是、比较、因为”和追问。',
-    whatItIs: '二选一问题让初学者先做选择，再把答案扩展成完整句。好的题目没有唯一正确答案，而且两边都合理，学生才会真正想表达。',
-    steps: ['输入成对的熟悉词或行动，先避开敏感和私人话题。', '投影题目，给全班 10 秒静默思考。', '学生站队或举手选择，再用句型说明原因并追问同伴。'],
-    exampleTitle: '课堂案例：周末活动意见线',
-    example: '投影“周末你想看电影还是去公园？”学生站到教室两边，用“我选……，因为……”告诉同边同学；随后跨边配对，必须复述对方的理由。',
-    tips: ['把“为什么？”设为每题必问的第二步。', '允许学生说“两者都不”，但必须提出第三个中文选项。', '涉及家庭、饮食或经济条件时，使用想象情境而非私人调查。']
+  "would-you-rather": {
+    title: "Would You Rather Prompt Builder",
+    eyebrow: "Low-pressure discussion activity",
+    grades: "Grades 2–12",
+    duration: "5–15 minutes",
+    summary: "Create either-or prompts that help students choose, justify, compare, predict, and ask follow-up questions.",
+    whatItIs: "An either-or question gives every student an immediate entry point: choose first, then build a reason. It works across subjects when both options are plausible and the reasoning matters more than the vote.",
+    steps: ["Enter pairs connected to familiar content and avoid sensitive personal topics.", "Display one prompt and give the class ten seconds of quiet thinking time.", "Students choose, explain with evidence, and ask a partner one follow-up question."],
+    exampleTitle: "Classroom example: choose the better strategy",
+    example: "Display “Would you rather solve this problem with a table or a diagram?” Students choose a side, explain what their representation reveals, then pair with someone who chose differently and summarize the other method.",
+    tips: ["Make “Why?” or “What is your evidence?” the required second step.", "Allow a third option when students can explain it well.", "Use imagined scenarios instead of personal surveys when a topic touches family, health, food, or money."]
   },
   jeopardy: {
-    title: 'Jeopardy 中文课堂抢答赛', eyebrow: '单元复习游戏', grades: '3–12 年级', duration: '15–30 分钟',
-    summary: '把题目按主题与难度排成抢答板，用小组讨论、计时和计分复习词汇、句型与文化内容。',
-    whatItIs: 'Jeopardy 的价值不只是抢分，而是让学生先讨论、再给出可解释的答案。题目应该覆盖多个学习目标，并为所有学生安排参与角色。',
-    steps: ['每栏对应一个清楚类别，每题只测试一个主要目标。', '答题前给小组 15–30 秒讨论，随机指定发言人。', '结束时回看失分最多的两题，要求学生写下正确答案。'],
-    exampleTitle: '课堂案例：期末复习的四种证据',
-    example: '设置“看图认词、听句判断、句型改写、文化解释”四栏。小组必须轮换记录员和发言人；最后每人选一道错题写解释，避免成绩只反映最快学生。',
-    tips: ['速度题和思考题混合，不能全靠反应快。', '答案有多种可能时，预先写清可接受标准。', '控制音效和竞争强度，让游戏服务复习而不是盖过学习。']
+    title: "Jeopardy Review Game",
+    eyebrow: "Whole-class review",
+    grades: "Grades 3–12",
+    duration: "15–30 minutes",
+    summary: "Arrange questions by category and difficulty for team discussion, timed responses, scoring, and review across any subject.",
+    whatItIs: "The value of Jeopardy is not only speed or points. A well-designed board gives teams time to discuss, requires explainable answers, and includes a role for every student.",
+    steps: ["Make each column a clear category and let each question check one main target.", "Give teams 15–30 seconds to discuss before randomly selecting a spokesperson.", "End by revisiting the two most-missed questions and asking every student to record a correct response."],
+    exampleTitle: "Classroom example: four kinds of evidence",
+    example: "Use columns for identify, calculate, compare, and explain. Teams rotate the recorder and spokesperson. At the end, each student chooses one missed question and writes why the corrected answer makes sense.",
+    tips: ["Mix quick retrieval with questions that reward careful thinking.", "Write acceptable-answer criteria in advance when more than one response could work.", "Control sound and competition so the game supports review instead of overwhelming it."]
   },
-  'character-race': {
-    title: 'Character Race 汉字寻找赛', eyebrow: '认读与搭档活动', grades: '1–8 年级', duration: '5–12 分钟',
-    summary: '把汉字或词语排成转盘与方格，一人说目标词、一人快速寻找，再交换角色。',
-    whatItIs: '这个活动把视觉扫描和口头提示结合起来。教师可以从直接读词开始，再升级为拼音、英文意思、动作或句子线索。',
-    steps: ['选择 12–20 个学生熟悉的词并生成清楚的大字版本。', '搭档 A 给提示，搭档 B 找词并在方格做记号。', '每五题交换角色，最后用三个词完成句子。'],
-    exampleTitle: '课堂案例：偏旁侦探',
-    example: '转盘放入带“口、木、氵”的已学汉字。第一轮直接读字，第二轮只说偏旁和意思，第三轮学生解释自己如何找到答案，把速度活动转为汉字结构观察。',
-    tips: ['低年级使用单圈和大字号。', '先强调准确再计时，读错的词要重新说一次。', '同一组不要超过 20 项；词太多时分成两轮。']
+  "character-race": {
+    title: "Term Race Vocabulary Finder",
+    eyebrow: "Recognition and partner activity",
+    grades: "Grades 1–8",
+    duration: "5–12 minutes",
+    summary: "Arrange words or short terms in a wheel and grid, then have partners give clues, find the target, and switch roles.",
+    whatItIs: "The activity combines visual scanning with spoken clues. Begin by reading a term directly, then increase the challenge with a definition, example, property, translation, or sentence clue.",
+    steps: ["Choose 12–20 familiar terms and generate a large, readable version.", "Partner A gives a clue; Partner B finds and marks the term.", "Switch roles every five clues, then use three selected terms in an explanation."],
+    exampleTitle: "Classroom example: concept detective",
+    example: "Add terms from a current unit. In round one, partners read the term. In round two, they give a definition without saying it. In round three, they explain how two terms connect, shifting the activity from speed to subject reasoning.",
+    tips: ["Use a single ring and larger type for younger students.", "Prioritize accuracy before adding a timer.", "Keep one round under twenty items; split a larger unit into two focused sets."]
   },
-  'maze-generator': {
-    title: 'Maze Generator 问答迷宫', eyebrow: '可打印复习任务', grades: '3–12 年级', duration: '制作 10–15 分钟',
-    summary: '把八组问题与答案做成可编辑迷宫，学生沿正确答案前进，同时留下思考过程。',
-    whatItIs: '迷宫把连续的小问题变成一条可视化路径。它适合形成性复习：教师可以从学生走错的位置快速看出是哪一个概念需要重教。',
-    steps: ['选择八个覆盖同一目标、答案清楚的问题。', '下载 PowerPoint 后检查每个分支和文字大小。', '学生独立完成后，两人比较路径并解释分歧。'],
-    exampleTitle: '课堂案例：量词迷宫',
-    example: '每题给一个名词，学生从“个、本、只、杯”等答案中选路。完成后用迷宫中四组正确搭配写句子；教师收回时重点看第一处错误，而不是只看终点。',
-    tips: ['错误选项要反映常见误解，不要只是明显乱答。', '初学者每题保留一个例句或图片线索。', '打印前走一遍正确路径，确认没有断路。']
+  "maze-generator": {
+    title: "Question-and-Answer Maze Generator",
+    eyebrow: "Printable review task",
+    grades: "Grades 3–12",
+    duration: "10–15 minutes",
+    summary: "Turn eight questions and answers into an editable maze so students follow correct responses and leave a visible reasoning path.",
+    whatItIs: "The maze converts a sequence of short checks into a visual path. It works well for formative review because the first wrong turn often reveals the exact idea that needs reteaching.",
+    steps: ["Choose eight focused questions with clear answers.", "Download the PowerPoint and check every branch, label, and font size.", "After students solve independently, have partners compare paths and explain the first disagreement."],
+    exampleTitle: "Classroom example: fraction equivalence maze",
+    example: "Each question shows one fraction and students choose an equivalent form. After reaching the end, they select four correct pairs and explain the strategy they used. Review the first wrong turn rather than checking only the final destination.",
+    tips: ["Use distractors based on common misconceptions instead of random wrong answers.", "Give beginners one worked example or visual cue.", "Walk the correct path yourself before printing to make sure every branch connects."]
   }
 };
 
 const articles = [
   {
-    slug: 'chinese-classroom-bingo-five-ways',
-    category: '中文课堂游戏',
-    title: '中文课堂 Bingo 的 5 种玩法：从认词到真实表达',
-    description: '同一张 Bingo 表怎样练认读、听力、描述、合作与出口检测？这里给出五种可直接使用的课堂流程。',
-    readTime: '8 分钟',
-    intro: ['Bingo 很容易准备，也很容易变成“老师读、学生圈”的一次性小游戏。这里采用的设计原则是：每一轮都比上一轮多一个语言动作。学生先听懂，再说明、追问或造句，游戏才会真正服务学习目标。', '下面五种玩法可以共用一组 9–16 个词。开始前先决定今天主要检查什么：声音辨认、汉字认读、词义，还是句子表达。不要在同一轮同时考所有能力。'],
-    sections: [
-      { heading: '玩法一：听词找字（适合第一次复习）', paragraphs: ['教师不展示答案，只读目标词两遍。学生先用手指找到，再用笔做记号。第一遍速度放慢，第二遍恢复自然语速。'], list: ['适合：一年级以上、刚学完一组词。', '教师观察：学生是靠拼音、字形还是同桌提示找到答案？', '升级：读完后请全班一起把词放进短句。'] },
-      { heading: '玩法二：听线索猜词', paragraphs: ['不要直接读词，而是给一个学生能够理解的中文线索。例如目标词是“雨伞”，可以说：“下雨的时候，我带什么？”学生必须先理解句子，再匹配词汇。'], callout: '准备线索时，一条线索只保留一个最合理答案；如果有多个答案，就把“你为什么这样选”加入规则。' },
-      { heading: '玩法三：学生当小老师', paragraphs: ['两人一组，A 选一个词并读出或描述，B 找到后必须复述，再交换角色。教师在教室里记录三类问题：发音、认读、句型。活动结束只讲最常见的一类，不打断每一次对话。'] },
-      { heading: '玩法四：走动式 Find someone who', paragraphs: ['每个格子不是单词，而是一个可问的问题，例如“喜欢吃饺子”“会说一种方言”“周末喜欢运动”。学生必须用完整问题采访同学，并在格子里写对方名字。'], list: ['先示范如何礼貌地问与回答。', '允许学生跳过不想回答的私人问题。', '规定同一个名字最多出现两次，鼓励更多交流。'] },
-      { heading: '玩法五：Bingo 之后再输出', paragraphs: ['有人连线后不要立刻结束。请获胜者选择连线中的三个词讲一个小故事，或全班各选一词写出口卡。这样胜负只是活动中点，语言输出才是结尾。'], callout: '实际课堂流程示例：8 分钟认读 Bingo → 4 分钟同桌描述 → 3 分钟用三个词写句子。材料不变，任务逐步加深。' },
-      { heading: '教师使用建议', paragraphs: ['低年级使用 3×3、大图和少量文字；初学者可以保留拼音，但第二轮尝试遮住拼音。游戏前说清楚获胜规则，游戏后一定安排一个可观察的学习证据，例如一句话、一张出口卡或一次同桌复述。'] }
+    slug: "chinese-classroom-bingo-five-ways",
+    category: "Chinese Language Teaching",
+    title: "Five Ways to Use Bingo in Chinese Class: From Recognition to Real Language",
+    description: "Use one Bingo board to practice character recognition, listening, description, collaboration, and an observable exit task.",
+    readTime: "8 min read",
+    intro: [
+      "Bingo is easy to prepare, but it can quickly become a one-way routine in which the teacher reads and students circle. A stronger design adds one language action in each round. Students first recognize, then describe, question, or create.",
+      "The five versions below can share the same set of 9–16 terms. Before class, decide what you are actually checking: sound recognition, character recognition, meaning, or sentence production. Do not assess all four at once."
     ],
-    relatedTool: { label: '使用撕纸 Bingo 课堂活动', href: '/low-prep-activities/tear-paper-bingo' }
+    sections: [
+      { heading: "1. Hear the word and find the character", paragraphs: ["Read the target word twice without displaying it. Students point first and mark second. Slow the first round, then return to natural speech."], list: ["Best for: grades one and up after a new set of terms.", "Notice whether students rely on pinyin, character shape, or a neighbor.", "Extend it by asking the class to place the word in a short sentence."] },
+      { heading: "2. Listen to a clue", paragraphs: ["Instead of reading the word, give one understandable Chinese clue. For 雨伞, say: “下雨的时候，我带什么？” Students must understand the sentence before matching the word."], callout: "Write clues with one most reasonable answer. If more than one answer could work, add “Explain why you chose it” to the rule." },
+      { heading: "3. Let students become the caller", paragraphs: ["In pairs, Student A chooses and reads or describes a term. Student B finds it and repeats it before roles switch. While circulating, record patterns in pronunciation, recognition, and sentence use. Address one common pattern after the round instead of interrupting every exchange."] },
+      { heading: "4. Turn the board into Find Someone Who", paragraphs: ["Replace single words with answerable prompts such as “likes dumplings,” “speaks another language,” or “enjoys sports on weekends.” Students ask complete questions and record a classmate’s name."], list: ["Model a respectful question and answer.", "Let students skip a personal question they do not want to answer.", "Limit how often one name can appear so students speak with more classmates."] },
+      { heading: "5. Add output after Bingo", paragraphs: ["Do not end as soon as someone completes a line. Ask the winner to use three connected terms in a short story, or ask every student to choose one square for an exit sentence."], callout: "Example sequence: 8 minutes of recognition Bingo, 4 minutes of partner description, and 3 minutes writing a sentence with three selected terms." },
+      { heading: "Teacher planning notes", paragraphs: ["Use a 3×3 board, large images, and limited text for younger learners. Beginners may keep pinyin in the first round and cover it in the second. State the winning rule before play, and always end with visible evidence of learning: a sentence, an exit card, or a partner retell."] }
+    ],
+    relatedTool: { label: "Open the Tear-Paper Bingo activity", href: "/low-prep-activities/tear-paper-bingo" }
   },
   {
-    slug: 'teaching-mid-autumn-festival-grade-one', category: '节日教学',
-    title: '如何教一年级学生认识中秋节：一节 35 分钟的中文课',
-    description: '为低年级中文学习者设计的中秋节课程：图片导入、核心词、故事动作、月相排序和安全的文化比较。', readTime: '7 分钟',
-    intro: ['一年级的节日课不需要塞进完整历史。孩子更需要几个能看见、能做动作、能带回家的文化连接。可以把目标缩小为：听懂并说出“月亮、月饼、家人、中秋节”，知道中秋节常与团圆和赏月有关。', '这是一份 35 分钟流程。它适合中文初学者，也可以根据学生背景调整。介绍文化时使用“很多家庭会……”而不是“所有中国人都……”，为不同家庭经验留出空间。'],
-    sections: [
-      { heading: '0–5 分钟：从月亮开始', paragraphs: ['出示一张大圆月图片，不先说节日名称。问：“你看到了什么？月亮是什么形状？”学生用手臂围成圆形，全班说“月亮，圆圆的月亮”。'] },
-      { heading: '5–12 分钟：四个核心词', paragraphs: ['依次教“月亮、月饼、家人、中秋节”。每个词配一个动作：指天空、双手托圆、双手拥抱、画一个大圆。只做快速听辨，不要求一年级学生马上书写所有汉字。'], list: ['听到“月亮”就指天空。', '看到图片就说词。', '教师故意做错动作，学生用中文纠正。'] },
-      { heading: '12–20 分钟：三幅图讲一个小故事', paragraphs: ['用三幅图表达：晚上到了；家人一起看月亮；大家分享月饼。每幅图只配一到两句短句，反复出现“月亮”和“家人”。学生跟动作复述，而不是背诵长篇传说。'], callout: '嫦娥故事可以另上一课。低年级第一节先建立节日、时间、家庭和圆月之间的清楚联系。' },
-      { heading: '20–28 分钟：月亮排序活动', paragraphs: ['给小组四张月相图片，让学生从弯到圆排序。教师说“大一点、小一点、圆圆的”，学生移动图片。最后把圆月放在“中秋节”卡片旁。'] },
-      { heading: '28–35 分钟：我的中秋小卡', paragraphs: ['学生画月亮和一种想与家人分享的食物，在句框中完成“中秋节，我和家人一起____。”不会写的学生可以口述给老师或只贴图片词卡。'], list: ['出口检查：指认四个核心词中的三个。', '家庭延伸：请家人说说自己是否过中秋节、怎样过；没有固定过法也完全可以。', '教师记录：下节课需要继续练的是声音、词义还是汉字。'] },
-      { heading: '关于文化表达的提醒', paragraphs: ['避免把中秋节简化成“吃月饼的一天”，也避免要求所有华裔学生代表某一种文化。可以说：“中秋节在不同地区、不同家庭有不同做法。今天我们认识几个常见元素，也欢迎你分享自己的家庭故事。”'] }
+    slug: "teaching-mid-autumn-festival-grade-one",
+    category: "Culture & Celebrations",
+    title: "Teaching the Mid-Autumn Festival in Grade One: A 35-Minute Chinese Lesson",
+    description: "A low-elementary lesson using images, four core words, movement, moon sequencing, and culturally respectful language.",
+    readTime: "7 min read",
+    intro: [
+      "A first-grade celebration lesson does not need a complete historical account. Children benefit more from a few visible, physical, and memorable connections. A focused goal is enough: understand and say 月亮, 月饼, 家人, and 中秋节, and recognize that many people connect the celebration with family and the full moon.",
+      "The sequence below is designed for beginning Chinese learners. Use phrases such as “many families…” instead of “all Chinese people…” so different regions and family experiences have room."
     ],
-    relatedTool: { label: '查看主题教学资源', href: '/theme-activities' }
+    sections: [
+      { heading: "0–5 minutes: begin with the moon", paragraphs: ["Show a large full-moon image without naming the celebration. Ask what students notice and what shape they see. Students form a circle with their arms and repeat 月亮, 圆圆的月亮."] },
+      { heading: "5–12 minutes: teach four core words", paragraphs: ["Teach 月亮, 月饼, 家人, and 中秋节 with one movement each: point upward, hold a pretend round cake, hug your shoulders, and draw a large circle. Use quick listening checks instead of requiring every character in writing."], list: ["Point upward when you hear 月亮.", "Say the word when the image appears.", "Correct the teacher when the teacher performs the wrong movement."] },
+      { heading: "12–20 minutes: tell a three-picture story", paragraphs: ["Use three images: evening arrives; a family looks at the moon; people share mooncakes. Give each image only one or two short sentences and repeat 月亮 and 家人. Students retell with movement instead of memorizing a long legend."], callout: "The Chang’e legend can be a separate lesson. The first meeting should establish a clear connection among the celebration, family, nighttime, and the full moon." },
+      { heading: "20–28 minutes: sequence the moon", paragraphs: ["Give groups four moon-phase pictures. Students order them from curved to round while responding to 大一点, 小一点, and 圆圆的. Place the full moon beside the 中秋节 card at the end."] },
+      { heading: "28–35 minutes: make a small reflection card", paragraphs: ["Students draw the moon and one food they would like to share with someone. Complete the frame “中秋节，我和家人一起____。” Students who are not ready to write can dictate or choose a picture card."], list: ["Exit check: identify three of the four core words.", "Home connection: invite families to share whether and how they observe the festival; having no fixed tradition is also valid.", "Teacher note: record whether the next lesson should focus on sound, meaning, or character recognition."] },
+      { heading: "A note about cultural language", paragraphs: ["Avoid reducing the Mid-Autumn Festival to “a day for eating mooncakes,” and do not ask Chinese heritage students to represent one culture. Explain that the celebration looks different across places and families, then invite—but never require—students to share their own experiences."] }
+    ],
+    relatedTool: { label: "Browse theme-based teaching resources", href: "/theme-activities" }
   },
   {
-    slug: 'ten-games-for-chinese-beginners', category: '中文课堂游戏',
-    title: '中文初学者课堂的 10 个小游戏：每个都要有语言目标',
-    description: '十个 3–12 分钟的中文课堂小游戏，包含适用目标、基本规则和避免只热闹不学习的教师提示。', readTime: '10 分钟',
-    intro: ['初学者需要高频重复，但“再读五遍”很快失去注意力。小游戏的作用，是让同一组语言在不同任务中重复出现。挑游戏时我先写一句目标，例如“学生能听懂并指出八个颜色词”，再选规则。', '下面每个活动都能在 3–12 分钟内完成。一次课选择一两个就够；规则越简单，留给中文的时间越多。'],
-    sections: [
-      { heading: '1–2：闪卡消失 / 听音拍卡', paragraphs: ['闪卡消失：展示 6 张卡，全班闭眼，拿走一张后用“少了什么？”让学生回答。听音拍卡：两人面对同一组卡，教师读词或说线索，学生先用手指指出再轻拍。'], callout: '为了减少只拼速度，答对者必须再读一次或放进句子才得分。' },
-      { heading: '3–4：向日葵转盘 / 神秘袋', paragraphs: ['转盘抽到一个词后完成指定语言动作；神秘袋里放实物或图片，学生摸到后先描述颜色、大小或类别，再猜是什么。'] },
-      { heading: '5–6：四角选择 / 二选一站队', paragraphs: ['教室四角贴四张词卡，教师说句子，学生走到对应角并告诉身边同学理由。二选一站队则用“你喜欢 A 还是 B？”建立低压力口语。'], list: ['先给 5 秒安静思考。', '移动之后必须说一句。', '轮换搭档，避免总和朋友说。'] },
-      { heading: '7–8：找错老师 / 传话画图', paragraphs: ['找错老师：教师故意把图片说错，学生用“不是……，是……”纠正。传话画图：第一位学生听一句位置描述，传给下一位，最后一位按信息画图，再和原句比较。'] },
-      { heading: '9–10：汉字侦探 / 三词小故事', paragraphs: ['汉字侦探要求学生在教室文字、词云或短文中找指定偏旁和已学字。三词小故事随机抽三个熟词，小组用句框连成两到四句话。'], callout: '初学者的小故事不需要复杂；“小猫喜欢苹果。它去学校吃苹果。”已经是在迁移词汇。' },
-      { heading: '怎样安排一周', paragraphs: ['周一用闪卡消失建立认读；周三用四角选择增加听力；周五用三词小故事检查能否输出。词汇相同、任务不同，学生会感到新鲜，教师也能看到学习如何从辨认走向表达。'] },
-      { heading: '三个常见误区', list: ['规则讲得比游戏还久：先示范一轮，再补充细节。', '总是同一批学生回答：使用同桌先说、随机发言或轮换角色。', '只宣布赢家就结束：用一句复述或出口卡收尾。'] }
+    slug: "ten-games-for-chinese-beginners",
+    category: "Chinese Language Teaching",
+    title: "Ten Quick Games for Beginning Chinese—Each With a Language Goal",
+    description: "Ten activities that take 3–12 minutes, with a purpose, simple rules, and teacher notes that keep the game focused on learning.",
+    readTime: "10 min read",
+    intro: [
+      "Beginners need frequent repetition, but “read it five more times” quickly loses attention. A useful game lets the same language appear in several different tasks. Begin by writing one goal, such as “Students can hear and point to eight color words,” and then choose the rule.",
+      "Each activity below takes 3–12 minutes. One or two games in a lesson is enough. The simpler the rule, the more time remains for Chinese."
     ],
-    relatedTool: { label: '打开低准备活动库', href: '/low-prep-activities' }
+    sections: [
+      { heading: "1–2. Missing card / Listen and tap", paragraphs: ["Display six cards, have students close their eyes, remove one, and ask 少了什么？ For Listen and Tap, two students share cards while the teacher reads a word or clue; students point before tapping."], callout: "To reduce pure speed, require the winner to read the term or use it in a sentence before earning the point." },
+      { heading: "3–4. Classroom spinner / Mystery bag", paragraphs: ["A spinner selects a term and a required language action. A mystery bag holds an object or image; students describe color, size, or category before guessing."] },
+      { heading: "5–6. Four corners / Either-or line", paragraphs: ["Post four terms in classroom corners. Read a sentence, then have students move to a matching corner and explain to a partner. An either-or line uses 你喜欢 A 还是 B？ for a low-pressure opinion task."], list: ["Give five seconds of quiet thinking first.", "Require one sentence after movement.", "Rotate partners so students do not always talk with the same friend."] },
+      { heading: "7–8. Catch the teacher / Draw the message", paragraphs: ["In Catch the Teacher, deliberately label an image incorrectly and let students correct with 不是……，是……. In Draw the Message, one student hears a location description, passes it along, and the final student draws the result before comparing it with the original."] },
+      { heading: "9–10. Character detective / Three-word story", paragraphs: ["Character Detective asks students to find a known radical or character in classroom print, a word cloud, or a short text. Three-Word Story gives a group three familiar terms and a sentence frame for a two- to four-sentence story."], callout: "A beginner story does not need to be complex. “小猫喜欢苹果。它去学校吃苹果。” already shows students transferring familiar language." },
+      { heading: "Plan the week, not ten separate games", paragraphs: ["Use Missing Card on Monday for recognition, Four Corners on Wednesday for listening, and Three-Word Story on Friday for output. The vocabulary stays familiar while the task changes, letting the teacher observe a move from recognition to expression."] },
+      { heading: "Three common mistakes", list: ["The explanation takes longer than the game: demonstrate one round, then add details.", "The same students answer every time: use partner rehearsal, rotating roles, or random selection.", "The game ends with a winner only: close with a retell, sentence, or exit card."] }
+    ],
+    relatedTool: { label: "Open the low-prep activity library", href: "/low-prep-activities" }
   },
   {
-    slug: 'using-word-walls-for-chinese-vocabulary', category: '汉字与词汇教学',
-    title: '如何用 Word Wall 复习中文词汇：不是把词贴上墙就结束',
-    description: '中文词墙的分类方法、每周五分钟练习、拼音取舍，以及怎样让学生真的在说写中使用墙上的词。', readTime: '8 分钟',
-    intro: ['好的中文 Word Wall 是学生会主动查找的工具，不是教室背景。每个词都应该有清楚用途：帮助认字、组织句子、比较词义，或者提醒学生使用本单元语言。', '更推荐“少而会用”的词墙。每周只增加 6–10 个核心词，旧词定期移动、组合或撤下。墙面有限，学生注意力也有限。'],
-    sections: [
-      { heading: '先决定怎样分类', paragraphs: ['按主题分类最直观，例如天气、食物、家人；按功能分类更能帮助表达，例如人物、动作、地点、连接词。低年级可用颜色和小图标，高年级则可以按偏旁、词性或句型功能整理。'] },
-      { heading: '拼音应该一直留着吗？', paragraphs: ['拼音是支架，不是永久标签。新词出现的第一周可以显示拼音；认读练习时用可折叠纸条遮住；单元后期只保留学生仍容易混淆的部分。这样既支持发音，也不会让学生永远跳过汉字。'] },
-      { heading: '五种每周 5 分钟用法', list: ['找搭档：每人拿一张词或图，在墙上找到对应项。', '一分钟分类：把五个词移动到正确类别并解释一个选择。', '缺词句子：教师说一个句子，停在目标词处，学生指墙补全。', '升级句子：从墙上选一个人物、一个动作、一个地点组成句子。', '今日退场词：离开前每人选一词说句子，已说过的词暂时盖住。'] },
-      { heading: '课堂实例：天气词墙的一周', paragraphs: ['周一贴“晴天、阴天、下雨、下雪、刮风、冷、热”；周二学生听句子指词；周三把天气与衣服配对；周四用“因为……所以……”连接；周五写两座城市的天气报告。墙上还是七个核心词，但语言任务不断扩展。'] },
-      { heading: '让学生共同维护', paragraphs: ['每周安排两名“词墙管理员”检查卡片、把课堂新发现加入候选区，并记录大家最常使用的词。学生也可以提交例句，但正式贴出前由教师检查汉字、拼音和语境。'] },
-      { heading: '教师检查清单', list: ['学生坐在后排也能读清吗？', '每个词本周至少被活动使用一次吗？', '图片是否真正帮助理解，而不是造成歧义？', '是否有连接词和高频动词，而不只是名词？', '哪些词已经会了，可以撤下腾出空间？'] }
+    slug: "using-word-walls-for-chinese-vocabulary",
+    category: "Vocabulary Instruction",
+    title: "How to Use a Word Wall for Chinese Vocabulary—Not Just Decoration",
+    description: "Organize a Chinese word wall, make thoughtful pinyin decisions, and use five-minute routines that bring the words into speaking and writing.",
+    readTime: "8 min read",
+    intro: [
+      "A useful Chinese word wall is something students actively consult, not background decoration. Every item should serve a purpose: support character recognition, organize a sentence, compare meaning, or remind students to use unit language.",
+      "A smaller wall that students use is better than a crowded one. Add only 6–10 core terms each week, then move, combine, cover, or remove older terms as students become independent."
     ],
-    relatedTool: { label: '建立可重复使用的词汇库', href: '/teaching-tools/word-list-library' }
+    sections: [
+      { heading: "Choose a useful organization", paragraphs: ["Topic groups—weather, food, family—are immediately understandable. Function groups—people, actions, places, connectors—often support expression more directly. Younger students benefit from color and small icons; older students can organize by radical, word class, or sentence function."] },
+      { heading: "Should pinyin stay forever?", paragraphs: ["Pinyin is a scaffold, not a permanent label. Show it when a word is new, cover it with a foldable strip during recognition practice, and keep it later only for terms students still confuse. This supports pronunciation without training students to skip the characters."] },
+      { heading: "Five weekly five-minute routines", list: ["Find a match: pair a word or image card with the wall entry.", "One-minute sort: move five terms into categories and explain one choice.", "Missing word: pause in a sentence and let students point to the word that completes it.", "Build a sentence: choose one person, action, and place from the wall.", "Exit word: each student uses one term; cover terms after use to increase variety."] },
+      { heading: "One week with a weather wall", paragraphs: ["On Monday, post 晴天, 阴天, 下雨, 下雪, 刮风, 冷, and 热. On Tuesday, students point while listening. On Wednesday, they match weather with clothing. On Thursday, they connect ideas with 因为……所以……. On Friday, they write weather reports for two cities. The seven terms stay the same while the language task expands."] },
+      { heading: "Let students help maintain it", paragraphs: ["Assign two weekly word-wall managers to check cards, add classroom discoveries to a candidate area, and notice the most-used terms. Students may submit example sentences, but the teacher reviews characters, pinyin, and context before posting."] },
+      { heading: "Teacher checklist", list: ["Can a student in the back read it?", "Has every term been used in an activity this week?", "Does each image clarify rather than confuse?", "Are there verbs and connectors, not only nouns?", "Which terms are now independent and can come down?"] }
+    ],
+    relatedTool: { label: "Build a reusable vocabulary list", href: "/teaching-tools/word-list-library" }
   },
   {
-    slug: 'meet-the-teacher-chinese-classroom-display', category: 'Printable Activities',
-    title: 'Meet the Teacher 中文教室布置：让展示板先开口说中文',
-    description: '把 Meet the Teacher 展示板变成开学第一周的可理解输入：内容选择、双语层级、学生寻宝和隐私边界。', readTime: '7 分钟',
-    intro: ['“Meet the Teacher”展示板不只是自我介绍，也可以成为学生第一次成功读懂中文的材料。关键是少量、重复、可猜：照片或图标提供语境，中文短句提供可理解输入。', '建议避免把整段个人履历贴满墙，而是选择能自然引出课堂语言的内容，例如名字、喜欢的书、宠物、城市、食物和课堂愿望。'],
-    sections: [
-      { heading: '展示板的六个小区域', list: ['我叫……：大字姓名与称呼。', '我来自……：地图和一个地名。', '我喜欢……：三张图片配三个中文词。', '我的一天：三幅简单日常图。', '我们的课堂：三条正面、可操作的约定。', '你呢？：留一个学生可以贴便签回答的问题。'] },
-      { heading: '中文、拼音和英文怎样排', paragraphs: ['最醒目的是中文，拼音小一号放在下方，英文只在真正需要澄清时出现。不要每句话都做等量三语翻译，否则学生目光会直接跳到英文。对零基础学生，图片和教师手势往往比更多翻译更有效。'] },
-      { heading: '开学第一天：五分钟展示板寻宝', paragraphs: ['发给搭档三项任务：“找到老师喜欢的一种食物；找到一个地名；找到一条课堂约定。”学生可以先指图，再尝试读中文。核对答案时教师把目标词放进短句，全班跟读一次。'] },
-      { heading: '把展示板变成口语支架', paragraphs: ['第二天遮住教师答案，让学生用同样句框介绍自己：“我叫……”“我喜欢……”“我来自……”。不愿公开个人信息的学生可以介绍一个虚构人物或书中角色。'] },
-      { heading: '隐私和边界', paragraphs: ['不要展示家庭住址、个人电话、日常具体行程或学生资料。照片中的其他人需要同意；无法确认时使用插画或物品照片。教师自我介绍应该建立连接，同时保持专业边界。'], callout: '可以分享“我喜欢喝茶”，不需要分享“我每天几点在哪一家店”。让学生看到健康的数字与现实隐私示范。' },
-      { heading: '一周后不要让它变成背景', paragraphs: ['每月更换“你呢？”问题，节日或新单元时从展示板取下一句作为暖身。一个会被不断指、读、问的角落，才是教学资源。'] }
+    slug: "meet-the-teacher-chinese-classroom-display",
+    category: "Printable Activities",
+    title: "Meet the Teacher in a Chinese Classroom: Make the Display Speak",
+    description: "Turn a Meet the Teacher display into comprehensible input with careful content, language layers, a student scavenger hunt, and clear privacy boundaries.",
+    readTime: "7 min read",
+    intro: [
+      "A Meet the Teacher display can become the first Chinese text students successfully understand. Keep it limited, repeated, and guessable: photos or icons supply context while short Chinese sentences provide comprehensible input.",
+      "Avoid covering the wall with a full biography. Choose details that naturally introduce classroom language: name, books, pets, places, food, routines, and a hope for the class."
     ],
-    relatedTool: { label: '查看更多可打印活动', href: '/resources?category=Printable%20Activities' }
+    sections: [
+      { heading: "Six small display zones", list: ["我叫……: a large name and teacher title.", "我来自……: a map and one place name.", "我喜欢……: three images with three Chinese terms.", "我的一天: three simple routine pictures.", "我们的课堂: three positive, actionable agreements.", "你呢？: one question students can answer on a sticky note."] },
+      { heading: "Layer Chinese, pinyin, and English", paragraphs: ["Make Chinese the most prominent layer. Place smaller pinyin below it and use English only where meaning would otherwise remain unclear. Equal three-language translations encourage eyes to jump directly to English; for complete beginners, a picture and teacher gesture often support meaning more effectively."] },
+      { heading: "Day one: a five-minute display hunt", paragraphs: ["Give partners three tasks: find one food the teacher likes, find one place, and find one classroom agreement. Students point first and attempt the Chinese second. During review, place each target term inside a short sentence and have the class repeat once."] },
+      { heading: "Turn the display into a speaking scaffold", paragraphs: ["On day two, cover the teacher’s answers and let students use the same frames: 我叫……, 我喜欢……, and 我来自……. A student who prefers not to share personal information can introduce a fictional character or a person from a book."] },
+      { heading: "Privacy and professional boundaries", paragraphs: ["Do not display a home address, personal phone number, precise daily schedule, or student information. Get permission from other people shown in photos; use illustrations or object photos when permission is uncertain."], callout: "Share “I like tea” rather than “I am at this café every day at 4:00.” The display can model healthy digital and real-world privacy." },
+      { heading: "Keep it active after the first week", paragraphs: ["Change the 你呢？ question monthly. When a new unit or celebration begins, pull one sentence from the display as a warm-up. A display becomes a resource only when students continue to point, read, ask, and respond."] }
+    ],
+    relatedTool: { label: "View more printable teaching resources", href: "/resources?category=Printable%20Activities" }
   }
 ];
 

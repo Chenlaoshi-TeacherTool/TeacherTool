@@ -2,8 +2,8 @@
   'use strict';
 
   var DISPLAY_MODES = [
-    { id: 'zh', label: 'Target Language' },
-    { id: 'en', label: 'English' },
+    { id: 'zh', label: 'Original Terms' },
+    { id: 'en', label: 'English Translation' },
     { id: 'py', label: 'Pinyin' }
   ];
 
@@ -22,18 +22,17 @@
 
   var BACKGROUNDS = ['#ffffff', '#fdf6e3', '#fde2e4', '#e3f0ff', '#e6f6e9', '#efe6ff'];
 
-  // Labels use each language's own name so teachers can identify it quickly.
   var SOURCE_LANGUAGES = [
-    { code: 'zh-CN', label: '中文' },
+    { code: 'zh-CN', label: 'Chinese' },
     { code: 'en', label: 'English' },
-    { code: 'ja', label: '日本語' },
-    { code: 'ko', label: '한국어' },
-    { code: 'fr', label: 'Français' },
-    { code: 'es', label: 'Español' },
-    { code: 'de', label: 'Deutsch' },
-    { code: 'it', label: 'Italiano' },
-    { code: 'ru', label: 'Русский' },
-    { code: 'pt', label: 'Português' }
+    { code: 'ja', label: 'Japanese' },
+    { code: 'ko', label: 'Korean' },
+    { code: 'fr', label: 'French' },
+    { code: 'es', label: 'Spanish' },
+    { code: 'de', label: 'German' },
+    { code: 'it', label: 'Italian' },
+    { code: 'ru', label: 'Russian' },
+    { code: 'pt', label: 'Portuguese' }
   ];
 
   // A4 portrait ratio (210mm x 297mm) so the on-screen preview matches the printed page.
@@ -41,7 +40,7 @@
   var CANVAS_H = Math.round(CANVAS_W * (297 / 210));
 
   var DEFAULT_WORDS = [
-    '苹果', '香蕉', '葡萄', '西瓜', '草莓', '橙子', '菠萝', '芒果', '梨', '桃子'
+    'hypothesis', 'evidence', 'variable', 'observe', 'measure', 'compare', 'pattern', 'result', 'explain', 'revise'
   ];
 
   var state = {
@@ -49,7 +48,7 @@
     scheme: 'colorful',
     font: 'default',
     background: '#ffffff',
-    sourceLang: 'zh-CN'
+    sourceLang: 'en'
   };
 
   var els = {};

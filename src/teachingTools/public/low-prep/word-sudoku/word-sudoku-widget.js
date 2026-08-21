@@ -1,14 +1,14 @@
 (() => {
   const defaultItems = [
-    { word: "苹果", icon: "🍎", manual: false },
-    { word: "香蕉", icon: "🍌", manual: false },
-    { word: "葡萄", icon: "🍇", manual: false },
-    { word: "西瓜", icon: "🍉", manual: false },
-    { word: "草莓", icon: "🍓", manual: false },
-    { word: "樱桃", icon: "🍒", manual: false },
-    { word: "桃子", icon: "🍑", manual: false },
-    { word: "橙子", icon: "🍊", manual: false },
-    { word: "菠萝", icon: "🍍", manual: false }
+    { word: "apple", icon: "🍎", manual: false },
+    { word: "banana", icon: "🍌", manual: false },
+    { word: "grape", icon: "🍇", manual: false },
+    { word: "watermelon", icon: "🍉", manual: false },
+    { word: "strawberry", icon: "🍓", manual: false },
+    { word: "cherry", icon: "🍒", manual: false },
+    { word: "peach", icon: "🍑", manual: false },
+    { word: "orange", icon: "🍊", manual: false },
+    { word: "pineapple", icon: "🍍", manual: false }
   ];
 
   const iconPalette = [

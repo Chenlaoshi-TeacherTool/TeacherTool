@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#194f45">
   <title>Vocabulary Mini Booklet · Chen Laoshi's Teaching Toolkit</title>
-  <meta name="description" content="Turn Chinese vocabulary into a folded, self-paced printable student booklet.">
+  <meta name="description" content="Turn vocabulary from any subject into a folded, self-paced printable student booklet.">
   <meta name="robots" content="noindex, follow">
   <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/vocabulary-booklet">
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Vocabulary Mini Booklet · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Turn Chinese vocabulary into a folded, self-paced printable student booklet."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/vocabulary-booklet"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Vocabulary Mini Booklet · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Turn vocabulary from any subject into a folded, self-paced printable student booklet."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/vocabulary-booklet"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="./vocabulary-booklet.css">
 </head>
@@ -72,17 +72,17 @@
         <input id="bookletTitle" maxlength="70" value="My vocabulary booklet">
 
         <label class="field-label" for="wordSource">Vocabulary</label>
-        <textarea id="wordSource" rows="14" spellcheck="false" placeholder="苹果 | píng guǒ | apple&#10;香蕉 | xiāng jiāo | banana">你好
-谢谢
-苹果
-香蕉
-草莓
-西瓜
-老师
-学生
-朋友
-再见</textarea>
-        <p class="field-help">One item per line. You can paste Chinese, or use 中文 | 拼音 | English. The first 100 unique terms will be used.</p>
+        <textarea id="wordSource" rows="14" spellcheck="false" placeholder="evaporation | | liquid changing into gas&#10;variable | | a factor that can change">hypothesis | | a testable explanation
+evidence | | information that supports a claim
+variable | | a factor that can change
+observe | | notice and record
+measure | | find a quantity
+compare | | identify similarities and differences
+pattern | | something that repeats
+result | | what happened
+explain | | make an idea clear
+revise | | improve after reviewing</textarea>
+        <p class="field-help">One item per line. Use term | pronunciation | definition when needed. The first 100 unique terms will be used.</p>
 
         <div class="button-row">
           <button class="btn btn-primary" id="buildButton" type="button">Build booklet</button>
@@ -100,20 +100,20 @@
         </div>
 
         <fieldset class="display-options">
-          <legend>Display languages <small>Select one or more</small></legend>
-          <label><input type="checkbox" name="displayLanguage" value="zh" checked> <span>中文</span><small>Chinese</small></label>
-          <label><input type="checkbox" name="displayLanguage" value="py"> <span>拼音</span><small>Pinyin</small></label>
-          <label><input type="checkbox" name="displayLanguage" value="en"> <span>English</span><small>English</small></label>
+          <legend>Display fields <small>Select one or more</small></legend>
+          <label><input type="checkbox" name="displayLanguage" value="zh" checked> <span>Term</span><small>Word or phrase</small></label>
+          <label><input type="checkbox" name="displayLanguage" value="py"> <span>Pronunciation</span><small>Optional support</small></label>
+          <label><input type="checkbox" name="displayLanguage" value="en"> <span>Definition</span><small>Meaning or explanation</small></label>
         </fieldset>
 
         <div class="font-option">
           <label for="fontSelect">Vocabulary font <small>Applied to the printed word lists</small></label>
           <select id="fontSelect">
-            <option value="kaiti" selected>楷体 KaiTi for Chinese</option>
+            <option value="kaiti" selected>KaiTi (supports Chinese characters)</option>
             <option value="serif">Textbook serif</option>
             <option value="sans">Clean sans-serif</option>
           </select>
-          <p class="font-preview" id="fontPreview"><span class="term-zh">你好</span> · <span class="term-py">nǐ hǎo</span> · <span class="term-en">hello</span></p>
+          <p class="font-preview" id="fontPreview"><span class="term-zh">hypothesis</span> · <span class="term-py">optional pronunciation</span> · <span class="term-en">a testable explanation</span></p>
         </div>
 
         <div class="print-guide">

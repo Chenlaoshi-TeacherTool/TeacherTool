@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#194f45">
-  <title><%= toolGuide.title %> - 陈老师中文教学工具</title>
+  <title><%= toolGuide.title %> - Chen Laoshi's Teaching Toolkit</title>
   <%- include('partials/seo', { pageDescription: toolGuide.summary }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/stylesheets/content-pages.css">
@@ -16,8 +16,8 @@
       <h1><%= toolGuide.title %></h1>
       <p><%= toolGuide.summary %></p>
       <div class="content-actions">
-        <a class="btn" href="<%= toolGuide.appUrl %>">打开工具 →</a>
-        <a class="text-link" href="<%= sectionPath %>">查看全部<%= sectionLabel %></a>
+        <a class="btn" href="<%= toolGuide.appUrl %>">Open the tool →</a>
+        <a class="text-link" href="<%= sectionPath %>">View all <%= sectionLabel %></a>
       </div>
     </div>
   </header>
@@ -27,11 +27,11 @@
     <section class="content-section content-section--soft">
       <div class="content-shell content-cta">
         <div>
-          <p class="content-kicker">开始准备</p>
-          <h2>先读活动目标，再打开生成器</h2>
-          <p>生成器负责排版和随机化；词汇选择、难度与课堂互动仍由教师决定。制作完成后请先用学生视角测试一次。</p>
+          <p class="content-kicker">Before you begin</p>
+          <h2>Start with the learning goal, then open the generator</h2>
+          <p>The generator handles layout or randomization. You still choose the content, difficulty, and classroom interaction. Test the finished material from a student's point of view before class.</p>
         </div>
-        <a class="btn" href="<%= toolGuide.appUrl %>">现在打开工具</a>
+        <a class="btn" href="<%= toolGuide.appUrl %>">Open the tool now</a>
       </div>
     </section>
   </main>

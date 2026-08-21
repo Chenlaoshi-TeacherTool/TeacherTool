@@ -1,8 +1,22 @@
 (function () {
   'use strict';
 
-  var REQUIRED_HEADERS = ['编号', '主题', '难度', '题目', '答案', '标签', '题型'];
-  var OPTION_HEADERS = ['选项A', '选项B', '选项C', '选项D'];
+  var HEADER_ALIASES = {
+    id: ['ID', '编号'],
+    theme: ['Topic', 'Theme', '主题'],
+    level: ['Level', 'Difficulty', '难度'],
+    prompt: ['Question', 'Prompt', '题目'],
+    answer: ['Answer', '答案'],
+    tags: ['Tags', '标签'],
+    type: ['Question Type', 'Type', '题型'],
+    optionA: ['Option A', '选项A'],
+    optionB: ['Option B', '选项B'],
+    optionC: ['Option C', '选项C'],
+    optionD: ['Option D', '选项D'],
+    note: ['Notes', 'Note', '备注'],
+    bankName: ['Question Bank Name', 'Bank Name', '题库名称']
+  };
+  var REQUIRED_FIELDS = ['id', 'theme', 'level', 'prompt', 'answer', 'tags', 'type'];
   var els = {};
   var currentBank = null;
   var pendingBank = null;
@@ -196,7 +210,7 @@
         presetBanks = payload.banks || [];
         renderPresetBanks();
         renderBankSelect();
-        if (presetBanks.length) loadPresetBank(presetBanks[0].id);
+        renderCurrentBank();
       })
       .catch(function () {
         els.presetBanks.innerHTML = '<p class="saved-empty">Preset question banks are unavailable right now. Please try again shortly.</p>';
@@ -472,32 +486,38 @@
     if (!grid.length) throw new Error('The question sheet is empty.');
 
     var headerRowIndex = grid.findIndex(function (row) {
-      return REQUIRED_HEADERS.every(function (header) { return row.indexOf(header) >= 0; });
+      return REQUIRED_FIELDS.every(function (field) {
+        return HEADER_ALIASES[field].some(function (header) { return row.indexOf(header) >= 0; });
+      });
     });
     if (headerRowIndex < 0) throw new Error('We could not find the expected question-bank column headers.');
     var headers = grid[headerRowIndex];
     var headerMap = Object.fromEntries(headers.map(function (header, index) { return [String(header).trim(), index]; }));
-    var missingHeaders = REQUIRED_HEADERS.filter(function (header) { return headerMap[header] == null; });
-    if (missingHeaders.length) throw new Error('Missing columns: ' + missingHeaders.join(', ') + '.');
+    function headerIndex(field) {
+      var alias = HEADER_ALIASES[field].find(function (header) { return headerMap[header] != null; });
+      return alias == null ? null : headerMap[alias];
+    }
+    var missingHeaders = REQUIRED_FIELDS.filter(function (field) { return headerIndex(field) == null; });
+    if (missingHeaders.length) throw new Error('Missing columns: ' + missingHeaders.map(function (field) { return HEADER_ALIASES[field][0]; }).join(', ') + '.');
 
     var issues = [];
     var ids = new Set();
     var questions = grid.slice(headerRowIndex + 1).map(function (row, rowIndex) {
-      function value(header) { return String(row[headerMap[header]] || '').trim(); }
-      if (!value('编号') && !value('题目')) return null;
+      function value(field) { var index = headerIndex(field); return index == null ? '' : String(row[index] || '').trim(); }
+      if (!value('id') && !value('prompt')) return null;
       var question = {
-        id: value('编号'),
-        theme: value('主题'),
-        level: value('难度'),
-        prompt: value('题目'),
-        answer: value('答案'),
-        tags: value('标签'),
-        type: value('题型'),
-        optionA: value('选项A'),
-        optionB: value('选项B'),
-        optionC: value('选项C'),
-        optionD: value('选项D'),
-        note: value('备注')
+        id: value('id'),
+        theme: value('theme'),
+        level: value('level'),
+        prompt: value('prompt'),
+        answer: value('answer'),
+        tags: value('tags'),
+        type: value('type'),
+        optionA: value('optionA'),
+        optionB: value('optionB'),
+        optionC: value('optionC'),
+        optionD: value('optionD'),
+        note: value('note')
       };
       var excelRow = headerRowIndex + rowIndex + 2;
       if (!question.id || !question.prompt || !question.answer) {
@@ -505,7 +525,7 @@
       }
       if (ids.has(question.id)) issues.push('Question ID “' + question.id + '” appears more than once.');
       ids.add(question.id);
-      if (question.type === '单选题' && ![question.optionA, question.optionB, question.optionC, question.optionD].every(Boolean)) {
+      if (/^(单选题|multiple choice)$/i.test(question.type) && ![question.optionA, question.optionB, question.optionC, question.optionD].every(Boolean)) {
         issues.push('Multiple-choice question “' + question.id + '” is missing an option.');
       }
       return window.ChenQuestionBank.normalizeQuestion(question);
@@ -513,7 +533,8 @@
 
     if (!questions.length) throw new Error('No questions were found below the header row.');
     var bankName = grid.slice(headerRowIndex + 1).map(function (row) {
-      return String(row[headerMap['题库名称']] || '').trim();
+      var bankNameIndex = headerIndex('bankName');
+      return bankNameIndex == null ? '' : String(row[bankNameIndex] || '').trim();
     }).find(Boolean) || file.name.replace(/\.xlsx$/i, '');
     var bank = window.ChenQuestionBank.normalizeBank({
       name: bankName,
@@ -544,7 +565,7 @@
     if (!workbookFile) return 'xl/worksheets/sheet1.xml';
     var workbook = parseXml(await workbookFile.async('text'));
     var sheets = Array.from(workbook.getElementsByTagName('sheet'));
-    var preferred = sheets.find(function (sheet) { return sheet.getAttribute('name') === '题库'; }) || sheets[0];
+    var preferred = sheets.find(function (sheet) { return /^(Question Bank|题库)$/i.test(sheet.getAttribute('name') || ''); }) || sheets[0];
     if (!preferred) throw new Error('This workbook does not include a worksheet.');
     var relationId = getAttributeBySuffix(preferred, 'id');
     var relationsFile = zip.file('xl/_rels/workbook.xml.rels');

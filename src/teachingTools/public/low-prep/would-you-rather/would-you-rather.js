@@ -33,11 +33,11 @@
     lastFocused: null
   };
   var examples = [
-    '吃火锅 / 吃披萨',
-    '去海边 / 去山上',
-    '养一只猫 / 养一只狗',
-    '早起 / 晚睡',
-    '喝奶茶 / 喝果汁'
+    'explain with a diagram / explain with a table',
+    'read a biography / read historical fiction',
+    'work alone / work with a partner',
+    'show your answer in writing / explain it aloud',
+    'start with an example / start with a rule'
   ];
 
   function clean(value) {
@@ -116,8 +116,8 @@
   }
 
   function templateQuestion(a, b) {
-    var question = clean(els.template.value) || '你喜欢{A}还是{B}？';
-    if (question.indexOf('{A}') === -1 && question.indexOf('{B}') === -1) question += ' {A} 还是 {B}？';
+    var question = clean(els.template.value) || 'Would you rather {A} or {B}?';
+    if (question.indexOf('{A}') === -1 && question.indexOf('{B}') === -1) question += ' {A} or {B}?';
     return question.replace(/\{A\}/g, a || '＿＿').replace(/\{B\}/g, b || '＿＿');
   }
 
@@ -126,7 +126,7 @@
   }
 
   function updateTemplateSample() {
-    els.templateSample.textContent = '现在会生成：' + templateQuestion('唱歌', '跳舞');
+    els.templateSample.textContent = 'Sample: ' + templateQuestion('explain with a diagram', 'explain with a table');
   }
 
   function applyTemplateToAll() {
@@ -218,7 +218,7 @@
       '<text x="90" y="82" fill="#356e57" font-size="25" font-weight="800" letter-spacing="3" font-family="Arial, Noto Sans SC, sans-serif">CHEN LAOSHI’S TEACHING TOOLKIT</text><text x="1510" y="82" text-anchor="end" fill="#356e57" font-size="25" font-weight="800" font-family="Arial, Noto Sans SC, sans-serif">' + (index + 1) + ' / ' + state.cards.length + '</text>' +
       sunflower(800, 142, 42) + textBlock(questionLines, 800, 294 - (questionLines.length - 1) * 24, 'text-anchor="middle" fill="#164c43" font-size="52" font-weight="800" font-family="Arial, Noto Sans SC, sans-serif"', 63) +
       choicePanel('A', card.a, index, votes) + choicePanel('B', card.b, index, votes) +
-      '<text x="800" y="825" text-anchor="middle" fill="#547267" font-size="27" font-family="Arial, Noto Sans SC, sans-serif">我选 ______，因为 ______。</text><text x="800" y="864" text-anchor="middle" fill="#8b5f1a" font-size="21" font-weight="700" font-family="Arial, Noto Sans SC, sans-serif">Choose a side · Say why · Listen to a classmate</text></svg>';
+      '<text x="800" y="825" text-anchor="middle" fill="#547267" font-size="27" font-family="Arial, Noto Sans SC, sans-serif">I choose ______ because ______.</text><text x="800" y="864" text-anchor="middle" fill="#8b5f1a" font-size="21" font-weight="700" font-family="Arial, Noto Sans SC, sans-serif">Choose a side · Give evidence · Listen to a classmate</text></svg>';
   }
 
   function renderPreview() {
@@ -296,7 +296,7 @@
           if (usedTemplateQuestion) card.question = templateQuestion(card.a.text, card.b.text);
           if (state.selected === index) renderPreview();
         });
-        wordInput.placeholder = '中文 / word';
+        wordInput.placeholder = 'word or short phrase';
         var pinyinInput = field(side.pinyin, 'Pinyin', function () { side.pinyin = pinyinInput.value; if (state.selected === index) renderPreview(); }); pinyinInput.placeholder = 'Pinyin';
         var englishInput = field(side.english, 'English', function () { side.english = englishInput.value; if (state.selected === index) renderPreview(); }); englishInput.placeholder = 'English';
         fields.append(wordInput, pinyinInput, englishInput); box.append(tag, thumb, fields); choices.appendChild(box);
@@ -311,12 +311,12 @@
     state.cards = result.cards;
     state.selected = 0; state.presentationIndex = 0; state.votes = {};
     renderCards(); renderPreview();
-    setStatus(result.cards.length ? result.cards.length + ' cards are ready to edit.' : 'Each line needs two choices, such as 苹果 / 香蕉.', result.cards.length ? 'success' : 'warning');
+    setStatus(result.cards.length ? result.cards.length + ' cards are ready to edit.' : 'Each line needs two choices, such as diagram / table.', result.cards.length ? 'success' : 'warning');
   }
 
   function appendDeck() {
     var result = getCardsFromText(els.pairs.value);
-    if (!result.cards.length) { setStatus('Each line needs two choices, such as 苹果 / 香蕉.', 'warning'); return; }
+    if (!result.cards.length) { setStatus('Each line needs two choices, such as diagram / table.', 'warning'); return; }
     var remaining = MAX_CARDS - state.cards.length;
     var added = result.cards.slice(0, Math.max(0, remaining));
     state.cards = state.cards.concat(added);
@@ -327,7 +327,7 @@
 
   function addBlankCard() {
     if (state.cards.length >= MAX_CARDS) { setStatus('A deck can have up to ' + MAX_CARDS + ' cards.', 'warning'); return; }
-    state.cards.push({ a: createSide('选项 A'), b: createSide('选项 B'), question: templateQuestion('选项 A', '选项 B') });
+    state.cards.push({ a: createSide('Option A'), b: createSide('Option B'), question: templateQuestion('Option A', 'Option B') });
     state.selected = state.cards.length - 1; renderCards(); renderPreview(); setStatus('A new card was added.');
   }
 

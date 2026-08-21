@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,45 +19,45 @@
   </header>
 
   <div id="coreWarn" class="warn" style="display:none">
-    没找到词表核心模块。手动出题不受影响，「用词表自动出题」需要先在词汇库里保存过词表。
+    The vocabulary library could not be loaded. You can still create questions manually; automatic vocabulary questions require a saved list.
   </div>
 
   <section>
-    <h2><span class="num">1</span>游戏名称与保存</h2>
+    <h2><span class="num">1</span>Game name and saved boards</h2>
     <div class="row">
-      <input type="text" id="gname" class="grow" placeholder="题库名字，例如：第三单元 · 复习赛">
+      <input type="text" id="gname" class="grow" placeholder="Board name, for example: Unit 3 Review">
     </div>
     <div class="row" style="margin-top:10px">
-      <button id="btnSave" class="primary">保存题库</button>
-      <button id="btnNew">新建一套</button>
+      <button id="btnSave" class="primary">Save board</button>
+      <button id="btnNew">New board</button>
     </div>
-    <p class="hint" style="margin:12px 0 6px">已保存的题库：</p>
+    <p class="hint" style="margin:12px 0 6px">Saved boards:</p>
     <div id="saved" class="saved"></div>
   </section>
 
   <section>
-    <h2><span class="num">2</span>出题 <span style="font-size:14px;font-weight:400;color:#5A6B57">已填 <b id="fillinfo">0 / 0</b></span></h2>
-    <p class="hint">点任意一格填题目和答案。想设 Daily Double 就在弹窗里勾一下（一场只留一个）。</p>
+    <h2><span class="num">2</span>Build the board <span style="font-size:14px;font-weight:400;color:#5A6B57">Filled <b id="fillinfo">0 / 0</b></span></h2>
+    <p class="hint">Select any cell to add a question and answer. You can mark one cell as the Daily Double.</p>
     <div class="row" style="margin-bottom:10px">
-      <span class="field">类别 <select id="optCats"><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
-      <span class="field">每类题数 <select id="optRows"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
-      <span class="field">起始分 <input type="number" id="optBase" value="100" step="50" style="width:88px"></span>
-      <span class="field">每级加 <input type="number" id="optStep" value="100" step="50" style="width:88px"></span>
-      <span class="field">抢答秒数 <input type="number" id="optSec" value="20" min="5" style="width:74px"></span>
-      <button id="btnBlank" class="ghost">清空题目</button>
-      <button id="btnImport" class="ghost">导入 JSON</button>
+      <span class="field">Categories <select id="optCats"><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
+      <span class="field">Questions per category <select id="optRows"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
+      <span class="field">Starting points <input type="number" id="optBase" value="100" step="50" style="width:88px"></span>
+      <span class="field">Point step <input type="number" id="optStep" value="100" step="50" style="width:88px"></span>
+      <span class="field">Answer time <input type="number" id="optSec" value="20" min="5" style="width:74px"></span>
+      <button id="btnBlank" class="ghost">Clear questions</button>
+      <button id="btnImport" class="ghost">Import JSON</button>
       <input type="file" id="file" accept=".json" style="display:none">
     </div>
     <div class="row" style="margin-bottom:12px">
-      <button id="btnGen" class="dark">用词表自动出题</button>
-      <span class="field">题型
+      <button id="btnGen" class="dark">Build from a vocabulary list</button>
+      <span class="field">Question type
         <select id="genMode" style="min-width:170px">
-          <option value="mixed" selected>混合题型</option>
-          <option value="py2zh">看拼音写汉字</option>
-          <option value="en2zh">看英文说中文</option>
-          <option value="zh2en">看中文说英文</option>
-          <option value="zh2py">看中文写拼音</option>
-          <option value="sentence">用这个词造句</option>
+          <option value="mixed" selected>Mixed language questions</option>
+          <option value="py2zh">Pinyin to Chinese</option>
+          <option value="en2zh">English to Chinese</option>
+          <option value="zh2en">Chinese to English</option>
+          <option value="zh2py">Chinese to pinyin</option>
+          <option value="sentence">Use the term in a sentence</option>
         </select>
       </span>
     </div>
@@ -65,60 +65,60 @@
       <div class="bank-source-head">
         <div>
           <p class="bank-source-kicker">Chen Laoshi Question Banks</p>
-          <h3>从公开题库创建游戏板</h3>
-          <p class="hint">选择 2–6 个主题。每个主题会成为一栏，并随机抽取每栏所需数量的题目。</p>
+          <h3>Create a board from published question banks</h3>
+          <p class="hint">Choose 2–6 topics. Each topic becomes a category, with questions selected to fill the board.</p>
         </div>
-        <a class="bank-library-link" href="/teaching-tools/question-bank-library/question-bank-library.html">浏览完整题库</a>
+        <a class="bank-library-link" href="/teaching-tools/question-bank-library/question-bank-library.html">Browse the full question library</a>
       </div>
-      <p class="bank-status" id="bankStatus" aria-live="polite">正在载入题库主题…</p>
+      <p class="bank-status" id="bankStatus" aria-live="polite">Loading question bank topics…</p>
       <div class="bank-choices" id="bankChoices" aria-label="Choose question-bank topics"></div>
       <div class="row bank-source-actions">
-        <button id="btnImportBanks" class="primary" type="button" disabled>用所选主题创建游戏板</button>
-        <span class="bank-selection-note" id="bankSelectionNote">选择 2–6 个主题</span>
+        <button id="btnImportBanks" class="primary" type="button" disabled>Create a board from selected topics</button>
+        <span class="bank-selection-note" id="bankSelectionNote">Choose 2–6 topics</span>
       </div>
     </div>
     <div id="cats" class="cats"></div>
   </section>
 
   <section>
-    <h2><span class="num">3</span>分组</h2>
+    <h2><span class="num">3</span>Teams</h2>
     <div class="row" style="margin-bottom:10px">
-      <input type="text" id="teamName" placeholder="队伍名字，例如：熊猫队" style="flex:0 1 240px">
-      <button id="btnAddTeam">加一队</button>
+      <input type="text" id="teamName" placeholder="Team name, for example: Blue Team" style="flex:0 1 240px">
+      <button id="btnAddTeam">Add team</button>
     </div>
     <div id="teams" class="teams"></div>
   </section>
 
   <section>
-    <h2><span class="num">4</span>上课与备份</h2>
+    <h2><span class="num">4</span>Play and export</h2>
     <div class="row">
-      <button id="btnStart" class="dark">▶ 全屏开赛</button>
-      <button id="btnPPTX" class="primary">导出 PPTX（题目+答案）</button>
-      <button id="btnPDF" class="primary">导出 PDF 题库</button>
-      <button id="btnJSON">导出 JSON 备份</button>
+      <button id="btnStart" class="dark">▶ Start full-screen game</button>
+      <button id="btnPPTX" class="primary">Export PPTX (questions + answers)</button>
+      <button id="btnPDF" class="primary">Export PDF question set</button>
+      <button id="btnJSON">Export JSON backup</button>
     </div>
     <p class="hint" style="margin-top:10px">
-      比赛时：点格子出题 → <b>T</b> 开始倒计时 → <b>空格</b> 显示答案 → 给答对的队 <b>+分</b> → <b>回车</b> 关掉并划掉这一格。Esc 退出。
+      During play: choose a cell → press <b>T</b> to start the timer → press <b>Space</b> to reveal the answer → award points → press <b>Enter</b> to close and mark the cell complete. Press Esc to exit.
     </p>
   </section>
 
-  <footer>陈老师教学工具 · Jeopardy 抢答赛 v1.0</footer>
+  <footer>Chen Laoshi's Teaching Toolkit · Jeopardy Review Game v1.0</footer>
 </div>
 
 <!-- 出题弹窗 -->
 <div class="modal" id="modal">
   <div class="sheet">
-    <h3 id="mTitle">填题目</h3>
-    <label class="hint" style="display:block;margin:0">题目（学生看到的）</label>
-    <textarea id="mQ" placeholder="例如：这个拼音是什么字？&#10;xióngmāo"></textarea>
-    <label class="hint" style="display:block;margin:8px 0 0">答案</label>
-    <textarea id="mA" placeholder="熊猫" style="min-height:60px"></textarea>
+    <h3 id="mTitle">Edit question</h3>
+    <label class="hint" style="display:block;margin:0">Question shown to students</label>
+    <textarea id="mQ" placeholder="For example: What process changes liquid water into water vapor?"></textarea>
+    <label class="hint" style="display:block;margin:8px 0 0">Answer</label>
+    <textarea id="mA" placeholder="Evaporation" style="min-height:60px"></textarea>
     <div class="row" style="margin-top:10px">
-      <label class="check"><input type="checkbox" id="mDD"> 设为 Daily Double（双倍分数）</label>
+      <label class="check"><input type="checkbox" id="mDD"> Make this the Daily Double</label>
       <span class="grow"></span>
-      <button id="mClear" class="ghost">清空这格</button>
-      <button id="mCancel">取消</button>
-      <button id="mSave" class="primary">保存</button>
+      <button id="mClear" class="ghost">Clear cell</button>
+      <button id="mCancel">Cancel</button>
+      <button id="mSave" class="primary">Save</button>
     </div>
   </div>
 </div>
@@ -127,7 +127,7 @@
 <div id="game">
   <div id="gtop">
     <h2 id="gtitle">Jeopardy</h2>
-    <button id="gExit">退出</button>
+    <button id="gExit">Exit</button>
   </div>
   <div id="gboard"></div>
   <div id="scores"></div>
@@ -144,15 +144,15 @@
   </div>
   <div id="timerbar"><div id="timerfill"></div></div>
   <div id="cfoot">
-    <button id="cTimer" class="primary">开始倒计时（T）</button>
-    <button id="cStop" class="mini">暂停</button>
-    <span style="font-weight:700">剩 <span id="tleft">20</span> 秒</span>
-    <button id="cReveal">显示答案（空格）</button>
+    <button id="cTimer" class="primary">Start timer (T)</button>
+    <button id="cStop" class="mini">Pause</button>
+    <span style="font-weight:700"><span id="tleft">20</span> seconds left</span>
+    <button id="cReveal">Reveal answer (Space)</button>
     <span style="width:14px"></span>
     <div id="cteams" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     <span style="width:14px"></span>
-    <button id="cDone" class="dark">这题结束（回车）</button>
-    <button id="cBack" class="mini">先不划掉</button>
+    <button id="cDone" class="dark">Finish question (Enter)</button>
+    <button id="cBack" class="mini">Return without completing</button>
   </div>
 </div>
 

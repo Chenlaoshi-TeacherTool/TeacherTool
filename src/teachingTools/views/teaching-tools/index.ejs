@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <%- include('../partials/adsense') %>
     <title>Teaching Tools - Teacher Toolkit</title>
-    <%- include('../partials/seo', { pageDescription: 'Discover practical teacher tools for Chinese vocabulary, classroom groups, QR worksheets, and more.' }) %>
+    <%- include('../partials/seo', { pageDescription: 'Discover practical classroom tools for teachers across subjects, including random groups, QR worksheets, spinners, question banks, and vocabulary resources.' }) %>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -96,6 +96,7 @@
         .tool-card p {
             margin-bottom: 20px;
         }
+        .tool-scope { display: inline-block; margin: 0 0 12px !important; padding: 4px 9px; border-radius: 999px; background: #edf5df; color: #356e57; font-size: .75rem; font-weight: 800; }
         .btn {
             background-color: #667eea;
             color: white;
@@ -144,7 +145,7 @@
     <a href="/" class="back-btn">← Back to Homepage</a>
     <section class="header">
         <h1>Teaching Tools</h1>
-        <p>Simple tools to save teachers time in the classroom.</p>
+        <p>Add your own names, links, terms, and questions. General-purpose tools work across subjects, while language-focused tools are clearly labeled.</p>
     </section>
 
     <section class="tool-search" aria-labelledby="tool-search-label">
@@ -159,32 +160,38 @@
     <section class="tools-grid">
         <div class="tool-card">
             <h3>📌 QR Code Generator</h3>
-            <p>Generate QR codes from any text or website link for classroom use.</p>
+            <p class="tool-scope">Works across subjects</p>
+            <p>Generate QR codes from text or links for stations, research, choice boards, and family communication.</p>
             <a href="/teaching-tools/qr-code-generator" class="btn">Open Tool</a>
         </div>
         <div class="tool-card">
             <h3>🎲 Random Group Generator</h3>
-            <p>Quickly create random student groups for your class.</p>
+            <p class="tool-scope">Works across subjects</p>
+            <p>Create partners or groups quickly for discussion, labs, problem solving, reading, and review.</p>
             <a href="/teaching-tools/random-group-generator" class="btn">Open Tool</a>
         </div>
         <div class="tool-card">
             <h3>🌻 Sunflower Spinner</h3>
-            <p>Add words, sentences, or names to a sunflower wheel, then spin for a bright classroom pick.</p>
+            <p class="tool-scope">Works across subjects</p>
+            <p>Add topics, questions, challenge levels, terms, or student numbers to a bright classroom wheel.</p>
             <a href="/teaching-tools/sunflower-spinner" class="btn">Learn &amp; open</a>
         </div>
         <div class="tool-card">
             <h3>🗂️ Library</h3>
-            <p>Create reusable Chinese, pinyin, and English word lists for future cards, games, and worksheets.</p>
+            <p class="tool-scope">Language &amp; vocabulary</p>
+            <p>Create reusable multilingual term lists for future cards, games, booklets, and worksheets.</p>
             <a href="/teaching-tools/word-list-library" class="btn">Learn &amp; open</a>
         </div>
         <div class="tool-card">
             <h3>🧠 Question Bank Library</h3>
-            <p>Build teacher-reviewed question sets for speaking, review games, and formative checks.</p>
+            <p class="tool-scope">Chinese starter banks</p>
+            <p>Browse teacher-reviewed Chinese question sets now; the flexible bank format is being prepared for personal, cross-subject uploads.</p>
             <a href="/teaching-tools/question-bank-library" class="btn">Learn &amp; open</a>
         </div>
         <div class="tool-card">
             <h3>📖 Vocabulary Mini Booklet</h3>
-            <p>Turn up to 100 vocabulary terms into a folded, self-paced student booklet.</p>
+            <p class="tool-scope">Any subject vocabulary</p>
+            <p>Turn up to 100 terms into a folded booklet for definitions, sketches, examples, and self-paced review.</p>
             <a href="/teaching-tools/vocabulary-booklet" class="btn">Learn &amp; open</a>
         </div>
     </section>
