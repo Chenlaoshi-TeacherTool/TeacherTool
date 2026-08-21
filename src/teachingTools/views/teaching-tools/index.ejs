@@ -59,6 +59,29 @@
         .tool-card[hidden] {
             display: none;
         }
+        .tool-sections {
+            padding: 34px 20px 48px;
+        }
+        .tool-section {
+            max-width: 1200px;
+            margin: 0 auto 46px;
+            scroll-margin-top: 24px;
+        }
+        .tool-section[hidden] {
+            display: none;
+        }
+        .tool-section-heading {
+            max-width: 760px;
+            margin-bottom: 18px;
+        }
+        .tool-section-heading h2 {
+            margin: 0 0 6px;
+            color: #2f3f77;
+        }
+        .tool-section-heading p {
+            margin: 0;
+            color: #5d7168;
+        }
         .back-btn {
             position: absolute;
             top: 20px;
@@ -74,9 +97,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 0;
         }
         .tool-card {
             background: white;
@@ -86,7 +107,7 @@
             text-align: center;
             transition: transform 0.3s;
         }
-        .tool-card:hover {
+        .tool-card:not(.coming-soon):hover {
             transform: translateY(-5px);
         }
         .tool-card h3 {
@@ -113,6 +134,10 @@
         .coming-soon {
             opacity: 0.6;
         }
+        .coming-soon .btn {
+            background-color: #a8acb9;
+            cursor: not-allowed;
+        }
         .qr-generator {
             max-width: 600px;
             margin: 20px auto;
@@ -137,6 +162,9 @@
             .tools-grid {
                 grid-template-columns: 1fr;
             }
+            .tool-sections {
+                padding-inline: 16px;
+            }
         }
     </style>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
@@ -154,53 +182,148 @@
             <span aria-hidden="true">⌕</span>
             <input id="toolSearch" type="search" placeholder="Search by tool name or keyword" autocomplete="off" aria-describedby="toolSearchStatus">
         </div>
-        <p id="toolSearchStatus" class="tool-search-status" role="status">Showing all published tools.</p>
+        <p id="toolSearchStatus" class="tool-search-status" role="status">Search all tools and activities.</p>
     </section>
 
-    <section class="tools-grid">
-        <div class="tool-card">
-            <h3>📌 QR Code Generator</h3>
-            <p class="tool-scope">Works across subjects</p>
-            <p>Generate QR codes from text or links for stations, research, choice boards, and family communication.</p>
-            <a href="/teaching-tools/qr-code-generator" class="btn">Open Tool</a>
-        </div>
-        <div class="tool-card">
-            <h3>🎲 Random Group Generator</h3>
-            <p class="tool-scope">Works across subjects</p>
-            <p>Create partners or groups quickly for discussion, labs, problem solving, reading, and review.</p>
-            <a href="/teaching-tools/random-group-generator" class="btn">Open Tool</a>
-        </div>
-        <div class="tool-card">
-            <h3>🐾 Class Pet Points</h3>
-            <p class="tool-scope">Teacher-managed · Saves in this browser</p>
-            <p>Help 24 original pets hatch, grow, sparkle, and wear teacher-chosen holiday skins.</p>
-            <a href="/teaching-tools/class-pet-points" class="btn">Open Tool</a>
-        </div>
-        <div class="tool-card">
-            <h3>🌻 Sunflower Spinner</h3>
-            <p class="tool-scope">Works across subjects</p>
-            <p>Add topics, questions, challenge levels, terms, or student numbers to a bright classroom wheel.</p>
-            <a href="/teaching-tools/sunflower-spinner" class="btn">Learn &amp; open</a>
-        </div>
-        <div class="tool-card">
-            <h3>🗂️ Library</h3>
-            <p class="tool-scope">Language &amp; vocabulary</p>
-            <p>Create reusable multilingual term lists for future cards, games, booklets, and worksheets.</p>
-            <a href="/teaching-tools/word-list-library" class="btn">Learn &amp; open</a>
-        </div>
-        <div class="tool-card">
-            <h3>🧠 Question Bank Library</h3>
-            <p class="tool-scope">Chinese starter banks</p>
-            <p>Browse teacher-reviewed Chinese question sets now; the flexible bank format is being prepared for personal, cross-subject uploads.</p>
-            <a href="/teaching-tools/question-bank-library" class="btn">Learn &amp; open</a>
-        </div>
-        <div class="tool-card">
-            <h3>📖 Vocabulary Mini Booklet</h3>
-            <p class="tool-scope">Any subject vocabulary</p>
-            <p>Turn up to 100 terms into a folded booklet for definitions, sketches, examples, and self-paced review.</p>
-            <a href="/teaching-tools/vocabulary-booklet" class="btn">Learn &amp; open</a>
-        </div>
-    </section>
+    <main class="tool-sections">
+        <section class="tool-section" aria-labelledby="classroom-tools-heading">
+            <div class="tool-section-heading">
+                <h2 id="classroom-tools-heading">Classroom Tools</h2>
+                <p>Build, organize, and manage reusable classroom materials.</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>📌 QR Code Generator</h3>
+                    <p class="tool-scope">Works across subjects</p>
+                    <p>Generate QR codes from text or links for stations, research, choice boards, and family communication.</p>
+                    <a href="/teaching-tools/qr-code-generator" class="btn">Open Tool</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🎲 Random Group Generator</h3>
+                    <p class="tool-scope">Works across subjects</p>
+                    <p>Create partners or groups quickly for discussion, labs, problem solving, reading, and review.</p>
+                    <a href="/teaching-tools/random-group-generator" class="btn">Open Tool</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🐾 Class Pet Points</h3>
+                    <p class="tool-scope">Teacher-managed · Saves in this browser</p>
+                    <p>Help 24 original pets hatch, grow, sparkle, and wear teacher-chosen holiday skins.</p>
+                    <a href="/teaching-tools/class-pet-points" class="btn">Open Tool</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🌻 Sunflower Spinner</h3>
+                    <p class="tool-scope">Works across subjects</p>
+                    <p>Add topics, questions, challenge levels, terms, or student numbers to a bright classroom wheel.</p>
+                    <a href="/teaching-tools/sunflower-spinner" class="btn">Learn &amp; open</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🗂️ Library</h3>
+                    <p class="tool-scope">Language &amp; vocabulary</p>
+                    <p>Create reusable multilingual term lists for future cards, games, booklets, and worksheets.</p>
+                    <a href="/teaching-tools/word-list-library" class="btn">Learn &amp; open</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🧠 Question Bank Library</h3>
+                    <p class="tool-scope">Chinese starter banks</p>
+                    <p>Browse teacher-reviewed Chinese question sets now; the flexible bank format is being prepared for personal, cross-subject uploads.</p>
+                    <a href="/teaching-tools/question-bank-library" class="btn">Learn &amp; open</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="tool-section" id="low-prep-activities" aria-labelledby="low-prep-heading">
+            <div class="tool-section-heading">
+                <h2 id="low-prep-heading">Low-Prep Activities</h2>
+                <p>Quick generators, printable materials, and flexible routines for busy teaching days.</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>🧩 Word Sudoku Generator</h3>
+                    <p class="tool-scope">5–10 min · Printable</p>
+                    <p>Enter nine subject terms, match each one with an icon, and generate a printable 9×9 vocabulary Sudoku.</p>
+                    <a href="/teaching-tools/word-sudoku" class="btn">Learn &amp; open</a>
+                </div>
+                <div class="tool-card">
+                    <h3>☁️ Word Cloud Game Generator</h3>
+                    <p class="tool-scope">5 min · Any subject</p>
+                    <p>Generate a printable word cloud for finding, sorting, connecting, and explaining terms.</p>
+                    <a href="/teaching-tools/word-cloud" class="btn">Learn &amp; open</a>
+                </div>
+                <div class="tool-card">
+                    <h3>📖 Vocabulary Mini Booklet</h3>
+                    <p class="tool-scope">10–15 min · Printable</p>
+                    <p>Turn up to 100 terms into a folded booklet for definitions, sketches, examples, and self-paced review.</p>
+                    <a href="/teaching-tools/vocabulary-booklet" class="btn">Learn &amp; open</a>
+                </div>
+                <div class="tool-card">
+                    <h3>📖 Independent Reading</h3>
+                    <p class="tool-scope">10–20 min · Reading</p>
+                    <p>Create a printable reading packet with your own text, comprehension questions, rewrite page, and storyboard.</p>
+                    <a href="/teaching-tools/independent-reading" class="btn">Open Activity</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🟨 Tear-Paper Bingo</h3>
+                    <p class="tool-scope">8–12 min · Listening</p>
+                    <p>Students tear matching terms from either end as they hear a word, definition, example, or clue.</p>
+                    <a href="/teaching-tools/tear-paper-bingo" class="btn">Preview &amp; Download</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🤔 Would You Rather</h3>
+                    <p class="tool-scope">5–10 min · Discussion</p>
+                    <p>Build either-or discussion slides that ask students to choose, justify, compare, and respond.</p>
+                    <a href="/teaching-tools/would-you-rather" class="btn">Open Generator</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🏆 Jeopardy</h3>
+                    <p class="tool-scope">15–25 min · Review</p>
+                    <p>Create a timed team review game with your own categories, questions, answers, and scoring.</p>
+                    <a href="/teaching-tools/jeopardy" class="btn">Open Activity</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🌻 Term Race</h3>
+                    <p class="tool-scope">5–10 min · Game</p>
+                    <p>Arrange terms in a sunflower wheel and grid for a fast partner clue-and-find game.</p>
+                    <a href="/teaching-tools/character-race" class="btn">Open Activity</a>
+                </div>
+                <div class="tool-card">
+                    <h3>🧭 Maze Generator</h3>
+                    <p class="tool-scope">10–15 min · Printable</p>
+                    <p>Turn eight questions and answers into an editable PowerPoint maze for any subject.</p>
+                    <a href="/teaching-tools/maze-generator" class="btn">Open Activity</a>
+                </div>
+                <div class="tool-card coming-soon">
+                    <h3>🧩 Tarsia Puzzle</h3>
+                    <p class="tool-scope">10–15 min · Printable</p>
+                    <p>Turn matching pairs into a printable triangle puzzle and rebuild it by matching edges.</p>
+                    <button class="btn" type="button" disabled>Coming Soon</button>
+                </div>
+                <div class="tool-card coming-soon">
+                    <h3>💬 5-Minute Speaking Prompts</h3>
+                    <p class="tool-scope">5 min · Speaking</p>
+                    <p>Ready-to-use questions for partners, small groups, or a quick whole-class warm-up.</p>
+                    <button class="btn" type="button" disabled>Coming Soon</button>
+                </div>
+                <div class="tool-card coming-soon">
+                    <h3>✍️ Quick Write</h3>
+                    <p class="tool-scope">5–10 min · Writing</p>
+                    <p>Short writing prompts that review key terms, concepts, or lesson themes.</p>
+                    <button class="btn" type="button" disabled>Coming Soon</button>
+                </div>
+                <div class="tool-card coming-soon">
+                    <h3>🎟️ Exit Ticket</h3>
+                    <p class="tool-scope">3–5 min · Assessment</p>
+                    <p>A fast end-of-class check for understanding, reflection, or one final learning challenge.</p>
+                    <button class="btn" type="button" disabled>Coming Soon</button>
+                </div>
+                <div class="tool-card coming-soon">
+                    <h3>🔄 Think–Pair–Share</h3>
+                    <p class="tool-scope">5–8 min · Discussion</p>
+                    <p>Move students from independent thinking to partner talk and class sharing.</p>
+                    <button class="btn" type="button" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <script src="/javascripts/account-coming-soon.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
@@ -211,7 +334,8 @@
         (function () {
             var search = document.getElementById('toolSearch');
             var status = document.getElementById('toolSearchStatus');
-            var cards = Array.prototype.slice.call(document.querySelectorAll('.tools-grid .tool-card'));
+            var cards = Array.prototype.slice.call(document.querySelectorAll('.tool-card'));
+            var sections = Array.prototype.slice.call(document.querySelectorAll('.tool-section'));
 
             function updateToolResults() {
                 var query = search.value.trim().toLocaleLowerCase();
@@ -223,12 +347,17 @@
                     if (isMatch) matches += 1;
                 });
 
+                sections.forEach(function (section) {
+                    var sectionCards = Array.prototype.slice.call(section.querySelectorAll('.tool-card'));
+                    section.hidden = sectionCards.every(function (card) { return card.hidden; });
+                });
+
                 if (!query) {
-                    status.textContent = 'Showing all ' + cards.length + ' tools.';
+                    status.textContent = 'Showing all ' + cards.length + ' tools and activities.';
                 } else if (matches === 1) {
-                    status.textContent = 'Showing 1 tool for “' + search.value.trim() + '”.';
+                    status.textContent = 'Showing 1 result for “' + search.value.trim() + '”.';
                 } else {
-                    status.textContent = 'Showing ' + matches + ' tools for “' + search.value.trim() + '”.';
+                    status.textContent = 'Showing ' + matches + ' results for “' + search.value.trim() + '”.';
                 }
             }
 

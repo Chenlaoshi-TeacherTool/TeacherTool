@@ -198,7 +198,7 @@ const articles = [
       { heading: "5. Add output after Bingo", paragraphs: ["Do not end as soon as someone completes a line. Ask the winner to use three connected terms in a short story, or ask every student to choose one square for an exit sentence."], callout: "Example sequence: 8 minutes of recognition Bingo, 4 minutes of partner description, and 3 minutes writing a sentence with three selected terms." },
       { heading: "Teacher planning notes", paragraphs: ["Use a 3×3 board, large images, and limited text for younger learners. Beginners may keep pinyin in the first round and cover it in the second. State the winning rule before play, and always end with visible evidence of learning: a sentence, an exit card, or a partner retell."] }
     ],
-    relatedTool: { label: "Open the Tear-Paper Bingo activity", href: "/low-prep-activities/tear-paper-bingo" }
+    relatedTool: { label: "Open the Tear-Paper Bingo activity", href: "/teaching-tools/tear-paper-bingo" }
   },
   {
     slug: "teaching-mid-autumn-festival-grade-one",
@@ -239,7 +239,7 @@ const articles = [
       { heading: "Plan the week, not ten separate games", paragraphs: ["Use Missing Card on Monday for recognition, Four Corners on Wednesday for listening, and Three-Word Story on Friday for output. The vocabulary stays familiar while the task changes, letting the teacher observe a move from recognition to expression."] },
       { heading: "Three common mistakes", list: ["The explanation takes longer than the game: demonstrate one round, then add details.", "The same students answer every time: use partner rehearsal, rotating roles, or random selection.", "The game ends with a winner only: close with a retell, sentence, or exit card."] }
     ],
-    relatedTool: { label: "Open the low-prep activity library", href: "/low-prep-activities" }
+    relatedTool: { label: "Browse low-prep activities in Teaching Tools", href: "/teaching-tools#low-prep-activities" }
   },
   {
     slug: "using-word-walls-for-chinese-vocabulary",
