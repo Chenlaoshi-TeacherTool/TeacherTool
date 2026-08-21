@@ -2,7 +2,9 @@
   'use strict';
 
   var STORAGE_KEY = 'chenlaoshi-class-pet-points-v1';
-  var BACKUP_VERSION = 1;
+  var LIBRARY_KEY = 'chenlaoshi-class-pet-library-v1';
+  var BACKUP_VERSION = 2;
+  var MAX_CLASSES = 12;
   var MAX_STUDENTS = 60;
   var MAX_HISTORY = 100;
   var saveTimer = null;
@@ -55,6 +57,9 @@
 
   var els = {
     app: document.getElementById('petApp'),
+    classSwitcher: document.getElementById('classSwitcher'),
+    newClassButton: document.getElementById('newClassButton'),
+    deleteClassButton: document.getElementById('deleteClassButton'),
     className: document.getElementById('className'),
     saveStatus: document.getElementById('saveStatus'),
     studentTotal: document.getElementById('studentTotal'),
@@ -87,15 +92,18 @@
     toast: document.getElementById('toast')
   };
 
-  function newState() {
+  function newState(className) {
+    var now = new Date().toISOString();
     return {
       version: BACKUP_VERSION,
-      className: 'My Class',
+      classId: makeClassId(),
+      className: cleanClassName(className, 'My Class'),
       students: [],
       history: [],
       nextOrder: 1,
       settings: { sort: 'added', privateView: false },
-      updatedAt: new Date().toISOString()
+      createdAt: now,
+      updatedAt: now
     };
   }
 
@@ -104,9 +112,23 @@
     return 'student-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 9);
   }
 
+  function makeClassId() {
+    return 'class-' + makeId();
+  }
+
   function cleanName(value, fallback) {
     var name = String(value || '').replace(/\s+/g, ' ').trim().slice(0, 40);
     return name || fallback || '';
+  }
+
+  function cleanClassName(value, fallback) {
+    var name = String(value || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+    return name || fallback || '';
+  }
+
+  function cleanIdentifier(value, fallback) {
+    var identifier = String(value || '').replace(/[^a-zA-Z0-9-]/g, '').slice(0, 80);
+    return identifier || fallback || '';
   }
 
   function clampInteger(value, min, max) {
@@ -116,10 +138,11 @@
   }
 
   function normalizeState(candidate) {
-    var normalized = newState();
+    var normalized = newState(candidate && candidate.className);
     if (!candidate || typeof candidate !== 'object') return normalized;
 
-    normalized.className = cleanName(candidate.className, 'My Class').slice(0, 60);
+    normalized.classId = cleanIdentifier(candidate.classId, normalized.classId);
+    normalized.className = cleanClassName(candidate.className, 'My Class');
     normalized.settings.sort = ['added', 'name', 'points-high', 'points-low', 'stage'].indexOf(candidate.settings && candidate.settings.sort) !== -1
       ? candidate.settings.sort
       : 'added';
@@ -163,29 +186,68 @@
     normalized.updatedAt = candidate.updatedAt && !Number.isNaN(Date.parse(candidate.updatedAt))
       ? candidate.updatedAt
       : new Date().toISOString();
+    normalized.createdAt = candidate.createdAt && !Number.isNaN(Date.parse(candidate.createdAt))
+      ? candidate.createdAt
+      : normalized.updatedAt;
     return normalized;
   }
 
-  function loadState() {
+  function normalizeLibrary(candidate, legacyClass) {
+    var rawClasses = candidate && Array.isArray(candidate.classes) ? candidate.classes.slice(0, MAX_CLASSES) : [];
+    var classes = rawClasses.length ? rawClasses.map(normalizeState) : [normalizeState(legacyClass)];
+    var seenClassIds = Object.create(null);
+    classes.forEach(function (classroom) {
+      if (seenClassIds[classroom.classId]) classroom.classId = makeClassId();
+      seenClassIds[classroom.classId] = true;
+    });
+    var activeClassId = cleanIdentifier(candidate && candidate.activeClassId);
+    if (!classes.some(function (classroom) { return classroom.classId === activeClassId; })) activeClassId = classes[0].classId;
+    return {
+      version: BACKUP_VERSION,
+      activeClassId: activeClassId,
+      classes: classes,
+      updatedAt: candidate && !Number.isNaN(Date.parse(candidate.updatedAt)) ? candidate.updatedAt : new Date().toISOString()
+    };
+  }
+
+  function loadLibrary() {
     try {
-      var raw = window.localStorage.getItem(STORAGE_KEY);
-      return raw ? normalizeState(JSON.parse(raw)) : newState();
+      var legacyRaw = window.localStorage.getItem(STORAGE_KEY);
+      var legacyClass = legacyRaw ? normalizeState(JSON.parse(legacyRaw)) : newState();
+      var libraryRaw = window.localStorage.getItem(LIBRARY_KEY);
+      return libraryRaw ? normalizeLibrary(JSON.parse(libraryRaw), legacyClass) : normalizeLibrary(null, legacyClass);
     } catch (error) {
-      window.setTimeout(function () { showToast('Saved class data could not be read. A new class has been opened.'); }, 0);
-      return newState();
+      window.setTimeout(function () { showToast('Saved class data could not be read. A new class library has been opened.'); }, 0);
+      return normalizeLibrary(null, newState());
     }
   }
 
-  var state = loadState();
+  var library = loadLibrary();
+  var state = library.classes.find(function (classroom) { return classroom.classId === library.activeClassId; }) || library.classes[0];
+
+  function syncCurrentClass() {
+    var index = library.classes.findIndex(function (classroom) { return classroom.classId === state.classId; });
+    if (index === -1) library.classes.push(state);
+    else library.classes[index] = state;
+    library.activeClassId = state.classId;
+    library.updatedAt = new Date().toISOString();
+  }
+
+  function savedClassStatus(recent) {
+    var count = library.classes.length;
+    return (recent ? 'Saved just now · ' : '') + count + ' class' + (count === 1 ? '' : 'es') + ' saved on this device';
+  }
 
   function persist(message) {
     state.updatedAt = new Date().toISOString();
+    syncCurrentClass();
     try {
+      window.localStorage.setItem(LIBRARY_KEY, JSON.stringify(library));
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      els.saveStatus.textContent = 'Saved just now on this device';
+      els.saveStatus.textContent = savedClassStatus(true);
       window.clearTimeout(saveTimer);
       saveTimer = window.setTimeout(function () {
-        els.saveStatus.textContent = 'Saved on this device';
+        els.saveStatus.textContent = savedClassStatus(false);
       }, 1800);
       if (message) showToast(message);
       return true;
@@ -371,6 +433,7 @@
   function renderSummary() {
     var classPoints = state.students.reduce(function (total, student) { return total + student.points; }, 0);
     var legends = state.students.filter(function (student) { return student.points >= 200; }).length;
+    renderClassLibrary();
     els.className.value = state.className;
     els.studentTotal.textContent = String(state.students.length);
     els.classPointsTotal.textContent = String(classPoints);
@@ -379,6 +442,18 @@
     els.privacyToggle.setAttribute('aria-pressed', String(state.settings.privateView));
     els.privacyToggle.textContent = state.settings.privateView ? '◉ Privacy display on' : '◉ Privacy display';
     document.body.classList.toggle('privacy-view', state.settings.privateView);
+  }
+
+  function renderClassLibrary() {
+    els.classSwitcher.replaceChildren();
+    library.classes.forEach(function (classroom) {
+      var option = element('option', '', classroom.className + ' · ' + classroom.students.length + ' student' + (classroom.students.length === 1 ? '' : 's'));
+      option.value = classroom.classId;
+      option.selected = classroom.classId === state.classId;
+      els.classSwitcher.appendChild(option);
+    });
+    els.deleteClassButton.disabled = library.classes.length <= 1;
+    if (els.saveStatus.textContent.indexOf('Saved just now') !== 0) els.saveStatus.textContent = savedClassStatus(false);
   }
 
   function renderRoster() {
@@ -644,19 +719,77 @@
     render();
   }
 
+  function clearClassWorkspace() {
+    els.studentSearch.value = '';
+    els.studentNames.value = '';
+    if (els.petPicker.open) closePetPicker();
+    if (els.skinPicker.open) closeSkinPicker();
+  }
+
+  function createClass() {
+    if (library.classes.length >= MAX_CLASSES) {
+      showToast('This device can keep up to ' + MAX_CLASSES + ' saved classes. Export a backup before replacing one.');
+      return;
+    }
+    var baseName = 'New Class';
+    var name = baseName;
+    var suffix = 2;
+    while (library.classes.some(function (classroom) { return classroom.className.toLocaleLowerCase() === name.toLocaleLowerCase(); })) {
+      name = baseName + ' ' + suffix;
+      suffix += 1;
+    }
+    persist();
+    state = newState(name);
+    library.classes.push(state);
+    library.activeClassId = state.classId;
+    clearClassWorkspace();
+    persist('New class saved. Type its name below.');
+    render();
+    els.className.focus();
+    els.className.select();
+  }
+
+  function switchClass(classId) {
+    if (!classId || classId === state.classId) return;
+    persist();
+    var nextClass = library.classes.find(function (classroom) { return classroom.classId === classId; });
+    if (!nextClass) return;
+    state = nextClass;
+    library.activeClassId = state.classId;
+    clearClassWorkspace();
+    persist('Opened ' + state.className + '.');
+    render();
+  }
+
+  function deleteCurrentClass() {
+    if (library.classes.length <= 1) {
+      showToast('Keep at least one saved class. Use Reset class to clear its roster.');
+      return;
+    }
+    if (!window.confirm('Delete the saved class “' + state.className + '” from this browser? Its roster, pets, points, and activity will be removed. Export a backup first if you may need it later.')) return;
+    var removedName = state.className;
+    var removedIndex = library.classes.findIndex(function (classroom) { return classroom.classId === state.classId; });
+    library.classes = library.classes.filter(function (classroom) { return classroom.classId !== state.classId; });
+    state = library.classes[Math.min(Math.max(removedIndex, 0), library.classes.length - 1)];
+    library.activeClassId = state.classId;
+    clearClassWorkspace();
+    persist('Deleted ' + removedName + ' from this device.');
+    render();
+  }
+
   function exportBackup() {
-    var payload = JSON.stringify(state, null, 2);
+    syncCurrentClass();
+    var payload = JSON.stringify(library, null, 2);
     var blob = new Blob([payload], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var link = document.createElement('a');
-    var safeClassName = (state.className || 'class-pet-points').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase() || 'class-pet-points';
     link.href = url;
-    link.download = safeClassName + '-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    link.download = 'class-pet-points-all-classes-' + new Date().toISOString().slice(0, 10) + '.json';
     document.body.appendChild(link);
     link.click();
     link.remove();
     window.setTimeout(function () { URL.revokeObjectURL(url); }, 0);
-    showToast('Backup downloaded. Keep it somewhere safe.');
+    showToast('Downloaded a backup of all ' + library.classes.length + ' saved class' + (library.classes.length === 1 ? '' : 'es') + '.');
   }
 
   function importBackup(file) {
@@ -665,12 +798,15 @@
     reader.onload = function () {
       try {
         var candidate = JSON.parse(String(reader.result || ''));
-        if (!candidate || !Array.isArray(candidate.students)) throw new Error('Invalid backup');
-        var imported = normalizeState(candidate);
-        if (state.students.length && !window.confirm('Replace the current class with this backup?')) return;
-        state = imported;
-        els.studentSearch.value = '';
-        persist('Imported ' + state.students.length + ' student' + (state.students.length === 1 ? '' : 's') + ' from the backup.');
+        if (!candidate || (!Array.isArray(candidate.classes) && !Array.isArray(candidate.students))) throw new Error('Invalid backup');
+        var importedLibrary = Array.isArray(candidate.classes)
+          ? normalizeLibrary(candidate, newState())
+          : normalizeLibrary(null, normalizeState(candidate));
+        if (library.classes.length && !window.confirm('Replace all saved classes on this device with this backup?')) return;
+        library = importedLibrary;
+        state = library.classes.find(function (classroom) { return classroom.classId === library.activeClassId; }) || library.classes[0];
+        clearClassWorkspace();
+        persist('Imported ' + library.classes.length + ' saved class' + (library.classes.length === 1 ? '' : 'es') + ' from the backup.');
         render();
       } catch (error) {
         showToast('That file is not a valid Class Pet Points backup.');
@@ -691,9 +827,12 @@
       return;
     }
     if (!window.confirm('Reset this class? All students, pets, points, and activity will be removed from this browser. Export a backup first if you may need it later.')) return;
-    state = newState();
-    els.studentSearch.value = '';
-    els.studentNames.value = '';
+    var resetState = newState(state.className);
+    resetState.classId = state.classId;
+    resetState.createdAt = state.createdAt;
+    resetState.settings = state.settings;
+    state = resetState;
+    clearClassWorkspace();
     persist('The local class has been reset.');
     render();
   }
@@ -721,15 +860,20 @@
     persist();
     renderRoster();
   });
+  els.classSwitcher.addEventListener('change', function () { switchClass(els.classSwitcher.value); });
+  els.newClassButton.addEventListener('click', createClass);
+  els.deleteClassButton.addEventListener('click', deleteCurrentClass);
   els.className.addEventListener('input', function () {
-    state.className = cleanName(els.className.value, 'My Class').slice(0, 60);
+    state.className = cleanClassName(els.className.value, 'My Class');
+    renderClassLibrary();
     window.clearTimeout(saveTimer);
     saveTimer = window.setTimeout(function () { persist(); }, 350);
   });
   els.className.addEventListener('blur', function () {
-    state.className = cleanName(els.className.value, 'My Class').slice(0, 60);
+    state.className = cleanClassName(els.className.value, 'My Class');
     els.className.value = state.className;
     persist();
+    renderClassLibrary();
   });
   els.privacyToggle.addEventListener('click', function () {
     state.settings.privateView = !state.settings.privateView;
@@ -766,15 +910,24 @@
   });
   els.skinPicker.addEventListener('close', function () { skinPickerStudentId = null; });
   window.addEventListener('storage', function (event) {
-    if (event.key !== STORAGE_KEY || !event.newValue) return;
+    if (event.key !== LIBRARY_KEY || !event.newValue) return;
     try {
-      state = normalizeState(JSON.parse(event.newValue));
+      library = normalizeLibrary(JSON.parse(event.newValue), state);
+      state = library.classes.find(function (classroom) { return classroom.classId === library.activeClassId; }) || library.classes[0];
+      clearClassWorkspace();
       render();
-      showToast('This class was updated in another tab.');
+      showToast('Saved classes were updated in another tab.');
     } catch (error) {
       // Ignore malformed changes from another tab and keep the current valid state.
     }
   });
 
+  syncCurrentClass();
+  try {
+    window.localStorage.setItem(LIBRARY_KEY, JSON.stringify(library));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    // The first interactive save will show a detailed warning if local storage is blocked.
+  }
   render();
 }());

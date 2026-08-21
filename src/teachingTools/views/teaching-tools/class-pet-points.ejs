@@ -35,14 +35,20 @@
   <main class="pet-app" id="petApp">
     <section class="privacy-note" aria-label="Student privacy reminder">
       <span aria-hidden="true">🔒</span>
-      <p><strong>Teacher-managed and private by design.</strong> This version saves only in this browser. Use nicknames, initials, or student numbers instead of full student names.</p>
+      <p><strong>Teacher-managed and private by design.</strong> Every saved class stays only in this browser, with its own roster, pets, points, skins, and activity. Use nicknames, initials, or student numbers instead of full student names.</p>
     </section>
 
     <section class="class-dashboard app-card" aria-labelledby="classSettingsTitle">
       <div class="class-name-control">
-        <label id="classSettingsTitle" for="className">Class name</label>
+        <label id="classSettingsTitle" for="classSwitcher">Saved class</label>
+        <div class="class-library-row">
+          <select id="classSwitcher" aria-label="Choose a saved class"></select>
+          <button class="class-library-button" id="newClassButton" type="button">+ New</button>
+          <button class="class-library-button class-delete-button" id="deleteClassButton" type="button">Delete</button>
+        </div>
+        <label class="class-name-label" for="className">Class name</label>
         <input id="className" maxlength="60" value="My Class" autocomplete="off">
-        <p id="saveStatus">Saved on this device</p>
+        <p id="saveStatus">1 class saved on this device</p>
       </div>
       <div class="class-stats" aria-live="polite">
         <div><strong id="studentTotal">0</strong><span>students</span></div>

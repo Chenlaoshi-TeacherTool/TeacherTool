@@ -204,7 +204,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .class-dashboard {
   padding: 22px;
   display: grid;
-  grid-template-columns: minmax(210px, .75fr) minmax(320px, 1fr) minmax(260px, auto);
+  grid-template-columns: minmax(300px, .9fr) minmax(320px, 1fr) minmax(260px, auto);
   align-items: center;
   gap: 24px;
 }
@@ -226,6 +226,40 @@ button { -webkit-tap-highlight-color: transparent; }
   font-size: 1.06rem;
   font-weight: 900;
 }
+
+.class-library-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.class-library-row select {
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 30px 7px 10px;
+  color: var(--pet-ink);
+  font-size: .82rem;
+  font-weight: 900;
+}
+
+.class-library-button {
+  min-height: 38px;
+  padding: 7px 9px;
+  border: 1px solid #cfdcca;
+  border-radius: 10px;
+  background: #f5f9ef;
+  color: var(--pet-leaf);
+  cursor: pointer;
+  font-size: .72rem;
+  font-weight: 900;
+}
+
+.class-library-button:hover { border-color: #9cba97; background: #eaf4df; }
+.class-library-button:disabled { cursor: not-allowed; opacity: .45; }
+.class-delete-button { color: #9a493e; }
+.class-delete-button:hover:not(:disabled) { border-color: #e1b4ad; background: #fff1ee; }
+.class-name-label { margin-top: 12px; }
 
 .class-name-control p {
   margin: 5px 0 0;
@@ -943,5 +977,7 @@ button { -webkit-tap-highlight-color: transparent; }
 
 @media (max-width: 390px) {
   .hero-pets { transform: scale(.88); transform-origin: left center; }
+  .class-library-row { grid-template-columns: 1fr 1fr; }
+  .class-library-row select { grid-column: 1 / -1; }
   .pet-picker-grid { grid-template-columns: repeat(2, minmax(90px, 1fr)); }
 }
