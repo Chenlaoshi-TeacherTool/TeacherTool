@@ -1,16 +1,93 @@
 <!DOCTYPE html>
 <html lang="zh-Hans">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
   <title>好物推荐 - 陈老师中文教室</title>
   <%- include('partials/seo', { pageDescription: '陈老师整理的中文教室好物与备课用品推荐，包含清楚的选择理由、使用场景和联盟链接说明。' }) %>
-  <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/stylesheets/content-pages.css">
 </head>
 <body>
-  <header class="content-hero"><div class="content-shell"><p class="content-kicker">好物推荐 · Classroom Finds</p><h1>真正有课堂用途的用品清单</h1><p>这里不追求“买得更多”，只整理能反复用于展示、分类、故事表达和课堂管理的用品。每次购买前，请先看自己已经有什么、学生是否真的会用到。</p></div></header>
+  <header class="content-hero">
+    <div class="content-shell">
+      <p class="content-kicker">好物推荐 · Classroom Finds</p>
+      <h1>真正有课堂用途的用品清单</h1>
+      <p>这里不追求“买得更多”，只整理能反复用于展示、分类、故事表达和课堂管理的用品。每次购买前，请先看自己已经有什么、学生是否真的会用到。</p>
+    </div>
+  </header>
+
   <main>
-    <section class="content-section"><div class="content-shell recommendation-feature"><div><p class="content-kicker">陈老师的 Amazon 清单</p><h2>中文教室常用好物</h2><p>清单集中整理适合课堂展示、词汇游戏、可视化流程和动手活动的用品。挑选时我会优先考虑：能否服务多个单元、是否容易收纳、低年级能否安全操作，以及不用购买也能否找到纸笔替代方案。</p><ul><li><strong>先从教学目标出发：</strong>例如需要学生分类、排序、讲故事，才选择相应材料。</li><li><strong>优先可重复使用：</strong>磁性、可擦写和耐用材料通常比一次性装饰更实用。</li><li><strong>保留低成本替代：</strong>词卡、便签和回收纸也能完成很多活动。</li></ul><a class="btn" href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer">查看陈老师的 Amazon 好物清单 →</a></div><aside class="affiliate-note"><h2>联盟链接说明</h2><p>这个页面包含 Amazon 联盟链接。如果你通过链接完成符合条件的购买，本站可能获得少量佣金，你支付的价格不会因此增加。推荐的目的是说明课堂用途，不代表每位教师都需要购买。</p><p>商品价格、库存和卖家信息可能变化，请在 Amazon 页面确认最新详情。</p></aside></div></section>
-    <section class="content-section content-section--soft"><div class="content-shell"><p class="content-kicker">购买前先问</p><div class="question-grid"><article><h2>一件材料能用几次？</h2><p>如果只能服务一次主题活动，先考虑借用或自己制作。</p></article><article><h2>学生会怎样使用？</h2><p>说出具体动作：分类、移动、描述、排序或展示，而不是“看起来很适合教室”。</p></article><article><h2>有没有纸笔版本？</h2><p>每项活动最好都有不依赖购买的替代方案，保证所有班级都能参与。</p></article></div></div></section>
+    <section class="content-section">
+      <div class="content-shell">
+        <div class="recommendation-feature">
+          <div>
+            <p class="content-kicker">陈老师的 Amazon 清单</p>
+            <h2>中文教室常用好物</h2>
+            <p>清单集中整理适合课堂展示、词汇游戏、可视化流程和动手活动的用品。挑选时我会优先考虑：能否服务多个单元、是否容易收纳、低年级能否安全操作，以及不用购买也能否找到纸笔替代方案。</p>
+            <ul>
+              <li><strong>先从教学目标出发：</strong>例如需要学生分类、排序、讲故事，才选择相应材料。</li>
+              <li><strong>优先可重复使用：</strong>磁性、可擦写和耐用材料通常比一次性装饰更实用。</li>
+              <li><strong>保留低成本替代：</strong>词卡、便签和回收纸也能完成很多活动。</li>
+            </ul>
+          </div>
+          <aside class="affiliate-note">
+            <h2>联盟链接说明</h2>
+            <p>这个页面包含 Amazon 联盟链接。如果你通过链接完成符合条件的购买，本站可能获得少量佣金，你支付的价格不会因此增加。推荐的目的是说明课堂用途，不代表每位教师都需要购买。</p>
+            <p>商品价格、库存和卖家信息可能变化，请在 Amazon 页面确认最新详情。</p>
+          </aside>
+        </div>
+
+        <article class="recommendation-product" aria-labelledby="rolling-cart-title">
+          <a class="recommendation-product__image" href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer" aria-label="在 Amazon 查看 15 抽屉教室收纳车">
+            <img src="/images/15-drawer-rolling-cart.png" alt="带有十五个彩色抽屉、顶部工作台和滚轮的教室收纳车" loading="lazy">
+          </a>
+
+          <div class="recommendation-product__copy">
+            <p class="product-number">好物 01 · Classroom Organization</p>
+            <h2 id="rolling-cart-title">15 Drawers Rolling Cart, Classroom Organizers</h2>
+            <p class="product-subtitle">15 抽屉移动式教室收纳车</p>
+            <p>这类收纳车最适合解决“材料很多，但上课时找不到”的问题。不同大小和颜色的抽屉可以把整套中文课堂材料按班级、单元或活动类型分开；滚轮让它能在备课区、白板旁和学习站之间移动。</p>
+
+            <h3>陈老师的推荐理由</h3>
+            <div class="product-reasons">
+              <section>
+                <strong>大抽屉放整套材料</strong>
+                <p>适合收纳每个班的 worksheet、学生作品、可打印游戏和待批改作业。一个班一个颜色，拿取时更快。</p>
+              </section>
+              <section>
+                <strong>小抽屉分类零散教具</strong>
+                <p>词卡、骰子、磁贴、白板笔、贴纸和出口卡都有固定位置，活动结束后学生也能按颜色归还。</p>
+              </section>
+              <section>
+                <strong>可以直接成为学习站</strong>
+                <p>顶部可放当天的任务篮或示范材料；把车推到小组旁，就能减少教师来回分发用品的时间。</p>
+              </section>
+            </div>
+
+            <div class="product-teacher-tip">
+              <strong>课堂使用建议：</strong>
+              <span>把较重的纸张和教具放在下层，轻便材料放在上层；为每个抽屉贴上中文和图片标签，让“整理材料”本身也成为认读练习。使用前请确认滚轮锁定，并提醒学生不要攀爬或拉出多个装满物品的抽屉。</span>
+            </div>
+
+            <a class="btn product-link" href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer">在 Amazon 查看这款收纳车 →</a>
+            <p class="product-link-note">联盟链接 · 购买前请在 Amazon 确认尺寸、价格、库存和最新商品信息。</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-section content-section--soft">
+      <div class="content-shell">
+        <p class="content-kicker">购买前先问</p>
+        <div class="question-grid">
+          <article><h2>一件材料能用几次？</h2><p>如果只能服务一次主题活动，先考虑借用或自己制作。</p></article>
+          <article><h2>学生会怎样使用？</h2><p>说出具体动作：分类、移动、描述、排序或展示，而不是“看起来很适合教室”。</p></article>
+          <article><h2>有没有纸笔版本？</h2><p>每项活动最好都有不依赖购买的替代方案，保证所有班级都能参与。</p></article>
+        </div>
+      </div>
+    </section>
   </main>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
