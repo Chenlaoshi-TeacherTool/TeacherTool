@@ -100,6 +100,10 @@ router.get('/teaching-tools/question-bank-library', function(req, res) {
   res.redirect(302, '/teaching-tools/question-bank-library/question-bank-library.html');
 });
 
+router.get('/teaching-tools/fakebook-profile', function(req, res) {
+  res.redirect(302, '/teaching-tools/fakebook-profile/fakebook-profile.html');
+});
+
 router.get('/classroom-shop', function(req, res, next) {
   res.render('classroom-shop', { title: 'Classroom Shop' });
 });
@@ -173,6 +177,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font',
     '/teaching-tools/sunflower-spinner/sunflower-spinner.html', '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
+    '/teaching-tools/fakebook-profile/fakebook-profile.html',
     '/low-prep/word-sudoku/word-sudoku-widget.html', '/low-prep/word-cloud/word-cloud-widget.html',
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',

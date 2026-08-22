@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1877f2">
+  <title>Fakebook Character Profile · Chen Laoshi's Teaching Toolkit</title>
+  <meta name="description" content="Students role-play a historical or fictional character by building a Facebook-style profile with a cover photo, friends, and posts, then reply in character. Saves privately in this browser.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/fakebook-profile/fakebook-profile.html">
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Fakebook Character Profile · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Students role-play a historical or fictional character by building a Facebook-style profile with a cover photo, friends, and posts, then reply in character."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/fakebook-profile/fakebook-profile.html"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="./fakebook-profile.css">
+</head>
+<body class="fb-body">
+  <header class="fb-tools-bar account-header-host">
+    <div class="fb-tools-inner">
+      <a class="back-link" href="/teaching-tools">← Back to Teaching Tools</a>
+      <div class="fb-profile-switcher">
+        <label class="sr-only" for="profileSwitcher">Saved character profile</label>
+        <select id="profileSwitcher" aria-label="Choose a saved character profile"></select>
+        <button class="fb-util-btn" id="newProfileButton" type="button">+ New</button>
+        <button class="fb-util-btn" id="duplicateProfileButton" type="button">Duplicate</button>
+        <button class="fb-util-btn danger" id="deleteProfileButton" type="button">Delete</button>
+      </div>
+      <div class="fb-tools-actions">
+        <span class="fb-save-status" id="saveStatus">Saved on this device</span>
+        <button class="fb-util-btn" id="exportButton" type="button">↓ Export backup</button>
+        <button class="fb-util-btn" id="importButton" type="button">↑ Import backup</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+        <button class="fb-util-btn" id="printButton" type="button">🖨 Print / Save PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="fb-privacy-note" aria-label="Student privacy reminder">
+    <span aria-hidden="true">🔒</span>
+    <p><strong>This is a private, offline pretend profile.</strong> It is not connected to real Facebook and nothing is uploaded anywhere — everything is saved only in this browser. Use a made-up character name, and avoid typing real personal information.</p>
+  </section>
+
+  <main class="fb-app" id="fbApp">
+    <header class="fb-cover-card">
+      <div class="fb-cover" id="coverPhoto" role="button" tabindex="0" aria-label="Click to change cover photo">
+        <span class="fb-cover-hint" id="coverHint">Create a fake profile for a historical / fictional character</span>
+        <button class="fb-cover-edit" id="coverEditButton" type="button">📷 Edit Cover Photo</button>
+      </div>
+      <div class="fb-identity">
+        <div class="fb-avatar" id="avatarPhoto" role="button" tabindex="0" aria-label="Click to change profile photo">
+          <span class="fb-avatar-fallback" aria-hidden="true">🧑</span>
+        </div>
+        <input id="characterName" class="fb-name-input" maxlength="80" placeholder="Character name" autocomplete="off">
+      </div>
+      <input id="coverFileInput" type="file" accept="image/*" hidden>
+      <input id="avatarFileInput" type="file" accept="image/*" hidden>
+    </header>
+
+    <div class="fb-columns">
+      <aside class="fb-sidebar">
+        <section class="fb-card" aria-labelledby="introTitle">
+          <div class="fb-card-heading">
+            <h2 id="introTitle">Intro</h2>
+          </div>
+          <ul class="fb-intro-list" id="introList"></ul>
+          <button class="fb-text-btn" id="addIntroLineButton" type="button">+ Add a line</button>
+        </section>
+
+        <section class="fb-card" aria-labelledby="friendsTitle">
+          <div class="fb-card-heading">
+            <input id="friendsTitle" class="fb-inline-title-input" maxlength="40" value="Friends">
+          </div>
+          <div class="fb-friends-grid" id="friendsGrid"></div>
+          <button class="fb-text-btn" id="addFriendButton" type="button">+ Add a new friend</button>
+        </section>
+      </aside>
+
+      <section class="fb-feed">
+        <section class="fb-card fb-composer" aria-labelledby="composerTitle">
+          <h2 id="composerTitle">Add a post</h2>
+          <p class="fb-tip">Tip: write as your character, in first person. Add a photo if you like, then post a reply below as one of your character's friends.</p>
+          <div class="fb-composer-row">
+            <label>Name<input id="postAuthor" placeholder="Author" autocomplete="off"></label>
+            <label>Date<input id="postDate" placeholder="earlier today…." autocomplete="off"></label>
+          </div>
+          <textarea id="postText" rows="4" placeholder="Write your post here…."></textarea>
+          <div class="fb-composer-media" id="postImagePreviewWrap" hidden>
+            <img id="postImagePreview" alt="Selected image preview">
+            <button class="fb-text-btn" id="postImageRemoveButton" type="button">Remove image</button>
+          </div>
+          <div class="fb-composer-actions">
+            <button class="fb-util-btn" id="postImageButton" type="button">🖼 Add photo</button>
+            <input id="postImageInput" type="file" accept="image/*" hidden>
+            <button class="fb-primary-btn" id="postSubmitButton" type="button">Post</button>
+          </div>
+        </section>
+
+        <section class="fb-posts" id="postsList" aria-live="polite"></section>
+
+        <section class="fb-card fb-about" aria-labelledby="aboutTitle">
+          <h2 id="aboutTitle">"Fakebook" character profile</h2>
+          <p>Use this page to build an imaginary profile for a book character, historical figure, scientist, or event you are studying.</p>
+          <ol>
+            <li>Enter a character name, then add a cover photo and profile photo.</li>
+            <li>Fill in the intro with facts, quotes, or details in character.</li>
+            <li>Add friends — other people connected to your character — with names and photos.</li>
+            <li>Write 1–2 posts as your character, then scroll to a post and reply in character as one of the friends.</li>
+          </ol>
+          <p class="fb-tip">Your work saves automatically in this browser. Use <strong>Export backup</strong> if you want a copy to keep or move to another computer.</p>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <div class="fb-toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p class="noscript-note">This tool needs JavaScript enabled to save and edit your character profile.</p></noscript>
+  <script src="./fakebook-profile.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
