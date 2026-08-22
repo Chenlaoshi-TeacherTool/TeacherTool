@@ -13,7 +13,7 @@
 
   const iconPalette = [
     "🐼", "🐧", "🦁", "🐭", "🦉", "🐰", "🐶", "🐱", "🐵", "🐟",
-    "🍎", "🍌", "🍇", "🍉", "🍓", "🍒", "🍑", "🍊", "🍍", "🥕",
+    "🍎", "🍌", "🍇", "🍉", "🍓", "🍒", "🍑", "🍊", "🍍", "🍐", "🥕",
     "📦", "🏠", "🏫", "📚", "✏️", "🎒", "🪑", "🧸", "⚽", "🎵",
     "☀️", "🌧️", "❄️", "🌈", "🌳", "🌸", "🚗", "🚌", "🚲", "✈️",
     "🍚", "🍜", "🥟", "🍞", "🥛", "💧", "🧃", "🎂", "🍦", "🍬",
@@ -42,8 +42,9 @@
     "🍓": "strawberry 草莓 fruit 水果 berry",
     "🍒": "cherry 樱桃 fruit 水果",
     "🍑": "peach 桃子 fruit 水果",
-    "🍊": "orange 橙子 桔子 fruit 水果",
+    "🍊": "orange 橙子 桔子 橘子 fruit 水果",
     "🍍": "pineapple 菠萝 凤梨 fruit 水果",
+    "🍐": "pear 梨 fruit 水果",
     "🥕": "carrot 胡萝卜 vegetable 蔬菜 food 食物",
     "📦": "box 箱子 package",
     "🏠": "house home 家 房子",
@@ -135,8 +136,9 @@
     { words: ["草莓", "strawberry"], icons: ["🍓"] },
     { words: ["樱桃", "cherry"], icons: ["🍒"] },
     { words: ["桃", "peach"], icons: ["🍑"] },
-    { words: ["橙", "桔", "orange"], icons: ["🍊"] },
+    { words: ["橙", "桔", "橘", "orange"], icons: ["🍊"] },
     { words: ["菠萝", "凤梨", "pineapple"], icons: ["🍍"] },
+    { words: ["梨", "pear"], icons: ["🍐"] },
     { words: ["熊猫", "panda"], icons: ["🐼"] },
     { words: ["企鹅", "penguin"], icons: ["🐧"] },
     { words: ["狮子", "lion"], icons: ["🦁"] },
@@ -203,9 +205,18 @@
 
   const difficultyTargets = { easy: 46, medium: 36, hard: 28 };
   const difficultyNames = { easy: "Easy", medium: "Medium", hard: "Hard" };
+  const topicIcons = {
+    "preset-hsk-1-essentials": "⭐",
+    "preset-food-and-fruit": "🍎",
+    "preset-classroom-basics": "🎒",
+    "preset-weather-and-seasons": "🌦️"
+  };
+  let topicLists = [];
+  let selectedTopicValue = "";
 
   const state = {
     items: defaultItems.map((item) => ({ ...item })),
+    title: "Word Sudoku",
     level: "medium",
     seed: 20260724,
     solution: [],
@@ -218,6 +229,12 @@
   const elements = {
     wordGrid: document.getElementById("wordGrid"),
     wordCount: document.getElementById("wordCount"),
+    toggleTopicLibrary: document.getElementById("toggleTopicLibrary"),
+    topicLibraryPanel: document.getElementById("topicLibraryPanel"),
+    topicLibraryStatus: document.getElementById("topicLibraryStatus"),
+    topicLibraryChoices: document.getElementById("topicLibraryChoices"),
+    topicLibrarySelectionNote: document.getElementById("topicLibrarySelectionNote"),
+    useSelectedTopic: document.getElementById("useSelectedTopic"),
     iconPicker: document.getElementById("iconPicker"),
     pickerTitle: document.getElementById("pickerTitle"),
     pickerGrid: document.getElementById("pickerGrid"),
@@ -248,6 +265,127 @@
     elements.toast.textContent = message;
     elements.toast.classList.add("show");
     toastTimer = setTimeout(() => elements.toast.classList.remove("show"), 1900);
+  }
+
+  function setTopicLibraryExpanded(expanded) {
+    elements.toggleTopicLibrary.setAttribute("aria-expanded", String(Boolean(expanded)));
+    elements.topicLibraryPanel.hidden = !expanded;
+  }
+
+  function topicIcon(list) {
+    return list.source === "saved" ? "📚" : (topicIcons[list.id] || "🀄");
+  }
+
+  function renderTopicChoices() {
+    if (!topicLists.some((list) => list.selectValue === selectedTopicValue)) {
+      selectedTopicValue = "";
+    }
+    elements.topicLibraryChoices.replaceChildren();
+    topicLists.forEach((list) => {
+      const count = list.count || (list.items || []).length;
+      const selected = list.selectValue === selectedTopicValue;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "topic-choice";
+      button.dataset.topicValue = list.selectValue;
+      button.setAttribute("aria-pressed", String(selected));
+      button.setAttribute("aria-label", `${selected ? "Remove" : "Select"} ${list.name || "vocabulary topic"}`);
+      button.disabled = count < 9;
+      if (button.disabled) button.title = "This list needs at least 9 terms for a Sudoku.";
+
+      const icon = document.createElement("span");
+      icon.className = "topic-choice-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = topicIcon(list);
+
+      const copy = document.createElement("span");
+      copy.className = "topic-choice-copy";
+      copy.textContent = list.name || "Untitled list";
+      const detail = document.createElement("small");
+      detail.textContent = `${list.source === "saved" ? "Saved list" : (list.theme || "Published topic")} · ${count} terms`;
+      copy.appendChild(detail);
+      button.append(icon, copy);
+      elements.topicLibraryChoices.appendChild(button);
+    });
+
+    if (!topicLists.length) {
+      const empty = document.createElement("p");
+      empty.className = "topic-library-empty";
+      empty.textContent = "No vocabulary topics are available yet.";
+      elements.topicLibraryChoices.appendChild(empty);
+    }
+
+    const publishedCount = topicLists.filter((list) => list.source === "published").length;
+    const savedCount = topicLists.length - publishedCount;
+    elements.topicLibraryStatus.textContent = `${publishedCount} published vocabulary topic${publishedCount === 1 ? "" : "s"}` +
+      `${savedCount ? ` and ${savedCount} saved list${savedCount === 1 ? "" : "s"}` : ""} are available.`;
+    const selected = topicLists.find((list) => list.selectValue === selectedTopicValue);
+    elements.topicLibrarySelectionNote.textContent = selected
+      ? `${selected.name} selected · first 9 terms will be used`
+      : "Choose 1 topic with at least 9 terms";
+    elements.useSelectedTopic.disabled = !selected;
+  }
+
+  async function loadTopicLists() {
+    try {
+      const response = await fetch("/api/wordlists/presets");
+      if (!response.ok) throw new Error("Vocabulary topics unavailable");
+      const payload = await response.json();
+      const published = (payload.lists || []).map((list) => ({
+        ...list,
+        source: "published",
+        selectValue: `published:${list.id}`
+      }));
+      const saved = window.ChenWordlist
+        ? window.ChenWordlist.listAll().map((summary) => {
+            const list = window.ChenWordlist.load(summary.id);
+            return list && Array.isArray(list.items)
+              ? { ...list, count: list.items.length, source: "saved", selectValue: `saved:${list.id}` }
+              : null;
+          }).filter(Boolean)
+        : [];
+      topicLists = published.concat(saved);
+      renderTopicChoices();
+    } catch (error) {
+      topicLists = [];
+      selectedTopicValue = "";
+      renderTopicChoices();
+      elements.topicLibraryStatus.textContent = "Vocabulary topics are unavailable right now. You can still enter words manually.";
+    }
+  }
+
+  function selectTopic(value) {
+    selectedTopicValue = selectedTopicValue === value ? "" : value;
+    renderTopicChoices();
+  }
+
+  function useSelectedTopic() {
+    const selected = topicLists.find((list) => list.selectValue === selectedTopicValue);
+    if (!selected) return;
+    const entries = (selected.items || []).filter((item) => item.zh || item.en || item.py).slice(0, 9);
+    if (entries.length < 9) {
+      showToast("Choose a vocabulary topic with at least 9 terms");
+      return;
+    }
+    const nextItems = entries.map((item) => ({
+      word: item.zh || item.en || item.py,
+      icon: "",
+      manual: false
+    }));
+    nextItems.forEach((item, index) => {
+      item.icon = suggestIcon(item.word, index, nextItems);
+    });
+    state.items = nextItems;
+    state.seed = (state.seed * 1664525 + 1013904223) >>> 0;
+    state.title = `${selected.theme || selected.name || "Vocabulary"} Word Sudoku`;
+    closePicker();
+    renderInputs();
+    renderLegends();
+    generatePuzzle();
+    showToast(`Loaded 9 terms from ${selected.name}`);
+    selectedTopicValue = "";
+    renderTopicChoices();
+    setTopicLibraryExpanded(false);
   }
 
   function makeRng(seed) {
@@ -637,8 +775,8 @@
     });
 
     elements.paperTitle.textContent = state.showAnswer
-      ? "Word Sudoku (Answer)"
-      : "Word Sudoku";
+      ? `${state.title} (Answer)`
+      : state.title;
     renderTwemoji(elements.sudoku);
   }
 
@@ -696,6 +834,18 @@
       : '<span aria-hidden="true">✓</span> Show Answer';
   }
 
+  elements.toggleTopicLibrary.addEventListener("click", () => {
+    setTopicLibraryExpanded(elements.toggleTopicLibrary.getAttribute("aria-expanded") !== "true");
+  });
+  elements.topicLibraryChoices.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-topic-value]");
+    if (button) selectTopic(button.dataset.topicValue);
+  });
+  elements.useSelectedTopic.addEventListener("click", useSelectedTopic);
+  window.addEventListener("storage", (event) => {
+    if (event.key && event.key.startsWith("clwl:")) loadTopicLists();
+  });
+
   elements.pickerClose.addEventListener("click", closePicker);
   elements.emojiSearchInput.addEventListener("input", renderPickerOptions);
   elements.applyCustomIcon.addEventListener("click", () =>
@@ -738,4 +888,5 @@
   renderInputs();
   renderLegends();
   generatePuzzle();
+  loadTopicLists();
 })();

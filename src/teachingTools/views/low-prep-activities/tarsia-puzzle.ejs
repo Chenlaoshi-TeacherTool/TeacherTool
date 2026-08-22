@@ -7,7 +7,7 @@
   <title>Tarsia Puzzle Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Turn vocabulary, pinyin, English meanings, Twemoji pictures, or question-and-answer pairs into a printable Tarsia triangle puzzle.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/tarsia-puzzle/tarsia-puzzle.css?v=reference-layout-1">
+  <link rel="stylesheet" href="/low-prep/tarsia-puzzle/tarsia-puzzle.css?v=topic-cards-1">
 </head>
 <body class="tarsia-page">
   <main class="tarsia-wrap">
@@ -72,28 +72,30 @@
           </div>
 
           <div id="vocabularyControls">
-            <div class="match-type-row">
-              <label for="matchType">Match each term with
-                <select id="matchType">
-                  <option value="english">English meaning</option>
-                  <option value="pinyin">Pinyin</option>
-                  <option value="emoji">Twemoji picture</option>
-                </select>
-              </label>
-              <p>Known items are filled from the Chen Laoshi word-list library. Every generated match remains editable.</p>
-            </div>
+            <button id="toggleWordLibrary" class="word-library-toggle" type="button" aria-expanded="false" aria-controls="wordLibraryPanel">
+              <span class="word-library-toggle-icon" aria-hidden="true">🗂️</span>
+              <span class="word-library-toggle-copy">
+                <small>Mandarin Library</small>
+                <strong>Create a puzzle from published vocabulary topics</strong>
+              </span>
+              <span class="word-library-toggle-arrow" aria-hidden="true">⌄</span>
+            </button>
 
-            <div class="library-box">
-              <div>
-                <p class="eyebrow">Chen Laoshi Library</p>
-                <h3>Add a preset word list</h3>
+            <div id="wordLibraryPanel" class="word-library-panel" hidden>
+              <div class="word-library-heading">
+                <div>
+                  <p class="eyebrow">Mandarin Library</p>
+                  <h3>Create a puzzle from published vocabulary topics</h3>
+                  <p>Choose one or more topics. Terms are added in order until the puzzle is full.</p>
+                </div>
+                <a class="library-link" href="/teaching-tools/word-list-library" target="_blank" rel="noopener">Browse the full Mandarin Library</a>
               </div>
-              <div class="library-actions">
-                <label class="sr-only" for="wordListSelect">Preset word list</label>
-                <select id="wordListSelect"><option value="">Loading word lists…</option></select>
-                <button id="addWordList" class="btn-secondary" type="button" disabled>Add terms</button>
+              <p id="wordListStatus" class="word-list-status" aria-live="polite">Loading vocabulary topics…</p>
+              <div id="wordListChoices" class="word-list-choices" aria-label="Choose vocabulary topics"></div>
+              <div class="word-list-actions">
+                <button id="addWordList" class="btn-primary" type="button" disabled>Add selected topics</button>
+                <span id="wordListSelectionNote">Choose at least 1 topic</span>
               </div>
-              <p id="wordListStatus" class="status-copy" aria-live="polite">Loading the library…</p>
             </div>
 
             <label class="bulk-label" for="vocabularyInput">
@@ -102,6 +104,17 @@
               <textarea id="vocabularyInput" rows="10" maxlength="3200" spellcheck="true" placeholder="苹果 | apple | píng guǒ | 🍎&#10;香蕉 | banana | xiāng jiāo | 🍌"></textarea>
             </label>
             <button id="buildVocabularyPairs" class="btn-secondary inline-action" type="button">Auto-fill matches</button>
+
+            <fieldset class="side-choice" aria-describedby="sideChoiceHelp">
+              <legend>Choose exactly 2 sides to match</legend>
+              <div class="side-options">
+                <label class="side-option"><input type="checkbox" name="vocabSide" value="chinese" checked><span>Chinese</span></label>
+                <label class="side-option"><input type="checkbox" name="vocabSide" value="english" checked><span>English</span></label>
+                <label class="side-option"><input type="checkbox" name="vocabSide" value="pinyin"><span>Pinyin</span></label>
+                <label class="side-option"><input type="checkbox" name="vocabSide" value="emoji"><span>Emoji</span></label>
+              </div>
+              <p id="sideChoiceHelp"><strong id="sideChoiceCount">2 selected</strong> · The first selected option appears on one edge and the second on its matching edge.</p>
+            </fieldset>
           </div>
 
           <div id="qaControls" hidden>
@@ -203,9 +216,10 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
+  <script src="/shared/wordlist-core.js"></script>
   <script src="/shared/deck-export.js"></script>
   <!-- Twemoji artwork: Twitter, Inc. and contributors (CC-BY 4.0), loaded as SVGs from the official repository. -->
-  <script src="/low-prep/tarsia-puzzle/tarsia-puzzle.js?v=reference-layout-1"></script>
+  <script src="/low-prep/tarsia-puzzle/tarsia-puzzle.js?v=topic-cards-1"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

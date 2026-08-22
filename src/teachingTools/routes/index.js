@@ -85,6 +85,7 @@ router.get('/teaching-tools/class-pet-points', function(req, res, next) {
     res.render('tool-landing', {
       title: toolGuides[slug].title,
       toolGuide: toolGuides[slug],
+      showToolGuide: slug !== 'word-sudoku',
       sectionLabel: config[1],
       sectionPath: config[2]
     });

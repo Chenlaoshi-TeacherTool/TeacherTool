@@ -11,7 +11,7 @@
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Word Sudoku Generator · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Create printable vocabulary Sudoku activities for review in any subject or language."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/word-sudoku"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="./word-sudoku-widget.css">
+  <link rel="stylesheet" href="./word-sudoku-widget.css?v=topic-library-2">
 </head>
 <body>
   <header class="hero">
@@ -42,6 +42,32 @@
             <p class="helper">Each word is auto-matched with a small icon; click an icon to change it anytime.</p>
           </div>
           <span class="count" id="wordCount">9/9 complete</span>
+        </div>
+
+        <button id="toggleTopicLibrary" class="topic-library-toggle" type="button" aria-expanded="false" aria-controls="topicLibraryPanel">
+          <span class="topic-library-toggle-icon" aria-hidden="true">🗂️</span>
+          <span class="topic-library-toggle-copy">
+            <small>Mandarin Library</small>
+            <strong>Create a Sudoku from published vocabulary topics</strong>
+          </span>
+          <span class="topic-library-toggle-arrow" aria-hidden="true">⌄</span>
+        </button>
+
+        <div id="topicLibraryPanel" class="topic-library-panel" hidden>
+          <div class="topic-library-heading">
+            <div>
+              <p class="eyebrow">Mandarin Library</p>
+              <h3>Create a Sudoku from published vocabulary topics</h3>
+              <p>Choose one topic. The first 9 terms become the Sudoku words and are automatically matched with icons.</p>
+            </div>
+            <a href="/teaching-tools/word-list-library" target="_blank" rel="noopener">Browse the full Mandarin Library</a>
+          </div>
+          <p id="topicLibraryStatus" class="topic-library-status" aria-live="polite">Loading vocabulary topics…</p>
+          <div id="topicLibraryChoices" class="topic-library-choices" aria-label="Choose a vocabulary topic"></div>
+          <div class="topic-library-actions">
+            <button id="useSelectedTopic" class="btn btn-primary" type="button" disabled>Use selected topic</button>
+            <span id="topicLibrarySelectionNote">Choose 1 topic with at least 9 terms</span>
+          </div>
         </div>
 
         <div class="word-grid" id="wordGrid"></div>
@@ -125,11 +151,50 @@
         <button class="btn btn-primary" id="printButton" type="button"><span aria-hidden="true">🖨</span> Print / Save PDF</button>
       </div>
     </section>
+
+    <section class="classroom-guide" aria-labelledby="classroom-guide-title">
+      <div class="classroom-guide-inner">
+        <p class="eyebrow">Recognition and logic practice</p>
+        <h2 id="classroom-guide-title">How to use Vocabulary Sudoku in class</h2>
+        <p class="classroom-guide-summary">Turn nine words or concepts into a printable 9×9 Sudoku for repeated recognition during logical problem solving.</p>
+        <div class="classroom-guide-facts" aria-label="Recommended use">
+          <span><strong>Best for:</strong> Grades 3–9</span>
+          <span><strong>Prep time:</strong> 8–12 minutes</span>
+        </div>
+        <div class="classroom-guide-grid">
+          <article>
+            <h3>What is this tool?</h3>
+            <p>Vocabulary Sudoku keeps the familiar rule that each item appears once in every row, column, and box, but replaces numbers with words or icons. It is best for reviewing terms students have already met.</p>
+          </article>
+          <article>
+            <h3>How to use it</h3>
+            <ol>
+              <li>Choose nine visually distinct terms students already recognize.</li>
+              <li>Use icons or short definitions for support, then remove those supports as students become fluent.</li>
+              <li>Model one smaller section before students work independently or with a partner.</li>
+            </ol>
+          </article>
+          <article class="classroom-guide-example">
+            <h3>Classroom example: geometry review station</h3>
+            <p>Use nine shape names with simple icons. After solving, students circle three terms and write one accurate property for each. The logic puzzle ends with evidence of subject understanding.</p>
+          </article>
+          <article>
+            <h3>Teacher tips</h3>
+            <ul>
+              <li>Do not introduce nine unfamiliar terms through the puzzle.</li>
+              <li>Offer a partially completed version to students new to Sudoku.</li>
+              <li>Provide an answer key for self-checking so teacher time goes to students who are genuinely stuck.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- Twemoji artwork: Twitter, Inc. and contributors (CC-BY 4.0), loaded as SVGs from the official repository. -->
-  <script src="./word-sudoku-widget.js"></script>
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="./word-sudoku-widget.js?v=topic-library-3"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

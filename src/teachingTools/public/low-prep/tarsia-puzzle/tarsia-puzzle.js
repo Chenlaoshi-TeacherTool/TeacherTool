@@ -10,8 +10,16 @@
   var toastTimer;
   var activeEmojiRow = -1;
   var wordLists = [];
+  var selectedWordListValues = [];
   var questionBanks = [];
   var wordIndex = new Map();
+  var SIDE_ORDER = ['chinese', 'english', 'pinyin', 'emoji'];
+  var WORD_LIST_ICONS = {
+    'preset-hsk-1-essentials': '⭐',
+    'preset-food-and-fruit': '🍎',
+    'preset-classroom-basics': '🎒',
+    'preset-weather-and-seasons': '🌦️'
+  };
 
   var vocabularySample = [
     ['苹果', 'apple', 'píng guǒ', '🍎'], ['香蕉', 'banana', 'xiāng jiāo', '🍌'],
@@ -91,7 +99,7 @@
   var state = {
     mode: 'vocabulary',
     size: 4,
-    matchType: 'english',
+    sideTypes: ['chinese', 'english'],
     title: 'Vocabulary Tarsia Puzzle',
     seed: 20260821,
     pairs: [],
@@ -104,8 +112,9 @@
 
   function cacheElements() {
     [
-      'puzzleTitle', 'puzzleSize', 'matchType', 'vocabularyControls', 'qaControls', 'contentHeading',
-      'pairCount', 'wordListSelect', 'addWordList', 'wordListStatus', 'vocabularyInput',
+      'puzzleTitle', 'puzzleSize', 'vocabularyControls', 'qaControls', 'contentHeading', 'sideChoiceCount',
+      'pairCount', 'toggleWordLibrary', 'wordLibraryPanel', 'wordListChoices', 'wordListSelectionNote',
+      'addWordList', 'wordListStatus', 'vocabularyInput',
       'buildVocabularyPairs', 'questionBankSelect', 'addQuestionBank', 'questionBankStatus',
       'qaInput', 'buildQaPairs', 'pairEditor', 'validationMessage', 'loadSample', 'generatePuzzle',
       'reshufflePuzzle', 'clearPuzzle', 'previewStatus', 'pagePreview', 'previewNote', 'printPuzzle',
@@ -150,9 +159,8 @@
       state.size = Number(elements.puzzleSize.value) === 3 ? 3 : 4;
       rebuildFromActiveInput();
     });
-    elements.matchType.addEventListener('change', function () {
-      state.matchType = elements.matchType.value;
-      buildVocabularyPairs(false);
+    $$('input[name="vocabSide"]').forEach(function (input) {
+      input.addEventListener('change', function () { handleSideChoice(input); });
     });
     elements.vocabularyInput.addEventListener('input', function () { markDirty(); saveDraft(); });
     elements.qaInput.addEventListener('input', function () { markDirty(); saveDraft(); });
@@ -165,9 +173,15 @@
       generatePuzzle(false);
     });
     elements.clearPuzzle.addEventListener('click', clearAll);
-    elements.addWordList.addEventListener('click', addSelectedWordList);
+    elements.toggleWordLibrary.addEventListener('click', function () {
+      setWordLibraryExpanded(elements.toggleWordLibrary.getAttribute('aria-expanded') !== 'true');
+    });
+    elements.wordListChoices.addEventListener('click', function (event) {
+      var button = event.target.closest('button[data-word-list-value]');
+      if (button) toggleWordListSelection(button.dataset.wordListValue);
+    });
+    elements.addWordList.addEventListener('click', addSelectedWordLists);
     elements.addQuestionBank.addEventListener('click', addSelectedQuestionBank);
-    elements.wordListSelect.addEventListener('change', function () { elements.addWordList.disabled = !elements.wordListSelect.value; });
     elements.questionBankSelect.addEventListener('change', function () { elements.addQuestionBank.disabled = !elements.questionBankSelect.value; });
     elements.pairEditor.addEventListener('input', editPairValue);
     elements.pairEditor.addEventListener('click', function (event) {
@@ -190,6 +204,9 @@
     elements.printPuzzle.addEventListener('click', printPuzzle);
     elements.downloadPdf.addEventListener('click', function () { exportPuzzle('pdf'); });
     elements.downloadPptx.addEventListener('click', function () { exportPuzzle('pptx'); });
+    window.addEventListener('storage', function (event) {
+      if (event.key && event.key.indexOf('clwl:') === 0) loadWordLists();
+    });
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && !elements.emojiPicker.hidden) closeEmojiPicker();
     });
@@ -229,17 +246,67 @@
     return wordIndex.get(sourceKey) || wordIndex.get(englishKey) || null;
   }
 
+  function selectedSideTypes() {
+    return $$('input[name="vocabSide"]:checked').map(function (input) { return input.value; })
+      .filter(function (value) { return SIDE_ORDER.indexOf(value) >= 0; });
+  }
+
+  function updateSideChoiceUi() {
+    var selected = selectedSideTypes();
+    state.sideTypes = selected;
+    elements.sideChoiceCount.textContent = selected.length + ' selected';
+    $('.side-choice').classList.toggle('needs-choice', selected.length !== 2);
+  }
+
+  function handleSideChoice(changedInput) {
+    var selected = selectedSideTypes();
+    if (selected.length > 2) {
+      changedInput.checked = false;
+      selected = selectedSideTypes();
+      showToast('Choose only two sides. Uncheck one before choosing another.');
+    }
+    updateSideChoiceUi();
+    if (selected.length === 2) buildVocabularyPairs(false);
+    else {
+      markDirty();
+      updateValidation(false);
+      saveDraft();
+    }
+  }
+
+  function restoreSideChoices(types) {
+    var valid = Array.isArray(types) ? types.filter(function (value, index) {
+      return SIDE_ORDER.indexOf(value) >= 0 && types.indexOf(value) === index;
+    }) : [];
+    if (valid.length !== 2) valid = ['chinese', 'english'];
+    $$('input[name="vocabSide"]').forEach(function (input) {
+      input.checked = valid.indexOf(input.value) >= 0;
+    });
+    updateSideChoiceUi();
+  }
+
   function buildVocabularyPairs(silent) {
-    state.matchType = elements.matchType.value;
+    updateSideChoiceUi();
+    if (state.sideTypes.length !== 2) {
+      updateValidation(false);
+      if (!silent) showToast('Choose exactly two sides before auto-filling matches.');
+      return false;
+    }
     var lines = elements.vocabularyInput.value.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
     var records = lines.map(parseVocabularyLine).slice(0, requiredPairCount());
     state.pairs = records.map(function (record) {
       var known = lookupWord(record);
-      var en = record.en || (known && known.en) || '';
-      var py = record.py || (known && known.py) || '';
-      var emoji = normalizeEmoji(record.emoji) || matchEmoji([record.source, en, py].join(' '));
-      var target = state.matchType === 'pinyin' ? py : (state.matchType === 'emoji' ? emoji : en);
-      return { a: record.source, b: target };
+      var chinese = record.source || (known && known.zh) || '';
+      var en = record.en || (known && known.en) || (window.ChenWordlist && window.ChenWordlist.toEnglish(chinese)) || '';
+      var py = record.py || (known && known.py) || (window.ChenWordlist && window.ChenWordlist.toPinyin(chinese, { spaced: true })) || '';
+      var emoji = normalizeEmoji(record.emoji) || matchEmoji([chinese, en, py].join(' '));
+      var values = { chinese: chinese, english: en, pinyin: py, emoji: emoji };
+      return {
+        a: values[state.sideTypes[0]] || '',
+        b: values[state.sideTypes[1]] || '',
+        kindA: state.sideTypes[0],
+        kindB: state.sideTypes[1]
+      };
     });
     padPairs();
     markDirty();
@@ -261,18 +328,22 @@
   function padPairs() {
     var count = requiredPairCount();
     state.pairs = state.pairs.slice(0, count);
-    while (state.pairs.length < count) state.pairs.push({ a: '', b: '' });
+    while (state.pairs.length < count) state.pairs.push({
+      a: '',
+      b: '',
+      kindA: state.sideTypes[0] || 'text',
+      kindB: state.sideTypes[1] || 'text'
+    });
   }
 
   function rebuildFromActiveInput() {
-    state.matchType = elements.matchType.value;
     elements.puzzleSize.value = String(state.size);
     if (state.mode === 'qa') buildQaPairs(true); else buildVocabularyPairs(true);
   }
 
   function renderPairEditor() {
     padPairs();
-    var emojiMode = state.mode === 'vocabulary' && state.matchType === 'emoji';
+    var emojiMode = state.mode === 'vocabulary' && state.sideTypes[1] === 'emoji';
     elements.pairEditor.innerHTML = state.pairs.map(function (pair, index) {
       var target = emojiMode
         ? '<button class="emoji-choice" type="button" data-emoji-row="' + index + '"><span class="emoji-preview">' + escapeHtml(pair.b || '🧩') + '</span><span class="change-label">Change</span></button>'
@@ -305,6 +376,9 @@
   function validatePairs(strict) {
     var needed = requiredPairCount();
     var completed = completedPairCount();
+    if (state.mode === 'vocabulary' && state.sideTypes.length !== 2) {
+      return { ok: false, message: 'Choose exactly two match sides: Chinese, English, Pinyin, or Emoji.' };
+    }
     if (strict && completed < needed) return { ok: false, message: 'Complete all ' + needed + ' matching pairs before generating.' };
 
     var filled = [];
@@ -392,7 +466,13 @@
     edgeGroups.forEach(function (group) { if (group.length === 2) internalEdges.push(group); });
     internalEdges = seededShuffle(internalEdges, seed ^ 0x2f6e2b1);
     var orderedPairs = seededShuffle(pairs.map(function (pair, index) {
-      return { a: pair.a.trim(), b: pair.b.trim(), originalIndex: index };
+      return {
+        a: pair.a.trim(),
+        b: pair.b.trim(),
+        kindA: pair.kindA || 'text',
+        kindB: pair.kindB || 'text',
+        originalIndex: index
+      };
     }), seed ^ 0x93ab741);
     var random = seededRandom(seed ^ 0x6d2b79f5);
 
@@ -401,8 +481,10 @@
       var swap = random() > .5;
       var first = swap ? pair.b : pair.a;
       var second = swap ? pair.a : pair.b;
-      group[0].piece.labels[group[0].edgeIndex] = makeContent(first, pair.originalIndex, swap);
-      group[1].piece.labels[group[1].edgeIndex] = makeContent(second, pair.originalIndex, !swap);
+      var firstKind = swap ? pair.kindB : pair.kindA;
+      var secondKind = swap ? pair.kindA : pair.kindB;
+      group[0].piece.labels[group[0].edgeIndex] = makeContent(first, pair.originalIndex, firstKind);
+      group[1].piece.labels[group[1].edgeIndex] = makeContent(second, pair.originalIndex, secondKind);
     });
 
     var cutOrder = seededShuffle(pieces.slice(), seed ^ 0x7f4a7c15).map(function (piece, index) {
@@ -415,11 +497,11 @@
     return { id: id, orientation: orientation, row: row, col: col, vertices: vertices, labels: [null, null, null] };
   }
 
-  function makeContent(value, pairIndex, isSecond) {
+  function makeContent(value, pairIndex, sideKind) {
     return {
       value: value,
       pairIndex: pairIndex,
-      kind: state.mode === 'vocabulary' && state.matchType === 'emoji' && isSecond ? 'emoji' : 'text'
+      kind: state.mode === 'vocabulary' && sideKind === 'emoji' ? 'emoji' : 'text'
     };
   }
 
@@ -645,7 +727,23 @@
       var response = await fetch('/api/wordlists/presets');
       if (!response.ok) throw new Error('Word-list request failed');
       var data = await response.json();
-      wordLists = data.lists || [];
+      var topicSets = (data.lists || []).map(function (list) {
+        return Object.assign({}, list, { source: 'topic', selectValue: 'topic:' + list.id });
+      });
+      var savedLists = [];
+      if (window.ChenWordlist) {
+        savedLists = window.ChenWordlist.listAll().map(function (summary) {
+          var list = window.ChenWordlist.load(summary.id);
+          if (!list || !Array.isArray(list.items)) return null;
+          return Object.assign({}, list, {
+            count: list.items.length,
+            source: 'saved',
+            selectValue: 'saved:' + list.id
+          });
+        }).filter(Boolean);
+      }
+      wordLists = topicSets.concat(savedLists);
+      wordIndex.clear();
       wordLists.forEach(function (list) {
         (list.items || []).forEach(function (item) {
           var record = { zh: item.zh || '', py: item.py || '', en: item.en || '' };
@@ -653,18 +751,59 @@
           if (record.en) wordIndex.set(normalizeSearch(record.en), record);
         });
       });
-      elements.wordListSelect.innerHTML = '<option value="">Choose a preset list…</option>' + wordLists.map(function (list) {
-        return '<option value="' + escapeAttribute(list.id) + '">' + escapeHtml(list.name) + ' · ' + list.count + ' terms</option>';
-      }).join('');
-      elements.wordListStatus.textContent = wordLists.length + ' teacher-curated word lists available. Add more than one list if you want to mix topics.';
+      selectedWordListValues = selectedWordListValues.filter(function (value) {
+        return wordLists.some(function (list) { return list.selectValue === value; });
+      });
+      renderWordListChoices();
       if (state.mode === 'vocabulary') {
         buildVocabularyPairs(true);
         if (completedPairCount() === requiredPairCount()) generatePuzzle(true);
       }
     } catch (error) {
-      elements.wordListSelect.innerHTML = '<option value="">Library unavailable</option>';
+      wordLists = [];
+      selectedWordListValues = [];
+      elements.wordListChoices.innerHTML = '<p class="word-list-empty">Vocabulary topics are unavailable right now.</p>';
       elements.wordListStatus.textContent = 'You can still paste vocabulary and edit every generated match manually.';
+      elements.wordListSelectionNote.textContent = 'Topics will appear when the library loads.';
+      elements.addWordList.disabled = true;
     }
+  }
+
+  function setWordLibraryExpanded(expanded) {
+    elements.toggleWordLibrary.setAttribute('aria-expanded', String(Boolean(expanded)));
+    elements.wordLibraryPanel.hidden = !expanded;
+  }
+
+  function wordListIcon(list) {
+    return list.source === 'saved' ? '📚' : (WORD_LIST_ICONS[list.id] || '🀄');
+  }
+
+  function renderWordListChoices() {
+    var topicCount = wordLists.filter(function (list) { return list.source === 'topic'; }).length;
+    var savedCount = wordLists.length - topicCount;
+    elements.wordListChoices.innerHTML = wordLists.map(function (list) {
+      var selected = selectedWordListValues.indexOf(list.selectValue) >= 0;
+      var count = list.count || (list.items || []).length;
+      var sourceLabel = list.source === 'saved' ? 'Saved list' : (list.theme || 'Published topic');
+      return '<button class="word-list-choice" type="button" data-word-list-value="' + escapeAttribute(list.selectValue) + '" aria-pressed="' + selected + '" aria-label="' + escapeAttribute((selected ? 'Remove ' : 'Select ') + (list.name || 'vocabulary topic')) + '">' +
+        '<span class="word-list-choice-icon" aria-hidden="true">' + escapeHtml(wordListIcon(list)) + '</span>' +
+        '<span class="word-list-choice-copy">' + escapeHtml(list.name || 'Untitled list') + '<small>' + escapeHtml(sourceLabel + ' · ' + count + ' terms') + '</small></span>' +
+        '</button>';
+    }).join('') || '<p class="word-list-empty">No vocabulary topics are available yet.</p>';
+    elements.wordListStatus.textContent = topicCount + ' published vocabulary topic' + (topicCount === 1 ? '' : 's') +
+      (savedCount ? ' and ' + savedCount + ' saved list' + (savedCount === 1 ? '' : 's') : '') + ' are available.';
+    elements.wordListSelectionNote.textContent = selectedWordListValues.length
+      ? selectedWordListValues.length + ' topic' + (selectedWordListValues.length === 1 ? '' : 's') + ' selected'
+      : 'Choose at least 1 topic';
+    elements.addWordList.textContent = selectedWordListValues.length === 1 ? 'Add selected topic' : 'Add selected topics';
+    elements.addWordList.disabled = selectedWordListValues.length === 0;
+  }
+
+  function toggleWordListSelection(value) {
+    var index = selectedWordListValues.indexOf(value);
+    if (index >= 0) selectedWordListValues.splice(index, 1);
+    else selectedWordListValues.push(value);
+    renderWordListChoices();
   }
 
   async function loadQuestionBanks() {
@@ -683,21 +822,35 @@
     }
   }
 
-  function addSelectedWordList() {
-    var selected = wordLists.find(function (list) { return list.id === elements.wordListSelect.value; });
-    if (!selected) return;
+  function addSelectedWordLists() {
+    var selected = selectedWordListValues.map(function (value) {
+      return wordLists.find(function (list) { return list.selectValue === value; });
+    }).filter(Boolean);
+    if (!selected.length) return;
     var existing = elements.vocabularyInput.value.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+    if (elements.vocabularyInput.value.trim() === sampleVocabularyText(requiredPairCount()).trim()) existing = [];
     var keys = new Set(existing.map(function (line) { return normalizeSearch(parseVocabularyLine(line).source); }));
-    (selected.items || []).forEach(function (item) {
-      if (existing.length >= requiredPairCount()) return;
-      if (keys.has(normalizeSearch(item.zh))) return;
-      var emoji = matchEmoji((item.zh || '') + ' ' + (item.en || ''));
-      existing.push([item.zh || '', item.en || '', item.py || '', emoji].join(' | '));
-      keys.add(normalizeSearch(item.zh));
+    var added = 0;
+    selected.forEach(function (list) {
+      (list.items || []).forEach(function (item) {
+        if (existing.length >= requiredPairCount()) return;
+        if (keys.has(normalizeSearch(item.zh))) return;
+        var emoji = normalizeEmoji(item.emoji || item.img) || matchEmoji((item.zh || '') + ' ' + (item.en || ''));
+        existing.push([item.zh || '', item.en || '', item.py || '', emoji].join(' | '));
+        keys.add(normalizeSearch(item.zh));
+        added += 1;
+      });
     });
     elements.vocabularyInput.value = existing.join('\n');
     buildVocabularyPairs(true);
-    showToast('Added terms from ' + selected.name + '.');
+    if (added) {
+      showToast('Added ' + added + ' terms from ' + selected.length + ' selected topic' + (selected.length === 1 ? '' : 's') + '.');
+      selectedWordListValues = [];
+      renderWordListChoices();
+      setWordLibraryExpanded(false);
+    } else {
+      showToast('There is no room for more terms. Clear the current list or choose a larger puzzle.');
+    }
   }
 
   async function addSelectedQuestionBank() {
@@ -880,8 +1033,11 @@
 
   async function embedUsedTwemoji() {
     var values = [];
-    if (state.mode === 'vocabulary' && state.matchType === 'emoji') {
-      state.pairs.forEach(function (pair) { if (pair.b && values.indexOf(pair.b) < 0) values.push(pair.b); });
+    if (state.mode === 'vocabulary' && state.sideTypes.indexOf('emoji') >= 0) {
+      state.pairs.forEach(function (pair) {
+        var emoji = pair.kindA === 'emoji' ? pair.a : (pair.kindB === 'emoji' ? pair.b : '');
+        if (emoji && values.indexOf(emoji) < 0) values.push(emoji);
+      });
     }
     var results = await Promise.all(values.map(async function (emoji) {
       try {
@@ -908,7 +1064,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         mode: state.mode,
         size: state.size,
-        matchType: state.matchType,
+        sideTypes: state.sideTypes,
         title: elements.puzzleTitle.value,
         vocabulary: elements.vocabularyInput.value,
         qa: elements.qaInput.value,
@@ -928,10 +1084,11 @@
       return;
     }
     state.size = draft.size === 3 ? 3 : 4;
-    state.matchType = ['english', 'pinyin', 'emoji'].indexOf(draft.matchType) >= 0 ? draft.matchType : 'english';
+    var savedSides = Array.isArray(draft.sideTypes) ? draft.sideTypes :
+      (['english', 'pinyin', 'emoji'].indexOf(draft.matchType) >= 0 ? ['chinese', draft.matchType] : ['chinese', 'english']);
     state.seed = Number(draft.seed) || state.seed;
     elements.puzzleSize.value = String(state.size);
-    elements.matchType.value = state.matchType;
+    restoreSideChoices(savedSides);
     elements.vocabularyInput.value = draft.vocabulary || sampleVocabularyText(requiredPairCount());
     elements.qaInput.value = draft.qa || sampleQaText(requiredPairCount());
     setMode(draft.mode === 'qa' ? 'qa' : 'vocabulary');
