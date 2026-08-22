@@ -72,12 +72,15 @@ router.get('/teaching-tools/class-pet-points', function(req, res, next) {
   res.render('teaching-tools/class-pet-points', { title: 'Class Pet Points' });
 });
 
+router.get('/teaching-tools/word-sudoku', function(req, res) {
+  res.redirect(302, '/low-prep/word-sudoku/word-sudoku-widget.html');
+});
+
 [
   ['sunflower-spinner', 'Teaching Tools', '/teaching-tools'],
   ['word-list-library', 'Teaching Tools', '/teaching-tools'],
   ['question-bank-library', 'Teaching Tools', '/teaching-tools'],
   ['vocabulary-booklet', 'Teaching Tools', '/teaching-tools'],
-  ['word-sudoku', 'Teaching Tools', '/teaching-tools'],
   ['word-cloud', 'Teaching Tools', '/teaching-tools']
 ].forEach(function(config) {
   var slug = config[0];
@@ -85,7 +88,6 @@ router.get('/teaching-tools/class-pet-points', function(req, res, next) {
     res.render('tool-landing', {
       title: toolGuides[slug].title,
       toolGuide: toolGuides[slug],
-      showToolGuide: slug !== 'word-sudoku',
       sectionLabel: config[1],
       sectionPath: config[2]
     });
@@ -165,7 +167,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points',
     '/teaching-tools/sunflower-spinner', '/teaching-tools/word-list-library',
     '/teaching-tools/question-bank-library', '/teaching-tools/vocabulary-booklet',
-    '/teaching-tools/word-sudoku', '/teaching-tools/word-cloud',
+    '/low-prep/word-sudoku/word-sudoku-widget.html', '/teaching-tools/word-cloud',
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',
     '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle'

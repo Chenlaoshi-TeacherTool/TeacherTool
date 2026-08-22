@@ -23,7 +23,7 @@
   </header>
 
   <main>
-    <% if (toolGuide.title !== 'Vocabulary Sudoku' && (typeof showToolGuide === 'undefined' || showToolGuide)) { %>
+    <% if (typeof showToolGuide === 'undefined' || showToolGuide) { %>
       <%- include('partials/tool-guide', { toolGuide: toolGuide }) %>
     <% } %>
     <section class="content-section content-section--soft">
