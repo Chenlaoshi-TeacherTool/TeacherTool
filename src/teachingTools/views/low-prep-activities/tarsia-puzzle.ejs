@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#315f4f">
+  <title>Tarsia Puzzle Generator - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Turn vocabulary, pinyin, English meanings, Twemoji pictures, or question-and-answer pairs into a printable Tarsia triangle puzzle.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/tarsia-puzzle/tarsia-puzzle.css?v=reference-layout-1">
+</head>
+<body class="tarsia-page">
+  <main class="tarsia-wrap">
+    <header class="tarsia-hero">
+      <div class="tarsia-hero-copy">
+        <a class="back-link" href="/teaching-tools#low-prep-activities">← Back to Teaching Tools</a>
+        <p class="eyebrow">Printable matching puzzle</p>
+        <h1><span aria-hidden="true">🧩</span> Tarsia Puzzle Generator</h1>
+        <p>Build a set of triangular pieces from vocabulary or question-and-answer pairs. Students cut, mix, and rebuild the large triangle by matching every edge.</p>
+        <div class="hero-points" aria-label="Tool highlights">
+          <span>9 or 18 matching pairs</span>
+          <span>Vocabulary + Q&amp;A modes</span>
+          <span>Cut sheet + answer key</span>
+        </div>
+      </div>
+      <div class="hero-puzzle" aria-hidden="true">
+        <svg viewBox="0 0 260 220" role="img">
+          <path d="M130 10 20 200h220z" fill="#fffdf7" stroke="currentColor" stroke-width="5"/>
+          <path d="M102.5 57.5h55M75 105h110M47.5 152.5h165M102.5 57.5 130 105 157.5 57.5M75 105l27.5 47.5L130 105l27.5 47.5L185 105M47.5 152.5 75 200l27.5-47.5L130 200l27.5-47.5L185 200l27.5-47.5" fill="none" stroke="currentColor" stroke-width="3"/>
+          <text x="130" y="91" text-anchor="middle">苹果</text>
+          <text x="116" y="121" text-anchor="middle">apple</text>
+          <text x="165" y="169" text-anchor="middle">🍎</text>
+        </svg>
+      </div>
+    </header>
+
+    <div class="tarsia-grid">
+      <section class="builder" aria-label="Build a Tarsia puzzle">
+        <section class="panel details-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step-number">1</span>
+              <p class="eyebrow">Puzzle setup</p>
+              <h2>Name and size your puzzle</h2>
+            </div>
+          </div>
+          <div class="form-grid">
+            <label for="puzzleTitle">Worksheet title
+              <input id="puzzleTitle" type="text" maxlength="60" value="Vocabulary Tarsia Puzzle">
+            </label>
+            <label for="puzzleSize">Puzzle size
+              <select id="puzzleSize">
+                <option value="4" selected>Standard · 16 pieces / 18 pairs</option>
+                <option value="3">Quick · 9 pieces / 9 pairs</option>
+              </select>
+            </label>
+          </div>
+          <div class="mode-switch" role="group" aria-label="Choose content type">
+            <button type="button" class="active" data-mode="vocabulary" aria-pressed="true">Vocabulary</button>
+            <button type="button" data-mode="qa" aria-pressed="false">Sentences &amp; answers</button>
+          </div>
+        </section>
+
+        <section class="panel content-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step-number">2</span>
+              <p class="eyebrow">Matching content</p>
+              <h2 id="contentHeading">Choose vocabulary</h2>
+            </div>
+            <span class="pair-count" id="pairCount">0 / 18 ready</span>
+          </div>
+
+          <div id="vocabularyControls">
+            <div class="match-type-row">
+              <label for="matchType">Match each term with
+                <select id="matchType">
+                  <option value="english">English meaning</option>
+                  <option value="pinyin">Pinyin</option>
+                  <option value="emoji">Twemoji picture</option>
+                </select>
+              </label>
+              <p>Known items are filled from the Chen Laoshi word-list library. Every generated match remains editable.</p>
+            </div>
+
+            <div class="library-box">
+              <div>
+                <p class="eyebrow">Chen Laoshi Library</p>
+                <h3>Add a preset word list</h3>
+              </div>
+              <div class="library-actions">
+                <label class="sr-only" for="wordListSelect">Preset word list</label>
+                <select id="wordListSelect"><option value="">Loading word lists…</option></select>
+                <button id="addWordList" class="btn-secondary" type="button" disabled>Add terms</button>
+              </div>
+              <p id="wordListStatus" class="status-copy" aria-live="polite">Loading the library…</p>
+            </div>
+
+            <label class="bulk-label" for="vocabularyInput">
+              <span>Paste or type vocabulary</span>
+              <span id="vocabularyFormat">One line each: Chinese | English | Pinyin | Emoji (only the first field is required)</span>
+              <textarea id="vocabularyInput" rows="10" maxlength="3200" spellcheck="true" placeholder="苹果 | apple | píng guǒ | 🍎&#10;香蕉 | banana | xiāng jiāo | 🍌"></textarea>
+            </label>
+            <button id="buildVocabularyPairs" class="btn-secondary inline-action" type="button">Auto-fill matches</button>
+          </div>
+
+          <div id="qaControls" hidden>
+            <div class="library-box">
+              <div>
+                <p class="eyebrow">Chen Laoshi Library</p>
+                <h3>Add preset questions</h3>
+              </div>
+              <div class="library-actions">
+                <label class="sr-only" for="questionBankSelect">Preset question bank</label>
+                <select id="questionBankSelect"><option value="">Loading question banks…</option></select>
+                <button id="addQuestionBank" class="btn-secondary" type="button" disabled>Add questions</button>
+              </div>
+              <p id="questionBankStatus" class="status-copy" aria-live="polite">Loading the library…</p>
+            </div>
+            <label class="bulk-label" for="qaInput">
+              <span>Paste sentences, questions, and answers</span>
+              <span>One pair per line. Separate the two matching sides with | or →.</span>
+              <textarea id="qaInput" rows="10" maxlength="5200" spellcheck="true" placeholder="What is 1/2 as a decimal? | 0.5&#10;The capital of France is… | Paris"></textarea>
+            </label>
+            <button id="buildQaPairs" class="btn-secondary inline-action" type="button">Build matching pairs</button>
+          </div>
+
+          <div class="review-heading">
+            <div>
+              <p class="eyebrow">Review before generating</p>
+              <h3>Edit the two sides of each match</h3>
+            </div>
+            <button id="loadSample" class="text-button" type="button">Load a sample</button>
+          </div>
+          <div id="pairEditor" class="pair-editor" aria-live="polite"></div>
+          <p id="validationMessage" class="validation-message" aria-live="polite"></p>
+        </section>
+
+        <section class="panel generate-panel">
+          <div>
+            <span class="step-number">3</span>
+            <p class="eyebrow">Build the worksheet</p>
+            <h2>Generate the cut sheet and answer key</h2>
+            <p>Each matching pair is placed on one shared edge in the completed triangle. A fresh layout changes where the pairs appear and how the pieces are mixed.</p>
+          </div>
+          <div class="generate-actions">
+            <button id="generatePuzzle" class="btn-primary" type="button">Generate puzzle</button>
+            <button id="reshufflePuzzle" class="btn-secondary" type="button">Fresh layout</button>
+            <button id="clearPuzzle" class="text-button" type="button">Clear all</button>
+          </div>
+        </section>
+      </section>
+
+      <aside class="preview-panel" aria-label="Puzzle preview">
+        <div class="preview-heading">
+          <div>
+            <p class="eyebrow">Live preview</p>
+            <h2>Your printable pages</h2>
+          </div>
+          <span id="previewStatus" class="ready-pill">Sample ready</span>
+        </div>
+        <div class="preview-tabs" role="tablist" aria-label="Preview page">
+          <button id="cutTab" class="active" type="button" role="tab" aria-selected="true" data-preview="cut">Cut-out pieces</button>
+          <button id="answerTab" type="button" role="tab" aria-selected="false" data-preview="answer">Answer key</button>
+        </div>
+        <div id="pagePreview" class="page-preview" aria-label="Tarsia worksheet preview"></div>
+        <p class="preview-note" id="previewNote">Print this page, cut out the triangles, and mix the pieces before students begin.</p>
+        <div class="download-actions">
+          <button id="printPuzzle" class="btn-primary" type="button">Print / Save PDF</button>
+          <button id="downloadPdf" class="btn-secondary" type="button">Download PDF</button>
+          <button id="downloadPptx" class="btn-secondary" type="button">PowerPoint</button>
+        </div>
+        <p class="export-note">Downloads include both the student cut sheet and the completed answer key. PowerPoint pages are print-ready image slides.</p>
+      </aside>
+    </div>
+  </main>
+
+  <section id="emojiPicker" class="emoji-picker" hidden aria-label="Choose a Twemoji picture">
+    <div class="emoji-picker-card" role="dialog" aria-modal="true" aria-labelledby="emojiPickerTitle">
+      <div class="emoji-picker-heading">
+        <div>
+          <p class="eyebrow">Open-source Twemoji</p>
+          <h2 id="emojiPickerTitle">Choose a picture</h2>
+        </div>
+        <button id="closeEmojiPicker" class="picker-close" type="button" aria-label="Close emoji picker">×</button>
+      </div>
+      <label for="emojiSearch">Search pictures
+        <input id="emojiSearch" type="search" placeholder="Try apple, weather, 学校…" autocomplete="off">
+      </label>
+      <div id="emojiGrid" class="emoji-grid"></div>
+      <label class="custom-emoji" for="customEmoji">Or paste an emoji
+        <span>
+          <input id="customEmoji" type="text" maxlength="12" placeholder="🐼">
+          <button id="useCustomEmoji" class="btn-secondary" type="button">Use</button>
+        </span>
+      </label>
+      <p class="twemoji-credit">Twemoji graphics by Twitter, Inc. and contributors, licensed under CC BY 4.0.</p>
+    </div>
+  </section>
+
+  <div id="printPages" class="print-pages" aria-hidden="true"></div>
+  <div id="tarsiaToast" class="toast" role="status" aria-live="polite"></div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/deck-export.js"></script>
+  <!-- Twemoji artwork: Twitter, Inc. and contributors (CC-BY 4.0), loaded as SVGs from the official repository. -->
+  <script src="/low-prep/tarsia-puzzle/tarsia-puzzle.js?v=reference-layout-1"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

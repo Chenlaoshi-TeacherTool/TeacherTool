@@ -106,7 +106,7 @@
   }
 
   // ---------------- PPTX ----------------
-  var EMU_W = 12192000, EMU_H = 6858000;   // 13.333 x 7.5 in  (16:9)
+  var DEFAULT_EMU_W = 12192000, DEFAULT_EMU_H = 6858000;   // 13.333 x 7.5 in  (16:9)
 
   function pptxTheme() {
     return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -158,7 +158,7 @@
       'hlink="hlink" folHlink="folHlink"/></p:clrMapOvr></p:sldLayout>';
   }
 
-  function pptxSlide(i) {
+  function pptxSlide(i, emuW, emuH) {
     return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
       '<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" ' +
       'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ' +
@@ -168,8 +168,8 @@
       '<a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>' +
       '<p:pic><p:nvPicPr><p:cNvPr id="2" name="Card ' + (i + 1) + '"/>' +
       '<p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>' +
-      '<p:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>' +
-      '<p:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + EMU_W + '" cy="' + EMU_H + '"/></a:xfrm>' +
+      '<p:blipFill><a:blip r:embed="rId2"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>' +
+      '<p:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + emuW + '" cy="' + emuH + '"/></a:xfrm>' +
       '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>' +
       '</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>';
   }
@@ -179,6 +179,10 @@
     var n = images.length;
     var files = [];
     var i;
+    // PowerPoint uses 12,700 EMUs per point. Existing callers keep the
+    // original 16:9 default; printable tools can opt into portrait pages.
+    var emuW = opts.emuWidth || (opts.pageWidth ? Math.round(opts.pageWidth * 12700) : DEFAULT_EMU_W);
+    var emuH = opts.emuHeight || (opts.pageHeight ? Math.round(opts.pageHeight * 12700) : DEFAULT_EMU_H);
 
     var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
       '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
@@ -219,7 +223,7 @@
         'xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" saveSubsetFonts="1">' +
         '<p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>' +
         '<p:sldIdLst>' + sldIds + '</p:sldIdLst>' +
-        '<p:sldSz cx="' + EMU_W + '" cy="' + EMU_H + '"/><p:notesSz cx="' + EMU_H + '" cy="' + EMU_W + '"/>' +
+        '<p:sldSz cx="' + emuW + '" cy="' + emuH + '"/><p:notesSz cx="' + emuH + '" cy="' + emuW + '"/>' +
         '</p:presentation>')
     });
     files.push({ name: 'ppt/_rels/presentation.xml.rels', data: utf8Bytes(presRels) });
@@ -241,11 +245,12 @@
     });
 
     for (i = 0; i < n; i++) {
-      files.push({ name: 'ppt/slides/slide' + (i + 1) + '.xml', data: utf8Bytes(pptxSlide(i)) });
+      files.push({ name: 'ppt/slides/slide' + (i + 1) + '.xml', data: utf8Bytes(pptxSlide(i, emuW, emuH)) });
       files.push({
         name: 'ppt/slides/_rels/slide' + (i + 1) + '.xml.rels', data: utf8Bytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
-          '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image' + (i + 1) + '.jpeg"/>' +
+          '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>' +
+          '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image' + (i + 1) + '.jpeg"/>' +
           '</Relationships>')
       });
       files.push({ name: 'ppt/media/image' + (i + 1) + '.jpeg', data: images[i].bytes });

@@ -176,6 +176,18 @@ const toolGuides = {
     exampleTitle: "Classroom example: fraction equivalence maze",
     example: "Each question shows one fraction and students choose an equivalent form. After reaching the end, they select four correct pairs and explain the strategy they used. Review the first wrong turn rather than checking only the final destination.",
     tips: ["Use distractors based on common misconceptions instead of random wrong answers.", "Give beginners one worked example or visual cue.", "Walk the correct path yourself before printing to make sure every branch connects."]
+  },
+  "tarsia-puzzle": {
+    title: "Tarsia Matching Puzzle Generator",
+    eyebrow: "Cut-and-rebuild review task",
+    grades: "Grades 2–12",
+    duration: "10–20 minutes",
+    summary: "Turn 9 or 18 matching pairs into triangular pieces that students rebuild by matching every interior edge.",
+    whatItIs: "A Tarsia puzzle breaks a completed large triangle into smaller triangular pieces. Students retrieve vocabulary, meanings, pronunciations, representations, or answers while testing how each piece fits with its neighbors.",
+    steps: ["Choose a quick 9-pair puzzle or a standard 18-pair puzzle.", "Review every automatically filled English, pinyin, or picture match before downloading.", "Print the cut sheet and answer key, then mix each student or group set in a labeled envelope."],
+    exampleTitle: "Classroom example: Chinese vocabulary in three passes",
+    example: "First match Chinese words to Twemoji pictures. Reuse the same word set on another day with pinyin, then with English meanings. Students explain two matches aloud before checking the completed triangle.",
+    tips: ["Use short, unambiguous labels so they remain readable along triangle edges.", "Avoid repeating the same answer on multiple edges unless you want more than one possible placement.", "Print one test copy and solve it yourself before preparing a class set."]
   }
 };
 

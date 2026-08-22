@@ -120,13 +120,17 @@ router.get('/teaching-tools/maze-generator', function(req, res, next) {
   res.render('low-prep-activities/maze-generator', { title: 'Maze Generator', toolGuide: toolGuides['maze-generator'] });
 });
 
+router.get('/teaching-tools/tarsia-puzzle', function(req, res, next) {
+  res.render('low-prep-activities/tarsia-puzzle', { title: 'Tarsia Puzzle Generator', toolGuide: toolGuides['tarsia-puzzle'] });
+});
+
 router.get('/low-prep-activities', function(req, res) {
   res.redirect(301, '/teaching-tools#low-prep-activities');
 });
 
 [
   'word-sudoku', 'word-cloud', 'independent-reading', 'tear-paper-bingo',
-  'would-you-rather', 'jeopardy', 'character-race', 'maze-generator'
+  'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -163,7 +167,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/word-sudoku', '/teaching-tools/word-cloud',
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',
-    '/teaching-tools/character-race', '/teaching-tools/maze-generator'
+    '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle'
   ].concat(articles.map(function(article) { return '/resources/' + article.slug; }));
   var urls = paths.map(function(path) {
     return '  <url><loc>' + baseUrl + path + '</loc></url>';
