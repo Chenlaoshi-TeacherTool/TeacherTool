@@ -136,11 +136,8 @@
   cursor: pointer;
 }
 .fb-cover-edit:hover { background: #fff; }
-.fb-cover { z-index: 0; }
 
 .fb-identity {
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: flex-end;
   gap: 16px;
@@ -148,6 +145,8 @@
   margin-top: -54px;
 }
 .fb-avatar {
+  position: relative;
+  z-index: 1;
   width: 132px;
   height: 132px;
   border-radius: 50%;
