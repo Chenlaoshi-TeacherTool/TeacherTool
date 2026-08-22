@@ -1,0 +1,309 @@
+.font-shell {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.font-hero {
+  overflow: hidden;
+  background: linear-gradient(135deg, #103e37, #194f45 58%, #2e7258);
+  color: #fffdf7;
+}
+
+.font-hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+  gap: clamp(42px, 8vw, 92px);
+  align-items: center;
+  min-height: 650px;
+  padding-block: 112px 82px;
+}
+
+.font-back {
+  position: absolute;
+  top: 28px;
+  left: 0;
+  padding: 8px 14px;
+  text-decoration: none;
+}
+
+.font-kicker {
+  margin: 0 0 10px;
+  color: #b85b45;
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.font-hero .font-kicker { color: #ffe18a; }
+
+.font-hero h1 {
+  max-width: 720px;
+  margin: 0;
+  color: #fffdf7;
+  font-family: 'DM Serif Display', 'Noto Sans SC', serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 400;
+  letter-spacing: -.035em;
+  line-height: .98;
+}
+
+.font-hero__lead {
+  max-width: 700px;
+  margin: 28px 0 0;
+  color: rgba(255, 253, 247, .88);
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  line-height: 1.8;
+}
+
+.font-hero__lead strong { color: #ffe18a; }
+
+.font-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.font-download {
+  padding: 12px 22px;
+  text-decoration: none;
+}
+
+.font-file-meta {
+  color: rgba(255, 253, 247, .68);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.font-hero__specimen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 380px;
+  padding: 48px 36px 32px;
+  border: 1px solid rgba(255, 253, 247, .38);
+  border-radius: 34px;
+  background: rgba(255, 253, 247, .1);
+  box-shadow: 0 28px 70px rgba(6, 38, 31, .28);
+  transform: rotate(1.5deg);
+}
+
+.specimen-pinyin {
+  margin-bottom: -12px;
+  color: #fffdf7;
+  font-size: 1.8rem;
+}
+
+.specimen-character {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 8rem;
+  line-height: 1;
+}
+
+.specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 142px;
+  height: 142px;
+  margin-top: 20px;
+  border: 2px solid rgba(255, 253, 247, .8);
+}
+
+.specimen-grid span { border: .5px solid rgba(255, 253, 247, .45); }
+.font-hero__specimen p { margin: 24px 0 0; color: #ffe18a; font-size: .86rem; }
+.font-hero__specimen code { font-family: Consolas, monospace; }
+
+.font-section { padding: 72px 0 84px; }
+.font-section--intro { background: #fff9e9; }
+.font-section__heading { max-width: 760px; }
+.font-section__heading h2 {
+  margin: 0 0 14px;
+  color: #194f45;
+  font-family: 'DM Serif Display', 'Noto Sans SC', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 1.12;
+}
+.font-section__heading > p:last-child { color: #5d7168; font-size: 1.05rem; }
+
+.font-preview-card {
+  margin: 32px 0 0;
+  padding: clamp(14px, 3vw, 28px);
+  border: 1px solid #e5ddc9;
+  border-radius: 26px;
+  background: #fffdf7;
+  box-shadow: 0 16px 34px rgba(24, 66, 55, .12);
+}
+.font-preview-card img { display: block; width: 100%; height: auto; border-radius: 14px; }
+.font-preview-card figcaption { margin-top: 13px; color: #5d7168; font-size: .88rem; text-align: center; }
+
+.font-section--rules { background: #edf5df; }
+.font-rule-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 34px;
+}
+.font-rule-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 310px;
+  padding: 28px;
+  border: 1px solid #d7e3c7;
+  border-radius: 22px;
+  background: #fffdf7;
+  box-shadow: 0 10px 22px rgba(24, 66, 55, .08);
+}
+.font-rule-card::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 6px;
+  content: '';
+  background: #6f9e72;
+}
+.font-rule-card--accent { background: #fff4cf; border-color: #ead48f; }
+.font-rule-card--accent::before { background: #f8c63f; }
+.font-rule-card__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  min-height: 52px;
+  padding: 6px 14px;
+  border-radius: 15px;
+  background: #194f45;
+  color: #fffdf7;
+  font-family: Consolas, monospace;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.font-rule-card__label { margin: 18px 0 2px; color: #c9503f; font-size: .75rem; font-weight: 900; letter-spacing: .08em; }
+.font-rule-card h3 { margin: 0 0 10px; color: #194f45; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.65rem; font-weight: 400; }
+.font-rule-card > p:last-child { margin-bottom: 0; color: #405b52; line-height: 1.75; }
+.font-rule-card code,
+.font-formula code,
+.font-section__heading code,
+.font-quick-compare code {
+  font-family: Consolas, 'Courier New', monospace;
+}
+.font-rule-card code { overflow-wrap: anywhere; color: #194f45; font-size: .86em; font-weight: 700; }
+
+.font-formula {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 28px;
+  padding: 22px;
+  overflow-x: auto;
+  border: 1px solid #cbdac2;
+  border-radius: 20px;
+  background: rgba(255, 253, 247, .72);
+}
+.font-formula > div { flex: 0 0 auto; }
+.font-formula span { display: block; margin-bottom: 5px; color: #5d7168; font-size: .72rem; font-weight: 900; letter-spacing: .05em; }
+.font-formula code { color: #194f45; font-size: 1rem; font-weight: 800; }
+.font-formula > b { color: #c9503f; font-size: 1.3rem; }
+.font-formula__result { padding: 12px 15px; border-radius: 13px; background: #194f45; }
+.font-formula__result span { color: #cce0c0; }
+.font-formula__result code { color: #fff2c5; }
+
+.font-note {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  margin-top: 22px;
+  padding: 19px 21px;
+  border-left: 5px solid #f8c63f;
+  border-radius: 13px;
+  background: #fff2c5;
+  color: #5c4817;
+}
+.font-note > span { color: #c9503f; font-size: 1.35rem; font-weight: 900; }
+.font-note p { margin: 0; line-height: 1.72; }
+.font-note strong { color: #194f45; }
+
+.font-section--steps { background: #fff9e9; }
+.font-step-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  margin: 38px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.font-step-list li { display: flex; gap: 16px; align-items: flex-start; }
+.font-step-list__number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f8c63f;
+  box-shadow: 0 4px 0 #d99d19;
+  color: #194f45;
+  font-weight: 900;
+}
+.font-step-list h3 { margin: 0 0 7px; color: #194f45; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.35rem; font-weight: 400; }
+.font-step-list p { margin: 0; color: #5d7168; line-height: 1.7; }
+
+.font-quick-compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 22px;
+  align-items: center;
+  margin-top: 44px;
+  padding: 26px;
+  border: 1px solid #e5ddc9;
+  border-radius: 22px;
+  background: #fffdf7;
+  box-shadow: 0 10px 22px rgba(24, 66, 55, .08);
+}
+.font-quick-compare > div { padding: 16px 18px; border-radius: 14px; background: #f4f8ec; }
+.font-quick-compare__label { margin: 0 0 8px; color: #c9503f; font-size: .75rem; font-weight: 900; letter-spacing: .06em; }
+.font-quick-compare code { color: #194f45; font-size: clamp(.82rem, 2vw, 1.05rem); font-weight: 800; overflow-wrap: anywhere; }
+.font-quick-compare__arrow { color: #c9503f; font-size: 2rem; }
+
+.font-section--source { background: #143f38; color: #fffdf7; }
+.font-source-grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(310px, .88fr); gap: clamp(40px, 8vw, 92px); align-items: center; }
+.font-source-grid h2 { max-width: 720px; margin: 0 0 20px; color: #fffdf7; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; line-height: 1.12; }
+.font-source-grid > div > p:not(.font-kicker) { color: rgba(255, 253, 247, .78); line-height: 1.85; }
+.font-source-grid > div a { color: #ffe18a; font-weight: 900; text-underline-offset: 3px; }
+.font-source-link { display: inline-block; margin-top: 10px; }
+.font-download-card {
+  padding: 32px;
+  border: 1px solid rgba(255, 253, 247, .32);
+  border-radius: 26px;
+  background: rgba(255, 253, 247, .1);
+  box-shadow: 0 22px 50px rgba(4, 30, 25, .25);
+}
+.font-download-card__eyebrow { margin: 0; color: #ffe18a; font-family: Consolas, monospace; font-size: .8rem; overflow-wrap: anywhere; }
+.font-download-card h3 { margin: 13px 0 12px; color: #fffdf7; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.85rem; font-weight: 400; line-height: 1.18; }
+.font-download-card > p:not(.font-download-card__eyebrow) { color: rgba(255, 253, 247, .76); line-height: 1.72; }
+.font-download-card .btn { display: block; margin: 25px 0 16px; padding: 12px 20px; text-align: center; text-decoration: none; }
+.font-download-card > span { display: block; color: rgba(255, 253, 247, .6); font-size: .82rem; text-align: center; }
+
+@media (max-width: 820px) {
+  .font-hero__inner { grid-template-columns: 1fr; min-height: 0; padding-block: 100px 66px; }
+  .font-hero__specimen { min-height: 320px; transform: none; }
+  .font-rule-grid,
+  .font-step-list { grid-template-columns: 1fr; }
+  .font-rule-card { min-height: 0; }
+  .font-source-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .font-shell { width: min(100% - 32px, 1120px); }
+  .font-back { top: 20px; }
+  .font-hero h1 { font-size: clamp(2.65rem, 16vw, 4.4rem); }
+  .font-hero__specimen { padding-inline: 20px; }
+  .font-section { padding-block: 54px 62px; }
+  .font-formula { align-items: stretch; flex-direction: column; }
+  .font-formula > b { transform: rotate(90deg); align-self: center; }
+  .font-formula__result { width: 100%; }
+  .font-quick-compare { grid-template-columns: 1fr; }
+  .font-quick-compare__arrow { justify-self: center; transform: rotate(90deg); }
+}

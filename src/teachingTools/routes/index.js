@@ -72,6 +72,10 @@ router.get('/teaching-tools/class-pet-points', function(req, res, next) {
   res.render('teaching-tools/class-pet-points', { title: 'Class Pet Points' });
 });
 
+router.get('/teaching-tools/yu-duoyinzi-font', function(req, res, next) {
+  res.render('teaching-tools/yu-duoyinzi-font', { title: '陈老师多音字拼音文楷合集' });
+});
+
 router.get('/teaching-tools/word-sudoku', function(req, res) {
   res.redirect(302, '/low-prep/word-sudoku/word-sudoku-widget.html');
 });
@@ -166,7 +170,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/', '/teaching-tools', '/theme-activities', '/theme-activities/weather', '/theme-activities/weather/songs',
     '/classroom-shop',
     '/resources', '/recommendations', '/about', '/contact', '/feedback', '/privacy',
-    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points',
+    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font',
     '/teaching-tools/sunflower-spinner/sunflower-spinner.html', '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
     '/low-prep/word-sudoku/word-sudoku-widget.html', '/low-prep/word-cloud/word-cloud-widget.html',

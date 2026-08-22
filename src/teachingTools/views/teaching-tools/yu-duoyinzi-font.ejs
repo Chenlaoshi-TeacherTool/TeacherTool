@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title>陈老师多音字拼音文楷合集 · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: '下载陈老师多音字拼音文楷 TTC 字体合集，用编号切换多音字读音，加 T 切换为上方拼音、下方田字格的练字样式。' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/teaching-tools/yu-duoyinzi-font/yu-duoyinzi-font.css">
+</head>
+<body>
+  <header class="font-hero">
+    <div class="font-shell font-hero__inner">
+      <a class="back-btn font-back" href="/teaching-tools">← 全部教学工具</a>
+      <div class="font-hero__copy">
+        <p class="font-kicker">中文字体资源 · 免费下载</p>
+        <h1>陈老师多音字<br>拼音文楷合集</h1>
+        <p class="font-hero__lead">给中文课堂准备的一套多音字字体：用编号选择读音，在编号后加 <strong>T</strong>，就能把同一内容变成“上方拼音＋下方田字格”的书写练习。</p>
+        <div class="font-actions">
+          <a class="btn font-download" href="/fonts/Yu_DuoYinZi_Collection.ttc" download>下载 TTC 字体合集 ↓</a>
+          <span class="font-file-meta">TTC · 约 271 MB</span>
+        </div>
+      </div>
+      <div class="font-hero__specimen" aria-label="字体用法示意">
+        <span class="specimen-pinyin">bù</span>
+        <span class="specimen-character">不</span>
+        <div class="specimen-grid" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <p><code>Yu_09T_DuoYinZi</code></p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="font-section font-section--intro">
+      <div class="font-shell">
+        <div class="font-section__heading">
+          <p class="font-kicker">一张图看懂</p>
+          <h2>同一个字，不同编号与田字格效果</h2>
+          <p>下面以“不”字为例。左侧是单字配拼音，右侧是在相同编号后加 T 得到的拼音田字格版本。</p>
+        </div>
+        <figure class="font-preview-card">
+          <img src="/images/yu-duoyinzi-font-preview.png" alt="不字使用 Yu_00 到 Yu_09 多音字字体，以及对应 T 田字格字体的预览对照">
+          <figcaption>字体编号与田字格样式预览</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="font-section font-section--rules" aria-labelledby="font-rules-title">
+      <div class="font-shell">
+        <div class="font-section__heading">
+          <p class="font-kicker">命名规则</p>
+          <h2 id="font-rules-title">看懂编号，就能快速选到需要的样式</h2>
+          <p>字体名称由“编号”和可选的“T”组成。先根据语境选择读音编号，再决定要不要换成田字格练习。</p>
+        </div>
+
+        <div class="font-rule-grid">
+          <article class="font-rule-card">
+            <span class="font-rule-card__mark">00</span>
+            <p class="font-rule-card__label">不显示拼音</p>
+            <h3>只要汉字</h3>
+            <p>选择 <code>Yu_00_DuoYinZi</code>，用于不需要拼音提示的单字、词语或句子。</p>
+          </article>
+          <article class="font-rule-card">
+            <span class="font-rule-card__mark">01–10</span>
+            <p class="font-rule-card__label">切换不同读音</p>
+            <h3>按语境选拼音</h3>
+            <p>从 <code>Yu_01_DuoYinZi</code> 起切换编号，直到找到这个多音字在当前词语中的正确读音。</p>
+          </article>
+          <article class="font-rule-card font-rule-card--accent">
+            <span class="font-rule-card__mark">＋ T</span>
+            <p class="font-rule-card__label">变成拼音田字格</p>
+            <h3>留给学生书写</h3>
+            <p>在编号后加 T，例如 <code>Yu_02T_DuoYinZi</code>：拼音在上，空白田字格在下。<code>00T</code> 则是不带拼音的田字格。</p>
+          </article>
+        </div>
+
+        <div class="font-formula" aria-label="字体名称组合示例">
+          <div><span>基础名称</span><code>Yu_</code></div>
+          <b aria-hidden="true">＋</b>
+          <div><span>读音编号</span><code>02</code></div>
+          <b aria-hidden="true">＋</b>
+          <div><span>田字格（可选）</span><code>T</code></div>
+          <b aria-hidden="true">＝</b>
+          <div class="font-formula__result"><span>选择这个字体</span><code>Yu_02T_DuoYinZi</code></div>
+        </div>
+
+        <aside class="font-note">
+          <span aria-hidden="true">◎</span>
+          <p><strong>请按词语语境选读音。</strong> 字体不会自动判断多音字应该读什么音；建议先输入一个字测试不同编号，确认正确后再排版整份练习。</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="font-section font-section--steps" aria-labelledby="font-steps-title">
+      <div class="font-shell">
+        <div class="font-section__heading">
+          <p class="font-kicker">开始使用</p>
+          <h2 id="font-steps-title">下载一次，在常用文档软件里直接选字体</h2>
+          <p>合集以 TTC 格式提供。安装后会在字体菜单中显示多组以 <code>Yu_</code> 开头的名称。</p>
+        </div>
+
+        <ol class="font-step-list">
+          <li>
+            <span class="font-step-list__number">1</span>
+            <div><h3>下载并安装</h3><p>下载 TTC 文件，在电脑上打开并安装字体合集。</p></div>
+          </li>
+          <li>
+            <span class="font-step-list__number">2</span>
+            <div><h3>重新打开软件</h3><p>如果 Word、PowerPoint 或其他排版软件已经打开，请关闭后重新启动，让字体列表刷新。</p></div>
+          </li>
+          <li>
+            <span class="font-step-list__number">3</span>
+            <div><h3>输入文字并选字体</h3><p>输入汉字，依次尝试编号；需要练字页时，改选同编号的 T 版本。</p></div>
+          </li>
+        </ol>
+
+        <div class="font-quick-compare">
+          <div>
+            <p class="font-quick-compare__label">单字＋拼音</p>
+            <code>Yu_06_DuoYinZi</code>
+          </div>
+          <span class="font-quick-compare__arrow" aria-hidden="true">→</span>
+          <div>
+            <p class="font-quick-compare__label">同一读音＋田字格</p>
+            <code>Yu_06T_DuoYinZi</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="font-section font-section--source" aria-labelledby="font-source-title">
+      <div class="font-shell font-source-grid">
+        <div>
+          <p class="font-kicker">字体来源</p>
+          <h2 id="font-source-title">在开源拼音文楷基础上，为课堂重新整理</h2>
+          <p>这套合集根据开源字体<a href="https://toneoz.com/blog/download-fonts/#kleekai" target="_blank" rel="noopener noreferrer">澳声通《拼音文楷》（霞鹜文楷拼音版）</a>制作，并将多音字读音与田字格版本整理成容易在文档软件中切换的编号字体。</p>
+          <p>原字体页面说明其采用简体教育笔形，并以开源字体 Fontworks Klee One 与霞鹜文楷 GB 为基础。需要了解原字体、授权与项目来源时，请以原作者页面为准。</p>
+          <a class="font-source-link" href="https://toneoz.com/blog/download-fonts/#kleekai" target="_blank" rel="noopener noreferrer">查看原字体介绍与开源说明 ↗</a>
+        </div>
+        <aside class="font-download-card" aria-label="下载字体合集">
+          <p class="font-download-card__eyebrow">Yu_DuoYinZi_Collection.ttc</p>
+          <h3>准备好制作拼音与田字格练习了吗？</h3>
+          <p>一个文件包含不同读音编号与田字格样式。文件较大，下载可能需要一点时间。</p>
+          <a class="btn" href="/fonts/Yu_DuoYinZi_Collection.ttc" download>下载字体合集 ↓</a>
+          <span>约 271 MB · TTC 格式</span>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
