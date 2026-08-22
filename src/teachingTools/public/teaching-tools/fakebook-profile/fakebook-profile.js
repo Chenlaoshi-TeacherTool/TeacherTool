@@ -44,9 +44,7 @@
     els.coverPhoto = document.getElementById('coverPhoto');
     els.coverHint = document.getElementById('coverHint');
     els.coverEditButton = document.getElementById('coverEditButton');
-    els.coverFileInput = document.getElementById('coverFileInput');
     els.avatarPhoto = document.getElementById('avatarPhoto');
-    els.avatarFileInput = document.getElementById('avatarFileInput');
     els.characterName = document.getElementById('characterName');
 
     els.introList = document.getElementById('introList');
@@ -461,15 +459,25 @@
     var input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
+    input.style.position = 'fixed';
+    input.style.top = '-9999px';
+    input.style.left = '-9999px';
+    var cleanup = function () {
+      if (input.parentNode) input.parentNode.removeChild(input);
+    };
     input.addEventListener('change', function () {
       var file = input.files && input.files[0];
+      cleanup();
       if (!file) return;
       compressImage(file, maxDimension, function (dataUrl) {
         if (dataUrl) callback(dataUrl);
         else showToastMsg('Could not read that image.');
       });
     });
+    input.addEventListener('cancel', cleanup);
+    document.body.appendChild(input);
     input.click();
+    window.setTimeout(cleanup, 60000);
   }
 
   function compressImage(file, maxDimension, callback) {
