@@ -55,6 +55,8 @@ body { margin: 0; }
 .tool-learning-guide__grid p, .tool-learning-guide__grid li { color: #435e55; line-height: 1.75; }
 .tool-learning-guide__grid ol, .tool-learning-guide__grid ul { padding-left: 21px; }
 .content-cta { display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+.content-cta > div { min-width: 0; }
+.content-cta > .btn { flex: 0 0 auto; white-space: nowrap; }
 .content-cta h2, .prose-grid h2, .contact-card h2, .recommendation-feature h2, .question-grid h2 { margin: 5px 0 12px; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-weight: 400; }
 .about-hero-grid { display: grid; grid-template-columns: 1fr 280px; gap: 50px; align-items: center; }
 .about-hero-grid img { width: 100%; border: 7px solid #fff6db; border-radius: 50%; background: #f8c63f; }
