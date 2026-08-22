@@ -76,12 +76,15 @@ router.get('/teaching-tools/word-sudoku', function(req, res) {
   res.redirect(302, '/low-prep/word-sudoku/word-sudoku-widget.html');
 });
 
+router.get('/teaching-tools/word-cloud', function(req, res) {
+  res.redirect(302, '/low-prep/word-cloud/word-cloud-widget.html');
+});
+
 [
   ['sunflower-spinner', 'Teaching Tools', '/teaching-tools'],
   ['word-list-library', 'Teaching Tools', '/teaching-tools'],
   ['question-bank-library', 'Teaching Tools', '/teaching-tools'],
-  ['vocabulary-booklet', 'Teaching Tools', '/teaching-tools'],
-  ['word-cloud', 'Teaching Tools', '/teaching-tools']
+  ['vocabulary-booklet', 'Teaching Tools', '/teaching-tools']
 ].forEach(function(config) {
   var slug = config[0];
   router.get('/teaching-tools/' + slug, function(req, res, next) {
@@ -167,7 +170,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points',
     '/teaching-tools/sunflower-spinner', '/teaching-tools/word-list-library',
     '/teaching-tools/question-bank-library', '/teaching-tools/vocabulary-booklet',
-    '/low-prep/word-sudoku/word-sudoku-widget.html', '/teaching-tools/word-cloud',
+    '/low-prep/word-sudoku/word-sudoku-widget.html', '/low-prep/word-cloud/word-cloud-widget.html',
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',
     '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle'
