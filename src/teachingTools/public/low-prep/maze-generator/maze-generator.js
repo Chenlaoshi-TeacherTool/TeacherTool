@@ -59,10 +59,6 @@
     return Array.from({ length: PAIR_COUNT }, function () { return { question: '', answer: '' }; });
   }
 
-  function escapeHtml(value) {
-    return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-
   function showToast(message, isError) {
     var node = $('#mazeToast');
     node.textContent = message;
@@ -72,34 +68,43 @@
     toastTimer = setTimeout(function () { node.classList.remove('show'); }, 2600);
   }
 
-  function pairMarkup(index, data) {
-    var number = index + 1;
-    return '<article class="maze-pair">' +
-      '<div class="maze-pair-number">' + number + '</div>' +
-      '<label>Question or sentence<textarea data-question="' + index + '" maxlength="120" placeholder="e.g. The puppy is sitting ___ the table.">' + escapeHtml(data.question) + '</textarea></label>' +
-      '<label>Short answer<input data-answer="' + index + '" maxlength="28" value="' + escapeHtml(data.answer) + '" placeholder="e.g. under"></label>' +
-      '</article>';
+  function formatPairLine(pair, index) {
+    return (index + 1) + '. ' + String(pair.question || '').trim() + ' | ' + String(pair.answer || '').trim();
   }
 
   function fillPairRows(pairs) {
     var data = Array.isArray(pairs) ? pairs.slice(0, PAIR_COUNT) : [];
     while (data.length < PAIR_COUNT) data.push({ question: '', answer: '' });
-    $('#mazePairs').innerHTML = data.map(function (pair, index) {
-      return pairMarkup(index, pair);
-    }).join('');
+    $('#mazePairInput').value = data.map(formatPairLine).join('\n');
+  }
+
+  function parsePairText(value) {
+    var pairs = emptyPairs();
+    var nextIndex = 0;
+    String(value || '').split(/\r?\n/).forEach(function (rawLine) {
+      if (!rawLine.trim()) return;
+      var line = rawLine.trim();
+      var numbered = line.match(/^(\d+)\s*[.\)\]:：、-]\s*(.*)$/);
+      var pairIndex = numbered ? Number(numbered[1]) - 1 : nextIndex;
+      if (numbered) line = numbered[2];
+      while (nextIndex < PAIR_COUNT && (pairs[nextIndex].question || pairs[nextIndex].answer)) nextIndex += 1;
+      if (pairIndex < 0 || pairIndex >= PAIR_COUNT) pairIndex = nextIndex;
+      if (pairIndex < 0 || pairIndex >= PAIR_COUNT) return;
+      var pieces = line.split(/\s*(?:\||｜|→|=>|\t)\s*/);
+      if (pieces.length < 2) pieces = line.split(/\s+(?:Answer|答案)\s*[:：]\s*/i);
+      pairs[pairIndex] = {
+        question: String(pieces.shift() || '').trim().slice(0, 120),
+        answer: String(pieces.join(' | ') || '').trim().slice(0, 28)
+      };
+      if (!numbered) nextIndex = pairIndex + 1;
+    });
+    return pairs;
   }
 
   function readData() {
-    var pairs = [];
-    for (var index = 0; index < PAIR_COUNT; index += 1) {
-      pairs.push({
-        question: $('[data-question="' + index + '"]').value.trim(),
-        answer: $('[data-answer="' + index + '"]').value.trim()
-      });
-    }
     return {
       title: $('#mazeTitle').value.trim(),
-      pairs: pairs
+      pairs: parsePairText($('#mazePairInput').value)
     };
   }
 
@@ -426,7 +431,7 @@
     $('#mazeTitle').value = saved.title || '';
     fillPairRows(saved.pairs);
     $('#mazeTitle').addEventListener('input', saveDraft);
-    $('#mazePairs').addEventListener('input', saveDraft);
+    $('#mazePairInput').addEventListener('input', saveDraft);
     $('#generateMaze').addEventListener('click', downloadEditablePptx);
     $('#loadMazeSample').addEventListener('click', loadSample);
     $('#clearMaze').addEventListener('click', clearAll);

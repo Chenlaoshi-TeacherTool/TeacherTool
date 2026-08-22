@@ -7,7 +7,7 @@
   <title>Maze Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Create a printable, editable PowerPoint maze from eight questions and answers for your Chinese language classroom.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/maze-generator/maze-generator.css">
+  <link rel="stylesheet" href="/low-prep/maze-generator/maze-generator.css?v=single-pair-input-1">
 </head>
 <body class="maze-page">
   <main class="maze-wrap">
@@ -47,7 +47,7 @@
             </div>
             <button id="loadMazeSample" class="maze-secondary" type="button">Load a sample</button>
           </div>
-          <p class="maze-help">Each large box holds one question. Keep answers short—one word or a brief phrase works best. The other answer boxes become shuffled choices.</p>
+          <p class="maze-help">Use one numbered line for each question. Put the short answer directly after the question, separated by a vertical bar <strong>|</strong>. The other answers become shuffled choices.</p>
           <div class="maze-library" aria-labelledby="mazeLibraryHeading">
             <div class="maze-library-heading">
               <div>
@@ -64,7 +64,14 @@
               <span id="mazeBankSelectionNote" class="maze-bank-selection-note">Choose up to eight topics to begin</span>
             </div>
           </div>
-          <div id="mazePairs" class="maze-pairs"></div>
+          <div class="maze-pair-editor">
+            <label class="maze-pair-label" for="mazePairInput">
+              <span>Eight numbered question &amp; answer pairs</span>
+              <span class="maze-pair-example">Format: 1. Question | Answer</span>
+            </label>
+            <textarea id="mazePairInput" class="maze-pair-input" rows="12" maxlength="1500" spellcheck="true" aria-describedby="mazePairHelp" placeholder="1. The puppy is sitting ___ the table. | under"></textarea>
+            <p id="mazePairHelp" class="maze-pair-help">One pair per line. You can also use an arrow (→) between the question and answer.</p>
+          </div>
           <div class="maze-generate-row">
             <button id="generateMaze" class="maze-primary" type="button">Generate &amp; download PowerPoint</button>
             <span>Ready when you are—your editable worksheet includes student pages and an answer key.</span>
@@ -89,7 +96,7 @@
   <div id="mazeToast" class="maze-toast" role="status" aria-live="polite"></div>
 
   <script src="/vendor/jszip.min.js"></script>
-  <script src="/low-prep/maze-generator/maze-generator.js"></script>
+  <script src="/low-prep/maze-generator/maze-generator.js?v=single-pair-input-1"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
