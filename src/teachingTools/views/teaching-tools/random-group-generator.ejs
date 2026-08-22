@@ -1,184 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Group Generator - Teacher Toolkit</title>
-    <%- include('../partials/seo', { pageDescription: 'Quickly create random student groups for clear, balanced classroom activities.' }) %>
-
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            color: #333;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: rgba(255,255,255,0.2);
-            border: 1px solid white;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 20px;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-        }
-
-        input, select {
-            padding: 10px;
-            margin: 10px 5px 10px 0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        .btn {
-            background-color: #667eea;
-            color: white;
-            padding: 10px 18px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #5a67d8;
-        }
-
-        .results {
-            margin-top: 20px;
-        }
-
-        .group {
-            background: #eef1ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-    </style>
-    <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title>Random Group Generator - Teacher Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Quickly create random student groups for clear, balanced classroom activities.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/teaching-tools/random-group-generator/random-group-generator.css?v=group-builder-1">
 </head>
-
-<body>
-
-<a href="/teaching-tools" class="back-btn">← Back</a>
-
-<section class="header">
-    <h1>🎲 Random Group Generator</h1>
-    <p>Quickly create random student groups for your class.</p>
-</section>
-
-<div class="container">
-
-    <div class="card">
-        <h3>Enter Student Names</h3>
-        <textarea id="names" placeholder="Enter one name per line..."></textarea>
+<body class="group-page">
+  <header class="header group-hero">
+    <a href="/teaching-tools" class="back-btn">← Back to Teaching Tools</a>
+    <div class="group-hero__inner">
+      <div class="group-hero__icon" aria-hidden="true">🎲</div>
+      <div>
+        <p class="group-eyebrow">Classroom management tool</p>
+        <h1>Random Group Generator</h1>
+        <p>Paste your class list, choose how you want to divide it, and make fair groups in seconds.</p>
+      </div>
+      <div class="group-hero__chips" aria-label="Tool features">
+        <span>Fair shuffle</span>
+        <span>Two grouping modes</span>
+        <span>Easy to copy</span>
+      </div>
     </div>
+  </header>
 
-    <div class="card">
-        <h3>Grouping Options</h3>
+  <main class="group-workspace">
+    <section class="group-builder" aria-labelledby="groupBuilderTitle">
+      <header class="group-builder__header">
+        <span class="group-step-icon" aria-hidden="true">1</span>
+        <div>
+          <p class="group-eyebrow">Add your class</p>
+          <h2 id="groupBuilderTitle">Who is here today?</h2>
+          <p>Enter one student per line. Blank lines are ignored.</p>
+        </div>
+        <span id="studentCount" class="group-count" aria-live="polite">0 students</span>
+      </header>
 
-        <label>Group Size:</label>
-        <input type="number" id="groupSize" placeholder="e.g. 3">
+      <div class="group-builder__body">
+        <section class="group-name-panel" aria-labelledby="nameListTitle">
+          <div class="group-section-title">
+            <div>
+              <p class="group-eyebrow">Student list</p>
+              <h3 id="nameListTitle">Paste or type names</h3>
+            </div>
+            <span aria-hidden="true">✎</span>
+          </div>
+          <label class="sr-only" for="names">Student names, one per line</label>
+          <textarea id="names" rows="12" spellcheck="false" placeholder="Ava&#10;Mateo&#10;Sofia&#10;Noah&#10;Liam"></textarea>
+          <div class="group-input-footer">
+            <p>Tip: paste a column directly from your roster.</p>
+            <div>
+              <button id="loadGroupSample" class="group-text-button" type="button">Use sample names</button>
+              <button id="clearGroupNames" class="group-text-button group-text-button--muted" type="button">Clear</button>
+            </div>
+          </div>
+        </section>
 
-        <label>OR Number of Groups:</label>
-        <input type="number" id="groupCount" placeholder="e.g. 4">
+        <aside class="group-settings" aria-labelledby="groupSettingsTitle">
+          <div class="group-section-title">
+            <div>
+              <p class="group-eyebrow">Step 2</p>
+              <h3 id="groupSettingsTitle">Choose a grouping method</h3>
+            </div>
+            <span aria-hidden="true">⚙️</span>
+          </div>
 
-        <br><br>
-        <button class="btn" onclick="generateGroups()">Generate Groups</button>
-    </div>
+          <fieldset class="group-mode-options">
+            <legend class="sr-only">Grouping method</legend>
+            <label class="group-mode-card is-selected" data-mode-card="size">
+              <span class="group-mode-card__top">
+                <input type="radio" name="groupMode" value="size" checked>
+                <strong>Students per group</strong>
+              </span>
+              <span class="group-mode-card__hint">Choose the maximum size of each team.</span>
+              <span class="group-number-field">
+                <span>Group size</span>
+                <input id="groupSize" type="number" min="2" max="50" value="3" inputmode="numeric" aria-label="Students per group">
+              </span>
+            </label>
 
-    <div class="card results" id="results">
-        <h3>Results</h3>
-        <div id="groupOutput"></div>
-    </div>
+            <label class="group-mode-card" data-mode-card="count">
+              <span class="group-mode-card__top">
+                <input type="radio" name="groupMode" value="count">
+                <strong>Number of groups</strong>
+              </span>
+              <span class="group-mode-card__hint">Choose how many teams you need.</span>
+              <span class="group-number-field">
+                <span>Group count</span>
+                <input id="groupCount" type="number" min="2" max="50" value="4" inputmode="numeric" aria-label="Number of groups" disabled>
+              </span>
+            </label>
+          </fieldset>
 
-</div>
+          <div class="group-plan" aria-live="polite">
+            <span aria-hidden="true">✦</span>
+            <p id="groupingPreview">Add student names to preview your groups.</p>
+          </div>
+          <button id="generateGroups" class="group-primary-button" type="button">🎲 Make random groups</button>
+          <p id="groupStatus" class="group-status" role="status"></p>
+        </aside>
+      </div>
+    </section>
 
-<script>
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
+    <section class="group-results" id="results" aria-labelledby="groupResultsTitle">
+      <header class="group-results__header">
+        <div class="group-results__heading">
+          <span class="group-step-icon group-step-icon--leaf" aria-hidden="true">3</span>
+          <div>
+            <p class="group-eyebrow">Ready for class</p>
+            <h2 id="groupResultsTitle">Your groups</h2>
+            <p id="resultSummary">Groups will appear here after you add names.</p>
+          </div>
+        </div>
+        <div class="group-results__actions">
+          <button id="reshuffleGroups" class="group-secondary-button" type="button" disabled>↻ Shuffle again</button>
+          <button id="copyGroups" class="group-secondary-button" type="button" disabled>⧉ Copy groups</button>
+        </div>
+      </header>
+      <div id="groupOutput" class="group-output" aria-live="polite">
+        <div class="group-empty-state">
+          <span aria-hidden="true">🎲</span>
+          <strong>No groups yet</strong>
+          <p>Your shuffled teams will be easy to scan and copy from here.</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
-function generateGroups() {
-    let names = document.getElementById("names").value
-        .split("\n")
-        .map(n => n.trim())
-        .filter(n => n !== "");
-
-    let groupSize = parseInt(document.getElementById("groupSize").value);
-    let groupCount = parseInt(document.getElementById("groupCount").value);
-
-    if (names.length === 0) {
-        alert("Please enter student names.");
-        return;
-    }
-
-    shuffle(names);
-
-    let groups = [];
-
-    if (groupSize) {
-        for (let i = 0; i < names.length; i += groupSize) {
-            groups.push(names.slice(i, i + groupSize));
-        }
-    } else if (groupCount) {
-        for (let i = 0; i < groupCount; i++) {
-            groups.push([]);
-        }
-        names.forEach((name, index) => {
-            groups[index % groupCount].push(name);
-        });
-    } else {
-        alert("Please enter either group size or number of groups.");
-        return;
-    }
-
-    let output = "";
-    groups.forEach((group, index) => {
-        output += `<div class="group"><strong>Group ${index + 1}:</strong><br>${group.join(", ")}</div>`;
-    });
-
-    document.getElementById("groupOutput").innerHTML = output;
-}
-</script>
-<%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
-<script src="/javascripts/account-coming-soon.js"></script>
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+  <script src="/teaching-tools/random-group-generator/random-group-generator.js?v=group-builder-1"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>
