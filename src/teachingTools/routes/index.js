@@ -84,20 +84,16 @@ router.get('/teaching-tools/vocabulary-booklet', function(req, res) {
   res.redirect(302, '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html');
 });
 
-[
-  ['sunflower-spinner', 'Teaching Tools', '/teaching-tools'],
-  ['word-list-library', 'Teaching Tools', '/teaching-tools'],
-  ['question-bank-library', 'Teaching Tools', '/teaching-tools']
-].forEach(function(config) {
-  var slug = config[0];
-  router.get('/teaching-tools/' + slug, function(req, res, next) {
-    res.render('tool-landing', {
-      title: toolGuides[slug].title,
-      toolGuide: toolGuides[slug],
-      sectionLabel: config[1],
-      sectionPath: config[2]
-    });
-  });
+router.get('/teaching-tools/sunflower-spinner', function(req, res) {
+  res.redirect(302, '/teaching-tools/sunflower-spinner/sunflower-spinner.html');
+});
+
+router.get('/teaching-tools/word-list-library', function(req, res) {
+  res.redirect(302, '/teaching-tools/word-list-library/word-list-library.html');
+});
+
+router.get('/teaching-tools/question-bank-library', function(req, res) {
+  res.redirect(302, '/teaching-tools/question-bank-library/question-bank-library.html');
 });
 
 router.get('/classroom-shop', function(req, res, next) {
@@ -171,8 +167,8 @@ router.get('/sitemap.xml', function(req, res) {
     '/classroom-shop',
     '/resources', '/recommendations', '/about', '/contact', '/feedback', '/privacy',
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points',
-    '/teaching-tools/sunflower-spinner', '/teaching-tools/word-list-library',
-    '/teaching-tools/question-bank-library', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
+    '/teaching-tools/sunflower-spinner/sunflower-spinner.html', '/teaching-tools/word-list-library/word-list-library.html',
+    '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
     '/low-prep/word-sudoku/word-sudoku-widget.html', '/low-prep/word-cloud/word-cloud-widget.html',
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',

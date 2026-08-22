@@ -271,7 +271,7 @@ const articles = [
       { heading: "Let students help maintain it", paragraphs: ["Assign two weekly word-wall managers to check cards, add classroom discoveries to a candidate area, and notice the most-used terms. Students may submit example sentences, but the teacher reviews characters, pinyin, and context before posting."] },
       { heading: "Teacher checklist", list: ["Can a student in the back read it?", "Has every term been used in an activity this week?", "Does each image clarify rather than confuse?", "Are there verbs and connectors, not only nouns?", "Which terms are now independent and can come down?"] }
     ],
-    relatedTool: { label: "Build a reusable vocabulary list", href: "/teaching-tools/word-list-library" }
+    relatedTool: { label: "Build a reusable vocabulary list", href: "/teaching-tools/word-list-library/word-list-library.html" }
   },
   {
     slug: "meet-the-teacher-chinese-classroom-display",
