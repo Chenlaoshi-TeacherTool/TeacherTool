@@ -20,7 +20,11 @@
 </form>
 
 <% if (list) { %>
-<h2 style="margin-top:32px;">Terms (<%= items.length %>)</h2>
+<p style="margin-top:24px;">
+  <a href="/admin/wordlists/<%= list.id %>/import">Import from Excel</a> ·
+  <a href="/admin/wordlists/<%= list.id %>/export">Export to Excel</a>
+</p>
+<h2 style="margin-top:16px;">Terms (<%= items.length %>)</h2>
 <div class="items-grid">
   <div class="grid-header">Image</div>
   <div class="grid-header">Chinese</div>

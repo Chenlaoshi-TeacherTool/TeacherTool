@@ -1,0 +1,34 @@
+<%- include('layout-head') %>
+<h1>Import into: <%= list.name %></h1>
+<p><a href="/admin/wordlists/<%= list.id %>/edit">&larr; Back to word list</a></p>
+
+<% if (result) { %>
+  <% if (result.error) { %>
+    <p style="color:#dc2626;"><%= result.error %></p>
+  <% } else { %>
+    <p style="color:#16a34a;">Done: <%= result.created %> created, <%= result.updated %> updated<% if (result.skipped) { %>, <%= result.skipped %> skipped (missing pinyin or English)<% } %>. (<%= result.total %> rows read.)</p>
+  <% } %>
+<% } %>
+
+<form method="POST" action="/admin/wordlists/<%= list.id %>/import" enctype="multipart/form-data">
+  <label>Excel file (.xlsx)</label>
+  <input type="file" name="file" accept=".xlsx" required>
+  <div class="actions">
+    <button type="submit">Upload and import</button>
+  </div>
+</form>
+
+<div style="margin-top:24px;font-size:0.9rem;color:#444;">
+  <p>The first row must be column headers (any order). Rows are matched to existing terms by <code>zh</code> — a matching Chinese term updates that row, a new one is added. Export this list first to get a starting file in the right shape.</p>
+  <table>
+    <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>zh</code></td><td>Chinese term, e.g. <code>苹果</code>. Required — rows without one are skipped, and it's the key used to match existing terms.</td></tr>
+      <tr><td><code>py</code></td><td>Pinyin, e.g. <code>píng guǒ</code>. Required.</td></tr>
+      <tr><td><code>en</code></td><td>English meaning, e.g. <code>apple</code>. Required.</td></tr>
+      <tr><td><code>note</code></td><td>Optional teacher note.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<%- include('layout-foot') %>

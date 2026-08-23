@@ -134,6 +134,131 @@ router.post('/wordlists/:id/items/:itemId/delete', async function (req, res, nex
   } catch (err) { next(err); }
 });
 
+async function getListOr404(pool, id, res) {
+  var result = await pool.request().input('id', sql.Int, id).query('SELECT * FROM word_lists WHERE id = @id');
+  var list = result.recordset[0];
+  if (!list) { res.status(404).send('Word list not found.'); return null; }
+  return list;
+}
+
+var WORDLIST_IMPORT_COLUMNS = ['zh', 'py', 'en', 'note'];
+
+function readWordListImportRows(worksheet) {
+  var columnIndex = {};
+  worksheet.getRow(1).eachCell({ includeEmpty: false }, function (cell, colNumber) {
+    var key = String(cell.value || '').trim().toLowerCase();
+    if (key) columnIndex[key] = colNumber;
+  });
+  var rows = [];
+  worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+    if (rowNumber === 1) return;
+    var record = {};
+    WORDLIST_IMPORT_COLUMNS.forEach(function (col) {
+      var idx = columnIndex[col];
+      var cellValue = idx ? row.getCell(idx).value : null;
+      record[col] = cellValue === null || cellValue === undefined ? '' : String(cellValue).trim();
+    });
+    if (record.zh) rows.push(record);
+  });
+  return rows;
+}
+
+router.get('/wordlists/:id/export', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var list = await getListOr404(pool, req.params.id, res);
+    if (!list) return;
+    var itemsResult = await pool.request().input('listId', sql.Int, req.params.id)
+      .query('SELECT * FROM word_list_items WHERE list_id = @listId ORDER BY sort_order, id');
+
+    var workbook = new ExcelJS.Workbook();
+    var worksheet = workbook.addWorksheet('Terms');
+    worksheet.columns = [
+      { header: 'zh', key: 'zh', width: 16 },
+      { header: 'py', key: 'py', width: 20 },
+      { header: 'en', key: 'en', width: 24 },
+      { header: 'note', key: 'note', width: 30 }
+    ];
+    itemsResult.recordset.forEach(function (item) {
+      worksheet.addRow({ zh: item.zh, py: item.py, en: item.en, note: item.note || '' });
+    });
+
+    var fileName = (list.slug || 'word-list') + '.xlsx';
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="' + fileName + '"');
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) { next(err); }
+});
+
+router.get('/wordlists/:id/import', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var list = await getListOr404(pool, req.params.id, res);
+    if (!list) return;
+    res.render('admin/wordlists-import', { title: 'Import into ' + list.name, list: list, result: null, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.post('/wordlists/:id/import', upload.single('file'), async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var list = await getListOr404(pool, req.params.id, res);
+    if (!list) return;
+
+    if (!req.file) {
+      return res.render('admin/wordlists-import', {
+        title: 'Import into ' + list.name, list: list, adminUser: req.adminUser,
+        result: { error: 'No file was uploaded.' }
+      });
+    }
+
+    var workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(req.file.buffer);
+    var worksheet = workbook.worksheets[0];
+    if (!worksheet) throw new Error('The uploaded file has no worksheets.');
+    var rows = readWordListImportRows(worksheet);
+
+    var existingResult = await pool.request().input('listId', sql.Int, req.params.id)
+      .query('SELECT id, zh, sort_order FROM word_list_items WHERE list_id = @listId');
+    var existingByZh = {};
+    existingResult.recordset.forEach(function (item) { existingByZh[item.zh] = item; });
+    var maxSortOrder = existingResult.recordset.reduce(function (max, item) { return Math.max(max, item.sort_order); }, -1);
+
+    var created = 0, updated = 0, skipped = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (!row.py || !row.en) { skipped++; continue; }
+      var existing = existingByZh[row.zh];
+      if (existing) {
+        await pool.request()
+          .input('itemId', sql.Int, existing.id)
+          .input('py', sql.NVarChar, row.py)
+          .input('en', sql.NVarChar, row.en)
+          .input('note', sql.NVarChar, row.note || null)
+          .query('UPDATE word_list_items SET py=@py, en=@en, note=@note WHERE id=@itemId');
+        updated++;
+      } else {
+        maxSortOrder++;
+        await pool.request()
+          .input('listId', sql.Int, req.params.id)
+          .input('zh', sql.NVarChar, row.zh)
+          .input('py', sql.NVarChar, row.py)
+          .input('en', sql.NVarChar, row.en)
+          .input('note', sql.NVarChar, row.note || null)
+          .input('sortOrder', sql.Int, maxSortOrder)
+          .query('INSERT INTO word_list_items (list_id, zh, py, en, note, sort_order) VALUES (@listId, @zh, @py, @en, @note, @sortOrder)');
+        created++;
+      }
+    }
+
+    res.render('admin/wordlists-import', {
+      title: 'Import into ' + list.name, list: list, adminUser: req.adminUser,
+      result: { created: created, updated: updated, skipped: skipped, total: rows.length }
+    });
+  } catch (err) { next(err); }
+});
+
 function parseCsv(text) {
   if (!text) return [];
   return text.split(',').map(function (part) { return part.trim(); }).filter(Boolean);

@@ -13,7 +13,11 @@
       <td><%= list.theme || '' %></td>
       <td><%= list.level || '' %></td>
       <td><%= list.item_count %></td>
-      <td><a href="/admin/wordlists/<%= list.id %>/edit">Edit</a></td>
+      <td>
+        <a href="/admin/wordlists/<%= list.id %>/edit">Edit</a> ·
+        <a href="/admin/wordlists/<%= list.id %>/import">Import</a> ·
+        <a href="/admin/wordlists/<%= list.id %>/export">Export</a>
+      </td>
     </tr>
     <% }) %>
   </tbody>
