@@ -49,6 +49,126 @@ router.post('/wordlists/new', async function (req, res, next) {
   } catch (err) { next(err); }
 });
 
+var BULK_IMPORT_COLUMNS = ['slug', 'name', 'theme', 'level', 'curriculum', 'zh', 'py', 'en', 'note'];
+
+function readBulkImportRows(worksheet) {
+  var columnIndex = {};
+  worksheet.getRow(1).eachCell({ includeEmpty: false }, function (cell, colNumber) {
+    var key = String(cell.value || '').trim().toLowerCase();
+    if (key) columnIndex[key] = colNumber;
+  });
+  var rows = [];
+  worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+    if (rowNumber === 1) return;
+    var record = {};
+    BULK_IMPORT_COLUMNS.forEach(function (col) {
+      var idx = columnIndex[col];
+      var cellValue = idx ? row.getCell(idx).value : null;
+      record[col] = cellValue === null || cellValue === undefined ? '' : String(cellValue).trim();
+    });
+    if (record.slug && record.zh) rows.push(record);
+  });
+  return rows;
+}
+
+router.get('/wordlists/import', function (req, res) {
+  res.render('admin/wordlists-bulk-import', { title: 'Bulk import word lists', result: null, adminUser: req.adminUser });
+});
+
+router.post('/wordlists/import', upload.array('files', 30), async function (req, res, next) {
+  try {
+    if (!req.files || !req.files.length) {
+      return res.render('admin/wordlists-bulk-import', {
+        title: 'Bulk import word lists', adminUser: req.adminUser,
+        result: { error: 'No files were uploaded.' }
+      });
+    }
+
+    var allRows = [];
+    for (var f = 0; f < req.files.length; f++) {
+      var workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(req.files[f].buffer);
+      var worksheet = workbook.worksheets[0];
+      if (!worksheet) continue;
+      allRows = allRows.concat(readBulkImportRows(worksheet));
+    }
+
+    var bySlug = {};
+    var slugOrder = [];
+    allRows.forEach(function (row) {
+      if (!bySlug[row.slug]) { bySlug[row.slug] = []; slugOrder.push(row.slug); }
+      bySlug[row.slug].push(row);
+    });
+
+    var pool = await sqlClient.getPool();
+    var listsCreated = 0, listsUpdated = 0, itemsCreated = 0, itemsUpdated = 0, itemsSkipped = 0;
+
+    for (var s = 0; s < slugOrder.length; s++) {
+      var slug = slugOrder[s];
+      var rows = bySlug[slug];
+      var listId;
+
+      var existingListResult = await pool.request().input('slug', sql.NVarChar, slug).query('SELECT id FROM word_lists WHERE slug = @slug');
+      if (existingListResult.recordset[0]) {
+        listId = existingListResult.recordset[0].id;
+        listsUpdated++;
+      } else {
+        var first = rows[0];
+        var created = await pool.request()
+          .input('slug', sql.NVarChar, slug)
+          .input('name', sql.NVarChar, first.name || slug)
+          .input('theme', sql.NVarChar, first.theme || null)
+          .input('level', sql.NVarChar, first.level || null)
+          .input('curriculum', sql.NVarChar, first.curriculum || null)
+          .query('INSERT INTO word_lists (slug, name, theme, level, curriculum) OUTPUT INSERTED.id VALUES (@slug, @name, @theme, @level, @curriculum)');
+        listId = created.recordset[0].id;
+        listsCreated++;
+      }
+
+      var existingItemsResult = await pool.request().input('listId', sql.Int, listId)
+        .query('SELECT id, zh, sort_order FROM word_list_items WHERE list_id = @listId');
+      var existingByZh = {};
+      existingItemsResult.recordset.forEach(function (item) { existingByZh[item.zh] = item; });
+      var maxSortOrder = existingItemsResult.recordset.reduce(function (max, item) { return Math.max(max, item.sort_order); }, -1);
+
+      for (var r = 0; r < rows.length; r++) {
+        var row = rows[r];
+        if (!row.py || !row.en) { itemsSkipped++; continue; }
+        var existingItem = existingByZh[row.zh];
+        if (existingItem) {
+          await pool.request()
+            .input('itemId', sql.Int, existingItem.id)
+            .input('py', sql.NVarChar, row.py)
+            .input('en', sql.NVarChar, row.en)
+            .input('note', sql.NVarChar, row.note || null)
+            .query('UPDATE word_list_items SET py=@py, en=@en, note=@note WHERE id=@itemId');
+          itemsUpdated++;
+        } else {
+          maxSortOrder++;
+          await pool.request()
+            .input('listId', sql.Int, listId)
+            .input('zh', sql.NVarChar, row.zh)
+            .input('py', sql.NVarChar, row.py)
+            .input('en', sql.NVarChar, row.en)
+            .input('note', sql.NVarChar, row.note || null)
+            .input('sortOrder', sql.Int, maxSortOrder)
+            .query('INSERT INTO word_list_items (list_id, zh, py, en, note, sort_order) VALUES (@listId, @zh, @py, @en, @note, @sortOrder)');
+          itemsCreated++;
+        }
+      }
+    }
+
+    res.render('admin/wordlists-bulk-import', {
+      title: 'Bulk import word lists', adminUser: req.adminUser,
+      result: {
+        listsCreated: listsCreated, listsUpdated: listsUpdated,
+        itemsCreated: itemsCreated, itemsUpdated: itemsUpdated, itemsSkipped: itemsSkipped,
+        listCount: slugOrder.length
+      }
+    });
+  } catch (err) { next(err); }
+});
+
 router.get('/wordlists/:id/edit', async function (req, res, next) {
   try {
     var pool = await sqlClient.getPool();
@@ -174,13 +294,21 @@ router.get('/wordlists/:id/export', async function (req, res, next) {
     var workbook = new ExcelJS.Workbook();
     var worksheet = workbook.addWorksheet('Terms');
     worksheet.columns = [
+      { header: 'slug', key: 'slug', width: 20 },
+      { header: 'name', key: 'name', width: 20 },
+      { header: 'theme', key: 'theme', width: 16 },
+      { header: 'level', key: 'level', width: 12 },
+      { header: 'curriculum', key: 'curriculum', width: 16 },
       { header: 'zh', key: 'zh', width: 16 },
       { header: 'py', key: 'py', width: 20 },
       { header: 'en', key: 'en', width: 24 },
       { header: 'note', key: 'note', width: 30 }
     ];
     itemsResult.recordset.forEach(function (item) {
-      worksheet.addRow({ zh: item.zh, py: item.py, en: item.en, note: item.note || '' });
+      worksheet.addRow({
+        slug: list.slug, name: list.name, theme: list.theme || '', level: list.level || '', curriculum: list.curriculum || '',
+        zh: item.zh, py: item.py, en: item.en, note: item.note || ''
+      });
     });
 
     var fileName = (list.slug || 'word-list') + '.xlsx';

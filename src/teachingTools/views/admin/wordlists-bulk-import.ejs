@@ -1,0 +1,42 @@
+<%- include('layout-head') %>
+<h1>Bulk import word lists</h1>
+<p><a href="/admin/wordlists">&larr; Back to word lists</a></p>
+
+<% if (result) { %>
+  <% if (result.error) { %>
+    <p style="color:#dc2626;"><%= result.error %></p>
+  <% } else { %>
+    <p style="color:#16a34a;">
+      Done: <%= result.listCount %> word list(s) processed (<%= result.listsCreated %> created, <%= result.listsUpdated %> already existed) —
+      <%= result.itemsCreated %> terms created, <%= result.itemsUpdated %> updated<% if (result.itemsSkipped) { %>, <%= result.itemsSkipped %> skipped (missing pinyin or English)<% } %>.
+    </p>
+  <% } %>
+<% } %>
+
+<form method="POST" action="/admin/wordlists/import" enctype="multipart/form-data">
+  <label>Excel files (.xlsx) — select multiple at once</label>
+  <input type="file" name="files" accept=".xlsx" multiple required>
+  <div class="actions">
+    <button type="submit">Upload and import</button>
+  </div>
+</form>
+
+<div style="margin-top:24px;font-size:0.9rem;color:#444;">
+  <p>Upload one or many files. Each row names the word list it belongs to via <code>slug</code> — a new slug creates a new word list, an existing slug adds/updates terms in that list. Terms within a list are matched by <code>zh</code>. Exporting an existing list gives you a file in this exact shape.</p>
+  <table>
+    <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>slug</code></td><td>Word list slug, e.g. <code>topic-animals</code>. Required on every row — identifies which list the term belongs to.</td></tr>
+      <tr><td><code>name</code></td><td>Word list display name, e.g. <code>Animals</code>. Used only when the slug doesn't exist yet.</td></tr>
+      <tr><td><code>theme</code></td><td>Word list theme. Used only when creating a new list.</td></tr>
+      <tr><td><code>level</code></td><td>Word list level. Used only when creating a new list.</td></tr>
+      <tr><td><code>curriculum</code></td><td>Word list curriculum label. Used only when creating a new list.</td></tr>
+      <tr><td><code>zh</code></td><td>Chinese term, e.g. <code>狗</code>. Required — rows without one are skipped, and it's the key used to match existing terms.</td></tr>
+      <tr><td><code>py</code></td><td>Pinyin, e.g. <code>gǒu</code>. Required.</td></tr>
+      <tr><td><code>en</code></td><td>English meaning, e.g. <code>dog</code>. Required.</td></tr>
+      <tr><td><code>note</code></td><td>Optional teacher note.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<%- include('layout-foot') %>
