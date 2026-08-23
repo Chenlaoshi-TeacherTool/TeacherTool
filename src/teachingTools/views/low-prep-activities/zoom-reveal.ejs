@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>Zoom Reveal - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Upload a photo, pick a spot, and zoom in super close. Zoom out slowly while students guess what the picture is. Images stay in your browser and never touch a server.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/zoom-reveal/zoom-reveal.css?v=1">
+</head>
+<body class="reveal-page">
+  <main class="reveal-wrap">
+    <header class="reveal-header">
+      <div class="reveal-header-content">
+        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+        <p class="reveal-eyebrow">Guessing warm-up</p>
+        <h1>🔍 Zoom Reveal</h1>
+        <p>Upload a picture, click the spot you want to hide in plain sight, then zoom in until it's unrecognizable. Slowly zoom back out—manually or on autoplay—while students guess what the whole picture shows.</p>
+        <div class="reveal-hero-points" aria-label="Tool highlights">
+          <span>Images never leave your browser</span>
+          <span>Click anywhere to move the spotlight</span>
+          <span>Drag to zoom out, or let it play automatically</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="reveal-layout">
+      <section class="reveal-builder" aria-label="Set up the game">
+        <section class="reveal-panel">
+          <div class="reveal-panel-heading">
+            <div>
+              <span class="reveal-step">1</span>
+              <p class="reveal-kicker">Images</p>
+              <h2>Upload your pictures</h2>
+            </div>
+          </div>
+          <label class="reveal-upload-drop" for="image-input">
+            <input id="image-input" type="file" accept="image/*" multiple hidden>
+            <span class="reveal-upload-icon" aria-hidden="true">＋</span>
+            <span class="reveal-upload-text">Click to choose images (you can select several at once)</span>
+          </label>
+          <p class="reveal-help">Images are read directly in your browser and are never uploaded anywhere.</p>
+          <ul id="image-list" class="reveal-image-list" aria-label="Uploaded images"></ul>
+        </section>
+
+        <section class="reveal-panel">
+          <div class="reveal-panel-heading">
+            <div>
+              <span class="reveal-step">2</span>
+              <p class="reveal-kicker">Zoom</p>
+              <h2>How close should it start?</h2>
+            </div>
+          </div>
+          <label for="max-zoom">Maximum zoom: <output id="max-zoom-value">8</output>×
+            <input id="max-zoom" type="range" min="2" max="20" step="0.5" value="8">
+          </label>
+          <p class="reveal-help">Click anywhere on the picture (right side) to move the spotlight—that's the spot it will zoom into. Once zoomed in, click and drag the picture to look around.</p>
+        </section>
+
+        <section class="reveal-panel">
+          <div class="reveal-panel-heading">
+            <div>
+              <span class="reveal-step">3</span>
+              <p class="reveal-kicker">Autoplay</p>
+              <h2>Zoom-out speed</h2>
+            </div>
+          </div>
+          <label for="zoom-duration">Seconds to fully zoom out: <output id="duration-value">20</output>s
+            <input id="zoom-duration" type="range" min="4" max="60" step="1" value="20">
+          </label>
+        </section>
+
+        <p id="setup-status" class="reveal-setup-status" aria-live="polite">Upload at least one image to begin.</p>
+      </section>
+
+      <section class="reveal-preview-panel" aria-label="Reveal stage">
+        <div class="reveal-preview-heading">
+          <h2>Reveal stage</h2>
+          <p id="progress-text" class="reveal-progress-text">No image loaded yet.</p>
+        </div>
+
+        <div id="reveal-stage" class="reveal-stage">
+          <p class="reveal-stage-empty">Upload images on the left, then click Zoom In.</p>
+        </div>
+
+        <label for="zoom-slider" class="reveal-zoom-slider-label">Zoom level
+          <input id="zoom-slider" type="range" min="1" max="8" step="0.05" value="8" disabled>
+        </label>
+
+        <div class="reveal-stage-controls">
+          <button id="start-button" class="reveal-primary" type="button" disabled>🔍 Zoom In</button>
+          <button id="play-button" class="reveal-secondary" type="button" disabled>▶ Auto Zoom Out</button>
+          <button id="reveal-all-button" class="reveal-secondary" type="button" disabled>⏭ Reveal Full Image</button>
+          <button id="restart-button" class="reveal-secondary" type="button" disabled>↺ Restart</button>
+          <button id="fullscreen-button" class="reveal-secondary" type="button" disabled>⛶ Fullscreen</button>
+        </div>
+        <div class="reveal-nav-controls">
+          <button id="prev-button" class="reveal-secondary" type="button" disabled>← Previous</button>
+          <button id="next-button" class="reveal-primary" type="button" disabled>Next image →</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/low-prep/zoom-reveal/zoom-reveal.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
