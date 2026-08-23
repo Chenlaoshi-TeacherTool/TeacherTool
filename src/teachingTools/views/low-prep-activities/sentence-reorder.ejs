@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>Sentence Reorder - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Type in sentences and turn them into drag-and-drop word puzzles. Students drag the scrambled words back into the correct order, right in the browser.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder.css?v=3">
+</head>
+<body class="reorder-page">
+  <main class="reorder-wrap">
+    <header class="reorder-header">
+      <div class="reorder-header-content">
+        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+        <p class="reorder-eyebrow">Sentence structure warm-up</p>
+        <h1>🧩 Sentence Reorder</h1>
+        <p>Type in one or more sentences, split into words, and let students drag the scrambled words back into the right order. Great for grammar, syntax, and word-order practice.</p>
+        <div class="reorder-hero-points" aria-label="Tool highlights">
+          <span>Works with any language</span>
+          <span>Drag with a mouse, finger, or stylus</span>
+          <span>Instant per-word feedback</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="reorder-layout">
+      <section class="reorder-builder" aria-label="Set up the puzzle">
+        <section class="reorder-panel">
+          <div class="reorder-panel-heading">
+            <div>
+              <span class="reorder-step">1</span>
+              <p class="reorder-kicker">Sentences</p>
+              <h2>Enter your sentences</h2>
+            </div>
+          </div>
+          <label for="sentence-input">One sentence per line. Words are split by spaces.</label>
+          <textarea id="sentence-input" rows="6" placeholder="The quick brown fox jumps over the lazy dog.&#10;She sells seashells by the seashore."></textarea>
+          <p class="reorder-help">Punctuation stays attached to the word it's next to (e.g. "dog." is one chip).</p>
+        </section>
+
+        <section class="reorder-panel">
+          <div class="reorder-panel-heading">
+            <div>
+              <span class="reorder-step">2</span>
+              <p class="reorder-kicker">Options</p>
+              <h2>Puzzle options</h2>
+            </div>
+          </div>
+          <label class="reorder-checkbox">
+            <input type="checkbox" id="hide-punctuation-case">
+            Ignore capitalization and punctuation when checking
+          </label>
+        </section>
+
+        <button id="generate-button" class="reorder-primary" type="button">🧩 Generate Puzzle</button>
+        <p id="setup-status" class="reorder-setup-status" aria-live="polite">Enter at least one sentence to begin.</p>
+      </section>
+
+      <section class="reorder-preview-panel" aria-label="Puzzle stage">
+        <div class="reorder-preview-heading">
+          <h2>Puzzle stage</h2>
+          <p id="progress-text" class="reorder-progress-text">No puzzle loaded yet.</p>
+        </div>
+
+        <div id="puzzle-stage" class="reorder-stage">
+          <p class="reorder-stage-empty">Enter sentences on the left, then click Generate Puzzle.</p>
+        </div>
+
+        <p id="feedback-text" class="reorder-feedback" aria-live="polite"></p>
+
+        <div class="reorder-stage-controls">
+          <button id="check-button" class="reorder-primary" type="button" disabled>✓ Check Answer</button>
+          <button id="shuffle-button" class="reorder-secondary" type="button" disabled>🔀 Shuffle Again</button>
+          <button id="reveal-button" class="reorder-secondary" type="button" disabled>👀 Show Answer</button>
+          <button id="fullscreen-button" class="reorder-secondary" type="button" disabled>⛶ Fullscreen</button>
+        </div>
+        <div class="reorder-nav-controls">
+          <button id="prev-button" class="reorder-secondary" type="button" disabled>← Previous</button>
+          <button id="next-button" class="reorder-primary" type="button" disabled>Next sentence →</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/low-prep/sentence-reorder/sentence-reorder.js?v=4" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
