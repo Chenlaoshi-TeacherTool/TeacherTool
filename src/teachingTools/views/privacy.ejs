@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,58 +31,58 @@
 <body>
     <header class="privacy-hero">
         <div class="privacy-hero-inner">
-            <a class="privacy-back" href="/">&larr; Back to the toolkit</a>
-            <h1>Privacy Policy</h1>
-            <p>This policy explains how Chen Laoshi's Teaching Toolkit handles information when you browse the site, use its classroom tools, send feedback, place a Classroom Shop order, or view advertising.</p>
+            <a class="privacy-back" href="/"><%= t('privacy.backLink') %></a>
+            <h1><%= t('privacy.title') %></h1>
+            <p><%= t('privacy.intro') %></p>
         </div>
     </header>
 
     <main class="privacy-main">
         <article class="privacy-card">
-            <p class="privacy-updated">Last updated: August 20, 2026</p>
+            <p class="privacy-updated"><%= t('privacy.updated') %></p>
 
-            <h2>Information you choose to provide</h2>
-            <p>You can browse and use the toolkit without creating an account. If you voluntarily submit the feedback form, the information you enter is sent to Tally so Chen Laoshi can read and respond to your message. Please do not submit student records, sensitive personal information, or information about a child.</p>
+            <h2><%= t('privacy.s1Title') %></h2>
+            <p><%= t('privacy.s1P1') %></p>
 
-            <h2>Classroom Shop orders and payments</h2>
-            <p>If you place a Classroom Shop order, you may choose to provide your name, quantity, mailing address, order question, and PayPal transaction number through the feedback form or by email. This information is used only to arrange and fulfill your order. Do not send payment-card details by email or through the feedback form. PayPal payments are processed on PayPal's website and are subject to PayPal's own privacy policy.</p>
+            <h2><%= t('privacy.s2Title') %></h2>
+            <p><%= t('privacy.s2P1') %></p>
 
-            <h2>Information stored in your browser</h2>
-            <p>Some classroom tools save word lists, game settings, or unfinished work in your browser's local storage. This information stays on your device unless you export it, clear your browser data, or use a feature that explicitly sends it elsewhere.</p>
+            <h2><%= t('privacy.s3Title') %></h2>
+            <p><%= t('privacy.s3P1') %></p>
 
-            <h2>Advertising and cookies</h2>
-            <p>Selected informational and directory pages use Google AdSense. Google and its partners may use cookies, web beacons, IP addresses, or similar technologies to deliver, measure, and protect advertising. Ad requests from this site are configured for Google's child age treatment as a conservative privacy choice. This disables personalized advertising and remarketing for those requests and applies additional ad-serving protections.</p>
-            <p>Learn more about <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">how Google uses information from partner sites</a>. You can also review Google's <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">advertising settings</a>.</p>
+            <h2><%= t('privacy.s4Title') %></h2>
+            <p><%= t('privacy.s4P1') %></p>
+            <p><%= t('privacy.s4P2Before') %><a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer"><%= t('privacy.s4P2LinkText') %></a><%= t('privacy.s4P2Middle') %><a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer"><%= t('privacy.s4P2LinkText2') %></a><%= t('privacy.s4P2After') %></p>
 
-            <h2>Third-party services and links</h2>
+            <h2><%= t('privacy.s5Title') %></h2>
             <ul>
-                <li>Tally provides the optional feedback form.</li>
-                <li>YouTube provides embedded videos on selected activity pages.</li>
-                <li>PayPal and Amazon links open external services when you choose to use them.</li>
-                <li>Google AdSense provides advertising on selected pages.</li>
+                <li><%= t('privacy.s5Li1') %></li>
+                <li><%= t('privacy.s5Li2') %></li>
+                <li><%= t('privacy.s5Li3') %></li>
+                <li><%= t('privacy.s5Li4') %></li>
             </ul>
-            <p>These services have their own privacy policies and may process information according to their terms.</p>
+            <p><%= t('privacy.s5P1') %></p>
 
-            <h2>Affiliate recommendations</h2>
-            <p>The Classroom Recommendations page contains Amazon affiliate links. If you follow one of these links and make a qualifying purchase, the site may receive a small commission without increasing your price. Affiliate links are marked with a disclosure and do not affect the educational guidance on this site. Amazon may use cookies or similar technologies under its own privacy policy when you visit its service.</p>
+            <h2><%= t('privacy.s6Title') %></h2>
+            <p><%= t('privacy.s6P1') %></p>
 
-            <h2>Children's privacy</h2>
-            <p>The website is designed for teachers and other adults and is not directed to children under 13. The site does not knowingly collect personal information from children. Because classroom resources may sometimes be displayed around students, advertising uses Google's more restrictive child age treatment as an extra precaution.</p>
+            <h2><%= t('privacy.s7Title') %></h2>
+            <p><%= t('privacy.s7P1') %></p>
 
-            <h2>Your choices</h2>
-            <p>You may block or clear cookies and local storage using your browser settings. Doing so may reset saved word lists or tool preferences. Visitors in regions where consent is required may also be shown Google's consent or privacy choices before eligible advertising is served.</p>
+            <h2><%= t('privacy.s8Title') %></h2>
+            <p><%= t('privacy.s8P1') %></p>
 
-            <h2>Changes to this policy</h2>
-            <p>This policy may be updated when the toolkit adds or changes services. The latest version and its update date will always be published on this page.</p>
+            <h2><%= t('privacy.s9Title') %></h2>
+            <p><%= t('privacy.s9P1') %></p>
 
             <div class="privacy-note">
-                <strong>Questions?</strong> Email <a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a> or visit the <a href="/contact">Contact page</a> to contact Chen Laoshi about this policy.
+                <strong><%= t('privacy.noteStrong') %></strong> <%= t('privacy.noteBefore') %><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a><%= t('privacy.noteMiddle') %><a href="/contact"><%= t('privacy.noteLinkText') %></a><%= t('privacy.noteAfter') %>
             </div>
         </article>
     </main>
 
     <footer class="privacy-footer">
-        <p>&copy; 2026 Chen Laoshi's Teaching Toolkit &middot; <a href="/">Return home</a> &middot; <a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a></p>
+        <p><%- t('privacy.footer') %></p>
     </footer>
     <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

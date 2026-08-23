@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
   <title>Contact Chen Laoshi - Chen Laoshi's Teaching Toolkit</title>
@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
 </head>
 <body>
-  <header class="content-hero"><div class="content-shell"><p class="content-kicker">Contact</p><h1>Tell me what would make your teaching day easier</h1><p>Report a tool problem, suggest a classroom topic, or share how you adapted an activity for your subject. I read every message, but please do not send student information.</p></div></header>
+  <header class="content-hero"><div class="content-shell"><p class="content-kicker"><%= t('contact.kicker') %></p><h1><%= t('contact.title') %></h1><p><%= t('contact.intro') %></p></div></header>
   <main class="content-section"><div class="content-shell contact-grid">
-    <section class="contact-card"><h2>Email</h2><p><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a></p><p>To help me understand a problem quickly, include the page name, your browser, what you did before the problem appeared, and a screenshot that contains no student information.</p><a class="btn" href="mailto:clsteachingtools@gmail.com?subject=Chen%20Laoshi%20Teaching%20Toolkit%20feedback">Email Chen Laoshi</a></section>
-    <section class="contact-card"><h2>Good reasons to get in touch</h2><ul><li>A tool will not open, download, or print</li><li>Instructions, examples, or subject terminology need a correction</li><li>You would like a new classroom activity or article topic</li><li>You have a question about privacy, advertising, or recommendation links</li></ul></section>
-    <section class="contact-card contact-card--wide"><h2>Please protect student privacy</h2><p>Do not send student names, photos, grades, school account details, medical information, or anything else that could identify a child. Word lists and classroom settings are usually stored locally in your browser. When reporting a problem, replace real student information with fictional examples.</p><p>For more detail about data and third-party services, read the <a href="/privacy">Privacy Policy</a>.</p></section>
+    <section class="contact-card"><h2><%= t('contact.emailTitle') %></h2><p><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a></p><p><%= t('contact.emailHelp') %></p><a class="btn" href="mailto:clsteachingtools@gmail.com?subject=Chen%20Laoshi%20Teaching%20Toolkit%20feedback"><%= t('contact.emailCta') %></a></section>
+    <section class="contact-card"><h2><%= t('contact.reasonsTitle') %></h2><ul><li><%= t('contact.reason1') %></li><li><%= t('contact.reason2') %></li><li><%= t('contact.reason3') %></li><li><%= t('contact.reason4') %></li></ul></section>
+    <section class="contact-card contact-card--wide"><h2><%= t('contact.privacyTitle') %></h2><p><%= t('contact.privacyP1') %></p><p><%= t('contact.privacyP2Prefix') %><a href="/privacy"><%= t('contact.privacyP2Link') %></a><%= t('contact.privacyP2Suffix') %></p></section>
   </div></main>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

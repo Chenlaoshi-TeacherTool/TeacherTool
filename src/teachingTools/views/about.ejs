@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
   <title>About Chen Laoshi and This Site - Chen Laoshi's Teaching Toolkit</title>
@@ -7,13 +7,13 @@
   <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
 </head>
 <body>
-  <header class="content-hero"><div class="content-shell about-hero-grid"><div><p class="content-kicker">About this site</p><h1>Hi, I’m Chen Laoshi.</h1><p>I built this site to keep practical classroom tools, ready-to-use activities, and honest teaching notes in one welcoming place.</p></div><img src="/images/chen-laoshi-logo.svg" alt="Illustration of Chen Laoshi holding a book, surrounded by sunflowers and classroom supplies"></div></header>
+  <header class="content-hero"><div class="content-shell about-hero-grid"><div><p class="content-kicker"><%= t('nav.about') %></p><h1><%= t('about.title') %></h1><p><%= t('about.intro') %></p></div><img src="/images/chen-laoshi-logo.svg" alt="Illustration of Chen Laoshi holding a book, surrounded by sunflowers and classroom supplies"></div></header>
   <main>
     <section class="content-section"><div class="content-shell prose-grid">
-      <article><h2>Who is this site for?</h2><p>The toolkit is open to teachers in every subject area. Random groups, QR worksheets, question banks, spinners, review games, reading packets, and classroom organization ideas can work in math, science, social studies, language arts, world languages, and more.</p><p>My own classroom experience is rooted in Chinese language teaching, so some articles and vocabulary presets are designed specifically for Chinese learners. They are clearly labeled, while the general-purpose tools let you enter your own content in any language or subject.</p></article>
-      <article><h2>Why combine tools and teaching notes?</h2><p>A generator can handle layout, repeated typing, or randomization. It cannot decide what students should learn, what support they need, or how an activity should lead to evidence of learning.</p><p>That is why each major tool includes recommended grade levels, clear steps, a classroom example, and practical teacher tips. The resource library goes further by explaining the instructional thinking behind an activity.</p></article>
-      <article><h2>Content principles</h2><ul><li>Start with a learning goal, then choose the game or tool.</li><li>Give teachers a concrete classroom workflow, not just a title and a button.</li><li>Label subject-specific content clearly and keep general tools flexible.</li><li>Review and improve each resource instead of publishing for volume.</li><li>Never require teachers or students to upload sensitive personal information.</li></ul></article>
-      <article><h2>A note for teachers</h2><p>A strong activity does not have to be complicated. A focused set of terms, one clear question, or a purposeful partner exchange can be more effective than a crowded worksheet. I hope these resources make planning feel lighter and leave more time for students to think, talk, create, and practice.</p><a class="btn" href="/resources">Explore teaching resources</a></article>
+      <article><h2><%= t('about.whoTitle') %></h2><p><%= t('about.whoP1') %></p><p><%= t('about.whoP2') %></p></article>
+      <article><h2><%= t('about.whyTitle') %></h2><p><%= t('about.whyP1') %></p><p><%= t('about.whyP2') %></p></article>
+      <article><h2><%= t('about.principlesTitle') %></h2><ul><li><%= t('about.principle1') %></li><li><%= t('about.principle2') %></li><li><%= t('about.principle3') %></li><li><%= t('about.principle4') %></li><li><%= t('about.principle5') %></li></ul></article>
+      <article><h2><%= t('about.noteTitle') %></h2><p><%= t('about.noteP1') %></p><a class="btn" href="/resources"><%= t('about.noteCta') %></a></article>
     </div></section>
   </main>
   <script src="/javascripts/milk-tea-footer.js"></script>

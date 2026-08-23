@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var i18n = require('./services/i18n');
 
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
@@ -27,6 +28,32 @@ app.use(function(req, res, next) {
   res.locals.requestPath = req.path || '/';
   next();
 });
+
+// Site-wide language support: read the preference cookie, expose it (and a
+// t() translation helper) to every view, and inject the shared site header
+// right after <body> for rendered pages, without editing every template.
+app.use(function(req, res, next) {
+  var lang = i18n.normalizeLang(req.cookies && req.cookies.lang);
+  res.locals.lang = lang;
+  res.locals.t = function(key) { return i18n.t(lang, key); };
+
+  if (req.path.indexOf('/admin') === 0) return next();
+
+  var originalRender = res.render.bind(res);
+  res.render = function(view, options, callback) {
+    if (typeof options === 'function') { callback = options; options = undefined; }
+    originalRender(view, options, function(err, html) {
+      if (err) return callback ? callback(err) : next(err);
+      req.app.render('partials/site-header', res.locals, function(headerErr, headerHtml) {
+        var withHeader = headerErr ? html : html.replace(/<body([^>]*)>/i, '<body$1>' + headerHtml);
+        if (callback) return callback(null, withHeader);
+        res.send(withHeader);
+      });
+    });
+  };
+  next();
+});
+
 // Let application routes own clean directory-style URLs instead of having
 // express.static add a trailing-slash redirect before the router can respond.
 app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));

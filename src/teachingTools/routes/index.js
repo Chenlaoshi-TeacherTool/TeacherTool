@@ -6,6 +6,14 @@ siteContentStore.refresh().catch(function (err) {
   console.error('Could not load site content from DAB at startup:', err.message);
 });
 
+router.get('/set-language', function(req, res) {
+  var lang = req.query.lang === 'zh' ? 'zh' : 'en';
+  res.cookie('lang', lang, { maxAge: 365 * 24 * 60 * 60 * 1000, sameSite: 'Lax' });
+  var redirectTo = req.query.redirect;
+  var safeRedirect = (typeof redirectTo === 'string' && redirectTo.charAt(0) === '/' && redirectTo.charAt(1) !== '/') ? redirectTo : '/';
+  res.redirect(safeRedirect);
+});
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Home' });

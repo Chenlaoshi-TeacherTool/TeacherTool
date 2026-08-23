@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -178,12 +178,12 @@
             <div class="hero-copy">
                 <div class="hero-title-row">
                     <span class="hero-avatar-mini" aria-hidden="true"><img src="/images/chen-laoshi-logo.svg" alt=""></span>
-                    <h1>Chen Laoshi’s<br>Teaching Tools<span>Practical support for every classroom</span></h1>
+                    <h1><%= t('home.heroTitleLine1') %><br><%= t('home.heroTitleLine2') %><span><%= t('home.heroTitleTagline') %></span></h1>
                 </div>
-                <p>A welcoming collection of classroom-ready tools, adaptable activities, and thoughtful teaching ideas for educators across subjects.</p>
+                <p><%= t('home.heroIntro') %></p>
                 <div class="hero-buttons">
-                    <a href="/theme-activities" class="btn">Explore activities</a>
-                    <a href="/teaching-tools" class="btn btn-secondary">Open teacher tools</a>
+                    <a href="/theme-activities" class="btn"><%= t('home.heroExploreActivities') %></a>
+                    <a href="/teaching-tools" class="btn btn-secondary"><%= t('home.heroOpenTools') %></a>
                 </div>
             </div>
             <div class="hero-avatar-wrap">
@@ -198,62 +198,62 @@
         <div class="home-paths-shell">
             <header class="home-paths-header">
                 <div>
-                    <div class="eyebrow">Start here</div>
-                    <h2 id="home-paths-heading">Popular teaching tools</h2>
+                    <div class="eyebrow"><%= t('home.pathsEyebrow') %></div>
+                    <h2 id="home-paths-heading"><%= t('home.pathsHeading') %></h2>
                 </div>
-                <p>Jump straight into the classroom materials teachers open most. Every tool works right in the browser—no login required.</p>
+                <p><%= t('home.pathsIntro') %></p>
             </header>
 
             <div class="home-tools-grid" id="tools">
                 <a class="home-tool-card" href="/teaching-tools/random-group-generator">
                     <span class="home-tool-card__icon" aria-hidden="true">🎲</span>
-                    <h3>Random Group Generator</h3>
-                    <p>Create partners or groups quickly for discussion, labs, and review.</p>
+                    <h3><%= t('home.tool1Title') %></h3>
+                    <p><%= t('home.tool1Desc') %></p>
                 </a>
                 <a class="home-tool-card" href="/teaching-tools/qr-code-generator">
                     <span class="home-tool-card__icon" aria-hidden="true">🔗</span>
-                    <h3>QR Code Generator</h3>
-                    <p>Generate QR codes for stations, research, and family communication.</p>
+                    <h3><%= t('home.tool2Title') %></h3>
+                    <p><%= t('home.tool2Desc') %></p>
                 </a>
                 <a class="home-tool-card" href="/teaching-tools/class-pet-points">
                     <span class="home-tool-card__icon" aria-hidden="true">🐾</span>
-                    <h3>Class Pet Points</h3>
-                    <p>Help class pets hatch and grow as students earn points.</p>
+                    <h3><%= t('home.tool3Title') %></h3>
+                    <p><%= t('home.tool3Desc') %></p>
                 </a>
                 <a class="home-tool-card" href="/teaching-tools/sunflower-spinner/sunflower-spinner.html">
                     <span class="home-tool-card__icon" aria-hidden="true">🌻</span>
-                    <h3>Sunflower Spinner</h3>
-                    <p>Spin topics, questions, or student names on a bright wheel.</p>
+                    <h3><%= t('home.tool4Title') %></h3>
+                    <p><%= t('home.tool4Desc') %></p>
                 </a>
                 <a class="home-tool-card" href="/teaching-tools/jeopardy">
                     <span class="home-tool-card__icon" aria-hidden="true">🏆</span>
-                    <h3>Jeopardy</h3>
-                    <p>Create a timed team review game with your own questions.</p>
+                    <h3><%= t('home.tool5Title') %></h3>
+                    <p><%= t('home.tool5Desc') %></p>
                 </a>
                 <a class="home-tool-card" href="/teaching-tools/bingo-generator">
                     <span class="home-tool-card__icon" aria-hidden="true">🎯</span>
-                    <h3>Bingo Generator</h3>
-                    <p>Turn vocabulary or sentences into printable bingo sheets.</p>
+                    <h3><%= t('home.tool6Title') %></h3>
+                    <p><%= t('home.tool6Desc') %></p>
                 </a>
                 <a class="home-tool-card" href="/teaching-tools/maze-generator">
                     <span class="home-tool-card__icon" aria-hidden="true">🧭</span>
-                    <h3>Maze Maker</h3>
-                    <p>Turn questions and answers into an editable PowerPoint maze.</p>
+                    <h3><%= t('home.tool7Title') %></h3>
+                    <p><%= t('home.tool7Desc') %></p>
                 </a>
                 <a class="home-tool-card" href="/teaching-tools/word-cloud">
                     <span class="home-tool-card__icon" aria-hidden="true">☁️</span>
-                    <h3>Word Cloud</h3>
-                    <p>Generate a printable word cloud for sorting and explaining terms.</p>
+                    <h3><%= t('home.tool8Title') %></h3>
+                    <p><%= t('home.tool8Desc') %></p>
                 </a>
             </div>
 
             <div class="home-tools-more">
-                <a href="/teaching-tools" class="btn">Browse all teaching tools →</a>
+                <a href="/teaching-tools" class="btn"><%= t('home.browseAll') %></a>
             </div>
 
             <div class="home-paths-about">
-                <span><strong>New here?</strong> Learn which tools work across subjects and which resources reflect Chen Laoshi's Chinese-language teaching experience.</span>
-                <a href="/about">Meet Chen Laoshi →</a>
+                <span><strong><%= t('home.newHereStrong') %></strong> <%= t('home.newHereText') %></span>
+                <a href="/about"><%= t('home.meetChenLaoshi') %></a>
             </div>
         </div>
     </main>
@@ -261,59 +261,59 @@
     <section class="content-section" aria-labelledby="home-recommendations-heading">
         <div class="content-shell recommendation-feature">
             <div>
-                <div class="eyebrow" style="border-color:#f1d58c; background:#fff2c5; color:#8a5b15;">🛍️ Classroom Finds</div>
-                <h2 id="home-recommendations-heading" style="font-size:clamp(2rem,4vw,3rem);">Supplies that can earn their place in a classroom</h2>
-                <p>Each recommendation explains what students or teachers can do with the item, how it can be reused, and what low-cost alternative could serve the same purpose.</p>
-                <a class="btn" href="/recommendations">View classroom finds and disclosures →</a>
+                <div class="eyebrow" style="border-color:#f1d58c; background:#fff2c5; color:#8a5b15;"><%= t('home.findsEyebrow') %></div>
+                <h2 id="home-recommendations-heading" style="font-size:clamp(2rem,4vw,3rem);"><%= t('home.findsHeading') %></h2>
+                <p><%= t('home.findsIntro') %></p>
+                <a class="btn" href="/recommendations"><%= t('home.findsCta') %></a>
             </div>
             <aside class="affiliate-note">
-                <h2>Amazon classroom list</h2>
-                <p>This is an affiliate link. A qualifying purchase may support the site with a small commission, without increasing your price.</p>
-                <a href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer">Open the Amazon list →</a>
+                <h2><%= t('home.affiliateHeading') %></h2>
+                <p><%= t('home.affiliateNote') %></p>
+                <a href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= t('home.affiliateCta') %></a>
             </aside>
         </div>
     </section>
 
     <section class="shop-preview" aria-labelledby="shop-preview-heading">
         <div class="shop-preview-copy">
-            <div class="eyebrow">🧲 Classroom finds</div>
-            <h2 id="shop-preview-heading">A few joyful classroom helpers.</h2>
-            <p>Occasional teacher-friendly supplies, carefully described and ready for a new classroom. The first find: colorful magnetic people for displays, storytelling, and playful language practice.</p>
-            <a href="/classroom-shop" class="btn">Visit the chenlaoshi's shop →</a>
-            <p class="shop-note">Open-box finds · Shipping included</p>
+            <div class="eyebrow"><%= t('home.shopEyebrow') %></div>
+            <h2 id="shop-preview-heading"><%= t('home.shopHeading') %></h2>
+            <p><%= t('home.shopIntro') %></p>
+            <a href="/classroom-shop" class="btn"><%= t('home.shopCta') %></a>
+            <p class="shop-note"><%= t('home.shopNote') %></p>
         </div>
         <img src="/images/magnetic-people-classroom.png" alt="Colorful magnetic people holding classroom artwork on a magnetic board">
     </section>
 
     <section class="featured">
-        <h2>From Chen Laoshi's desk</h2>
+        <h2><%= t('home.deskHeading') %></h2>
         <div class="featured-items">
             <article class="featured-item">
-                <h3>Fresh classroom ideas</h3>
-                <p>A growing collection of approachable lesson ideas to keep your planning feeling light.</p>
+                <h3><%= t('home.desk1Title') %></h3>
+                <p><%= t('home.desk1Desc') %></p>
             </article>
             <article class="featured-item">
-                <h3>Tools that save time</h3>
-                <p>Open a focused tool, get the job done, and bring your attention back to your students.</p>
+                <h3><%= t('home.desk2Title') %></h3>
+                <p><%= t('home.desk2Desc') %></p>
             </article>
             <article class="featured-item">
-                <h3>Seasonal sparks</h3>
-                <p>Use timely prompts and themes to make each unit feel connected to the world outside.</p>
+                <h3><%= t('home.desk3Title') %></h3>
+                <p><%= t('home.desk3Desc') %></p>
             </article>
         </div>
     </section>
 
     <section class="feedback-section" id="feedback" aria-labelledby="feedback-heading">
         <div class="feedback-copy">
-            <div class="eyebrow">💌 Your voice matters</div>
-            <h2 id="feedback-heading">Help this toolkit grow.</h2>
-            <p>What would make your teaching day easier? Share a feature idea, suggestion, or bug you found. I read every message.</p>
-            <a class="feedback-note" href="/feedback">🌻 Feedback goes directly to Chen Laoshi <span aria-hidden="true">→</span></a>
+            <div class="eyebrow"><%= t('home.feedbackEyebrow') %></div>
+            <h2 id="feedback-heading"><%= t('home.feedbackHeading') %></h2>
+            <p><%= t('home.feedbackIntro') %></p>
+            <a class="feedback-note" href="/feedback"><%= t('home.feedbackCta') %> <span aria-hidden="true">→</span></a>
         </div>
     </section>
 
     <footer>
-        <p>© 2026 Chen Laoshi's Teaching Tools · Made with care for curious classrooms. · <a href="/privacy">Privacy Policy</a> · <a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a></p>
+        <p><%- t('footer.home') %></p>
     </footer>
     <script src="/javascripts/account-coming-soon.js"></script>
     <script src="/javascripts/milk-tea-footer.js"></script>

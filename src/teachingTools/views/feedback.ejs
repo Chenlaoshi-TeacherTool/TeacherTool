@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,9 +22,9 @@
 <body class="feedback-page">
   <header class="content-hero">
     <div class="content-shell">
-      <p class="content-kicker">Your voice matters</p>
-      <h1>Share feedback with Chen Laoshi</h1>
-      <p>Suggest a feature, report a problem, ask an order question, or tell me how you use a tool in your classroom. Please do not include student information.</p>
+      <p class="content-kicker"><%= t('feedback.kicker') %></p>
+      <h1><%= t('feedback.title') %></h1>
+      <p><%= t('feedback.intro') %></p>
     </div>
   </header>
   <main class="feedback-page-main">
@@ -32,7 +32,7 @@
       <div class="feedback-form-card">
         <iframe data-tally-src="https://tally.so/embed/GxEBPk?alignLeft=1&amp;hideTitle=1&amp;transparentBackground=1&amp;dynamicHeight=1" loading="eager" title="Share feedback with Chen Laoshi"></iframe>
       </div>
-      <p class="feedback-privacy-note">Your response is sent through Tally. Do not submit student records, sensitive personal information, or payment-card details. Read the <a href="/privacy">Privacy Policy</a> for more information.</p>
+      <p class="feedback-privacy-note"><%= t('feedback.noteBefore') %><a href="/privacy"><%= t('feedback.noteLink') %></a><%= t('feedback.noteAfter') %></p>
     </div>
   </main>
   <script src="/javascripts/milk-tea-footer.js"></script>
