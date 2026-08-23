@@ -24,6 +24,9 @@
     .items-grid input { width: 100%; box-sizing: border-box; padding: 6px; font-size: 0.9rem; }
     .grid-header { font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #ddd; padding-bottom: 4px; }
     .row-form { display: contents; }
+    .question-card { border: 1px solid #ddd; border-radius: 6px; padding: 14px; margin: 12px 0; }
+    .q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+    select { padding: 6px; font-size: 0.9rem; width: 100%; }
   </style>
 </head>
 <body>
@@ -31,6 +34,7 @@
     <nav>
       <a href="/admin">Dashboard</a>
       <a href="/admin/wordlists">Word Lists</a>
+      <a href="/admin/questionbanks">Question Banks</a>
     </nav>
     <span style="font-size:0.85rem;color:#666;">Signed in as <%= adminUser.name %></span>
   </div>

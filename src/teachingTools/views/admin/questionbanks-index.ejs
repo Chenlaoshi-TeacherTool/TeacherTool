@@ -1,0 +1,21 @@
+<%- include('layout-head') %>
+<h1>Question Banks</h1>
+<p><a class="button" href="/admin/questionbanks/new">+ New question bank</a></p>
+<table>
+  <thead>
+    <tr><th>Name</th><th>Slug</th><th>Theme</th><th>Level</th><th># Questions</th><th></th></tr>
+  </thead>
+  <tbody>
+    <% banks.forEach(function (bank) { %>
+    <tr>
+      <td><%= bank.name %></td>
+      <td><%= bank.slug %></td>
+      <td><%= bank.theme || '' %></td>
+      <td><%= bank.level || '' %></td>
+      <td><%= bank.question_count %></td>
+      <td><a href="/admin/questionbanks/<%= bank.id %>/edit">Edit</a></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('layout-foot') %>

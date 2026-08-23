@@ -118,4 +118,148 @@ router.post('/wordlists/:id/items/:itemId/delete', async function (req, res, nex
   } catch (err) { next(err); }
 });
 
+function parseCsv(text) {
+  if (!text) return [];
+  return text.split(',').map(function (part) { return part.trim(); }).filter(Boolean);
+}
+
+async function getLookup(pool, table) {
+  var result = await pool.request().query('SELECT code, label_en FROM ' + table + ' ORDER BY code');
+  return result.recordset;
+}
+
+router.get('/questionbanks', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().query(
+      'SELECT qb.id, qb.slug, qb.name, qb.theme, qb.level, COUNT(q.id) AS question_count ' +
+      'FROM question_banks qb LEFT JOIN questions q ON q.bank_id = qb.id ' +
+      'GROUP BY qb.id, qb.slug, qb.name, qb.theme, qb.level ORDER BY qb.name'
+    );
+    res.render('admin/questionbanks-index', { title: 'Question Banks', banks: result.recordset, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.get('/questionbanks/new', function (req, res) {
+  res.render('admin/questionbanks-edit', { title: 'New Question Bank', bank: null, questions: [], levels: [], types: [], adminUser: req.adminUser });
+});
+
+router.post('/questionbanks/new', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request()
+      .input('slug', sql.NVarChar, req.body.slug)
+      .input('name', sql.NVarChar, req.body.name)
+      .input('description', sql.NVarChar, req.body.description || null)
+      .input('theme', sql.NVarChar, req.body.theme || null)
+      .input('level', sql.NVarChar, req.body.level || null)
+      .input('curriculum', sql.NVarChar, req.body.curriculum || null)
+      .query('INSERT INTO question_banks (slug, name, description, theme, level, curriculum) OUTPUT INSERTED.id VALUES (@slug, @name, @description, @theme, @level, @curriculum)');
+    res.redirect('/admin/questionbanks/' + result.recordset[0].id + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.get('/questionbanks/:id/edit', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var bankResult = await pool.request().input('id', sql.Int, req.params.id).query('SELECT * FROM question_banks WHERE id = @id');
+    var bank = bankResult.recordset[0];
+    if (!bank) return res.status(404).send('Question bank not found.');
+    var questionsResult = await pool.request().input('bankId', sql.Int, req.params.id)
+      .query('SELECT * FROM questions WHERE bank_id = @bankId ORDER BY sort_order, id');
+    var questions = questionsResult.recordset.map(function (q) {
+      return Object.assign({}, q, {
+        optionsText: JSON.parse(q.options || '[]').join(', '),
+        tagsText: JSON.parse(q.tags || '[]').join(', ')
+      });
+    });
+    var levels = await getLookup(pool, 'level_lookup');
+    var types = await getLookup(pool, 'type_lookup');
+    res.render('admin/questionbanks-edit', { title: 'Edit ' + bank.name, bank: bank, questions: questions, levels: levels, types: types, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.post('/questionbanks/:id', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('id', sql.Int, req.params.id)
+      .input('slug', sql.NVarChar, req.body.slug)
+      .input('name', sql.NVarChar, req.body.name)
+      .input('description', sql.NVarChar, req.body.description || null)
+      .input('theme', sql.NVarChar, req.body.theme || null)
+      .input('level', sql.NVarChar, req.body.level || null)
+      .input('curriculum', sql.NVarChar, req.body.curriculum || null)
+      .query('UPDATE question_banks SET slug=@slug, name=@name, description=@description, theme=@theme, level=@level, curriculum=@curriculum, updated_at=SYSUTCDATETIME() WHERE id=@id');
+    res.redirect('/admin/questionbanks/' + req.params.id + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/questionbanks/:id/delete', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var tx = pool.transaction();
+    await tx.begin();
+    await tx.request().input('bankId', sql.Int, req.params.id).query('DELETE FROM questions WHERE bank_id = @bankId');
+    await tx.request().input('id', sql.Int, req.params.id).query('DELETE FROM question_banks WHERE id = @id');
+    await tx.commit();
+    res.redirect('/admin/questionbanks');
+  } catch (err) { next(err); }
+});
+
+router.post('/questionbanks/:id/questions', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var maxResult = await pool.request().input('bankId', sql.Int, req.params.id)
+      .query('SELECT ISNULL(MAX(sort_order), -1) + 1 AS nextOrder FROM questions WHERE bank_id = @bankId');
+    await pool.request()
+      .input('bankId', sql.Int, req.params.id)
+      .input('externalId', sql.NVarChar, req.body.external_id)
+      .input('themeZh', sql.NVarChar, req.body.theme_zh || null)
+      .input('levelCode', sql.NVarChar, req.body.level_code || null)
+      .input('typeCode', sql.NVarChar, req.body.type_code || null)
+      .input('prompt', sql.NVarChar, req.body.prompt)
+      .input('answer', sql.NVarChar, req.body.answer)
+      .input('note', sql.NVarChar, req.body.note || '')
+      .input('options', sql.NVarChar, JSON.stringify(parseCsv(req.body.options)))
+      .input('tags', sql.NVarChar, JSON.stringify(parseCsv(req.body.tags)))
+      .input('sortOrder', sql.Int, maxResult.recordset[0].nextOrder)
+      .query(
+        'INSERT INTO questions (bank_id, external_id, theme_zh, level_code, type_code, prompt, answer, note, options, tags, sort_order) ' +
+        'VALUES (@bankId, @externalId, @themeZh, @levelCode, @typeCode, @prompt, @answer, @note, @options, @tags, @sortOrder)'
+      );
+    res.redirect('/admin/questionbanks/' + req.params.id + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/questionbanks/:id/questions/:qId', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('qId', sql.Int, req.params.qId)
+      .input('externalId', sql.NVarChar, req.body.external_id)
+      .input('themeZh', sql.NVarChar, req.body.theme_zh || null)
+      .input('levelCode', sql.NVarChar, req.body.level_code || null)
+      .input('typeCode', sql.NVarChar, req.body.type_code || null)
+      .input('prompt', sql.NVarChar, req.body.prompt)
+      .input('answer', sql.NVarChar, req.body.answer)
+      .input('note', sql.NVarChar, req.body.note || '')
+      .input('options', sql.NVarChar, JSON.stringify(parseCsv(req.body.options)))
+      .input('tags', sql.NVarChar, JSON.stringify(parseCsv(req.body.tags)))
+      .query(
+        'UPDATE questions SET external_id=@externalId, theme_zh=@themeZh, level_code=@levelCode, type_code=@typeCode, ' +
+        'prompt=@prompt, answer=@answer, note=@note, options=@options, tags=@tags WHERE id = @qId'
+      );
+    res.redirect('/admin/questionbanks/' + req.params.id + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/questionbanks/:id/questions/:qId/delete', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request().input('qId', sql.Int, req.params.qId).query('DELETE FROM questions WHERE id = @qId');
+    res.redirect('/admin/questionbanks/' + req.params.id + '/edit');
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

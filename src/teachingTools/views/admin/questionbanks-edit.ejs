@@ -1,0 +1,98 @@
+<%- include('layout-head') %>
+<h1><%= bank ? 'Edit: ' + bank.name : 'New Question Bank' %></h1>
+
+<form method="POST" action="<%= bank ? '/admin/questionbanks/' + bank.id : '/admin/questionbanks/new' %>">
+  <label>Slug (used in URLs, no spaces)</label>
+  <input type="text" name="slug" value="<%= bank ? bank.slug : '' %>" required>
+  <label>Name</label>
+  <input type="text" name="name" value="<%= bank ? bank.name : '' %>" required>
+  <label>Description</label>
+  <textarea name="description" rows="2"><%= bank ? (bank.description || '') : '' %></textarea>
+  <label>Theme</label>
+  <input type="text" name="theme" value="<%= bank ? (bank.theme || '') : '' %>">
+  <label>Level</label>
+  <input type="text" name="level" value="<%= bank ? (bank.level || 'Mixed levels') : 'Mixed levels' %>">
+  <label>Curriculum</label>
+  <input type="text" name="curriculum" value="<%= bank ? (bank.curriculum || '') : '' %>">
+  <div class="actions">
+    <button type="submit"><%= bank ? 'Save changes' : 'Create question bank' %></button>
+  </div>
+</form>
+
+<% if (bank) { %>
+<h2 style="margin-top:32px;">Questions (<%= questions.length %>)</h2>
+
+<% questions.forEach(function (q) { %>
+<div class="question-card">
+  <form method="POST" action="/admin/questionbanks/<%= bank.id %>/questions/<%= q.id %>">
+    <div class="q-grid">
+      <label>ID<input type="text" name="external_id" value="<%= q.external_id %>" required></label>
+      <label>Original theme (Chinese)<input type="text" name="theme_zh" value="<%= q.theme_zh || '' %>"></label>
+      <label>Level
+        <select name="level_code">
+          <% levels.forEach(function (lv) { %>
+          <option value="<%= lv.code %>" <%= q.level_code === lv.code ? 'selected' : '' %>><%= lv.code %> (<%= lv.label_en %>)</option>
+          <% }) %>
+        </select>
+      </label>
+      <label>Type
+        <select name="type_code">
+          <% types.forEach(function (tp) { %>
+          <option value="<%= tp.code %>" <%= q.type_code === tp.code ? 'selected' : '' %>><%= tp.code %> (<%= tp.label_en %>)</option>
+          <% }) %>
+        </select>
+      </label>
+    </div>
+    <label>Prompt<textarea name="prompt" rows="2" required><%= q.prompt %></textarea></label>
+    <label>Answer<input type="text" name="answer" value="<%= q.answer %>" required></label>
+    <label>Options (comma-separated, only for Multiple Choice)<input type="text" name="options" value="<%= q.optionsText %>"></label>
+    <label>Tags (comma-separated)<input type="text" name="tags" value="<%= q.tagsText %>"></label>
+    <label>Note<input type="text" name="note" value="<%= q.note || '' %>"></label>
+    <div class="actions">
+      <button type="submit">Save</button>
+    </div>
+  </form>
+  <form method="POST" action="/admin/questionbanks/<%= bank.id %>/questions/<%= q.id %>/delete" onsubmit="return confirm('Delete this question?');">
+    <button type="submit" class="danger">Delete question</button>
+  </form>
+</div>
+<% }) %>
+
+<div class="question-card">
+  <h3 style="margin-top:0;">Add a question</h3>
+  <form method="POST" action="/admin/questionbanks/<%= bank.id %>/questions">
+    <div class="q-grid">
+      <label>ID<input type="text" name="external_id" required></label>
+      <label>Original theme (Chinese)<input type="text" name="theme_zh"></label>
+      <label>Level
+        <select name="level_code">
+          <% levels.forEach(function (lv) { %>
+          <option value="<%= lv.code %>"><%= lv.code %> (<%= lv.label_en %>)</option>
+          <% }) %>
+        </select>
+      </label>
+      <label>Type
+        <select name="type_code">
+          <% types.forEach(function (tp) { %>
+          <option value="<%= tp.code %>"><%= tp.code %> (<%= tp.label_en %>)</option>
+          <% }) %>
+        </select>
+      </label>
+    </div>
+    <label>Prompt<textarea name="prompt" rows="2" required></textarea></label>
+    <label>Answer<input type="text" name="answer" required></label>
+    <label>Options (comma-separated, only for Multiple Choice)<input type="text" name="options"></label>
+    <label>Tags (comma-separated)<input type="text" name="tags"></label>
+    <label>Note<input type="text" name="note"></label>
+    <div class="actions">
+      <button type="submit">Add question</button>
+    </div>
+  </form>
+</div>
+
+<form method="POST" action="/admin/questionbanks/<%= bank.id %>/delete" onsubmit="return confirm('Delete this entire question bank and all its questions?');" style="margin-top:24px;">
+  <button type="submit" class="danger">Delete this question bank</button>
+</form>
+<% } %>
+
+<%- include('layout-foot') %>
