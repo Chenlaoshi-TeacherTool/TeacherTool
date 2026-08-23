@@ -153,6 +153,10 @@ router.get('/teaching-tools/zoom-reveal', function(req, res, next) {
   res.render('low-prep-activities/zoom-reveal', { title: 'Zoom Reveal', toolGuide: siteContentStore.get().toolGuides['zoom-reveal'] });
 });
 
+router.get('/teaching-tools/name-tent-generator', function(req, res, next) {
+  res.render('low-prep-activities/name-tent-generator', { title: 'Desk Name Tent Generator', toolGuide: siteContentStore.get().toolGuides['name-tent-generator'] });
+});
+
 router.get('/low-prep-activities', function(req, res) {
   res.redirect(301, '/teaching-tools#low-prep-activities');
 });
@@ -160,7 +164,7 @@ router.get('/low-prep-activities', function(req, res) {
 [
   'word-sudoku', 'word-cloud', 'independent-reading', 'tear-paper-bingo',
   'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle',
-  'image-revealer', 'zoom-reveal'
+  'image-revealer', 'zoom-reveal', 'name-tent-generator'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -199,7 +203,8 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',
     '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle',
-    '/teaching-tools/bingo-generator', '/teaching-tools/image-revealer', '/teaching-tools/zoom-reveal'
+    '/teaching-tools/bingo-generator', '/teaching-tools/image-revealer', '/teaching-tools/zoom-reveal',
+    '/teaching-tools/name-tent-generator'
   ].concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var urls = paths.map(function(path) {
     return '  <url><loc>' + baseUrl + path + '</loc></url>';

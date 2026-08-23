@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#315f4f">
+  <title>Desk Name Tent Generator - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Turn a class list into printable desk name tents. Each student gets one letter-size sheet with fold lines marked—no cutting needed—that folds flat into a standing triangle. Choose Chinese, English, pinyin, or all three, plus a colored border.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/name-tent-generator/name-tent-generator.css">
+</head>
+<body class="tent-page">
+  <main class="tent-wrap">
+    <header class="tent-hero">
+      <div class="tent-hero-copy">
+        <a class="back-link" href="/teaching-tools#low-prep-activities">← Back to Teaching Tools</a>
+        <p class="eyebrow">Printable classroom setup</p>
+        <h1><span aria-hidden="true">🔺</span> Desk Name Tent Generator</h1>
+        <p>Paste in your class list and get a full set of desk name tents—one letter-size page per student, fold lines already marked, no cutting required. Fold twice and tape shut to make a standing triangle.</p>
+        <div class="hero-points" aria-label="Tool highlights">
+          <span>One full page per student, no cutting</span>
+          <span>Chinese, English, pinyin, or all three</span>
+          <span>Pick a border color for each name</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="privacy-banner" role="note">
+      <span class="privacy-icon" aria-hidden="true">⚠️</span>
+      <p><strong>Privacy tip:</strong> please avoid using students' full legal names. Use a first name, nickname, initials, or student number instead—these sheets are meant to be seen (and sometimes photographed) by other people in the room.</p>
+    </div>
+
+    <div class="tent-grid">
+      <section class="builder" aria-label="Build desk name tents">
+        <form id="tent-form">
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="step-number">1</span>
+                <p class="eyebrow">Class list</p>
+                <h2>Add your students</h2>
+              </div>
+              <button id="load-example" class="ghost-button" type="button">Load example</button>
+            </div>
+            <label for="names">One student per line
+              <textarea id="names" class="names-textarea" required placeholder="Lily | 丽丽&#10;Max | 马克斯&#10;Emma | 艾玛 | orange"></textarea>
+            </label>
+            <p class="field-help">Format: <strong>name | Chinese name | color (optional)</strong>. Pinyin is generated automatically from the Chinese name. Leave a field blank if it doesn't apply—just a name on its own also works. Optional color words: red, orange, yellow, green, blue, purple.</p>
+            <p id="name-count" class="name-count" aria-live="polite">No names detected yet.</p>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="step-number">2</span>
+                <p class="eyebrow">Display</p>
+                <h2>What should each name tent show?</h2>
+              </div>
+            </div>
+            <div class="mode-switch" role="radiogroup" aria-label="Display language">
+              <label><input type="radio" name="displayMode" value="zh"> Chinese only</label>
+              <label><input type="radio" name="displayMode" value="en"> English only</label>
+              <label><input type="radio" name="displayMode" value="py"> Pinyin only</label>
+              <label><input type="radio" name="displayMode" value="all" checked> Show all</label>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="step-number">3</span>
+                <p class="eyebrow">Colors</p>
+                <h2>Border color</h2>
+              </div>
+            </div>
+            <div class="color-mode-switch" role="radiogroup" aria-label="Color mode">
+              <label><input type="radio" name="colorMode" value="auto" checked> Cycle through a color palette</label>
+              <label><input type="radio" name="colorMode" value="single"> Use one color for everyone</label>
+            </div>
+            <div id="single-color-row" style="display:none; margin-bottom: 14px;">
+              <label for="single-color-select">Color for every name tent
+                <select id="single-color-select">
+                  <option value="red">Red</option>
+                  <option value="orange">Orange</option>
+                  <option value="yellow">Yellow</option>
+                  <option value="green" selected>Green</option>
+                  <option value="blue">Blue</option>
+                  <option value="purple">Purple</option>
+                </select>
+              </label>
+            </div>
+            <p class="field-help" style="margin-top:0;">Colors in the cycling palette (uncheck any you don't want used):</p>
+            <div class="color-swatches" id="color-swatches">
+              <label class="color-swatch" style="--swatch-color:var(--tent-red)"><input type="checkbox" value="red" checked><span><span class="color-dot"></span>Red</span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-orange)"><input type="checkbox" value="orange" checked><span><span class="color-dot"></span>Orange</span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-yellow)"><input type="checkbox" value="yellow" checked><span><span class="color-dot"></span>Yellow</span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-tgreen)"><input type="checkbox" value="green" checked><span><span class="color-dot"></span>Green</span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-blue)"><input type="checkbox" value="blue" checked><span><span class="color-dot"></span>Blue</span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-purple)"><input type="checkbox" value="purple" checked><span><span class="color-dot"></span>Purple</span></label>
+            </div>
+          </section>
+
+          <div class="form-footer">
+            <button class="generate-button" type="submit">Generate name tents</button>
+            <p id="generation-status" class="generation-status" aria-live="polite"></p>
+          </div>
+          <div class="download-row">
+            <button id="print-pdf" class="download-button" type="button" disabled>Print / Save as PDF</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="preview-panel" aria-label="Generated name tents">
+        <div class="preview-heading">
+          <h2>Preview</h2>
+          <p>Each card below prints on its own full letter-size, landscape page.</p>
+        </div>
+        <div class="fold-instructions">
+          <strong>How to assemble:</strong> print landscape, then fold along both dashed lines so the sheet forms a triangle that lies flat on the desk, like a little tent with the ridge running left to right. The name shows on the two angled faces (visible to the student and to whoever is across the table); the third panel rests flat as the base. Fold the narrow end tab behind Panel 1 and tape or glue it there.
+        </div>
+        <div id="preview-panel-body">
+          <div id="preview-cards" class="preview-cards">
+            <p class="preview-empty">Add student names on the left, then click "Generate name tents" to see cards here.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="print-area" class="tent-print-area"></div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro/dist/index.js" defer></script>
+  <script src="/low-prep/name-tent-generator/name-tent-generator.js" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
