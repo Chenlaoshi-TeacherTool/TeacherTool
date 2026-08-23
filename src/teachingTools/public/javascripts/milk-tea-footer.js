@@ -1,7 +1,63 @@
 (function () {
   'use strict';
 
+  var LABELS = {
+    en: {
+      brand: "Chen Laoshi's Teaching Toolkit",
+      tagline: 'Practical tools for every classroom',
+      home: 'Home',
+      tools: 'Teaching Tools',
+      resources: 'Teaching Resources',
+      finds: 'Classroom Finds',
+      about: 'About',
+      contact: 'Contact',
+      privacy: 'Privacy Policy',
+      legalFooter: '&copy; 2026 Chen Laoshi\'s Teaching Toolkit &middot; <a href="/about">About</a> &middot; <a href="/resources">Teaching Resources</a> &middot; <a href="/recommendations">Recommendations</a> &middot; <a href="/contact">Contact</a> &middot; <a href="/privacy">Privacy Policy</a>',
+      milkTeaKicker: 'Optional support',
+      milkTeaTitle: 'Enjoying the toolkit? Buy Chen Laoshi a milk tea.',
+      milkTeaToggle: 'Buy me a milk tea 🧋',
+      milkTeaHeading: 'Buy me a milk tea 🧋',
+      milkTeaBody: 'A small, optional treat helps support new classroom resources. Thank you—there is never any pressure.',
+      milkTeaClose: 'Close support options',
+      milkTeaChoose: 'Choose an amount'
+    },
+    zh: {
+      brand: '陈老师教学工具包',
+      tagline: '为每一个教室提供实用支持',
+      home: '首页',
+      tools: '教学工具',
+      resources: '教学资源',
+      finds: '教室好物',
+      about: '关于',
+      contact: '联系',
+      privacy: '隐私政策',
+      legalFooter: '&copy; 2026 陈老师教学工具包 &middot; <a href="/about">关于</a> &middot; <a href="/resources">教学资源</a> &middot; <a href="/recommendations">教室好物</a> &middot; <a href="/contact">联系</a> &middot; <a href="/privacy">隐私政策</a>',
+      milkTeaKicker: '可选支持',
+      milkTeaTitle: '喜欢这个工具包吗？请陈老师喝一杯奶茶。',
+      milkTeaToggle: '请我喝奶茶 🧋',
+      milkTeaHeading: '请我喝奶茶 🧋',
+      milkTeaBody: '一点小小的、完全自愿的心意可以帮助支持新的教室资源。谢谢您——完全没有压力。',
+      milkTeaClose: '关闭支持选项',
+      milkTeaChoose: '自选金额'
+    }
+  };
+
+  function getLang() {
+    var match = document.cookie.match(/(?:^|; )lang=([^;]+)/);
+    return match && decodeURIComponent(match[1]) === 'zh' ? 'zh' : 'en';
+  }
+
+  function buildLangSwitchHtml(lang) {
+    var redirect = encodeURIComponent(window.location.pathname + window.location.search);
+    return '<div class="site-lang-switch" role="group" aria-label="Language / 语言">' +
+      '<a class="' + (lang === 'en' ? 'is-active' : '') + '" href="/set-language?lang=en&redirect=' + redirect + '" hreflang="en" lang="en">EN</a>' +
+      '<a class="' + (lang === 'zh' ? 'is-active' : '') + '" href="/set-language?lang=zh&redirect=' + redirect + '" hreflang="zh" lang="zh">中文</a>' +
+      '</div>';
+  }
+
   function createFooter() {
+    var lang = getLang();
+    var t = LABELS[lang];
     if (document.getElementById('milkTeaFooter')) return;
 
     var style = document.createElement('style');
@@ -16,6 +72,10 @@
       '.site-main-nav-links { display: flex; align-items: center; justify-content: flex-end; gap: 3px; margin: 0; padding: 0; list-style: none; }',
       '.site-main-nav-links a { display: block; padding: 8px 10px; border-radius: 999px; color: #29463d; font-size: .85rem; font-weight: 900; text-decoration: none; white-space: nowrap; }',
       '.site-main-nav-links a:hover, .site-main-nav-links a[aria-current="page"] { background: #edf5df; color: #194f45; }',
+      '.site-lang-switch { display: flex; flex-shrink: 0; align-items: center; gap: 2px; padding: 3px; border: 1px solid #d7e3c7; border-radius: 999px; background: #fffdf7; }',
+      '.site-lang-switch a { padding: 5px 11px !important; border-radius: 999px; color: #5d7168; font-size: .78rem; font-weight: 800; text-decoration: none; }',
+      '.site-lang-switch a:hover { color: #194f45; background: transparent; }',
+      '.site-lang-switch a.is-active { background: #194f45; color: #fffdf7; }',
       '.site-legal-footer, .site-legal-footer * { box-sizing: border-box; }',
       '.site-legal-footer-inner { width: min(1140px, calc(100% - 40px)); margin: 0 auto; }',
       '.site-legal-footer p { margin: 0; color: inherit; font-size: .92rem; line-height: 1.6; }',
@@ -56,15 +116,16 @@
       nav.setAttribute('aria-label', 'Main navigation');
       nav.innerHTML = [
         '<div class="site-main-nav-inner">',
-        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" alt=""><span>Chen Laoshi\'s Teaching Toolkit<small>Practical tools for every classroom</small></span></a>',
+        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" alt=""><span>' + t.brand + '<small>' + t.tagline + '</small></span></a>',
         '  <ul class="site-main-nav-links">',
-        '    <li><a href="/">Home</a></li>',
-        '    <li><a href="/teaching-tools">Teaching Tools</a></li>',
-        '    <li><a href="/resources">Teaching Resources</a></li>',
-        '    <li><a href="/recommendations">Classroom Finds</a></li>',
-        '    <li><a href="/about">About</a></li>',
-        '    <li><a href="/contact">Contact</a></li>',
+        '    <li><a href="/">' + t.home + '</a></li>',
+        '    <li><a href="/teaching-tools">' + t.tools + '</a></li>',
+        '    <li><a href="/resources">' + t.resources + '</a></li>',
+        '    <li><a href="/recommendations">' + t.finds + '</a></li>',
+        '    <li><a href="/about">' + t.about + '</a></li>',
+        '    <li><a href="/contact">' + t.contact + '</a></li>',
         '  </ul>',
+        '  ' + buildLangSwitchHtml(lang),
         '</div>'
       ].join('');
       var currentPath = window.location.pathname;
@@ -83,7 +144,7 @@
     legalFooter.setAttribute('aria-label', 'Site information');
     legalFooter.innerHTML = [
       '<div class="site-legal-footer-inner">',
-      '  <p>&copy; 2026 Chen Laoshi\'s Teaching Toolkit &middot; <a href="/about">About</a> &middot; <a href="/resources">Teaching Resources</a> &middot; <a href="/recommendations">Recommendations</a> &middot; <a href="/contact">Contact</a> &middot; <a href="/privacy">Privacy Policy</a></p>',
+      '  <p>' + t.legalFooter + '</p>',
       '</div>'
     ].join('');
     if (legalFooter.parentElement !== document.body) document.body.appendChild(legalFooter);
@@ -96,19 +157,19 @@
       '<div class="milk-tea-footer-inner">',
       '  <div class="milk-tea-footer-copy">',
       '    <span class="milk-tea-footer-icon" aria-hidden="true">🧋</span>',
-      '    <div><p class="milk-tea-footer-kicker">Optional support</p><p class="milk-tea-footer-title">Enjoying the toolkit? Buy Chen Laoshi a milk tea.</p></div>',
+      '    <div><p class="milk-tea-footer-kicker">' + t.milkTeaKicker + '</p><p class="milk-tea-footer-title">' + t.milkTeaTitle + '</p></div>',
       '  </div>',
       '  <div class="milk-tea-footer-actions">',
       '    <div class="milk-tea-menu" id="milkTeaMenu" hidden>',
-      '      <div class="milk-tea-menu-header"><div><h2>Buy me a milk tea 🧋</h2><p>A small, optional treat helps support new classroom resources. Thank you—there is never any pressure.</p></div><button class="milk-tea-close" type="button" aria-label="Close support options">×</button></div>',
+      '      <div class="milk-tea-menu-header"><div><h2>' + t.milkTeaHeading + '</h2><p>' + t.milkTeaBody + '</p></div><button class="milk-tea-close" type="button" aria-label="' + t.milkTeaClose + '">×</button></div>',
       '      <div class="milk-tea-options">',
       '        <a class="milk-tea-option primary" href="https://paypal.me/chenlaoshitoolkit/1.99USD" target="_blank" rel="noopener noreferrer">$1.99</a>',
       '        <a class="milk-tea-option" href="https://paypal.me/chenlaoshitoolkit/4.99USD" target="_blank" rel="noopener noreferrer">$4.99</a>',
       '        <a class="milk-tea-option" href="https://paypal.me/chenlaoshitoolkit/9.99USD" target="_blank" rel="noopener noreferrer">$9.99</a>',
-      '        <a class="milk-tea-option" href="https://paypal.me/chenlaoshitoolkit" target="_blank" rel="noopener noreferrer">Choose an amount</a>',
+      '        <a class="milk-tea-option" href="https://paypal.me/chenlaoshitoolkit" target="_blank" rel="noopener noreferrer">' + t.milkTeaChoose + '</a>',
       '      </div>',
       '    </div>',
-      '    <button class="milk-tea-footer-toggle" type="button" aria-expanded="false" aria-controls="milkTeaMenu">Buy me a milk tea 🧋</button>',
+      '    <button class="milk-tea-footer-toggle" type="button" aria-expanded="false" aria-controls="milkTeaMenu">' + t.milkTeaToggle + '</button>',
       '  </div>',
       '</div>'
     ].join('');

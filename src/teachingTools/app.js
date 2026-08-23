@@ -29,28 +29,14 @@ app.use(function(req, res, next) {
   next();
 });
 
-// Site-wide language support: read the preference cookie, expose it (and a
-// t() translation helper) to every view, and inject the shared site header
-// right after <body> for rendered pages, without editing every template.
+// Site-wide language support: read the preference cookie and expose it (plus
+// a t() translation helper) to every view. The nav bar itself is injected
+// client-side by public/javascripts/milk-tea-footer.js, which reads this same
+// cookie to render its own language toggle and bilingual labels.
 app.use(function(req, res, next) {
   var lang = i18n.normalizeLang(req.cookies && req.cookies.lang);
   res.locals.lang = lang;
   res.locals.t = function(key) { return i18n.t(lang, key); };
-
-  if (req.path.indexOf('/admin') === 0) return next();
-
-  var originalRender = res.render.bind(res);
-  res.render = function(view, options, callback) {
-    if (typeof options === 'function') { callback = options; options = undefined; }
-    originalRender(view, options, function(err, html) {
-      if (err) return callback ? callback(err) : next(err);
-      req.app.render('partials/site-header', res.locals, function(headerErr, headerHtml) {
-        var withHeader = headerErr ? html : html.replace(/<body([^>]*)>/i, '<body$1>' + headerHtml);
-        if (callback) return callback(null, withHeader);
-        res.send(withHeader);
-      });
-    });
-  };
   next();
 });
 
