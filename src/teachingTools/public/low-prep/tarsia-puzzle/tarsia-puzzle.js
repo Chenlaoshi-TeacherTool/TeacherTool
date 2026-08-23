@@ -10,16 +10,8 @@
   var toastTimer;
   var activeEmojiRow = -1;
   var wordLists = [];
-  var selectedWordListValues = [];
-  var questionBanks = [];
   var wordIndex = new Map();
   var SIDE_ORDER = ['chinese', 'english', 'pinyin', 'emoji'];
-  var WORD_LIST_ICONS = {
-    'preset-hsk-1-essentials': '⭐',
-    'preset-food-and-fruit': '🍎',
-    'preset-classroom-basics': '🎒',
-    'preset-weather-and-seasons': '🌦️'
-  };
 
   var vocabularySample = [
     ['苹果', 'apple', 'píng guǒ', '🍎'], ['香蕉', 'banana', 'xiāng jiāo', '🍌'],
@@ -113,9 +105,8 @@
   function cacheElements() {
     [
       'puzzleTitle', 'puzzleSize', 'vocabularyControls', 'qaControls', 'contentHeading', 'sideChoiceCount',
-      'pairCount', 'toggleWordLibrary', 'wordLibraryPanel', 'wordListChoices', 'wordListSelectionNote',
-      'addWordList', 'wordListStatus', 'vocabularyInput',
-      'buildVocabularyPairs', 'questionBankSelect', 'addQuestionBank', 'questionBankStatus',
+      'pairCount', 'toggleWordLibrary', 'wordLibraryPanel', 'wordListPicker', 'vocabularyInput',
+      'buildVocabularyPairs', 'questionBankPicker',
       'qaInput', 'buildQaPairs', 'pairEditor', 'validationMessage', 'loadSample', 'generatePuzzle',
       'reshufflePuzzle', 'clearPuzzle', 'previewStatus', 'pagePreview', 'previewNote', 'printPuzzle',
       'downloadPdf', 'downloadPptx', 'emojiPicker', 'closeEmojiPicker', 'emojiSearch', 'emojiGrid',
@@ -176,13 +167,6 @@
     elements.toggleWordLibrary.addEventListener('click', function () {
       setWordLibraryExpanded(elements.toggleWordLibrary.getAttribute('aria-expanded') !== 'true');
     });
-    elements.wordListChoices.addEventListener('click', function (event) {
-      var button = event.target.closest('button[data-word-list-value]');
-      if (button) toggleWordListSelection(button.dataset.wordListValue);
-    });
-    elements.addWordList.addEventListener('click', addSelectedWordLists);
-    elements.addQuestionBank.addEventListener('click', addSelectedQuestionBank);
-    elements.questionBankSelect.addEventListener('change', function () { elements.addQuestionBank.disabled = !elements.questionBankSelect.value; });
     elements.pairEditor.addEventListener('input', editPairValue);
     elements.pairEditor.addEventListener('click', function (event) {
       var trigger = event.target.closest('[data-emoji-row]');
@@ -722,50 +706,39 @@
     saveDraft();
   }
 
+  function refreshWordIndex() {
+    wordIndex.clear();
+    wordLists.forEach(function (list) {
+      (list.items || []).forEach(function (item) {
+        var record = { zh: item.zh || '', py: item.py || '', en: item.en || '' };
+        if (record.zh) wordIndex.set(normalizeSearch(record.zh), record);
+        if (record.en) wordIndex.set(normalizeSearch(record.en), record);
+      });
+    });
+  }
+
   async function loadWordLists() {
     try {
       var response = await fetch('/api/wordlists/presets');
       if (!response.ok) throw new Error('Word-list request failed');
       var data = await response.json();
-      var topicSets = (data.lists || []).map(function (list) {
-        return Object.assign({}, list, { source: 'topic', selectValue: 'topic:' + list.id });
-      });
+      var topicSets = data.lists || [];
       var savedLists = [];
       if (window.ChenWordlist) {
         savedLists = window.ChenWordlist.listAll().map(function (summary) {
           var list = window.ChenWordlist.load(summary.id);
           if (!list || !Array.isArray(list.items)) return null;
-          return Object.assign({}, list, {
-            count: list.items.length,
-            source: 'saved',
-            selectValue: 'saved:' + list.id
-          });
+          return list;
         }).filter(Boolean);
       }
       wordLists = topicSets.concat(savedLists);
-      wordIndex.clear();
-      wordLists.forEach(function (list) {
-        (list.items || []).forEach(function (item) {
-          var record = { zh: item.zh || '', py: item.py || '', en: item.en || '' };
-          if (record.zh) wordIndex.set(normalizeSearch(record.zh), record);
-          if (record.en) wordIndex.set(normalizeSearch(record.en), record);
-        });
-      });
-      selectedWordListValues = selectedWordListValues.filter(function (value) {
-        return wordLists.some(function (list) { return list.selectValue === value; });
-      });
-      renderWordListChoices();
+      refreshWordIndex();
       if (state.mode === 'vocabulary') {
         buildVocabularyPairs(true);
         if (completedPairCount() === requiredPairCount()) generatePuzzle(true);
       }
     } catch (error) {
       wordLists = [];
-      selectedWordListValues = [];
-      elements.wordListChoices.innerHTML = '<p class="word-list-empty">Vocabulary topics are unavailable right now.</p>';
-      elements.wordListStatus.textContent = 'You can still paste vocabulary and edit every generated match manually.';
-      elements.wordListSelectionNote.textContent = 'Topics will appear when the library loads.';
-      elements.addWordList.disabled = true;
     }
   }
 
@@ -774,64 +747,13 @@
     elements.wordLibraryPanel.hidden = !expanded;
   }
 
-  function wordListIcon(list) {
-    return list.source === 'saved' ? '📚' : (WORD_LIST_ICONS[list.id] || '🀄');
-  }
-
-  function renderWordListChoices() {
-    var topicCount = wordLists.filter(function (list) { return list.source === 'topic'; }).length;
-    var savedCount = wordLists.length - topicCount;
-    elements.wordListChoices.innerHTML = wordLists.map(function (list) {
-      var selected = selectedWordListValues.indexOf(list.selectValue) >= 0;
-      var count = list.count || (list.items || []).length;
-      var sourceLabel = list.source === 'saved' ? 'Saved list' : (list.theme || 'Published topic');
-      return '<button class="word-list-choice" type="button" data-word-list-value="' + escapeAttribute(list.selectValue) + '" aria-pressed="' + selected + '" aria-label="' + escapeAttribute((selected ? 'Remove ' : 'Select ') + (list.name || 'vocabulary topic')) + '">' +
-        '<span class="word-list-choice-icon" aria-hidden="true">' + escapeHtml(wordListIcon(list)) + '</span>' +
-        '<span class="word-list-choice-copy">' + escapeHtml(list.name || 'Untitled list') + '<small>' + escapeHtml(sourceLabel + ' · ' + count + ' terms') + '</small></span>' +
-        '</button>';
-    }).join('') || '<p class="word-list-empty">No vocabulary topics are available yet.</p>';
-    elements.wordListStatus.textContent = topicCount + ' published vocabulary topic' + (topicCount === 1 ? '' : 's') +
-      (savedCount ? ' and ' + savedCount + ' saved list' + (savedCount === 1 ? '' : 's') : '') + ' are available.';
-    elements.wordListSelectionNote.textContent = selectedWordListValues.length
-      ? selectedWordListValues.length + ' topic' + (selectedWordListValues.length === 1 ? '' : 's') + ' selected'
-      : 'Choose at least 1 topic';
-    elements.addWordList.textContent = selectedWordListValues.length === 1 ? 'Add selected topic' : 'Add selected topics';
-    elements.addWordList.disabled = selectedWordListValues.length === 0;
-  }
-
-  function toggleWordListSelection(value) {
-    var index = selectedWordListValues.indexOf(value);
-    if (index >= 0) selectedWordListValues.splice(index, 1);
-    else selectedWordListValues.push(value);
-    renderWordListChoices();
-  }
-
-  async function loadQuestionBanks() {
-    try {
-      var response = await fetch('/api/questionbanks/presets');
-      if (!response.ok) throw new Error('Question-bank request failed');
-      var data = await response.json();
-      questionBanks = data.banks || [];
-      elements.questionBankSelect.innerHTML = '<option value="">Choose a question bank…</option>' + questionBanks.map(function (bank) {
-        return '<option value="' + escapeAttribute(bank.id) + '">' + escapeHtml(bank.name) + ' · ' + bank.count + ' questions</option>';
-      }).join('');
-      elements.questionBankStatus.textContent = questionBanks.length + ' teacher-curated question banks available. Answers can be edited after import.';
-    } catch (error) {
-      elements.questionBankSelect.innerHTML = '<option value="">Library unavailable</option>';
-      elements.questionBankStatus.textContent = 'You can still paste your own questions and answers.';
-    }
-  }
-
-  function addSelectedWordLists() {
-    var selected = selectedWordListValues.map(function (value) {
-      return wordLists.find(function (list) { return list.selectValue === value; });
-    }).filter(Boolean);
-    if (!selected.length) return;
+  function addTermsFromWordLists(lists) {
+    if (!lists.length) return;
     var existing = elements.vocabularyInput.value.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
     if (elements.vocabularyInput.value.trim() === sampleVocabularyText(requiredPairCount()).trim()) existing = [];
     var keys = new Set(existing.map(function (line) { return normalizeSearch(parseVocabularyLine(line).source); }));
     var added = 0;
-    selected.forEach(function (list) {
+    lists.forEach(function (list) {
       (list.items || []).forEach(function (item) {
         if (existing.length >= requiredPairCount()) return;
         if (keys.has(normalizeSearch(item.zh))) return;
@@ -844,39 +766,60 @@
     elements.vocabularyInput.value = existing.join('\n');
     buildVocabularyPairs(true);
     if (added) {
-      showToast('Added ' + added + ' terms from ' + selected.length + ' selected topic' + (selected.length === 1 ? '' : 's') + '.');
-      selectedWordListValues = [];
-      renderWordListChoices();
+      showToast('Added ' + added + ' terms from ' + lists.length + ' selected topic' + (lists.length === 1 ? '' : 's') + '.');
       setWordLibraryExpanded(false);
     } else {
       showToast('There is no room for more terms. Clear the current list or choose a larger puzzle.');
     }
   }
 
-  async function addSelectedQuestionBank() {
-    var id = elements.questionBankSelect.value;
-    var meta = questionBanks.find(function (bank) { return bank.id === id; });
-    if (!id) return;
-    elements.addQuestionBank.disabled = true;
-    try {
-      var response = await fetch('/api/questionbanks/presets/' + encodeURIComponent(id));
-      if (!response.ok) throw new Error('Question bank unavailable');
-      var bank = await response.json();
-      var existing = elements.qaInput.value.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+  function addQuestionsFromBanks(banks) {
+    if (!banks.length) return;
+    var existing = elements.qaInput.value.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+    var added = 0;
+    banks.forEach(function (bank) {
       (bank.questions || []).forEach(function (question) {
         if (existing.length >= requiredPairCount()) return;
         var prompt = question.prompt || question.question || question.text || '';
         var answer = resolveQuestionAnswer(question);
-        if (prompt && answer) existing.push(prompt.replace(/\|/g, '/') + ' | ' + answer.replace(/\|/g, '/'));
+        if (prompt && answer) { existing.push(prompt.replace(/\|/g, '/') + ' | ' + answer.replace(/\|/g, '/')); added += 1; }
       });
-      elements.qaInput.value = existing.join('\n');
-      buildQaPairs(true);
-      showToast('Added questions from ' + ((meta && meta.name) || bank.name || 'the selected bank') + '.');
-    } catch (error) {
-      showToast('That question bank could not be loaded.');
-    } finally {
-      elements.addQuestionBank.disabled = false;
+    });
+    elements.qaInput.value = existing.join('\n');
+    buildQaPairs(true);
+    if (added) {
+      showToast('Added questions from ' + banks.map(function (bank) { return bank.name; }).join(', ') + '.');
+    } else {
+      showToast('There is no room for more questions. Clear the current list or choose a larger puzzle.');
     }
+  }
+
+  function initLibraryPickers() {
+    if (!window.ChenLibraryPicker) return;
+    var wordListPicker = ChenLibraryPicker.create({
+      root: elements.wordListPicker,
+      source: 'wordlists',
+      min: 1,
+      title: 'Create a puzzle from published vocabulary topics',
+      hint: 'Choose one or more topics. Terms are added in order until the puzzle is full.',
+      importLabel: 'Add selected topics',
+      onImport: function (lists) {
+        addTermsFromWordLists(lists);
+        wordListPicker.reset();
+      }
+    });
+    var questionBankPicker = ChenLibraryPicker.create({
+      root: elements.questionBankPicker,
+      source: 'questionbanks',
+      min: 1,
+      title: 'Add preset questions',
+      hint: 'Choose one or more question banks. Answers can be edited after import.',
+      importLabel: 'Add questions',
+      onImport: function (banks) {
+        addQuestionsFromBanks(banks);
+        questionBankPicker.reset();
+      }
+    });
   }
 
   function resolveQuestionAnswer(question) {
@@ -1125,7 +1068,7 @@
     bindEvents();
     loadDraft();
     loadWordLists();
-    loadQuestionBanks();
+    initLibraryPickers();
   }
 
   initialize();

@@ -1,0 +1,17 @@
+/* Default look for ChenLibraryPicker (public/shared/library-picker.js). */
+.lib-picker{margin:0 0 15px;padding:14px;border:2px solid #d8e4c8;border-radius:11px;background:linear-gradient(135deg,#fffef8,#f2f7eb)}
+.lib-picker-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.lib-picker h3{margin:0;color:#2f5233;font-size:17px}
+.lib-picker-kicker{margin:0 0 2px;color:#3d6b43;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.lib-picker .hint{margin:3px 0 0;color:#5a6b52}
+.lib-picker-library-link{flex:0 0 auto;padding:5px 9px;border:1.5px solid #1f2d1f;border-radius:7px;color:#1f2d1f;background:#fff;text-decoration:none;font-size:12px;font-weight:700}
+.lib-picker-library-link:hover{background:#fff4c2}
+.lib-picker-status{min-height:18px;margin:10px 0 7px;color:#6b7a63;font-size:12px;font-weight:600}
+.lib-picker-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:7px}
+button.lib-picker-choice{min-height:39px;padding:7px 9px;display:flex;align-items:center;gap:7px;border:1.5px solid #d8e4c8;border-radius:8px;background:#fff;box-shadow:none;text-align:left;font-size:12px;line-height:1.2;cursor:pointer}
+button.lib-picker-choice:hover{border-color:#e8c34a;background:#fff8de}
+button.lib-picker-choice[aria-pressed="true"]{border-color:#2f5233;background:#2f5233;color:#fff}
+.lib-picker-choice-icon{font-size:16px;line-height:1}
+.lib-picker-actions{margin-top:11px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lib-picker-note{color:#6b7a63;font-size:12px;font-weight:600}
+@media(max-width:700px){.lib-picker-head{flex-direction:column}.lib-picker-library-link{align-self:flex-start}.lib-picker-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
