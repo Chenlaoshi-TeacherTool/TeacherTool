@@ -7,6 +7,7 @@
   <title>Bingo Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Turn any list of vocabulary or sentences into a set of unique, printable bingo sheets in Chinese, English, pinyin, or all three.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="/low-prep/bingo-generator/bingo-generator.css">
 </head>
 <body class="bingo-page">
@@ -72,6 +73,7 @@
             </label>
             <p class="field-help">Format: <strong>term | pinyin | English</strong>. Pinyin and English fill in automatically for common words if you leave them out — just typing the term on each line also works.</p>
             <p id="term-count" class="term-count" aria-live="polite">No terms detected yet.</p>
+            <div id="bingoLibraryPicker"></div>
           </section>
 
           <section class="panel">
@@ -116,6 +118,7 @@
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/library-picker.js"></script>
   <script src="/vendor/docx.iife.js" defer></script>
   <script src="/low-prep/bingo-generator/bingo-generator.js" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>

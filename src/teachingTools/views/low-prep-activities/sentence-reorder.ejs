@@ -7,6 +7,7 @@
   <title>Sentence Reorder - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Type in sentences and turn them into drag-and-drop word puzzles. Students drag the scrambled words back into the correct order, right in the browser.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder.css?v=3">
 </head>
 <body class="reorder-page">
@@ -38,6 +39,7 @@
           <label for="sentence-input">One sentence per line. Words are split by spaces.</label>
           <textarea id="sentence-input" rows="6" placeholder="The quick brown fox jumps over the lazy dog.&#10;She sells seashells by the seashore."></textarea>
           <p class="reorder-help">Punctuation stays attached to the word it's next to (e.g. "dog." is one chip).</p>
+          <div id="sentenceLibraryPicker"></div>
         </section>
 
         <section class="reorder-panel">
@@ -86,6 +88,7 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
+  <script src="/shared/library-picker.js" defer></script>
   <script src="/low-prep/sentence-reorder/sentence-reorder.js?v=4" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>

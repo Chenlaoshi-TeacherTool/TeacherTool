@@ -27,6 +27,49 @@
 
   sentenceInput.addEventListener('input', updateSetupStatus);
   updateSetupStatus();
+  initLibraryPicker();
+
+  var SENTENCE_TEMPLATES = [
+    'I like the {word}.',
+    'This is a {word}.',
+    'I can see a {word}.',
+    'She has a {word}.',
+    'We need a {word}.',
+    'Where is the {word}?'
+  ];
+
+  function sentencesFromWordList(list, templateOffset) {
+    return (list.items || [])
+      .filter(function (item) { return item.en; })
+      .map(function (item, index) {
+        var template = SENTENCE_TEMPLATES[(templateOffset + index) % SENTENCE_TEMPLATES.length];
+        return template.replace('{word}', String(item.en).trim().toLowerCase());
+      });
+  }
+
+  function initLibraryPicker() {
+    if (!window.ChenLibraryPicker) return;
+    var picker = ChenLibraryPicker.create({
+      root: document.getElementById('sentenceLibraryPicker'),
+      source: 'wordlists',
+      min: 1,
+      title: 'Add example sentences from the library',
+      hint: 'Choose one or more vocabulary topics. Each term becomes a simple sentence you can shuffle into a word-order puzzle.',
+      importLabel: 'Add sentences from selected topics',
+      onImport: function (lists) {
+        var lines = [];
+        lists.forEach(function (list, listIndex) {
+          lines = lines.concat(sentencesFromWordList(list, listIndex));
+        });
+        if (lines.length) {
+          var existing = sentenceInput.value.trim();
+          sentenceInput.value = (existing ? existing + '\n' : '') + lines.join('\n');
+          updateSetupStatus();
+        }
+        picker.reset();
+      }
+    });
+  }
 
   function updateSetupStatus() {
     var count = parseSentences(sentenceInput.value).length;
