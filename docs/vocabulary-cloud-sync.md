@@ -1,5 +1,9 @@
 # Vocabulary Library: cloud-sync rollout
 
+> **Superseded:** the Azure Table Storage decision below has been replaced by a single Azure SQL
+> database for all content, including teacher-owned word lists. See
+> `docs/azure-architecture-migration.md`.
+
 ## What is complete locally
 
 - Public preset word-list API: `GET /api/wordlists/presets`

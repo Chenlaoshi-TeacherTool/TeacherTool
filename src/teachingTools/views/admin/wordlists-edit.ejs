@@ -1,0 +1,60 @@
+<%- include('layout-head') %>
+<h1><%= list ? 'Edit: ' + list.name : 'New Word List' %></h1>
+
+<form method="POST" action="<%= list ? '/admin/wordlists/' + list.id : '/admin/wordlists/new' %>">
+  <label>Slug (used in URLs, no spaces)</label>
+  <input type="text" name="slug" value="<%= list ? list.slug : '' %>" required>
+  <label>Name</label>
+  <input type="text" name="name" value="<%= list ? list.name : '' %>" required>
+  <label>Description</label>
+  <textarea name="description" rows="2"><%= list ? (list.description || '') : '' %></textarea>
+  <label>Theme</label>
+  <input type="text" name="theme" value="<%= list ? (list.theme || '') : '' %>">
+  <label>Level</label>
+  <input type="text" name="level" value="<%= list ? (list.level || '') : '' %>">
+  <label>Curriculum</label>
+  <input type="text" name="curriculum" value="<%= list ? (list.curriculum || '') : '' %>">
+  <div class="actions">
+    <button type="submit"><%= list ? 'Save changes' : 'Create word list' %></button>
+  </div>
+</form>
+
+<% if (list) { %>
+<h2 style="margin-top:32px;">Terms (<%= items.length %>)</h2>
+<div class="items-grid">
+  <div class="grid-header">Chinese</div>
+  <div class="grid-header">Pinyin</div>
+  <div class="grid-header">English</div>
+  <div class="grid-header">Note</div>
+  <div class="grid-header"></div>
+  <div class="grid-header"></div>
+
+  <% items.forEach(function (item) { %>
+  <form class="row-form" method="POST" action="/admin/wordlists/<%= list.id %>/items/<%= item.id %>">
+    <div><input type="text" name="zh" value="<%= item.zh %>" required></div>
+    <div><input type="text" name="py" value="<%= item.py %>" required></div>
+    <div><input type="text" name="en" value="<%= item.en %>" required></div>
+    <div><input type="text" name="note" value="<%= item.note || '' %>"></div>
+    <div><button type="submit">Save</button></div>
+  </form>
+  <form method="POST" action="/admin/wordlists/<%= list.id %>/items/<%= item.id %>/delete" onsubmit="return confirm('Delete this term?');">
+    <button type="submit" class="danger">Delete</button>
+  </form>
+  <% }) %>
+
+  <form class="row-form" method="POST" action="/admin/wordlists/<%= list.id %>/items">
+    <div><input type="text" name="zh" placeholder="Chinese" required></div>
+    <div><input type="text" name="py" placeholder="Pinyin" required></div>
+    <div><input type="text" name="en" placeholder="English" required></div>
+    <div><input type="text" name="note" placeholder="(optional)"></div>
+    <div><button type="submit">Add term</button></div>
+  </form>
+  <div></div>
+</div>
+
+<form method="POST" action="/admin/wordlists/<%= list.id %>/delete" onsubmit="return confirm('Delete this entire word list and all its terms?');" style="margin-top:24px;">
+  <button type="submit" class="danger">Delete this word list</button>
+</form>
+<% } %>
+
+<%- include('layout-foot') %>

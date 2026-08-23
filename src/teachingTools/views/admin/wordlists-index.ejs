@@ -1,0 +1,21 @@
+<%- include('layout-head') %>
+<h1>Word Lists</h1>
+<p><a class="button" href="/admin/wordlists/new">+ New word list</a></p>
+<table>
+  <thead>
+    <tr><th>Name</th><th>Slug</th><th>Theme</th><th>Level</th><th># Terms</th><th></th></tr>
+  </thead>
+  <tbody>
+    <% lists.forEach(function (list) { %>
+    <tr>
+      <td><%= list.name %></td>
+      <td><%= list.slug %></td>
+      <td><%= list.theme || '' %></td>
+      <td><%= list.level || '' %></td>
+      <td><%= list.item_count %></td>
+      <td><a href="/admin/wordlists/<%= list.id %>/edit">Edit</a></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('layout-foot') %>

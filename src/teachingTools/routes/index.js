@@ -1,8 +1,20 @@
 var express = require('express');
 var router = express.Router();
 var siteContent = require('../data/site-content');
+var dabSiteContent = require('../services/dabSiteContentClient');
 var toolGuides = siteContent.toolGuides;
 var articles = siteContent.articles;
+
+if (process.env.DAB_BASE_URL) {
+  dabSiteContent.loadAll()
+    .then(function (result) {
+      toolGuides = result.toolGuides;
+      articles = result.articles;
+    })
+    .catch(function (err) {
+      console.error('Could not load site content from DAB, keeping built-in content:', err.message);
+    });
+}
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -165,7 +177,7 @@ router.get('/theme-activities/weather/songs', function(req, res, next) {
 
 router.get('/robots.txt', function(req, res) {
   var baseUrl = res.locals.siteUrl.replace(/\/$/, '');
-  res.type('text/plain').send('User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ' + baseUrl + '/sitemap.xml\n');
+  res.type('text/plain').send('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\nSitemap: ' + baseUrl + '/sitemap.xml\n');
 });
 
 router.get('/sitemap.xml', function(req, res) {

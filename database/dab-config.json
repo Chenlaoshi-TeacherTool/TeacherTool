@@ -1,0 +1,99 @@
+{
+  "$schema": "https://github.com/Azure/data-api-builder/releases/latest/download/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "@env('DATABASE_CONNECTION_STRING')"
+  },
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/api"
+    },
+    "graphql": {
+      "enabled": false
+    },
+    "host": {
+      "cors": {
+        "origins": ["*"],
+        "allow-credentials": false
+      },
+      "authentication": {
+        "provider": "AppService"
+      }
+    }
+  },
+  "entities": {
+    "WordList": {
+      "source": "dbo.word_lists",
+      "rest": {
+        "path": "/wordlists"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
+    "WordListItem": {
+      "source": "dbo.word_list_items",
+      "rest": {
+        "path": "/wordlistitems"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
+    "QuestionBank": {
+      "source": "dbo.question_banks",
+      "rest": {
+        "path": "/questionbanks"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
+    "Question": {
+      "source": "dbo.questions",
+      "rest": {
+        "path": "/questions"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
+    "ToolGuide": {
+      "source": "dbo.tool_guides",
+      "rest": {
+        "path": "/toolguides"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
+    "Article": {
+      "source": "dbo.articles",
+      "rest": {
+        "path": "/articles"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    }
+  }
+}
