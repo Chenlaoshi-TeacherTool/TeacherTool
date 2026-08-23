@@ -141,6 +141,10 @@ router.get('/teaching-tools/tarsia-puzzle', function(req, res, next) {
   res.render('low-prep-activities/tarsia-puzzle', { title: 'Tarsia Puzzle Generator', toolGuide: siteContentStore.get().toolGuides['tarsia-puzzle'] });
 });
 
+router.get('/teaching-tools/bingo-generator', function(req, res, next) {
+  res.render('low-prep-activities/bingo-generator', { title: 'Bingo Generator', toolGuide: siteContentStore.get().toolGuides['bingo-generator'] });
+});
+
 router.get('/low-prep-activities', function(req, res) {
   res.redirect(301, '/teaching-tools#low-prep-activities');
 });
@@ -185,7 +189,8 @@ router.get('/sitemap.xml', function(req, res) {
     '/low-prep/word-sudoku/word-sudoku-widget.html', '/low-prep/word-cloud/word-cloud-widget.html',
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',
-    '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle'
+    '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle',
+    '/teaching-tools/bingo-generator'
   ].concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var urls = paths.map(function(path) {
     return '  <url><loc>' + baseUrl + path + '</loc></url>';

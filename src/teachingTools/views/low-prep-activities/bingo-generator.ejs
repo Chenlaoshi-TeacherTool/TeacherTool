@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#315f4f">
+  <title>Bingo Generator - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Turn any list of vocabulary or sentences into a set of unique, printable bingo sheets in Chinese, English, pinyin, or all three.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/bingo-generator/bingo-generator.css">
+</head>
+<body class="bingo-page">
+  <main class="bingo-wrap">
+    <header class="bingo-hero">
+      <div class="bingo-hero-copy">
+        <a class="back-link" href="/teaching-tools#low-prep-activities">← Back to Teaching Tools</a>
+        <p class="eyebrow">Printable review game</p>
+        <h1><span aria-hidden="true">🎯</span> Bingo Generator</h1>
+        <p>Paste in your vocabulary or sentences, choose how many different sheets you need, and download a set of shuffled bingo cards as a Word document or a printable PDF.</p>
+        <div class="hero-points" aria-label="Tool highlights">
+          <span>Every sheet is shuffled differently</span>
+          <span>Chinese, English, pinyin, or all three</span>
+          <span>Download Word or print to PDF</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="bingo-grid">
+      <section class="builder" aria-label="Build a bingo game">
+        <form id="bingo-form">
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="step-number">1</span>
+                <p class="eyebrow">Setup</p>
+                <h2>Name your game</h2>
+              </div>
+              <button id="load-example" class="ghost-button" type="button">Load example</button>
+            </div>
+            <div class="form-grid">
+              <label for="title">Game title
+                <input id="title" type="text" maxlength="70" placeholder="e.g. Unit 3 Vocabulary Bingo" value="Vocabulary Bingo">
+              </label>
+              <label for="sheets">How many different bingo sheets?
+                <input id="sheets" type="number" min="1" max="60" step="1" value="10" required>
+              </label>
+            </div>
+            <div class="form-grid">
+              <label for="gridSize">Grid size
+                <select id="gridSize">
+                  <option value="5" selected>5 × 5 (25 spaces)</option>
+                  <option value="4">4 × 4 (16 spaces)</option>
+                </select>
+              </label>
+              <label class="checkbox-field" for="freeSpace">
+                <input id="freeSpace" type="checkbox" checked>
+                Include a FREE space in the center
+              </label>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="step-number">2</span>
+                <p class="eyebrow">Content</p>
+                <h2>Add your terms or sentences</h2>
+              </div>
+            </div>
+            <label for="terms">One term per line
+              <textarea id="terms" class="terms-textarea" required placeholder="猫 | māo | cat&#10;狗 | gǒu | dog&#10;鸟 | niǎo | bird"></textarea>
+            </label>
+            <p class="field-help">Format: <strong>term | pinyin | English</strong>. Pinyin and English fill in automatically for common words if you leave them out — just typing the term on each line also works.</p>
+            <p id="term-count" class="term-count" aria-live="polite">No terms detected yet.</p>
+          </section>
+
+          <section class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="step-number">3</span>
+                <p class="eyebrow">Display</p>
+                <h2>What should each space show?</h2>
+              </div>
+            </div>
+            <div class="mode-switch" role="radiogroup" aria-label="Display language">
+              <label><input type="radio" name="displayMode" value="zh" checked> Term only</label>
+              <label><input type="radio" name="displayMode" value="en"> English only</label>
+              <label><input type="radio" name="displayMode" value="py"> Pinyin only</label>
+              <label><input type="radio" name="displayMode" value="all"> Show all</label>
+            </div>
+          </section>
+
+          <div class="form-footer">
+            <button class="generate-button" type="submit">Generate bingo sheets</button>
+            <p id="generation-status" class="generation-status" aria-live="polite"></p>
+          </div>
+          <div class="download-row">
+            <button id="download-word" class="download-button" type="button" disabled>Download Word (.docx)</button>
+            <button id="print-pdf" class="download-button" type="button" disabled>Print / Save as PDF</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="preview-panel" aria-label="Generated bingo sheets">
+        <div class="preview-heading">
+          <h2>Preview</h2>
+          <p>Generated sheets appear here and are what gets printed to PDF.</p>
+        </div>
+        <div id="preview-area" class="preview-area">
+          <p class="preview-empty">Fill out the form and click “Generate bingo sheets” to see your cards here.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="/vendor/docx.iife.js" defer></script>
+  <script src="/low-prep/bingo-generator/bingo-generator.js" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
