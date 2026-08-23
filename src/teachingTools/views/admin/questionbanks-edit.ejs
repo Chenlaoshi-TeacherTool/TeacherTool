@@ -21,6 +21,7 @@
 
 <% if (bank) { %>
 <h2 style="margin-top:32px;">Questions (<%= questions.length %>)</h2>
+<p><a class="button" href="/admin/questionbanks/<%= bank.id %>/import">Import from Excel</a></p>
 
 <% questions.forEach(function (q) { %>
 <div class="question-card">

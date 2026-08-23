@@ -1,0 +1,39 @@
+<%- include('layout-head') %>
+<h1>Import into: <%= bank.name %></h1>
+<p><a href="/admin/questionbanks/<%= bank.id %>/edit">&larr; Back to question bank</a></p>
+
+<% if (result) { %>
+  <% if (result.error) { %>
+    <p style="color:#dc2626;"><%= result.error %></p>
+  <% } else { %>
+    <p style="color:#16a34a;">Done: <%= result.created %> created, <%= result.updated %> updated<% if (result.skipped) { %>, <%= result.skipped %> skipped (missing prompt or answer)<% } %>. (<%= result.total %> rows read.)</p>
+  <% } %>
+<% } %>
+
+<form method="POST" action="/admin/questionbanks/<%= bank.id %>/import" enctype="multipart/form-data">
+  <label>Excel file (.xlsx)</label>
+  <input type="file" name="file" accept=".xlsx" required>
+  <div class="actions">
+    <button type="submit">Upload and import</button>
+  </div>
+</form>
+
+<div style="margin-top:24px;font-size:0.9rem;color:#444;">
+  <p>The first row must be column headers (any order). Rows are matched to existing questions by <code>id</code> — a matching id updates that question, a new id creates one.</p>
+  <table>
+    <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>Question id, e.g. <code>AN001</code>. Required — rows without one are skipped.</td></tr>
+      <tr><td><code>theme</code></td><td>Original topic label (e.g. Chinese theme text). Optional.</td></tr>
+      <tr><td><code>level</code></td><td>Level code: <code>初级</code>, <code>中级</code>, or <code>高级</code>.</td></tr>
+      <tr><td><code>prompt</code></td><td>The question text. Required.</td></tr>
+      <tr><td><code>answer</code></td><td>The correct answer. Required.</td></tr>
+      <tr><td><code>tags</code></td><td>Comma-separated tags, e.g. <code>词汇, 翻译</code>.</td></tr>
+      <tr><td><code>type</code></td><td>Type code: <code>单选题</code>, <code>填空题</code>, or <code>情境题</code>.</td></tr>
+      <tr><td><code>options</code></td><td>Comma-separated answer choices, only for <code>单选题</code>.</td></tr>
+      <tr><td><code>note</code></td><td>Optional scoring/teacher note.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<%- include('layout-foot') %>
