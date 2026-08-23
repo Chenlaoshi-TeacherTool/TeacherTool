@@ -8,8 +8,6 @@
   var A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main';
   var $ = function (selector) { return document.querySelector(selector); };
   var toastTimer;
-  var presetQuestionBanks = [];
-  var selectedPresetBankIds = [];
 
   var sourceQuestions = [
     '春天到了，小草和小树在做什么？',
@@ -131,85 +129,6 @@
     return copy;
   }
 
-  function presetBankIcon(id) {
-    var icons = {
-      'chenlaoshi-seasons-weather': '🌦️',
-      'chenlaoshi-animals': '🐾',
-      'chenlaoshi-numbers': '🔢',
-      'chenlaoshi-body-parts': '🧍',
-      'chenlaoshi-colors': '🎨',
-      'chenlaoshi-family': '👪',
-      'chenlaoshi-rooms': '🏠',
-      'chenlaoshi-clothing': '👕',
-      'chenlaoshi-jobs': '💼',
-      'chenlaoshi-countries': '🗺️',
-      'chenlaoshi-hobbies': '⚽',
-      'chenlaoshi-school': '🏫',
-      'chenlaoshi-back-to-school': '🎒',
-      'chenlaoshi-festivals': '🎉',
-      'chenlaoshi-self-introduction': '💬',
-      'chenlaoshi-pinyin': '🔤',
-      'chenlaoshi-core-high-frequency': '⭐'
-    };
-    return icons[id] || '📝';
-  }
-
-  function renderPresetBankChoices() {
-    var choices = $('#mazeBankChoices');
-    var status = $('#mazeBankStatus');
-    var importButton = $('#importMazeBank');
-    var note = $('#mazeBankSelectionNote');
-    choices.innerHTML = '';
-    if (!presetQuestionBanks.length) {
-      status.textContent = 'Question-bank topics are unavailable right now. Please try again later.';
-      note.textContent = 'Topics will appear here when the Library is available.';
-      importButton.disabled = true;
-      return;
-    }
-    presetQuestionBanks.forEach(function (bank) {
-      var button = document.createElement('button');
-      var chosen = selectedPresetBankIds.indexOf(bank.id) !== -1;
-      button.type = 'button';
-      button.className = 'maze-bank-choice';
-      button.dataset.bankId = bank.id;
-      button.setAttribute('aria-pressed', String(chosen));
-      button.textContent = presetBankIcon(bank.id) + ' ' + (bank.theme || bank.name);
-      button.addEventListener('click', function () {
-        var selectedIndex = selectedPresetBankIds.indexOf(bank.id);
-        if (selectedIndex !== -1) {
-          selectedPresetBankIds.splice(selectedIndex, 1);
-        } else if (selectedPresetBankIds.length < PAIR_COUNT) {
-          selectedPresetBankIds.push(bank.id);
-        } else {
-          showToast('Choose up to 8 topics for one maze.', true);
-        }
-        renderPresetBankChoices();
-      });
-      choices.appendChild(button);
-    });
-    status.textContent = presetQuestionBanks.length + ' preset topics are ready to use.';
-    note.textContent = selectedPresetBankIds.length
-      ? selectedPresetBankIds.length + ' topic' + (selectedPresetBankIds.length === 1 ? '' : 's') + ' selected · eight questions will be balanced across them.'
-      : 'Choose up to eight topics to begin.';
-    importButton.disabled = !selectedPresetBankIds.length;
-  }
-
-  function loadPresetQuestionBanks() {
-    fetch('/api/questionbanks/presets')
-      .then(function (response) {
-        if (!response.ok) throw new Error('Question bank list unavailable');
-        return response.json();
-      })
-      .then(function (payload) {
-        presetQuestionBanks = payload.banks || [];
-        renderPresetBankChoices();
-      })
-      .catch(function () {
-        presetQuestionBanks = [];
-        renderPresetBankChoices();
-      });
-  }
-
   function answerForQuestion(question) {
     var answer = String(question.answer || '').trim();
     var options = Array.isArray(question.options) ? question.options : [];
@@ -218,12 +137,6 @@
       if (options[optionIndex]) answer = String(options[optionIndex]).trim();
     }
     return answer;
-  }
-
-  function selectedPresetBanks() {
-    return selectedPresetBankIds.map(function (id) {
-      return presetQuestionBanks.find(function (bank) { return bank.id === id; });
-    }).filter(Boolean);
   }
 
   function completePairs(questions) {
@@ -242,37 +155,37 @@
     return shuffle(chosen).slice(0, PAIR_COUNT);
   }
 
-  function importPresetBank() {
-    var selectedBanks = selectedPresetBanks();
-    if (!selectedBanks.length) return;
-    var importButton = $('#importMazeBank');
-    importButton.disabled = true;
-    importButton.textContent = 'Loading questions…';
-    $('#mazeBankStatus').textContent = 'Choosing eight questions from the Library…';
-    Promise.all(selectedBanks.map(function (bank) {
-      return fetch('/api/questionbanks/presets/' + encodeURIComponent(bank.id)).then(function (response) {
-        if (!response.ok) throw new Error('Question bank unavailable');
-        return response.json();
-      });
-    }))
-      .then(function (banks) {
-        var pairs = pickBalancedPairs(banks);
-        if (!$('#mazeTitle').value.trim()) {
-          $('#mazeTitle').value = selectedBanks.map(function (bank) { return bank.theme || bank.name; }).join(' · ') + ' Maze';
-        }
-        fillPairRows(pairs);
-        saveDraft();
-        $('#mazeBankStatus').textContent = 'Eight questions from ' + selectedBanks.length + ' selected topic' + (selectedBanks.length === 1 ? '' : 's') + ' are ready to edit.';
-        showToast('Library questions added to your maze.');
-      })
-      .catch(function () {
-        $('#mazeBankStatus').textContent = 'The selected topics could not be loaded. Please try again.';
-        showToast('The Library questions could not be loaded.', true);
-      })
-      .finally(function () {
-        importButton.textContent = 'Use 8 questions from selected topics';
-        renderPresetBankChoices();
-      });
+  function importPresetBanks(banks) {
+    try {
+      var pairs = pickBalancedPairs(banks);
+      if (!$('#mazeTitle').value.trim()) {
+        $('#mazeTitle').value = banks.map(function (bank) { return bank.theme || bank.name; }).join(' · ') + ' Maze';
+      }
+      fillPairRows(pairs);
+      saveDraft();
+      showToast('Library questions added to your maze.');
+    } catch (error) {
+      showToast('The selected topics do not have enough complete questions.', true);
+    }
+  }
+
+  function initQuestionBankPicker() {
+    if (!window.ChenLibraryPicker) return;
+    var picker = ChenLibraryPicker.create({
+      root: $('#mazeBankPicker'),
+      source: 'questionbanks',
+      min: 1,
+      max: PAIR_COUNT,
+      kicker: 'Chen Laoshi Library',
+      title: 'Use preset question banks',
+      hint: 'Choose up to eight topics, then bring in a balanced set of eight questions and answers. You can edit every pair afterward.',
+      libraryLinkText: 'Browse Library',
+      importLabel: 'Use 8 questions from selected topics',
+      onImport: function (banks) {
+        importPresetBanks(banks);
+        picker.reset();
+      }
+    });
   }
 
   function getShapeText(shape) {
@@ -435,8 +348,7 @@
     $('#generateMaze').addEventListener('click', downloadEditablePptx);
     $('#loadMazeSample').addEventListener('click', loadSample);
     $('#clearMaze').addEventListener('click', clearAll);
-    $('#importMazeBank').addEventListener('click', importPresetBank);
-    loadPresetQuestionBanks();
+    initQuestionBankPicker();
   }
 
   setup();

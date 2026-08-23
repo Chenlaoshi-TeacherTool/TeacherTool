@@ -7,6 +7,7 @@
 <title>Jeopardy - Chen Laoshi's Teaching Toolkit</title>
 <%- include('../partials/seo', { pageDescription: 'Create an energetic classroom Jeopardy review game with timed questions, Daily Doubles, and automatic scoring.' }) %>
 <link rel="stylesheet" href="/stylesheets/site-theme.css">
+<link rel="stylesheet" href="/shared/library-picker.css">
 <link rel="stylesheet" href="/low-prep/jeopardy/jeopardy.css">
 </head>
 <body class="jp-page">
@@ -61,22 +62,7 @@
         </select>
       </span>
     </div>
-    <div class="bank-source" id="bankSource">
-      <div class="bank-source-head">
-        <div>
-          <p class="bank-source-kicker">Chen Laoshi Question Banks</p>
-          <h3>Create a board from published question banks</h3>
-          <p class="hint">Choose 2–6 topics. Each topic becomes a category, with questions selected to fill the board.</p>
-        </div>
-        <a class="bank-library-link" href="/teaching-tools/question-bank-library/question-bank-library.html">Browse the full question library</a>
-      </div>
-      <p class="bank-status" id="bankStatus" aria-live="polite">Loading question bank topics…</p>
-      <div class="bank-choices" id="bankChoices" aria-label="Choose question-bank topics"></div>
-      <div class="row bank-source-actions">
-        <button id="btnImportBanks" class="primary" type="button" disabled>Create a board from selected topics</button>
-        <span class="bank-selection-note" id="bankSelectionNote">Choose 2–6 topics</span>
-      </div>
-    </div>
+    <div id="bankSource"></div>
     <div id="cats" class="cats"></div>
   </section>
 
@@ -162,6 +148,7 @@
 
 <script src="/shared/wordlist-core.js"></script>
 <script src="/shared/deck-export.js"></script>
+<script src="/shared/library-picker.js"></script>
 <script src="/low-prep/jeopardy/jeopardy.js"></script>
 <script src="/javascripts/account-coming-soon.js"></script>
 <script src="/javascripts/milk-tea-footer.js"></script>

@@ -7,6 +7,7 @@
   <title>Maze Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Create a printable, editable PowerPoint maze from eight questions and answers for your Chinese language classroom.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="/low-prep/maze-generator/maze-generator.css?v=single-pair-input-1">
 </head>
 <body class="maze-page">
@@ -48,22 +49,7 @@
             <button id="loadMazeSample" class="maze-secondary" type="button">Load a sample</button>
           </div>
           <p class="maze-help">Use one numbered line for each question. Put the short answer directly after the question, separated by a vertical bar <strong>|</strong>. The other answers become shuffled choices.</p>
-          <div class="maze-library" aria-labelledby="mazeLibraryHeading">
-            <div class="maze-library-heading">
-              <div>
-                <p class="maze-kicker">Chen Laoshi Library</p>
-                <h3 id="mazeLibraryHeading">Use preset question banks</h3>
-                <p class="maze-help">Choose up to eight topics, then bring in a balanced set of eight questions and answers. You can edit every pair afterward.</p>
-              </div>
-              <a class="maze-library-link" href="/teaching-tools/question-bank-library/question-bank-library.html">Browse Library</a>
-            </div>
-            <p id="mazeBankStatus" class="maze-bank-status" aria-live="polite">Loading question-bank topics…</p>
-            <div id="mazeBankChoices" class="maze-bank-choices" aria-label="Choose up to eight question-bank topics"></div>
-            <div class="maze-bank-actions">
-              <button id="importMazeBank" class="maze-secondary" type="button" disabled>Use 8 questions from selected topics</button>
-              <span id="mazeBankSelectionNote" class="maze-bank-selection-note">Choose up to eight topics to begin</span>
-            </div>
-          </div>
+          <div id="mazeBankPicker"></div>
           <div class="maze-pair-editor">
             <label class="maze-pair-label" for="mazePairInput">
               <span>Eight numbered question &amp; answer pairs</span>
@@ -96,6 +82,7 @@
   <div id="mazeToast" class="maze-toast" role="status" aria-live="polite"></div>
 
   <script src="/vendor/jszip.min.js"></script>
+  <script src="/shared/library-picker.js"></script>
   <script src="/low-prep/maze-generator/maze-generator.js?v=single-pair-input-1"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>

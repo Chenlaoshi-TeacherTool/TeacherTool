@@ -1,28 +1,6 @@
 var CW = window.ChenWordlist || null;
 var DE = window.DeckExport || null;
 var PRE = 'cljp:';
-var presetQuestionBanks = [];
-var selectedPresetBankIds = [];
-var PRESET_BANK_ICONS = {
-  'chenlaoshi-seasons-weather': 0x1f326,
-  'chenlaoshi-animals': 0x1f43e,
-  'chenlaoshi-numbers': 0x1f522,
-  'chenlaoshi-body-parts': 0x1f9cd,
-  'chenlaoshi-colors': 0x1f3a8,
-  'chenlaoshi-family': 0x1f46a,
-  'chenlaoshi-rooms': 0x1f3e0,
-  'chenlaoshi-clothing': 0x1f455,
-  'chenlaoshi-jobs': 0x1f4bc,
-  'chenlaoshi-countries': 0x1f5fa,
-  'chenlaoshi-hobbies': 0x26bd,
-  'chenlaoshi-school': 0x1f3eb,
-  'chenlaoshi-back-to-school': 0x1f392,
-  'chenlaoshi-festivals': 0x1f389,
-  'chenlaoshi-self-introduction': 0x1f4ac,
-  'chenlaoshi-pinyin': 0x1f524,
-  'chenlaoshi-core-high-frequency': 0x2b50
-};
-
 function blankGame(cats, rows, base, step) {
   cats = cats || 5; rows = rows || 5; base = base || 100; step = step || 100;
   var g = { id: null, name: '', rows: rows, base: base, step: step, seconds: 20, categories: [], teams: [] };
@@ -151,9 +129,6 @@ function genFromList() {
 }
 
 /* ---------------- from Chen Laoshi question banks ---------------- */
-function questionBankIcon(id) {
-  return String.fromCodePoint(PRESET_BANK_ICONS[id] || 0x1f4dd);
-}
 function shuffleQuestions(items) {
   var copy = (items || []).slice();
   for (var i = copy.length - 1; i > 0; i--) {
@@ -178,117 +153,42 @@ function questionToClue(question) {
   }
   return { q: prompt, a: answer, dd: false, used: false };
 }
-function selectedPresetBanks() {
-  return selectedPresetBankIds.map(function (id) {
-    return presetQuestionBanks.find(function (bank) { return bank.id === id; });
-  }).filter(Boolean);
-}
-function renderQuestionBankChoices() {
-  var choices = $('#bankChoices');
-  var status = $('#bankStatus');
-  var note = $('#bankSelectionNote');
-  var importButton = $('#btnImportBanks');
-  choices.innerHTML = '';
+function importPresetBanks(banks) {
+  var old = G;
+  var rows = old.rows;
+  var nextGame = blankGame(banks.length, rows, old.base, old.step);
+  nextGame.id = old.id;
+  nextGame.name = old.name || banks.map(function (bank) { return bank.theme; }).join(' · ') + ' · Jeopardy';
+  nextGame.seconds = old.seconds;
+  nextGame.teams = old.teams.map(function (team) { return { name: team.name, score: team.score }; });
 
-  if (!presetQuestionBanks.length) {
-    status.textContent = 'Published question banks are unavailable right now. Please try again later.';
-    note.textContent = 'Topics will appear when the library loads.';
-    importButton.disabled = true;
-    return;
-  }
-
-  presetQuestionBanks.forEach(function (bank) {
-    var button = el('button', 'bank-choice');
-    var chosen = selectedPresetBankIds.indexOf(bank.id) !== -1;
-    button.type = 'button';
-    button.dataset.bankId = bank.id;
-    button.setAttribute('aria-pressed', chosen ? 'true' : 'false');
-    button.setAttribute('aria-label', (chosen ? 'Remove ' : 'Select ') + bank.name);
-    var icon = el('span', 'bank-choice-icon');
-    icon.setAttribute('aria-hidden', 'true');
-    icon.textContent = questionBankIcon(bank.id);
-    var label = el('span');
-    label.textContent = bank.theme || bank.name;
-    button.appendChild(icon); button.appendChild(label);
-    button.addEventListener('click', function () { togglePresetBank(bank.id); });
-    choices.appendChild(button);
+  banks.forEach(function (bank, categoryIndex) {
+    var category = nextGame.categories[categoryIndex];
+    var questions = shuffleQuestions(bank.questions);
+    category.name = bank.theme || bank.name;
+    category.clues = category.clues.map(function (clue, rowIndex) {
+      return questions[rowIndex] ? questionToClue(questions[rowIndex]) : clue;
+    });
   });
 
-  status.textContent = presetQuestionBanks.length + ' published question bank topics are available.';
-  note.textContent = selectedPresetBankIds.length
-    ? selectedPresetBankIds.length + ' topics selected · each topic will become a category'
-    : 'Choose 2–6 topics';
-  importButton.disabled = selectedPresetBankIds.length < 2;
+  G = nextGame;
+  renderEditor();
+  toast('Published questions were added to the Jeopardy board.');
 }
-function togglePresetBank(id) {
-  var selectedIndex = selectedPresetBankIds.indexOf(id);
-  if (selectedIndex !== -1) {
-    selectedPresetBankIds.splice(selectedIndex, 1);
-  } else {
-    if (selectedPresetBankIds.length >= 6) {
-      toast('Choose no more than 6 topics.');
-      return;
+function initQuestionBankPicker() {
+  if (!window.ChenLibraryPicker) return;
+  var picker = ChenLibraryPicker.create({
+    root: $('#bankSource'),
+    source: 'questionbanks',
+    min: 2,
+    max: 6,
+    title: 'Create a board from published question banks',
+    hint: 'Choose 2–6 topics. Each topic becomes a category, with questions selected to fill the board.',
+    importLabel: 'Create a board from selected topics',
+    onImport: function (banks) {
+      importPresetBanks(banks);
+      picker.reset();
     }
-    selectedPresetBankIds.push(id);
-  }
-  renderQuestionBankChoices();
-}
-function loadPresetQuestionBanks() {
-  fetch('/api/questionbanks/presets')
-    .then(function (response) {
-      if (!response.ok) throw new Error('Question bank list unavailable');
-      return response.json();
-    })
-    .then(function (payload) {
-      presetQuestionBanks = payload.banks || [];
-      renderQuestionBankChoices();
-    })
-    .catch(function () {
-      presetQuestionBanks = [];
-      renderQuestionBankChoices();
-    });
-}
-function importPresetBanks() {
-  var selected = selectedPresetBanks();
-  if (selected.length < 2) {
-    toast('Choose at least 2 topics.');
-    return;
-  }
-  var importButton = $('#btnImportBanks');
-  importButton.disabled = true;
-  $('#bankStatus').textContent = 'Selecting questions from the chosen topics…';
-  Promise.all(selected.map(function (bank) {
-    return fetch('/api/questionbanks/presets/' + encodeURIComponent(bank.id)).then(function (response) {
-      if (!response.ok) throw new Error('Question bank unavailable');
-      return response.json();
-    });
-  })).then(function (banks) {
-    var old = G;
-    var rows = old.rows;
-    var nextGame = blankGame(banks.length, rows, old.base, old.step);
-    nextGame.id = old.id;
-    nextGame.name = old.name || banks.map(function (bank) { return bank.theme; }).join(' · ') + ' · Jeopardy';
-    nextGame.seconds = old.seconds;
-    nextGame.teams = old.teams.map(function (team) { return { name: team.name, score: team.score }; });
-
-    banks.forEach(function (bank, categoryIndex) {
-      var category = nextGame.categories[categoryIndex];
-      var questions = shuffleQuestions(bank.questions);
-      category.name = bank.theme || bank.name;
-      category.clues = category.clues.map(function (clue, rowIndex) {
-        return questions[rowIndex] ? questionToClue(questions[rowIndex]) : clue;
-      });
-    });
-
-    G = nextGame;
-    renderEditor();
-    renderQuestionBankChoices();
-    $('#bankStatus').textContent = 'Questions were added from ' + banks.length + ' topics. You can still edit any cell.';
-    toast('Published questions were added to the Jeopardy board.');
-  }).catch(function () {
-    $('#bankStatus').textContent = 'The question banks could not be loaded. Please try again later.';
-    renderQuestionBankChoices();
-    toast('The question banks could not be loaded.');
   });
 }
 
@@ -600,7 +500,6 @@ document.addEventListener('DOMContentLoaded', function () {
     G.teams.push({ name: n, score: 0 }); $('#teamName').value = ''; renderTeams();
   });
   $('#btnGen').addEventListener('click', genFromList);
-  $('#btnImportBanks').addEventListener('click', importPresetBanks);
   $('#btnBlank').addEventListener('click', function () {
     if (!confirm('Clear every question?')) return;
     var t = G.teams, n = G.name;
@@ -649,5 +548,5 @@ document.addEventListener('DOMContentLoaded', function () {
     if ($('#game').classList.contains('open') && e.key === 'Escape') exitGame();
   });
 
-  renderEditor(); renderSaved(); loadPresetQuestionBanks();
+  renderEditor(); renderSaved(); initQuestionBankPicker();
 });
