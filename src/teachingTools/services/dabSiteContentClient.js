@@ -1,11 +1,9 @@
 'use strict';
 
 /*
- * Reads tool guides and articles from a running Data API Builder instance
- * (see database/dab-config.json) instead of the hardcoded data/site-content.js
- * module. Only used when DAB_BASE_URL is set — see routes/index.js, which
- * loads this once at startup and falls back to the hardcoded module if it
- * fails.
+ * Reads tool guides and articles from the Data API Builder instance
+ * described in database/dab-config.json. See services/siteContentStore.js,
+ * which loads this at startup and after every admin edit.
  */
 
 function baseUrl() {

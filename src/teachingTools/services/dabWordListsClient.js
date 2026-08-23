@@ -1,9 +1,8 @@
 'use strict';
 
 /*
- * Reads word lists from a running Data API Builder instance (see
- * database/dab-config.json) instead of the hardcoded data/preset-wordlists.js
- * module. Only used when DAB_BASE_URL is set — see routes/api.js.
+ * Reads word lists from the Data API Builder instance described in
+ * database/dab-config.json. See routes/api.js.
  */
 
 function baseUrl() {

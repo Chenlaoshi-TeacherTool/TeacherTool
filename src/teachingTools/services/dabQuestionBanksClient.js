@@ -1,9 +1,8 @@
 'use strict';
 
 /*
- * Reads question banks from a running Data API Builder instance (see
- * database/dab-config.json) instead of the hardcoded data/preset-questionbanks.js
- * module tree. Only used when DAB_BASE_URL is set — see routes/api.js.
+ * Reads question banks from the Data API Builder instance described in
+ * database/dab-config.json. See routes/api.js.
  */
 
 var levelLabelsCache = null;

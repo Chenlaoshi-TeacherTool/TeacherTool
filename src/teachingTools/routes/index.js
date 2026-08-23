@@ -3,7 +3,7 @@ var router = express.Router();
 var siteContentStore = require('../services/siteContentStore');
 
 siteContentStore.refresh().catch(function (err) {
-  console.error('Could not load site content from DAB, keeping built-in content:', err.message);
+  console.error('Could not load site content from DAB at startup:', err.message);
 });
 
 /* GET home page. */

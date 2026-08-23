@@ -73,9 +73,22 @@ See `database/schema.sql` for the full DDL. Key decisions:
    Azure Container App; see `database/README.md` for the deployed URL and redeploy steps.
 6. ~~Set `DAB_BASE_URL` on the production App Service~~ — done. Production now reads from Azure
    SQL via DAB; verified `wordlists/presets`, `questionbanks/presets/:id`, `/resources`, and
-   `/teaching-tools/*` pages live. The `data/*.js` modules stay in place as the fallback path for
-   now — remove them and their `require()`s once the DAB path has run stable for a while.
-7. Add an Azure Storage account + container for Blob Storage; wire up `img_blob_url` once real
-   images are introduced.
-8. Build the admin CMS (form pages behind Easy Auth) for editing question banks, word lists,
-   tool guides, and articles.
+   `/teaching-tools/*` pages live.
+7. ~~Add an Azure Storage account + container for Blob Storage; wire up `img_blob_url`~~ — done.
+   Admin CMS word list items can attach an image, stored in the `wordlist-images` container.
+8. ~~Build the admin CMS~~ — done, covering word lists (with images), question banks (with an
+   Excel bulk-import), tool guides, and articles. Protected by Easy Auth plus an `ADMIN_USER_IDS`
+   allowlist (see `middleware/requireAdmin.js`); admin writes go directly to SQL rather than
+   through DAB, which stays anonymous-read-only.
+9. ~~Remove the `data/*.js` modules and their `require()`s~~ — done, after the DAB path ran
+   stable in production. `routes/api.js` and `services/siteContentStore.js` no longer have a
+   fallback: `DAB_BASE_URL` and a reachable DAB instance are required for the site to serve
+   word lists, question banks, tool guides, or articles.
+
+## Follow-up work not yet done
+
+- `GET /api/wordlists/mine` is still a `501` stub — teacher-owned cloud word lists (as opposed
+  to the admin-managed preset ones) aren't implemented yet.
+- No teaching tool's front-end actually renders `word_list_items.img_blob_url` yet — the field is
+  populated and returned by the API, but nothing displays the image.
+- Question bank images aren't wired up (only word list items have `img_blob_url`).
