@@ -7,6 +7,7 @@
 <title>Term Race - Chen Laoshi's Teaching Toolkit</title>
 <%- include('../partials/seo', { pageDescription: 'Arrange subject terms in a sunflower wheel and grid for a fast partner clue-and-find game.' }) %>
 <link rel="stylesheet" href="/stylesheets/site-theme.css">
+<link rel="stylesheet" href="/shared/library-picker.css">
 <link rel="stylesheet" href="/low-prep/character-race/character-race.css">
 </head>
 <body class="cr-page">
@@ -27,6 +28,7 @@
     <p class="hint">Enter one short term per line. You can also separate single-word items with spaces. Duplicates are removed automatically.</p>
     <textarea id="src" placeholder="hypothesis&#10;evidence&#10;variable&#10;observe&#10;measure"></textarea>
     <p class="hint">Language teachers can add optional pronunciation and meaning with <code>term | pronunciation | definition</code>.</p>
+    <div id="raceLibraryPicker"></div>
     <div class="row" style="margin-top:10px">
       <button id="btnMake" class="primary">Build the wheel</button>
       <button id="btnFromList">Use a saved word list</button>
@@ -115,6 +117,7 @@
 
 <script src="/shared/wordlist-core.js"></script>
 <script src="/shared/deck-export.js"></script>
+<script src="/shared/library-picker.js"></script>
 <script src="/low-prep/character-race/character-race.js"></script>
 <script src="/javascripts/account-coming-soon.js"></script>
 <script src="/javascripts/milk-tea-footer.js"></script>

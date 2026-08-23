@@ -7,6 +7,7 @@
   <title>Would You Rather Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Build lively Would You Rather speaking cards from your own prompts, vocabulary, or saved word lists.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="/low-prep/would-you-rather/would-you-rather.css?v=vocabulary-library-3">
 </head>
 <body class="wyr-page">
@@ -83,14 +84,7 @@ start with an example / start with a rule</textarea>
             <button class="wyr-secondary-btn wyr-danger-button" id="clearDeck" type="button">Clear deck</button>
             <button class="wyr-secondary-btn" id="addBlankCard" type="button">＋ Add one card</button>
             <button class="wyr-secondary-btn" id="loadExample" type="button">Load example</button>
-            <div class="wyr-library-box">
-              <p class="wyr-library-title">🗂️ My Library</p>
-              <a class="wyr-library-link" href="/teaching-tools/word-list-library/word-list-library.html">Browse vocabulary sets →</a>
-              <p class="wyr-library-description">Choose a ready-made Vocabulary Topic Set or one of your saved browser lists.</p>
-              <label class="sr-only" for="librarySelect">Choose a vocabulary topic set or saved list</label>
-              <select id="librarySelect"><option value="">Loading vocabulary sets…</option></select>
-              <button class="wyr-secondary-btn" id="useLibrary" type="button">Make pairs from list</button>
-            </div>
+            <div id="wyrLibraryPicker"></div>
           </div>
         </div>
         <p class="wyr-status" id="statusMessage" role="status">5 prompts are ready to preview.</p>
@@ -145,6 +139,7 @@ start with an example / start with a rule</textarea>
   <footer><p>© 2026 Chen Laoshi's Teaching Toolkit · Made with care for curious classrooms.</p></footer>
   <script src="/shared/wordlist-core.js"></script>
   <script src="/shared/deck-export.js"></script>
+  <script src="/shared/library-picker.js"></script>
   <script src="/low-prep/would-you-rather/material-symbols-catalog.js"></script>
   <script src="/low-prep/would-you-rather/would-you-rather.js?v=vocabulary-library-3"></script>
   <script src="/javascripts/account-coming-soon.js"></script>

@@ -11,6 +11,7 @@
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Word Sudoku Generator · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Create printable vocabulary Sudoku activities for review in any subject or language."><meta property="og:url" content="https://clsteachingtools.com/low-prep/word-sudoku/word-sudoku-widget.html"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="./word-sudoku-widget.css?v=topic-library-2">
 </head>
 <body>
@@ -54,20 +55,7 @@
         </button>
 
         <div id="topicLibraryPanel" class="topic-library-panel" hidden>
-          <div class="topic-library-heading">
-            <div>
-              <p class="eyebrow">Mandarin Library</p>
-              <h3>Create a Sudoku from published vocabulary topics</h3>
-              <p>Choose one topic. The first 9 terms become the Sudoku words and are automatically matched with icons.</p>
-            </div>
-            <a href="/teaching-tools/word-list-library/word-list-library.html" target="_blank" rel="noopener">Browse the full Mandarin Library</a>
-          </div>
-          <p id="topicLibraryStatus" class="topic-library-status" aria-live="polite">Loading vocabulary topics…</p>
-          <div id="topicLibraryChoices" class="topic-library-choices" aria-label="Choose a vocabulary topic"></div>
-          <div class="topic-library-actions">
-            <button id="useSelectedTopic" class="btn btn-primary" type="button" disabled>Use selected topic</button>
-            <span id="topicLibrarySelectionNote">Choose 1 topic with at least 9 terms</span>
-          </div>
+          <div id="sudokuLibraryPicker"></div>
         </div>
 
         <div class="word-grid" id="wordGrid"></div>
@@ -194,6 +182,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- Twemoji artwork: Twitter, Inc. and contributors (CC-BY 4.0), loaded as SVGs from the official repository. -->
   <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/library-picker.js"></script>
   <script src="./word-sudoku-widget.js?v=topic-library-3"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>

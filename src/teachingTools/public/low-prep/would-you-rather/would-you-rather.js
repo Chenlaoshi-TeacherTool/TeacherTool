@@ -5,8 +5,6 @@
   var MAX_IMAGE_BYTES = 3 * 1024 * 1024;
   var CW = window.ChenWordlist || null;
   var ICONS = window.WyrMaterialIcons || {};
-  var presetWordlists = [];
-  var presetWordlistsAvailable = true;
   var $ = function (selector) { return document.querySelector(selector); };
   var els = {
     pairs: $('#pairInput'),
@@ -16,7 +14,7 @@
     preview: $('#slidePreview'),
     cardList: $('#cardList'),
     cardCount: $('#cardCount'),
-    library: $('#librarySelect'),
+    libraryPicker: $('#wyrLibraryPicker'),
     presentation: $('#presentation'),
     presentationSlide: $('#presentationSlide'),
     presentationCount: $('#presentationCount'),
@@ -351,91 +349,34 @@
     renderCards(); renderPreview(); setStatus('Card removed.');
   }
 
-  function addLibraryGroup(label, lists, prefix) {
-    if (!lists.length) return;
-    var group = document.createElement('optgroup');
-    group.label = label;
+  function makePairsFromLists(lists) {
+    var items = [];
     lists.forEach(function (list) {
-      var option = document.createElement('option');
-      option.value = prefix + ':' + list.id;
-      option.textContent = list.name + ' (' + list.count + ' terms)';
-      group.appendChild(option);
-    });
-    els.library.appendChild(group);
-  }
-
-  function renderLibraryOptions() {
-    var selected = els.library.value;
-    var savedLists = CW && CW.listAll ? CW.listAll() : [];
-    els.library.innerHTML = '';
-    var placeholder = document.createElement('option');
-    placeholder.value = '';
-    placeholder.textContent = 'Choose a vocabulary topic set or saved list…';
-    els.library.appendChild(placeholder);
-    addLibraryGroup('Vocabulary Topic Sets', presetWordlists, 'preset');
-    addLibraryGroup('My saved lists', savedLists, 'saved');
-    if (!presetWordlistsAvailable) {
-      var unavailable = document.createElement('option');
-      unavailable.disabled = true;
-      unavailable.textContent = 'Vocabulary Topic Sets are unavailable right now';
-      els.library.appendChild(unavailable);
-    }
-    if (selected && els.library.querySelector('option[value="' + selected + '"]')) els.library.value = selected;
-  }
-
-  function refreshLibrary() {
-    renderLibraryOptions();
-    fetch('/api/wordlists/presets')
-      .then(function (response) {
-        if (!response.ok) throw new Error('Vocabulary Topic Sets unavailable');
-        return response.json();
-      })
-      .then(function (payload) {
-        presetWordlists = Array.isArray(payload.lists) ? payload.lists : [];
-        presetWordlistsAvailable = true;
-        renderLibraryOptions();
-      })
-      .catch(function () {
-        presetWordlists = [];
-        presetWordlistsAvailable = false;
-        renderLibraryOptions();
+      (list.items || []).forEach(function (item) {
+        if (item && clean(item.zh)) items.push(item);
       });
-  }
-
-  function makePairsFromList(list) {
-    var items = list && Array.isArray(list.items) ? list.items.filter(function (item) { return item && clean(item.zh); }) : [];
-    if (items.length < 2) { setStatus('That vocabulary list needs at least two words to make pairs.', 'warning'); return; }
+    });
+    if (items.length < 2) { setStatus('Choose topics with at least two words combined to make pairs.', 'warning'); return; }
     var mixed = shuffle(items); var lines = [];
     for (var i = 0; i + 1 < mixed.length && lines.length < MAX_CARDS; i += 2) lines.push(clean(mixed[i].zh) + ' / ' + clean(mixed[i + 1].zh));
-    els.pairs.value = lines.join('\n'); replaceDeck(); setStatus(lines.length + ' random pairs were made from “' + (list.name || 'your vocabulary list') + '”.');
+    els.pairs.value = lines.join('\n'); replaceDeck();
+    setStatus(lines.length + ' random pairs were made from ' + lists.length + ' selected topic' + (lists.length === 1 ? '' : 's') + '.');
   }
 
-  function useLibrary() {
-    var value = els.library.value;
-    if (!value) { setStatus('Choose a Vocabulary Topic Set or saved list first.', 'warning'); return; }
-    var separator = value.indexOf(':');
-    var type = separator === -1 ? '' : value.slice(0, separator);
-    var id = separator === -1 ? value : value.slice(separator + 1);
-    if (type === 'saved') {
-      if (!CW || !CW.load) { setStatus('Saved vocabulary lists are unavailable in this browser.', 'warning'); return; }
-      makePairsFromList(CW.load(id));
-      return;
-    }
-    if (type !== 'preset') { setStatus('Choose a Vocabulary Topic Set or saved list first.', 'warning'); return; }
-    var button = $('#useLibrary');
-    button.disabled = true;
-    button.textContent = 'Loading topic set…';
-    fetch('/api/wordlists/presets/' + encodeURIComponent(id))
-      .then(function (response) {
-        if (!response.ok) throw new Error('Vocabulary Topic Set unavailable');
-        return response.json();
-      })
-      .then(makePairsFromList)
-      .catch(function () { setStatus('That Vocabulary Topic Set could not be loaded. Please try again.', 'warning'); })
-      .finally(function () {
-        button.disabled = false;
-        button.textContent = 'Make pairs from list';
-      });
+  function initLibraryPicker() {
+    if (!window.ChenLibraryPicker || !els.libraryPicker) return;
+    var picker = ChenLibraryPicker.create({
+      root: els.libraryPicker,
+      source: 'wordlists',
+      min: 1,
+      title: 'Make pairs from the library',
+      hint: 'Choose one or more vocabulary topics. Terms are shuffled and randomly paired into either-or choices.',
+      importLabel: 'Make pairs from selected topics',
+      onImport: function (lists) {
+        makePairsFromLists(lists);
+        picker.reset();
+      }
+    });
   }
 
   function drawIcons(query) {
@@ -531,7 +472,6 @@
     $('#clearDeck').addEventListener('click', clearDeck);
     $('#addBlankCard').addEventListener('click', addBlankCard);
     $('#loadExample').addEventListener('click', function () { els.pairs.value = examples.join('\n'); replaceDeck(); });
-    $('#useLibrary').addEventListener('click', useLibrary);
     $('#applyTemplate').addEventListener('click', applyTemplateToAll);
     $('#presentDeck').addEventListener('click', openPresentation);
     $('#closePresentation').addEventListener('click', closePresentation);
@@ -551,5 +491,5 @@
     });
   }
 
-  refreshLibrary(); bindEvents(); updateTemplateSample(); replaceDeck();
+  initLibraryPicker(); bindEvents(); updateTemplateSample(); replaceDeck();
 })();

@@ -114,6 +114,33 @@ function renderChips() {
   $('#empty').style.display = S.order.length ? 'none' : '';
 }
 
+function initLibraryPicker() {
+  if (!window.ChenLibraryPicker) return;
+  var picker = ChenLibraryPicker.create({
+    root: $('#raceLibraryPicker'),
+    source: 'wordlists',
+    min: 1,
+    title: 'Add terms from the library',
+    hint: 'Choose one or more vocabulary topics to add their terms to your wheel.',
+    importLabel: 'Add terms from selected topics',
+    onImport: function (lists) {
+      var combined = S.order.map(function (zh) { return S.terms[zh]; });
+      var added = 0;
+      lists.forEach(function (list) {
+        (list.items || []).forEach(function (item) {
+          if (!item.zh || S.terms[item.zh]) return;
+          combined.push({ zh: item.zh, py: item.py || '', en: item.en || '' });
+          added += 1;
+        });
+      });
+      $('#src').value = combined.map(function (item) { return item.zh + ' | ' + item.py + ' | ' + item.en; }).join('\n');
+      setTerms(combined);
+      if (added) toast('Added ' + added + ' term' + (added === 1 ? '' : 's') + ' from the library.');
+      picker.reset();
+    }
+  });
+}
+
 /* ---------- circle layout ---------- */
 function layout() {
   var n = S.order.length;
@@ -415,6 +442,7 @@ document.addEventListener('DOMContentLoaded', function () {
     S.title = $('#title').value;
     setTerms(parseTerms($('#src').value));
   });
+  initLibraryPicker();
   $('#btnFromList').addEventListener('click', function () {
     if (!CW) { toast('Needs wordlist-core.js'); return; }
     var all = CW.listAll();

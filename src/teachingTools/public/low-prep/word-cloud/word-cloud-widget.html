@@ -11,6 +11,7 @@
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="Word Cloud Generator · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Generate printable word clouds from vocabulary, concepts, and key terms in any subject or language."><meta property="og:url" content="https://clsteachingtools.com/low-prep/word-cloud/word-cloud-widget.html"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="./word-cloud-widget.css?v=classroom-guide-1">
 </head>
 <body>
@@ -45,6 +46,7 @@
         <p class="helper">Enter one term per line from any subject or language. Terms listed earlier appear larger and more prominent in the cloud.</p>
         <label class="word-list-label" for="wordInput">One word per line</label>
         <textarea class="word-list-input" id="wordInput" rows="14" placeholder="hypothesis&#10;evidence&#10;variable" spellcheck="false" aria-describedby="wordCount"></textarea>
+        <div id="wordCloudLibraryPicker"></div>
         <div class="translation-settings">
           <label for="sourceLangSelect">Source language</label>
           <select id="sourceLangSelect" class="lang-select" aria-describedby="translationHelp"></select>
@@ -153,6 +155,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro/dist/index.js" defer></script>
+  <script src="/shared/library-picker.js" defer></script>
   <script src="./word-cloud-widget.js" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>

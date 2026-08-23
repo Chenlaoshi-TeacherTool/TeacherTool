@@ -25,6 +25,7 @@
     els.savedListSelect = document.getElementById('savedListSelect');
     els.loadSavedButton = document.getElementById('loadSavedButton');
     els.librarySourceMessage = document.getElementById('librarySourceMessage');
+    els.libraryPicker = document.getElementById('bookletLibraryPicker');
 
     if (!window.ChenWordlist) {
       setStatus('The vocabulary core did not load. Please refresh this page.');
@@ -51,7 +52,38 @@
     });
 
     refreshSavedLists();
+    initLibraryPicker();
     if (!loadLibraryDraft()) buildBooklet();
+  }
+
+  function initLibraryPicker() {
+    if (!window.ChenLibraryPicker || !els.libraryPicker) return;
+    var picker = ChenLibraryPicker.create({
+      root: els.libraryPicker,
+      source: 'wordlists',
+      min: 1,
+      title: 'Add terms from the library',
+      hint: 'Choose one or more vocabulary topics to add their terms to your booklet.',
+      importLabel: 'Add terms from selected topics',
+      onImport: function (lists) {
+        var existing = els.source.value.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+        var seen = {};
+        existing.forEach(function (line) { seen[line.split(/\s*\|\s*/)[0]] = true; });
+        var added = 0;
+        lists.forEach(function (list) {
+          (list.items || []).forEach(function (item) {
+            if (existing.length >= MAX_TERMS || !item.zh || seen[item.zh]) return;
+            existing.push([item.zh, item.py || '', item.en || ''].join(' | '));
+            seen[item.zh] = true;
+            added += 1;
+          });
+        });
+        els.source.value = existing.join('\n');
+        buildBooklet();
+        if (added) setStatus('Added ' + added + ' term' + (added === 1 ? '' : 's') + ' from the library.');
+        picker.reset();
+      }
+    });
   }
 
   function loadLibraryDraft() {

@@ -77,6 +77,7 @@
     els.readyPill = document.getElementById('readyPill');
     els.toast = document.getElementById('toast');
     els.sourceLangSelect = document.getElementById('sourceLangSelect');
+    els.libraryPicker = document.getElementById('wordCloudLibraryPicker');
 
     buildDisplayModeRow();
     buildSchemeRow();
@@ -98,9 +99,42 @@
 
     els.shuffleButton.addEventListener('click', regenerate);
     els.printButton.addEventListener('click', printWorksheet);
+    initLibraryPicker();
 
     updateWordCount();
     regenerate();
+  }
+
+  function initLibraryPicker() {
+    if (!window.ChenLibraryPicker || !els.libraryPicker) return;
+    var picker = ChenLibraryPicker.create({
+      root: els.libraryPicker,
+      source: 'wordlists',
+      min: 1,
+      title: 'Add words from the library',
+      hint: 'Choose one or more vocabulary topics to add their terms to your word cloud.',
+      importLabel: 'Add words from selected topics',
+      onImport: function (lists) {
+        var existing = els.wordInput.value.split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
+        var seen = {};
+        existing.forEach(function (line) { seen[line] = true; });
+        var added = 0;
+        lists.forEach(function (list) {
+          (list.items || []).forEach(function (item) {
+            var word = String(item.zh || '').trim();
+            if (!word || seen[word]) return;
+            seen[word] = true;
+            existing.push(word);
+            added += 1;
+          });
+        });
+        els.wordInput.value = existing.join('\n');
+        updateWordCount();
+        regenerate();
+        if (added) showToast('Added ' + added + ' word' + (added === 1 ? '' : 's') + ' from the library.');
+        picker.reset();
+      }
+    });
   }
 
   function debounce(fn, wait) {
