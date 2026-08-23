@@ -1,20 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var siteContent = require('../data/site-content');
-var dabSiteContent = require('../services/dabSiteContentClient');
-var toolGuides = siteContent.toolGuides;
-var articles = siteContent.articles;
+var siteContentStore = require('../services/siteContentStore');
 
-if (process.env.DAB_BASE_URL) {
-  dabSiteContent.loadAll()
-    .then(function (result) {
-      toolGuides = result.toolGuides;
-      articles = result.articles;
-    })
-    .catch(function (err) {
-      console.error('Could not load site content from DAB, keeping built-in content:', err.message);
-    });
-}
+siteContentStore.refresh().catch(function (err) {
+  console.error('Could not load site content from DAB, keeping built-in content:', err.message);
+});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -42,6 +32,7 @@ router.get('/recommendations', function(req, res, next) {
 });
 
 router.get('/resources', function(req, res, next) {
+  var articles = siteContentStore.get().articles;
   var categories = Array.from(new Set(articles.map(function(article) { return article.category; })));
   var activeCategory = typeof req.query.category === 'string' ? req.query.category : '';
   var visibleArticles = activeCategory
@@ -57,6 +48,7 @@ router.get('/resources', function(req, res, next) {
 });
 
 router.get('/resources/:slug', function(req, res, next) {
+  var articles = siteContentStore.get().articles;
   var article = articles.find(function(item) { return item.slug === req.params.slug; });
   if (!article) return next();
 
@@ -73,11 +65,11 @@ router.get('/teaching-tools', function(req, res, next) {
 });
 
 router.get('/teaching-tools/qr-code-generator', function(req, res, next) {
-  res.render('teaching-tools/qr-code-generator', { title: 'QR Code Generator', toolGuide: toolGuides['qr-code-generator'] });
+  res.render('teaching-tools/qr-code-generator', { title: 'QR Code Generator', toolGuide: siteContentStore.get().toolGuides['qr-code-generator'] });
 });
 
 router.get('/teaching-tools/random-group-generator', function(req, res, next) {
-  res.render('teaching-tools/random-group-generator', { title: 'Random Group Generator', toolGuide: toolGuides['random-group-generator'] });
+  res.render('teaching-tools/random-group-generator', { title: 'Random Group Generator', toolGuide: siteContentStore.get().toolGuides['random-group-generator'] });
 });
 
 router.get('/teaching-tools/class-pet-points', function(req, res, next) {
@@ -122,31 +114,31 @@ router.get('/classroom-shop', function(req, res, next) {
 
 // Low-prep activities now live within Teaching Tools.
 router.get('/teaching-tools/independent-reading', function(req, res, next) {
-  res.render('low-prep-activities/independent-reading', { title: 'Independent Reading Builder', toolGuide: toolGuides['independent-reading'] });
+  res.render('low-prep-activities/independent-reading', { title: 'Independent Reading Builder', toolGuide: siteContentStore.get().toolGuides['independent-reading'] });
 });
 
 router.get('/teaching-tools/tear-paper-bingo', function(req, res, next) {
-  res.render('low-prep-activities/tear-paper-bingo', { title: 'Tear-Paper Bingo', toolGuide: toolGuides['tear-paper-bingo'] });
+  res.render('low-prep-activities/tear-paper-bingo', { title: 'Tear-Paper Bingo', toolGuide: siteContentStore.get().toolGuides['tear-paper-bingo'] });
 });
 
 router.get('/teaching-tools/would-you-rather', function(req, res, next) {
-  res.render('low-prep-activities/would-you-rather', { title: 'Would You Rather Generator', toolGuide: toolGuides['would-you-rather'] });
+  res.render('low-prep-activities/would-you-rather', { title: 'Would You Rather Generator', toolGuide: siteContentStore.get().toolGuides['would-you-rather'] });
 });
 
 router.get('/teaching-tools/jeopardy', function(req, res, next) {
-  res.render('low-prep-activities/jeopardy', { title: 'Jeopardy Review Game', toolGuide: toolGuides.jeopardy });
+  res.render('low-prep-activities/jeopardy', { title: 'Jeopardy Review Game', toolGuide: siteContentStore.get().toolGuides.jeopardy });
 });
 
 router.get('/teaching-tools/character-race', function(req, res, next) {
-  res.render('low-prep-activities/character-race', { title: 'Character Race', toolGuide: toolGuides['character-race'] });
+  res.render('low-prep-activities/character-race', { title: 'Character Race', toolGuide: siteContentStore.get().toolGuides['character-race'] });
 });
 
 router.get('/teaching-tools/maze-generator', function(req, res, next) {
-  res.render('low-prep-activities/maze-generator', { title: 'Maze Generator', toolGuide: toolGuides['maze-generator'] });
+  res.render('low-prep-activities/maze-generator', { title: 'Maze Generator', toolGuide: siteContentStore.get().toolGuides['maze-generator'] });
 });
 
 router.get('/teaching-tools/tarsia-puzzle', function(req, res, next) {
-  res.render('low-prep-activities/tarsia-puzzle', { title: 'Tarsia Puzzle Generator', toolGuide: toolGuides['tarsia-puzzle'] });
+  res.render('low-prep-activities/tarsia-puzzle', { title: 'Tarsia Puzzle Generator', toolGuide: siteContentStore.get().toolGuides['tarsia-puzzle'] });
 });
 
 router.get('/low-prep-activities', function(req, res) {
@@ -194,7 +186,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',
     '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle'
-  ].concat(articles.map(function(article) { return '/resources/' + article.slug; }));
+  ].concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var urls = paths.map(function(path) {
     return '  <url><loc>' + baseUrl + path + '</loc></url>';
   }).join('\n');

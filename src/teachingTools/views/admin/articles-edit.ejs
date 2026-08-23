@@ -1,0 +1,38 @@
+<%- include('layout-head') %>
+<h1><%= article ? 'Edit: ' + article.title : 'New Article' %></h1>
+
+<% if (error) { %>
+<p style="color:#dc2626;"><%= error %></p>
+<% } %>
+
+<form method="POST" action="<%= (article && article.slug) ? '/admin/articles/' + encodeURIComponent(article.slug) : '/admin/articles/new' %>">
+  <label>Slug (used in URLs, no spaces)</label>
+  <input type="text" name="slug" value="<%= article ? article.slug : '' %>" <%= !isNew ? 'readonly' : 'required' %>>
+  <label>Category</label>
+  <input type="text" name="category" value="<%= article ? article.category : '' %>" required>
+  <label>Title</label>
+  <input type="text" name="title" value="<%= article ? article.title : '' %>" required>
+  <label>Description</label>
+  <textarea name="description" rows="2"><%= article ? (article.description || '') : '' %></textarea>
+  <label>Read time (e.g. "8 min read")</label>
+  <input type="text" name="read_time" value="<%= article ? (article.read_time || '') : '' %>">
+  <label>Intro paragraphs (one per line)</label>
+  <textarea name="intro" rows="4"><%= article ? article.introText : '' %></textarea>
+  <label>Sections (JSON array of {heading, paragraphs, list, callout} — paragraphs/list/callout are all optional)</label>
+  <textarea name="sections" rows="10" style="font-family:monospace;font-size:0.85rem;"><%= article ? article.sectionsText : '[]' %></textarea>
+  <label>Related tool label (optional)</label>
+  <input type="text" name="related_tool_label" value="<%= article ? (article.related_tool_label || '') : '' %>">
+  <label>Related tool link (optional)</label>
+  <input type="text" name="related_tool_href" value="<%= article ? (article.related_tool_href || '') : '' %>">
+  <div class="actions">
+    <button type="submit"><%= !isNew ? 'Save changes' : 'Create article' %></button>
+  </div>
+</form>
+
+<% if (!isNew) { %>
+<form method="POST" action="/admin/articles/<%= encodeURIComponent(article.slug) %>/delete" onsubmit="return confirm('Delete this article?');" style="margin-top:24px;">
+  <button type="submit" class="danger">Delete this article</button>
+</form>
+<% } %>
+
+<%- include('layout-foot') %>

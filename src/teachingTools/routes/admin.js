@@ -6,6 +6,7 @@ var ExcelJS = require('exceljs');
 var router = express.Router();
 var requireAdmin = require('../middleware/requireAdmin');
 var sqlClient = require('../services/sqlClient');
+var siteContentStore = require('../services/siteContentStore');
 var sql = sqlClient.sql;
 
 var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
@@ -372,6 +373,193 @@ router.post('/questionbanks/:id/import', upload.single('file'), async function (
       title: 'Import into ' + bank.name, bank: bank, adminUser: req.adminUser,
       result: { created: created, updated: updated, skipped: skipped, total: rows.length }
     });
+  } catch (err) { next(err); }
+});
+
+function parseLines(text) {
+  if (!text) return [];
+  return text.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+}
+
+// ===== Tool Guides =====
+
+router.get('/toolguides', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().query('SELECT slug, title, eyebrow, app_url FROM tool_guides ORDER BY title');
+    res.render('admin/toolguides-index', { title: 'Tool Guides', guides: result.recordset, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.get('/toolguides/new', function (req, res) {
+  res.render('admin/toolguides-edit', { title: 'New Tool Guide', guide: null, adminUser: req.adminUser });
+});
+
+router.post('/toolguides/new', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('slug', sql.NVarChar, req.body.slug)
+      .input('title', sql.NVarChar, req.body.title)
+      .input('eyebrow', sql.NVarChar, req.body.eyebrow || null)
+      .input('grades', sql.NVarChar, req.body.grades || null)
+      .input('duration', sql.NVarChar, req.body.duration || null)
+      .input('summary', sql.NVarChar, req.body.summary || null)
+      .input('whatItIs', sql.NVarChar, req.body.what_it_is || null)
+      .input('exampleTitle', sql.NVarChar, req.body.example_title || null)
+      .input('example', sql.NVarChar, req.body.example || null)
+      .input('appUrl', sql.NVarChar, req.body.app_url || null)
+      .input('steps', sql.NVarChar, JSON.stringify(parseLines(req.body.steps)))
+      .input('tips', sql.NVarChar, JSON.stringify(parseLines(req.body.tips)))
+      .query(
+        'INSERT INTO tool_guides (slug, title, eyebrow, grades, duration, summary, what_it_is, example_title, example, app_url, steps, tips) ' +
+        'VALUES (@slug, @title, @eyebrow, @grades, @duration, @summary, @whatItIs, @exampleTitle, @example, @appUrl, @steps, @tips)'
+      );
+    await siteContentStore.refresh();
+    res.redirect('/admin/toolguides/' + encodeURIComponent(req.body.slug) + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.get('/toolguides/:slug/edit', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().input('slug', sql.NVarChar, req.params.slug).query('SELECT * FROM tool_guides WHERE slug = @slug');
+    var guide = result.recordset[0];
+    if (!guide) return res.status(404).send('Tool guide not found.');
+    guide.stepsText = JSON.parse(guide.steps || '[]').join('\n');
+    guide.tipsText = JSON.parse(guide.tips || '[]').join('\n');
+    res.render('admin/toolguides-edit', { title: 'Edit ' + guide.title, guide: guide, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.post('/toolguides/:slug', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('slug', sql.NVarChar, req.params.slug)
+      .input('title', sql.NVarChar, req.body.title)
+      .input('eyebrow', sql.NVarChar, req.body.eyebrow || null)
+      .input('grades', sql.NVarChar, req.body.grades || null)
+      .input('duration', sql.NVarChar, req.body.duration || null)
+      .input('summary', sql.NVarChar, req.body.summary || null)
+      .input('whatItIs', sql.NVarChar, req.body.what_it_is || null)
+      .input('exampleTitle', sql.NVarChar, req.body.example_title || null)
+      .input('example', sql.NVarChar, req.body.example || null)
+      .input('appUrl', sql.NVarChar, req.body.app_url || null)
+      .input('steps', sql.NVarChar, JSON.stringify(parseLines(req.body.steps)))
+      .input('tips', sql.NVarChar, JSON.stringify(parseLines(req.body.tips)))
+      .query(
+        'UPDATE tool_guides SET title=@title, eyebrow=@eyebrow, grades=@grades, duration=@duration, summary=@summary, ' +
+        'what_it_is=@whatItIs, example_title=@exampleTitle, example=@example, app_url=@appUrl, steps=@steps, tips=@tips WHERE slug=@slug'
+      );
+    await siteContentStore.refresh();
+    res.redirect('/admin/toolguides/' + encodeURIComponent(req.params.slug) + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/toolguides/:slug/delete', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request().input('slug', sql.NVarChar, req.params.slug).query('DELETE FROM tool_guides WHERE slug = @slug');
+    await siteContentStore.refresh();
+    res.redirect('/admin/toolguides');
+  } catch (err) { next(err); }
+});
+
+// ===== Articles =====
+
+router.get('/articles', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().query('SELECT slug, title, category FROM articles ORDER BY title');
+    res.render('admin/articles-index', { title: 'Articles', articles: result.recordset, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.get('/articles/new', function (req, res) {
+  res.render('admin/articles-edit', { title: 'New Article', article: null, isNew: true, error: null, adminUser: req.adminUser });
+});
+
+router.post('/articles/new', async function (req, res, next) {
+  try {
+    var sections;
+    try {
+      sections = JSON.parse(req.body.sections || '[]');
+    } catch (parseErr) {
+      return res.render('admin/articles-edit', {
+        title: 'New Article', adminUser: req.adminUser, isNew: true, error: 'Sections is not valid JSON: ' + parseErr.message,
+        article: Object.assign({}, req.body, { introText: req.body.intro, sectionsText: req.body.sections })
+      });
+    }
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('slug', sql.NVarChar, req.body.slug)
+      .input('category', sql.NVarChar, req.body.category)
+      .input('title', sql.NVarChar, req.body.title)
+      .input('description', sql.NVarChar, req.body.description || null)
+      .input('readTime', sql.NVarChar, req.body.read_time || null)
+      .input('intro', sql.NVarChar, JSON.stringify(parseLines(req.body.intro)))
+      .input('sections', sql.NVarChar, JSON.stringify(sections))
+      .input('relatedToolLabel', sql.NVarChar, req.body.related_tool_label || null)
+      .input('relatedToolHref', sql.NVarChar, req.body.related_tool_href || null)
+      .query(
+        'INSERT INTO articles (slug, category, title, description, read_time, intro, sections, related_tool_label, related_tool_href) ' +
+        'VALUES (@slug, @category, @title, @description, @readTime, @intro, @sections, @relatedToolLabel, @relatedToolHref)'
+      );
+    await siteContentStore.refresh();
+    res.redirect('/admin/articles/' + encodeURIComponent(req.body.slug) + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.get('/articles/:slug/edit', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().input('slug', sql.NVarChar, req.params.slug).query('SELECT * FROM articles WHERE slug = @slug');
+    var article = result.recordset[0];
+    if (!article) return res.status(404).send('Article not found.');
+    article.introText = JSON.parse(article.intro || '[]').join('\n');
+    article.sectionsText = JSON.stringify(JSON.parse(article.sections || '[]'), null, 2);
+    res.render('admin/articles-edit', { title: 'Edit ' + article.title, article: article, isNew: false, error: null, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.post('/articles/:slug', async function (req, res, next) {
+  try {
+    var sections;
+    try {
+      sections = JSON.parse(req.body.sections || '[]');
+    } catch (parseErr) {
+      return res.render('admin/articles-edit', {
+        title: 'Edit ' + req.body.title, adminUser: req.adminUser, isNew: false, error: 'Sections is not valid JSON: ' + parseErr.message,
+        article: Object.assign({}, req.body, { slug: req.params.slug, introText: req.body.intro, sectionsText: req.body.sections })
+      });
+    }
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('slug', sql.NVarChar, req.params.slug)
+      .input('category', sql.NVarChar, req.body.category)
+      .input('title', sql.NVarChar, req.body.title)
+      .input('description', sql.NVarChar, req.body.description || null)
+      .input('readTime', sql.NVarChar, req.body.read_time || null)
+      .input('intro', sql.NVarChar, JSON.stringify(parseLines(req.body.intro)))
+      .input('sections', sql.NVarChar, JSON.stringify(sections))
+      .input('relatedToolLabel', sql.NVarChar, req.body.related_tool_label || null)
+      .input('relatedToolHref', sql.NVarChar, req.body.related_tool_href || null)
+      .query(
+        'UPDATE articles SET category=@category, title=@title, description=@description, read_time=@readTime, ' +
+        'intro=@intro, sections=@sections, related_tool_label=@relatedToolLabel, related_tool_href=@relatedToolHref WHERE slug=@slug'
+      );
+    await siteContentStore.refresh();
+    res.redirect('/admin/articles/' + encodeURIComponent(req.params.slug) + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/articles/:slug/delete', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request().input('slug', sql.NVarChar, req.params.slug).query('DELETE FROM articles WHERE slug = @slug');
+    await siteContentStore.refresh();
+    res.redirect('/admin/articles');
   } catch (err) { next(err); }
 });
 

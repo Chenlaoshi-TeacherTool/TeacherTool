@@ -1,0 +1,18 @@
+<%- include('layout-head') %>
+<h1>Tool Guides</h1>
+<p><a class="button" href="/admin/toolguides/new">+ New tool guide</a></p>
+<table>
+  <thead><tr><th>Title</th><th>Slug</th><th>Eyebrow</th><th>App URL</th><th></th></tr></thead>
+  <tbody>
+    <% guides.forEach(function (guide) { %>
+    <tr>
+      <td><%= guide.title %></td>
+      <td><%= guide.slug %></td>
+      <td><%= guide.eyebrow || '' %></td>
+      <td><%= guide.app_url || '' %></td>
+      <td><a href="/admin/toolguides/<%= encodeURIComponent(guide.slug) %>/edit">Edit</a></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('layout-foot') %>

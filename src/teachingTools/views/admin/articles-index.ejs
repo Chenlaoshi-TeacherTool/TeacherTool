@@ -1,0 +1,17 @@
+<%- include('layout-head') %>
+<h1>Articles</h1>
+<p><a class="button" href="/admin/articles/new">+ New article</a></p>
+<table>
+  <thead><tr><th>Title</th><th>Slug</th><th>Category</th><th></th></tr></thead>
+  <tbody>
+    <% articles.forEach(function (article) { %>
+    <tr>
+      <td><%= article.title %></td>
+      <td><%= article.slug %></td>
+      <td><%= article.category %></td>
+      <td><a href="/admin/articles/<%= encodeURIComponent(article.slug) %>/edit">Edit</a></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('layout-foot') %>

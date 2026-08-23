@@ -1,0 +1,40 @@
+<%- include('layout-head') %>
+<h1><%= guide ? 'Edit: ' + guide.title : 'New Tool Guide' %></h1>
+
+<form method="POST" action="<%= guide ? '/admin/toolguides/' + encodeURIComponent(guide.slug) : '/admin/toolguides/new' %>">
+  <label>Slug (used in URLs, no spaces)</label>
+  <input type="text" name="slug" value="<%= guide ? guide.slug : '' %>" <%= guide ? 'readonly' : 'required' %>>
+  <label>Title</label>
+  <input type="text" name="title" value="<%= guide ? guide.title : '' %>" required>
+  <label>Eyebrow (small label above the title)</label>
+  <input type="text" name="eyebrow" value="<%= guide ? (guide.eyebrow || '') : '' %>">
+  <label>Grades</label>
+  <input type="text" name="grades" value="<%= guide ? (guide.grades || '') : '' %>">
+  <label>Duration</label>
+  <input type="text" name="duration" value="<%= guide ? (guide.duration || '') : '' %>">
+  <label>Summary</label>
+  <textarea name="summary" rows="2"><%= guide ? (guide.summary || '') : '' %></textarea>
+  <label>What it is</label>
+  <textarea name="what_it_is" rows="3"><%= guide ? (guide.what_it_is || '') : '' %></textarea>
+  <label>Example title</label>
+  <input type="text" name="example_title" value="<%= guide ? (guide.example_title || '') : '' %>">
+  <label>Example</label>
+  <textarea name="example" rows="3"><%= guide ? (guide.example || '') : '' %></textarea>
+  <label>App URL (optional, if this guide links to a standalone tool page)</label>
+  <input type="text" name="app_url" value="<%= guide ? (guide.app_url || '') : '' %>">
+  <label>Steps (one per line)</label>
+  <textarea name="steps" rows="4"><%= guide ? guide.stepsText : '' %></textarea>
+  <label>Tips (one per line)</label>
+  <textarea name="tips" rows="4"><%= guide ? guide.tipsText : '' %></textarea>
+  <div class="actions">
+    <button type="submit"><%= guide ? 'Save changes' : 'Create tool guide' %></button>
+  </div>
+</form>
+
+<% if (guide) { %>
+<form method="POST" action="/admin/toolguides/<%= encodeURIComponent(guide.slug) %>/delete" onsubmit="return confirm('Delete this tool guide?');" style="margin-top:24px;">
+  <button type="submit" class="danger">Delete this tool guide</button>
+</form>
+<% } %>
+
+<%- include('layout-foot') %>
