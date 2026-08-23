@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 
 <head>
     <meta charset="UTF-8">
@@ -116,9 +116,9 @@
 <body>
 
     <div class="header">
-        <a href="/theme-activities/weather" class="back-btn">⬅ Back</a>
-        <h1>🎵 Weather Songs</h1>
-        <p>Learn Chinese through music!</p>
+        <a href="/theme-activities/weather" class="back-btn">⬅ <%= t('themeActivitiesWeatherSongs.back') %></a>
+        <h1>🎵 <%= t('themeActivitiesWeatherSongs.title') %></h1>
+        <p><%= t('themeActivitiesWeatherSongs.subtitle') %></p>
     </div>
 
     <div class="container">
@@ -126,7 +126,7 @@
         <!-- 🌤️ SONG 1 -->
         <div class="song-card">
             <h3>流浪 - 卢焱</h3>
-            <p>Simple beginner weather song</p>
+            <p><%= t('themeActivitiesWeatherSongs.song1Desc') %></p>
 
             <!-- 🎬 YouTube -->
             <div class="video-container">
@@ -137,7 +137,7 @@
             <!-- 📄 LYRICS -->
             <div class="lyrics">
                 <div class="song-card">
-                    <h3>《流浪》 Lu Yan - Lyrics PDF</h3>
+                    <h3><%= t('themeActivitiesWeatherSongs.song1LyricsTitle') %></h3>
 
                     <!-- 📄 PDF 预览 -->
                     <iframe
@@ -151,7 +151,7 @@
                         <a
                             href="/pdf/LiuLang_LuYan.pdf"
                             download class="btn">
-                            ⬇ Download Lyrics PDF
+                            ⬇ <%= t('themeActivitiesWeatherSongs.downloadLyricsPdf') %>
                         </a>
                     </div>
                 </div>
@@ -161,8 +161,8 @@
 
         <!-- 🌧️ SONG 2 -->
         <div class="song-card">
-            <h3>🌧️ Rain Song</h3>
-            <p>Rainy day vocabulary practice</p>
+            <h3>🌧️ <%= t('themeActivitiesWeatherSongs.song2Title') %></h3>
+            <p><%= t('themeActivitiesWeatherSongs.song2Desc') %></p>
 
             <div class="video-container">
                 <iframe src="https://www.youtube.com/embed/tyo3Rzbtl3w" allowfullscreen>

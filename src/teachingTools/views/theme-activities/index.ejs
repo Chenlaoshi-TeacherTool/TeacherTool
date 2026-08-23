@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -129,19 +129,19 @@
 
 <body>
 
-    <a href="/" class="back-btn">← Back to Homepage</a>
+    <a href="/" class="back-btn">← <%= t('themeActivities.backToHomepage') %></a>
 
     <section class="header">
-        <h1>Theme Activities</h1>
-        <p>Explore published classroom activities by topic. New themes appear here only after the lesson notes and materials have been reviewed.</p>
+        <h1><%= t('themeActivities.title') %></h1>
+        <p><%= t('themeActivities.intro') %></p>
     </section>
 
     <!-- 🔍 SEARCH BOX -->
     <div class="search-container">
-        <input 
-            type="text" 
-            id="searchBox" 
-            placeholder="🔍 Search published themes"
+        <input
+            type="text"
+            id="searchBox"
+            placeholder="🔍 <%= t('themeActivities.searchPlaceholder') %>"
             onkeyup="filterThemes()"
         >
     </div>
@@ -149,21 +149,21 @@
     <section class="tools-grid">
 
         <div class="tool-card" data-tags="weather seasons 四季 天气">
-            <h3>🌦 Seasons &amp; Weather</h3>
-            <p>Weather words, seasonal questions, songs, and a suggested lesson sequence for Chinese learners.</p>
-            <a href="/theme-activities/weather" class="btn">Open theme</a>
+            <h3>🌦 <%= t('themeActivities.weatherTitle') %></h3>
+            <p><%= t('themeActivities.weatherDesc') %></p>
+            <a href="/theme-activities/weather" class="btn"><%= t('themeActivities.openTheme') %></a>
         </div>
 
         <div class="tool-card" data-tags="festivals holidays mid autumn 中秋节 节日">
-            <h3>🥮 Mid-Autumn Festival</h3>
-            <p>A 35-minute Grade 1 lesson with four core words, movement, picture sequencing, and a take-home card.</p>
-            <a href="/resources/teaching-mid-autumn-festival-grade-one" class="btn">Read lesson</a>
+            <h3>🥮 <%= t('themeActivities.midAutumnTitle') %></h3>
+            <p><%= t('themeActivities.midAutumnDesc') %></p>
+            <a href="/resources/teaching-mid-autumn-festival-grade-one" class="btn"><%= t('themeActivities.readLesson') %></a>
         </div>
 
         <div class="tool-card" data-tags="games vocabulary classroom 中文 游戏 词汇">
-            <h3>🎲 Theme Game Ideas</h3>
-            <p>Ten short games that can be adapted to animals, family, food, colors, school, and other vocabulary themes.</p>
-            <a href="/resources/ten-games-for-chinese-beginners" class="btn">Read game guide</a>
+            <h3>🎲 <%= t('themeActivities.gameIdeasTitle') %></h3>
+            <p><%= t('themeActivities.gameIdeasDesc') %></p>
+            <a href="/resources/ten-games-for-chinese-beginners" class="btn"><%= t('themeActivities.readGameGuide') %></a>
         </div>
     </section>
 

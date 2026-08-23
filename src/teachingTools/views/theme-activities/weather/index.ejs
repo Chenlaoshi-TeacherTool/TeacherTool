@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -157,46 +157,46 @@
 </head>
 <body>
   <div class="header">
-    <a href="/theme-activities" class="back-btn">⬅ Back</a>
-    <h1>🌦️ Seasons &amp; Weather</h1>
-    <p>Seasons & Weather Activities</p>
+    <a href="/theme-activities" class="back-btn">⬅ <%= t('themeActivitiesWeather.back') %></a>
+    <h1>🌦️ <%= t('themeActivitiesWeather.title') %></h1>
+    <p><%= t('themeActivitiesWeather.subtitle') %></p>
 </div>
 
 <div class="tools-grid">
 
     <div class="tool-card">
-        <div class="tag">Vocabulary</div>
-        <h3>Weather Vocabulary</h3>
-        <p>Start with six useful words: 晴天、阴天、下雨、下雪、刮风、很冷. Show a picture, say the word once, then let students point before asking them to speak.</p>
-        <p><strong>Best for:</strong> Grades 1–6 · recognition and listening</p>
+        <div class="tag"><%= t('themeActivitiesWeather.tagVocabulary') %></div>
+        <h3><%= t('themeActivitiesWeather.vocabTitle') %></h3>
+        <p><%= t('themeActivitiesWeather.vocabDesc') %></p>
+        <p><strong><%= t('themeActivitiesWeather.vocabBestForStrong') %></strong> <%= t('themeActivitiesWeather.vocabBestForText') %></p>
     </div>
 
     <div class="tool-card">
-        <div class="tag">Practice</div>
-        <h3>Sentence Pattern Practice</h3>
-        <p>Practice the question “今天天气怎么样？” with the frame “今天____。” Add a second sentence—“我想____。” or “我要穿____。”—when students are ready.</p>
-        <p><strong>Teacher tip:</strong> Ask students to look outside so the answer carries real information.</p>
+        <div class="tag"><%= t('themeActivitiesWeather.tagPractice') %></div>
+        <h3><%= t('themeActivitiesWeather.practiceTitle') %></h3>
+        <p><%= t('themeActivitiesWeather.practiceDesc') %></p>
+        <p><strong><%= t('themeActivitiesWeather.practiceTipStrong') %></strong> <%= t('themeActivitiesWeather.practiceTipText') %></p>
     </div>
 
     <div class="tool-card">
-        <div class="tag">Game</div>
-        <h3>Weather Mini-Games</h3>
-        <p>Place four weather pictures in the room. Say a weather sentence, let students move to the matching picture, then tell a partner what they would wear or do.</p>
-        <p><strong>Time:</strong> 5–8 minutes · listening and speaking</p>
+        <div class="tag"><%= t('themeActivitiesWeather.tagGame') %></div>
+        <h3><%= t('themeActivitiesWeather.gameTitle') %></h3>
+        <p><%= t('themeActivitiesWeather.gameDesc') %></p>
+        <p><strong><%= t('themeActivitiesWeather.gameTimeStrong') %></strong> <%= t('themeActivitiesWeather.gameTimeText') %></p>
     </div>
 
     <div class="tool-card">
-        <div class="tag">Song</div>
-        <h3>Weather Songs</h3>
-        <p>Use a short song as repeated listening. First listen for one target word, then add gestures, and only after that invite students to sing the complete line.</p>
-        <a href="/theme-activities/weather/songs" class="btn">Open song notes</a>
+        <div class="tag"><%= t('themeActivitiesWeather.tagSong') %></div>
+        <h3><%= t('themeActivitiesWeather.songTitle') %></h3>
+        <p><%= t('themeActivitiesWeather.songDesc') %></p>
+        <a href="/theme-activities/weather/songs" class="btn"><%= t('themeActivitiesWeather.openSongNotes') %></a>
     </div>
 
         <div class="tool-card">
-        <div class="tag">Hands-on Activity</div>
-        <h3>Weather Crafts &amp; Activities</h3>
-        <p>Make a four-part weather wheel. Students turn the arrow, ask a partner “天气怎么样？”, and answer with the matching sentence before drawing suitable clothes.</p>
-        <p><strong>Materials:</strong> paper plate or cardstock, pencil, crayons, and a paper fastener.</p>
+        <div class="tag"><%= t('themeActivitiesWeather.tagHandsOn') %></div>
+        <h3><%= t('themeActivitiesWeather.craftsTitle') %></h3>
+        <p><%= t('themeActivitiesWeather.craftsDesc') %></p>
+        <p><strong><%= t('themeActivitiesWeather.craftsMaterialsStrong') %></strong> <%= t('themeActivitiesWeather.craftsMaterialsText') %></p>
     </div>
 </div>
 <script src="/javascripts/account-coming-soon.js"></script>

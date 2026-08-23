@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,14 +73,14 @@
 <body>
     <header class="shop-hero">
         <div class="hero-inner">
-            <a class="back-link" href="/">← Back to home</a>
+            <a class="back-link" href="/">← <%= t('classroomShop.backLink') %></a>
             <div class="hero-content">
                 <div>
-                    <p class="eyebrow">Chen Laoshi's Classroom Shop</p>
-                    <h1>Small finds for bright classrooms.</h1>
-                    <p>Occasional teaching supplies looking for a new classroom home—simple to order, clearly priced, and ready for creative language practice.</p>
+                    <p class="eyebrow"><%= t('classroomShop.eyebrow') %></p>
+                    <h1><%= t('classroomShop.title') %></h1>
+                    <p><%= t('classroomShop.intro') %></p>
                 </div>
-                <div class="hero-badges" aria-label="Shop highlights"><span>Open-box finds</span><span>Free U.S. shipping*</span><span>Small-batch stock</span></div>
+                <div class="hero-badges" aria-label="Shop highlights"><span><%= t('classroomShop.badge1') %></span><span><%= t('classroomShop.badge2') %></span><span><%= t('classroomShop.badge3') %></span></div>
             </div>
         </div>
     </header>
@@ -94,46 +94,46 @@
                     <button class="gallery-control next" data-gallery-next type="button" aria-label="Show next product image">›</button>
                     <p class="gallery-status" data-gallery-status aria-live="polite">Image 1 of 2</p>
                 </div>
-                <div class="gallery-note">🧲 Bend them into cute poses and place them on magnetic surfaces to brighten your classroom displays. They’re also perfect as fidgets or little gifts for your students.</div>
+                <div class="gallery-note">🧲 <%= t('classroomShop.galleryNote') %></div>
             </div>
             <article class="product-panel">
-                <p class="product-status">Open-box · Like new</p>
-                <h2 id="magnetic-people-title">Magnetic People</h2>
-                <p class="product-subtitle">30 colorful magnetic figures per set</p>
+                <p class="product-status"><%= t('classroomShop.productStatus') %></p>
+                <h2 id="magnetic-people-title"><%= t('classroomShop.productTitle') %></h2>
+                <p class="product-subtitle"><%= t('classroomShop.productSubtitle') %></p>
                 <ul class="product-details">
-                    <li><span>✨</span><span><strong>1 set = 30 pieces.</strong> Bend, pose, connect, and use for imaginative classroom play.</span></li>
-                    <li><span>🖍️</span><span>Great for magnetic boards, storytelling prompts, quick rewards, names, and small-group games.</span></li>
-                    <li><span>📦</span><span><strong>Every listed price includes free standard shipping to the contiguous U.S.</strong></span></li>
+                    <li><span>✨</span><span><strong><%= t('classroomShop.detail1Strong') %></strong> <%= t('classroomShop.detail1Text') %></span></li>
+                    <li><span>🖍️</span><span><%= t('classroomShop.detail2Text') %></span></li>
+                    <li><span>📦</span><span><strong><%= t('classroomShop.detail3Strong') %></strong></span></li>
                 </ul>
-                <p class="bundle-title">Choose your bundle</p>
+                <p class="bundle-title"><%= t('classroomShop.bundleTitle') %></p>
                 <div class="bundle-list">
-                    <div class="bundle"><div><strong>1 set</strong><span>30 magnetic people</span></div><span class="price">$16.99</span></div>
-                    <div class="bundle"><div><strong>2 sets</strong><span>60 magnetic people</span></div><span class="price">$30</span></div>
-                    <div class="bundle"><div><strong>3 sets</strong><span>90 magnetic people</span></div><span class="price">$40</span></div>
-                    <div class="bundle"><div><strong>4 sets</strong><span>120 magnetic people</span></div><span class="price">$48</span></div>
-                    <div class="bundle"><div><strong>5 sets</strong><span>150 magnetic people</span></div><span class="price">$50</span></div>
+                    <div class="bundle"><div><strong><%= t('classroomShop.bundle1Name') %></strong><span><%= t('classroomShop.bundle1Desc') %></span></div><span class="price">$16.99</span></div>
+                    <div class="bundle"><div><strong><%= t('classroomShop.bundle2Name') %></strong><span><%= t('classroomShop.bundle2Desc') %></span></div><span class="price">$30</span></div>
+                    <div class="bundle"><div><strong><%= t('classroomShop.bundle3Name') %></strong><span><%= t('classroomShop.bundle3Desc') %></span></div><span class="price">$40</span></div>
+                    <div class="bundle"><div><strong><%= t('classroomShop.bundle4Name') %></strong><span><%= t('classroomShop.bundle4Desc') %></span></div><span class="price">$48</span></div>
+                    <div class="bundle"><div><strong><%= t('classroomShop.bundle5Name') %></strong><span><%= t('classroomShop.bundle5Desc') %></span></div><span class="price">$50</span></div>
                 </div>
-                <a class="buy-button" href="https://paypal.me/chenlaoshitoolkit" target="_blank" rel="noopener noreferrer">Pay with PayPal →</a>
-                <p class="amazon-note">🛒 <span>Prefer Amazon checkout, or need it sooner? <a href="https://amzn.to/4g5HgLA" target="_blank" rel="sponsored noopener noreferrer">Find a similar magnetic set on Amazon →</a><span class="disclosure">As an Amazon Associate I earn from qualifying purchases, at no extra cost to you.</span></span></p>
-                <p class="order-note"><strong>Before paying:</strong> <a href="/feedback">send an order note</a> with your name, quantity, mailing address, and the PayPal transaction number after payment. Please do not include payment-card details.<br><br><strong>Order questions?</strong> Email <a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a>. For your privacy, please do not send payment-card details by email.<br><br><strong>*Free U.S. shipping:</strong> included for the contiguous 48 states and Washington, D.C. Alaska, Hawaii, U.S. territories, and APO/FPO/DPO addresses are not included—please contact me before purchasing for a shipping quote.</p>
+                <a class="buy-button" href="https://paypal.me/chenlaoshitoolkit" target="_blank" rel="noopener noreferrer"><%= t('classroomShop.payWithPaypal') %></a>
+                <p class="amazon-note">🛒 <span><%= t('classroomShop.amazonNotePrefix') %> <a href="https://amzn.to/4g5HgLA" target="_blank" rel="sponsored noopener noreferrer"><%= t('classroomShop.amazonNoteLink') %></a><span class="disclosure"><%= t('classroomShop.amazonNoteDisclosure') %></span></span></p>
+                <p class="order-note"><strong><%= t('classroomShop.orderNote1Strong') %></strong> <a href="/feedback"><%= t('classroomShop.orderNote1LinkText') %></a><%= t('classroomShop.orderNote1Suffix') %><br><br><strong><%= t('classroomShop.orderNote2Strong') %></strong> <%= t('classroomShop.orderNote2Prefix') %><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a><%= t('classroomShop.orderNote2Suffix') %><br><br><strong><%= t('classroomShop.orderNote3Strong') %></strong> <%= t('classroomShop.orderNote3Text') %></p>
             </article>
         </section>
 
         <section aria-labelledby="ordering-heading">
             <div class="section-heading">
-                <p class="eyebrow">Simple first-round ordering</p>
-                <h2 id="ordering-heading">Three small steps.</h2>
-                <p>This keeps stock and shipping personal while the classroom shop is still growing.</p>
+                <p class="eyebrow"><%= t('classroomShop.orderingEyebrow') %></p>
+                <h2 id="ordering-heading"><%= t('classroomShop.orderingTitle') %></h2>
+                <p><%= t('classroomShop.orderingIntro') %></p>
             </div>
             <div class="how-grid">
-                <article class="how-card"><div class="step-number">1</div><h3>Choose a bundle</h3><p>Pick the quantity that suits your classroom. Each set includes 30 magnetic people, with free standard shipping in the contiguous U.S.</p></article>
-                <article class="how-card"><div class="step-number">2</div><h3>Send the details</h3><p>Use the <a href="/feedback">feedback form</a> or email <a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a> with your name, quantity, full mailing address, and any question before or after payment.</p></article>
-                <article class="how-card"><div class="step-number">3</div><h3>Pay securely</h3><p>Use the PayPal button to send payment. I will match it with your note and confirm your order personally.</p></article>
+                <article class="how-card"><div class="step-number">1</div><h3><%= t('classroomShop.step1Title') %></h3><p><%= t('classroomShop.step1Text') %></p></article>
+                <article class="how-card"><div class="step-number">2</div><h3><%= t('classroomShop.step2Title') %></h3><p><%= t('classroomShop.step2Prefix') %><a href="/feedback"><%= t('classroomShop.step2LinkText') %></a><%= t('classroomShop.step2Middle') %><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a><%= t('classroomShop.step2Suffix') %></p></article>
+                <article class="how-card"><div class="step-number">3</div><h3><%= t('classroomShop.step3Title') %></h3><p><%= t('classroomShop.step3Text') %></p></article>
             </div>
         </section>
 
     </main>
-    <footer><p>© 2026 Chen Laoshi's Teaching Toolkit · Made with care for curious classrooms. · <a href="/privacy">Privacy Policy</a> · <a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a></p></footer>
+    <footer><p><%- t('footer.home') %></p></footer>
     <script src="/javascripts/account-coming-soon.js"></script>
     <script src="/javascripts/milk-tea-footer.js"></script>
     <script>

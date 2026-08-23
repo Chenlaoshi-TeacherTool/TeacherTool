@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,15 +13,15 @@
 <body>
   <header class="content-hero">
     <div class="content-shell">
-      <p class="content-kicker">Teaching Resources · Teacher Blog</p>
-      <h1>Classroom methods with enough detail to use</h1>
-      <p>These articles explain how to run an activity, teach culture thoughtfully, review vocabulary, and use the site's tools with a clear learning goal. Chinese-language resources are labeled, and many routines can be adapted for other subjects.</p>
+      <p class="content-kicker"><%= t('resourcesIndex.kicker') %></p>
+      <h1><%= t('resourcesIndex.title') %></h1>
+      <p><%= t('resourcesIndex.intro') %></p>
     </div>
   </header>
   <main class="content-section">
     <div class="content-shell">
       <nav class="filter-chips" aria-label="Resource categories">
-        <a href="/resources" class="<%= !activeCategory ? 'active' : '' %>">All resources</a>
+        <a href="/resources" class="<%= !activeCategory ? 'active' : '' %>"><%= t('resourcesIndex.allResources') %></a>
         <% categories.forEach(function(category) { %><a href="/resources?category=<%= encodeURIComponent(category) %>" class="<%= activeCategory === category ? 'active' : '' %>"><%= category %></a><% }) %>
       </nav>
       <div class="resource-grid">
@@ -30,11 +30,11 @@
             <p class="resource-card__meta"><%= article.category %> · <%= article.readTime %></p>
             <h2><a href="/resources/<%= article.slug %>"><%= article.title %></a></h2>
             <p><%= article.description %></p>
-            <a class="resource-card__link" href="/resources/<%= article.slug %>">Read the full classroom guide →</a>
+            <a class="resource-card__link" href="/resources/<%= article.slug %>"><%= t('resourcesIndex.readGuide') %></a>
           </article>
         <% }) %>
       </div>
-      <% if (!articles.length) { %><p class="empty-state">Resources for this category are still being prepared. You can return to all published articles.</p><% } %>
+      <% if (!articles.length) { %><p class="empty-state"><%= t('resourcesIndex.emptyState') %></p><% } %>
     </div>
   </main>
   <script src="/javascripts/milk-tea-footer.js"></script>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +16,7 @@
       <p class="content-kicker"><%= article.category %> · <%= article.readTime %></p>
       <h1><%= article.title %></h1>
       <p><%= article.description %></p>
-      <p class="article-byline">Chen Laoshi's Teaching Resources · Last updated August 20, 2026</p>
+      <p class="article-byline"><%= t('resourcesArticle.byline') %></p>
     </div>
   </header>
 
@@ -28,22 +28,22 @@
           <h2><%= section.heading %></h2>
           <% (section.paragraphs || []).forEach(function(paragraph) { %><p><%= paragraph %></p><% }) %>
           <% if (section.list) { %><ul><% section.list.forEach(function(item) { %><li><%= item %></li><% }) %></ul><% } %>
-          <% if (section.callout) { %><aside class="article-callout"><strong>Classroom note:</strong> <%= section.callout %></aside><% } %>
+          <% if (section.callout) { %><aside class="article-callout"><strong><%= t('resourcesArticle.calloutStrong') %></strong> <%= section.callout %></aside><% } %>
         </section>
       <% }) %>
       <section class="article-tool-cta">
-        <div><p class="content-kicker">Put the method into practice</p><h2>Related tool or resource</h2><p>Choose the learning goal before the tool. The tool can save preparation time; the teacher still makes the instructional decisions.</p></div>
+        <div><p class="content-kicker"><%= t('resourcesArticle.ctaKicker') %></p><h2><%= t('resourcesArticle.ctaTitle') %></h2><p><%= t('resourcesArticle.ctaText') %></p></div>
         <a class="btn" href="<%= article.relatedTool.href %>"><%= article.relatedTool.label %> →</a>
       </section>
-      <p class="article-editorial-note"><strong>Editorial note:</strong> This site does not publish articles for volume. Each resource is organized around a clear classroom task and teacher judgment. Adapt the ideas for student age, subject knowledge, language proficiency, learning needs, and school policy.</p>
+      <p class="article-editorial-note"><strong><%= t('resourcesArticle.editorialStrong') %></strong> <%= t('resourcesArticle.editorialText') %></p>
     </article>
     <aside class="article-sidebar" aria-label="More teaching resources">
-      <p class="content-kicker">Keep reading</p>
-      <h2>More classroom methods</h2>
+      <p class="content-kicker"><%= t('resourcesArticle.sidebarKicker') %></p>
+      <h2><%= t('resourcesArticle.sidebarTitle') %></h2>
       <% relatedArticles.forEach(function(item) { %>
         <a href="/resources/<%= item.slug %>"><span><%= item.category %></span><strong><%= item.title %></strong></a>
       <% }) %>
-      <a class="article-sidebar__all" href="/resources">View all teaching resources →</a>
+      <a class="article-sidebar__all" href="/resources"><%= t('resourcesArticle.sidebarAllLink') %></a>
     </aside>
   </main>
   <script src="/javascripts/milk-tea-footer.js"></script>

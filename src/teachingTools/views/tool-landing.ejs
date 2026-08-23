@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,8 +16,8 @@
       <h1><%= toolGuide.title %></h1>
       <p><%= toolGuide.summary %></p>
       <div class="content-actions">
-        <a class="btn" href="<%= toolGuide.appUrl %>">Open the tool →</a>
-        <a class="text-link" href="<%= sectionPath %>">View all <%= sectionLabel %></a>
+        <a class="btn" href="<%= toolGuide.appUrl %>"><%= t('toolLanding.openTool') %></a>
+        <a class="text-link" href="<%= sectionPath %>"><%= t('toolLanding.viewAllPrefix') %> <%= sectionLabel %></a>
       </div>
     </div>
   </header>
@@ -29,11 +29,11 @@
     <section class="content-section content-section--soft">
       <div class="content-shell content-cta">
         <div>
-          <p class="content-kicker">Before you begin</p>
-          <h2>Start with the learning goal, then open the generator</h2>
-          <p>The generator handles layout or randomization. You still choose the content, difficulty, and classroom interaction. Test the finished material from a student's point of view before class.</p>
+          <p class="content-kicker"><%= t('toolLanding.beforeYouBegin') %></p>
+          <h2><%= t('toolLanding.startHeading') %></h2>
+          <p><%= t('toolLanding.startText') %></p>
         </div>
-        <a class="btn" href="<%= toolGuide.appUrl %>">Open the tool now</a>
+        <a class="btn" href="<%= toolGuide.appUrl %>"><%= t('toolLanding.openToolNow') %></a>
       </div>
     </section>
   </main>

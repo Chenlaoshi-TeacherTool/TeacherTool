@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,9 +12,9 @@
 <body>
   <header class="content-hero">
     <div class="content-shell">
-      <p class="content-kicker">Classroom Finds</p>
-      <h1>Supplies chosen for a real classroom purpose</h1>
-      <p>This is not a list about buying more. It is a small collection of items that can support organization, displays, hands-on learning, and classroom routines across subjects.</p>
+      <p class="content-kicker"><%= t('recommendations.kicker') %></p>
+      <h1><%= t('recommendations.title') %></h1>
+      <p><%= t('recommendations.intro') %></p>
     </div>
   </header>
 
@@ -23,19 +23,19 @@
       <div class="content-shell">
         <div class="recommendation-feature">
           <div>
-            <p class="content-kicker">Chen Laoshi's classroom list</p>
-            <h2>What makes an item worth recommending?</h2>
-            <p>I look for supplies that can serve more than one unit, are easy to organize, are safe for students to use as directed, and have a low-cost or paper-based alternative whenever possible.</p>
+            <p class="content-kicker"><%= t('recommendations.listKicker') %></p>
+            <h2><%= t('recommendations.listTitle') %></h2>
+            <p><%= t('recommendations.listIntro') %></p>
             <ul>
-              <li><strong>Begin with the learning goal:</strong> choose a material because students need to sort, build, explain, display, or practice—not simply because it looks good.</li>
-              <li><strong>Prefer repeated use:</strong> durable, magnetic, movable, and erasable materials often offer more value than one-time decorations.</li>
-              <li><strong>Keep an accessible alternative:</strong> index cards, sticky notes, folders, and reused paper can support many of the same classroom routines.</li>
+              <li><strong><%= t('recommendations.item1Strong') %></strong> <%= t('recommendations.item1Text') %></li>
+              <li><strong><%= t('recommendations.item2Strong') %></strong> <%= t('recommendations.item2Text') %></li>
+              <li><strong><%= t('recommendations.item3Strong') %></strong> <%= t('recommendations.item3Text') %></li>
             </ul>
           </div>
           <aside class="affiliate-note">
-            <h2>Affiliate disclosure</h2>
-            <p>This page contains Amazon affiliate links. If you make a qualifying purchase through one of these links, the site may earn a small commission at no additional cost to you.</p>
-            <p>Prices, availability, sellers, and product details can change. Please confirm the latest information on Amazon before purchasing.</p>
+            <h2><%= t('recommendations.affiliateTitle') %></h2>
+            <p><%= t('recommendations.affiliateP1') %></p>
+            <p><%= t('recommendations.affiliateP2') %></p>
           </aside>
         </div>
 
@@ -45,22 +45,22 @@
           </a>
 
           <div class="recommendation-product__copy">
-            <p class="product-number">Find 01 · Classroom Organization</p>
-            <h2 id="rolling-cart-title">15 Drawers Rolling Cart, Classroom Organizers</h2>
-            <p class="product-subtitle">A mobile home for materials, stations, and student work</p>
-            <p>This style of rolling cart is useful when a classroom has plenty of materials but they are hard to find at the moment of instruction. Different drawer sizes and colors make it easy to organize by class, unit, project, or activity type, while the wheels let the cart move between a planning area, teaching space, and student station.</p>
+            <p class="product-number"><%= t('recommendations.product1Meta') %></p>
+            <h2 id="rolling-cart-title"><%= t('recommendations.product1Title') %></h2>
+            <p class="product-subtitle"><%= t('recommendations.product1Subtitle') %></p>
+            <p><%= t('recommendations.product1Desc') %></p>
 
-            <h3>Why I recommend it</h3>
+            <h3><%= t('recommendations.product1WhyTitle') %></h3>
             <div class="product-reasons">
-              <section><strong>Large drawers hold complete sets</strong><p>Store worksheets, student projects, printable games, lab sheets, art materials, or work waiting to be reviewed. A different color for each class makes retrieval faster.</p></section>
-              <section><strong>Small drawers sort loose supplies</strong><p>Keep cards, dice, magnets, markers, sticky notes, manipulatives, and exit tickets in a consistent place that students can help maintain.</p></section>
-              <section><strong>It can become a learning station</strong><p>Use the top for a task basket or demonstration materials, then roll the cart to a small group to reduce time spent passing out supplies.</p></section>
+              <section><strong><%= t('recommendations.product1Reason1Strong') %></strong><p><%= t('recommendations.product1Reason1Text') %></p></section>
+              <section><strong><%= t('recommendations.product1Reason2Strong') %></strong><p><%= t('recommendations.product1Reason2Text') %></p></section>
+              <section><strong><%= t('recommendations.product1Reason3Strong') %></strong><p><%= t('recommendations.product1Reason3Text') %></p></section>
             </div>
 
-            <div class="product-teacher-tip"><strong>Classroom use tip:</strong><span> Place heavier paper and supplies in the lower drawers and lighter items near the top. Add word-and-picture labels so students can return materials independently. Lock the wheels before use, and remind students not to climb on the cart or pull out several full drawers at once.</span></div>
+            <div class="product-teacher-tip"><strong><%= t('recommendations.product1TipStrong') %></strong><span> <%= t('recommendations.product1TipText') %></span></div>
 
-            <a class="btn product-link" href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer">View this rolling cart on Amazon →</a>
-            <p class="product-link-note">Affiliate link · Check current dimensions, price, stock, and product details on Amazon before purchasing.</p>
+            <a class="btn product-link" href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= t('recommendations.product1LinkText') %></a>
+            <p class="product-link-note"><%= t('recommendations.product1LinkNote') %></p>
           </div>
         </article>
       </div>
@@ -68,11 +68,11 @@
 
     <section class="content-section content-section--soft">
       <div class="content-shell">
-        <p class="content-kicker">Ask before you buy</p>
+        <p class="content-kicker"><%= t('recommendations.askKicker') %></p>
         <div class="question-grid">
-          <article><h2>How often will I use it?</h2><p>If it serves only one theme or one day, consider borrowing it or making a simple version first.</p></article>
-          <article><h2>What will students do with it?</h2><p>Name the action—sort, move, explain, build, compare, or display—instead of settling for “it looks good in a classroom.”</p></article>
-          <article><h2>Is there a low-cost version?</h2><p>Keep an option that does not depend on purchasing so the activity remains usable in different classrooms and budgets.</p></article>
+          <article><h2><%= t('recommendations.q1Title') %></h2><p><%= t('recommendations.q1Text') %></p></article>
+          <article><h2><%= t('recommendations.q2Title') %></h2><p><%= t('recommendations.q2Text') %></p></article>
+          <article><h2><%= t('recommendations.q3Title') %></h2><p><%= t('recommendations.q3Text') %></p></article>
         </div>
       </div>
     </section>
