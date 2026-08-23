@@ -94,6 +94,30 @@
           "actions": ["read"]
         }
       ]
+    },
+    "LevelLookup": {
+      "source": "dbo.level_lookup",
+      "rest": {
+        "path": "/level_lookup"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
+    "TypeLookup": {
+      "source": "dbo.type_lookup",
+      "rest": {
+        "path": "/type_lookup"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
     }
   }
 }
