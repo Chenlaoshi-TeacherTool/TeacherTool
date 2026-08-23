@@ -33,6 +33,9 @@ DAB is now running as an Azure Container App:
 - Container App: `teachingtools-dab`, connected to the `TeacherToolDb` Azure SQL database via the
   `DATABASE_CONNECTION_STRING` secret
 - Public URL: `https://teachingtools-dab.agreeablecliff-18528c5a.westus2.azurecontainerapps.io/api`
+- Image pulls use the Container App's system-assigned managed identity (granted `AcrPull` on
+  `chenlaoshiacr`) rather than the registry's admin username/password — the ACR admin user is
+  disabled.
 
 To point `routes/api.js` / `routes/index.js` at it, set `DAB_BASE_URL` to that URL (with `/api`)
 in the environment where the Express app runs.
