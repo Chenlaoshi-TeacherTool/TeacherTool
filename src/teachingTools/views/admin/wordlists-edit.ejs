@@ -22,6 +22,7 @@
 <% if (list) { %>
 <h2 style="margin-top:32px;">Terms (<%= items.length %>)</h2>
 <div class="items-grid">
+  <div class="grid-header">Image</div>
   <div class="grid-header">Chinese</div>
   <div class="grid-header">Pinyin</div>
   <div class="grid-header">English</div>
@@ -30,7 +31,14 @@
   <div class="grid-header"></div>
 
   <% items.forEach(function (item) { %>
-  <form class="row-form" method="POST" action="/admin/wordlists/<%= list.id %>/items/<%= item.id %>">
+  <form class="row-form" method="POST" action="/admin/wordlists/<%= list.id %>/items/<%= item.id %>" enctype="multipart/form-data">
+    <div>
+      <% if (item.img_blob_url) { %>
+        <img src="<%= item.img_blob_url %>" alt="" class="thumb">
+        <label class="remove-image-label"><input type="checkbox" name="remove_image" value="1"> remove</label>
+      <% } %>
+      <input type="file" name="image" accept="image/*">
+    </div>
     <div><input type="text" name="zh" value="<%= item.zh %>" required></div>
     <div><input type="text" name="py" value="<%= item.py %>" required></div>
     <div><input type="text" name="en" value="<%= item.en %>" required></div>
@@ -42,7 +50,8 @@
   </form>
   <% }) %>
 
-  <form class="row-form" method="POST" action="/admin/wordlists/<%= list.id %>/items">
+  <form class="row-form" method="POST" action="/admin/wordlists/<%= list.id %>/items" enctype="multipart/form-data">
+    <div><input type="file" name="image" accept="image/*"></div>
     <div><input type="text" name="zh" placeholder="Chinese" required></div>
     <div><input type="text" name="py" placeholder="Pinyin" required></div>
     <div><input type="text" name="en" placeholder="English" required></div>

@@ -20,8 +20,11 @@
     button.danger { background: #dc2626; }
     button.secondary { background: #6b7280; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 12px; margin-bottom: 20px; }
-    .items-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto auto; gap: 6px 8px; align-items: center; margin: 16px 0; }
-    .items-grid input { width: 100%; box-sizing: border-box; padding: 6px; font-size: 0.9rem; }
+    .items-grid { display: grid; grid-template-columns: auto 1fr 1fr 1fr 1fr auto auto; gap: 6px 8px; align-items: center; margin: 16px 0; }
+    .items-grid input[type=text] { width: 100%; box-sizing: border-box; padding: 6px; font-size: 0.9rem; }
+    .items-grid input[type=file] { font-size: 0.75rem; max-width: 140px; }
+    .thumb { width: 48px; height: 48px; object-fit: cover; display: block; margin-bottom: 2px; border-radius: 4px; }
+    .remove-image-label { display: block; font-weight: 400; font-size: 0.75rem; margin: 0 0 4px; }
     .grid-header { font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #ddd; padding-bottom: 4px; }
     .row-form { display: contents; }
     .question-card { border: 1px solid #ddd; border-radius: 6px; padding: 14px; margin: 12px 0; }

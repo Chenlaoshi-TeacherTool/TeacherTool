@@ -7,6 +7,7 @@ var router = express.Router();
 var requireAdmin = require('../middleware/requireAdmin');
 var sqlClient = require('../services/sqlClient');
 var siteContentStore = require('../services/siteContentStore');
+var blobStorage = require('../services/blobStorage');
 var sql = sqlClient.sql;
 
 var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
@@ -84,8 +85,9 @@ router.post('/wordlists/:id/delete', async function (req, res, next) {
   } catch (err) { next(err); }
 });
 
-router.post('/wordlists/:id/items', async function (req, res, next) {
+router.post('/wordlists/:id/items', upload.single('image'), async function (req, res, next) {
   try {
+    var imgUrl = req.file ? await blobStorage.uploadImage(req.file) : null;
     var pool = await sqlClient.getPool();
     var maxResult = await pool.request().input('listId', sql.Int, req.params.id)
       .query('SELECT ISNULL(MAX(sort_order), -1) + 1 AS nextOrder FROM word_list_items WHERE list_id = @listId');
@@ -95,22 +97,31 @@ router.post('/wordlists/:id/items', async function (req, res, next) {
       .input('py', sql.NVarChar, req.body.py)
       .input('en', sql.NVarChar, req.body.en)
       .input('note', sql.NVarChar, req.body.note || null)
+      .input('imgUrl', sql.NVarChar, imgUrl)
       .input('sortOrder', sql.Int, maxResult.recordset[0].nextOrder)
-      .query('INSERT INTO word_list_items (list_id, zh, py, en, note, sort_order) VALUES (@listId, @zh, @py, @en, @note, @sortOrder)');
+      .query('INSERT INTO word_list_items (list_id, zh, py, en, img_blob_url, note, sort_order) VALUES (@listId, @zh, @py, @en, @imgUrl, @note, @sortOrder)');
     res.redirect('/admin/wordlists/' + req.params.id + '/edit');
   } catch (err) { next(err); }
 });
 
-router.post('/wordlists/:id/items/:itemId', async function (req, res, next) {
+router.post('/wordlists/:id/items/:itemId', upload.single('image'), async function (req, res, next) {
   try {
     var pool = await sqlClient.getPool();
-    await pool.request()
+    var request = pool.request()
       .input('itemId', sql.Int, req.params.itemId)
       .input('zh', sql.NVarChar, req.body.zh)
       .input('py', sql.NVarChar, req.body.py)
       .input('en', sql.NVarChar, req.body.en)
-      .input('note', sql.NVarChar, req.body.note || null)
-      .query('UPDATE word_list_items SET zh=@zh, py=@py, en=@en, note=@note WHERE id = @itemId');
+      .input('note', sql.NVarChar, req.body.note || null);
+    var setClauses = 'zh=@zh, py=@py, en=@en, note=@note';
+    if (req.file) {
+      var imgUrl = await blobStorage.uploadImage(req.file);
+      request.input('imgUrl', sql.NVarChar, imgUrl);
+      setClauses += ', img_blob_url=@imgUrl';
+    } else if (req.body.remove_image) {
+      setClauses += ', img_blob_url=NULL';
+    }
+    await request.query('UPDATE word_list_items SET ' + setClauses + ' WHERE id = @itemId');
     res.redirect('/admin/wordlists/' + req.params.id + '/edit');
   } catch (err) { next(err); }
 });
