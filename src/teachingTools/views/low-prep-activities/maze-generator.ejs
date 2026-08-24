@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,14 +14,14 @@
   <main class="maze-wrap">
     <header class="maze-header">
       <div class="maze-header-content">
-        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
-        <p class="maze-eyebrow">Editable PowerPoint worksheet</p>
-        <h1>🧭 Maze Generator</h1>
-        <p>Build a ready-to-print maze from eight questions and answers. Your answers are placed along one complete route, then exported in the Chen Laoshi editable PowerPoint template.</p>
+        <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('mazeGenerator.backBtn') %></a>
+        <p class="maze-eyebrow"><%= t('mazeGenerator.eyebrow') %></p>
+        <h1>🧭 <%= t('mazeGenerator.title') %></h1>
+        <p><%= t('mazeGenerator.subtitle') %></p>
       </div>
       <figure class="maze-header-sample">
         <img src="/images/maze-generator-sample.png" alt="Sample four seasons vocabulary maze worksheet">
-        <figcaption>Sample worksheet</figcaption>
+        <figcaption><%= t('mazeGenerator.sampleWorksheet') %></figcaption>
       </figure>
     </header>
 
@@ -30,47 +30,47 @@
         <section class="maze-panel maze-intro">
           <div>
             <span class="maze-step">1</span>
-            <p class="maze-kicker">Worksheet details</p>
-            <h2>Name your maze</h2>
+            <p class="maze-kicker"><%= t('mazeGenerator.worksheetDetailsKicker') %></p>
+            <h2><%= t('mazeGenerator.nameYourMaze') %></h2>
           </div>
-          <label class="maze-title-field" for="mazeTitle">Worksheet title
+          <label class="maze-title-field" for="mazeTitle"><%= t('mazeGenerator.worksheetTitleLabel') %>
             <input id="mazeTitle" type="text" maxlength="60" placeholder="e.g. Unit 3 Vocabulary Maze">
           </label>
-          <p class="maze-help">The title appears on all three editable PowerPoint pages.</p>
+          <p class="maze-help"><%= t('mazeGenerator.titleHelp') %></p>
         </section>
 
         <section class="maze-panel">
           <div class="maze-panel-heading">
             <div>
               <span class="maze-step">2</span>
-              <p class="maze-kicker">Question &amp; answer pairs</p>
-              <h2>Add eight questions</h2>
+              <p class="maze-kicker"><%= t('mazeGenerator.qaKicker') %></p>
+              <h2><%= t('mazeGenerator.addEightQuestions') %></h2>
             </div>
-            <button id="loadMazeSample" class="maze-secondary" type="button">Load a sample</button>
+            <button id="loadMazeSample" class="maze-secondary" type="button"><%= t('mazeGenerator.loadSample') %></button>
           </div>
-          <p class="maze-help">Use one numbered line for each question. Put the short answer directly after the question, separated by a vertical bar <strong>|</strong>. The other answers become shuffled choices.</p>
+          <p class="maze-help"><%= t('mazeGenerator.qaHelpPrefix') %><strong>|</strong><%= t('mazeGenerator.qaHelpSuffix') %></p>
           <div id="mazeBankPicker"></div>
           <div class="maze-pair-editor">
             <label class="maze-pair-label" for="mazePairInput">
-              <span>Eight numbered question &amp; answer pairs</span>
-              <span class="maze-pair-example">Format: 1. Question | Answer</span>
+              <span><%= t('mazeGenerator.eightPairsLabel') %></span>
+              <span class="maze-pair-example"><%= t('mazeGenerator.formatExample') %></span>
             </label>
             <textarea id="mazePairInput" class="maze-pair-input" rows="12" maxlength="1500" spellcheck="true" aria-describedby="mazePairHelp" placeholder="1. The puppy is sitting ___ the table. | under"></textarea>
-            <p id="mazePairHelp" class="maze-pair-help">One pair per line. You can also use an arrow (→) between the question and answer.</p>
+            <p id="mazePairHelp" class="maze-pair-help"><%= t('mazeGenerator.pairHelp') %></p>
           </div>
           <div class="maze-generate-row">
-            <button id="generateMaze" class="maze-primary" type="button">Generate &amp; download PowerPoint</button>
-            <span>Ready when you are—your editable worksheet includes student pages and an answer key.</span>
+            <button id="generateMaze" class="maze-primary" type="button"><%= t('mazeGenerator.generateButton') %></button>
+            <span><%= t('mazeGenerator.readyText') %></span>
           </div>
         </section>
         <section class="maze-panel maze-actions-panel">
           <div>
-            <p class="maze-kicker">Start over</p>
-            <h2>Make another maze</h2>
-            <p class="maze-help">Clear the title and all eight pairs when you are ready for a new worksheet.</p>
+            <p class="maze-kicker"><%= t('mazeGenerator.startOverKicker') %></p>
+            <h2><%= t('mazeGenerator.makeAnotherMaze') %></h2>
+            <p class="maze-help"><%= t('mazeGenerator.clearHelp') %></p>
           </div>
           <div class="maze-actions">
-            <button id="clearMaze" class="maze-secondary" type="button">Clear all</button>
+            <button id="clearMaze" class="maze-secondary" type="button"><%= t('mazeGenerator.clearAllButton') %></button>
           </div>
         </section>
       </section>

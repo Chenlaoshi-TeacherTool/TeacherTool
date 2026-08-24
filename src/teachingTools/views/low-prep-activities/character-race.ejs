@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,81 +13,81 @@
 <body class="cr-page">
 <div class="cr-wrap">
   <header class="cr-header">
-    <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+    <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('characterRace.backBtn') %></a>
     <div class="fl"><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg></div>
-    <h1>Term Race</h1>
-    <p>Arrange terms in a wheel—one partner gives a clue, the other finds the answer, and then they switch roles.</p>
+    <h1><%= t('characterRace.title') %></h1>
+    <p><%= t('characterRace.subtitle') %></p>
   </header>
 
   <div id="coreWarn" class="warn" style="display:none">
-    The optional vocabulary module is unavailable. Saved language lists and automatic pinyin will not work, but manual entry still does.
+    <%= t('characterRace.coreWarn') %>
   </div>
 
   <section>
-    <h2><span class="num">1</span>Add your terms <span style="font-size:14px;font-weight:400;color:#5A6B57">Total <b id="count">0</b></span></h2>
-    <p class="hint">Enter one short term per line. You can also separate single-word items with spaces. Duplicates are removed automatically.</p>
+    <h2><span class="num">1</span><%= t('characterRace.addTermsHeading') %> <span style="font-size:14px;font-weight:400;color:#5A6B57"><%= t('characterRace.totalLabel') %> <b id="count">0</b></span></h2>
+    <p class="hint"><%= t('characterRace.termsHint') %></p>
     <textarea id="src" placeholder="hypothesis&#10;evidence&#10;variable&#10;observe&#10;measure"></textarea>
-    <p class="hint">Language teachers can add optional pronunciation and meaning with <code>term | pronunciation | definition</code>.</p>
+    <p class="hint"><%= t('characterRace.pronunciationHintPrefix') %><code>term | pronunciation | definition</code><%= t('characterRace.pronunciationHintSuffix') %></p>
     <div id="raceLibraryPicker"></div>
     <div class="row" style="margin-top:10px">
-      <button id="btnMake" class="primary">Build the wheel</button>
-      <button id="btnFromList">Use a saved word list</button>
-      <button id="btnDemo" class="ghost">Load a sample</button>
-      <button id="btnShuffle">Shuffle positions</button>
-      <button id="btnClear" class="mini">Clear</button>
+      <button id="btnMake" class="primary"><%= t('characterRace.btnMake') %></button>
+      <button id="btnFromList"><%= t('characterRace.btnFromList') %></button>
+      <button id="btnDemo" class="ghost"><%= t('characterRace.btnDemo') %></button>
+      <button id="btnShuffle"><%= t('characterRace.btnShuffle') %></button>
+      <button id="btnClear" class="mini"><%= t('characterRace.btnClear') %></button>
     </div>
     <div class="row" style="margin-top:12px">
       <input type="text" id="title" placeholder="Title, e.g. Lesson 3 · New Words" style="flex:1 1 240px">
     </div>
     <div id="chips" class="chips" style="margin-top:12px"></div>
-    <p class="hint" id="empty" style="margin:8px 0 0">No terms yet—enter your own list above, or choose “Load a sample.”</p>
+    <p class="hint" id="empty" style="margin:8px 0 0"><%= t('characterRace.emptyHintPrefix') %>“<%= t('characterRace.loadSampleLinkText') %>”<%= t('characterRace.emptyHintSuffix') %></p>
   </section>
 
   <section>
-    <h2><span class="num">2</span>Layout</h2>
-    <p class="hint">A single ring is easiest to read; 12–20 short terms work best. Over 30 terms automatically split into three rings, but text gets smaller—for younger grades, print two sheets instead.</p>
+    <h2><span class="num">2</span><%= t('characterRace.layoutHeading') %></h2>
+    <p class="hint"><%= t('characterRace.layoutHint') %></p>
     <div class="row">
-      <span class="field">Support line
+      <span class="field"><%= t('characterRace.supportLineLabel') %>
         <select id="optTargetLanguage" aria-label="Support line">
-          <option value="english" selected>Definition</option>
-          <option value="pinyin">Pinyin</option>
+          <option value="english" selected><%= t('characterRace.definitionOption') %></option>
+          <option value="pinyin"><%= t('characterRace.pinyinOption') %></option>
         </select>
       </span>
-      <label class="check"><input type="checkbox" id="optFlower" checked> Sunflower style</label>
-      <span class="field">Rings
-        <select id="optRings"><option value="auto">Auto</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select>
+      <label class="check"><input type="checkbox" id="optFlower" checked> <%= t('characterRace.sunflowerStyleLabel') %></label>
+      <span class="field"><%= t('characterRace.ringsLabel') %>
+        <select id="optRings"><option value="auto"><%= t('characterRace.autoOption') %></option><option value="1"><%= t('characterRace.oneOption') %></option><option value="2"><%= t('characterRace.twoOption') %></option><option value="3"><%= t('characterRace.threeOption') %></option></select>
       </span>
-      <span class="field">Text size
-        <select id="optSize"><option value="auto">Auto</option><option value="34">Small</option><option value="46">Medium</option><option value="60">Large</option></select>
+      <span class="field"><%= t('characterRace.textSizeLabel') %>
+        <select id="optSize"><option value="auto"><%= t('characterRace.autoOption') %></option><option value="34"><%= t('characterRace.smallOption') %></option><option value="46"><%= t('characterRace.mediumOption') %></option><option value="60"><%= t('characterRace.largeOption') %></option></select>
       </span>
-      <span class="field">Grid squares
+      <span class="field"><%= t('characterRace.gridSquaresLabel') %>
         <select id="optGrid"><option value="16">16</option><option value="20" selected>20</option><option value="25">25</option></select>
       </span>
     </div>
-    <p class="hint" id="targetLanguageHint" aria-live="polite" style="margin:8px 0 0">Each tile shows the term with its optional definition underneath.</p>
+    <p class="hint" id="targetLanguageHint" aria-live="polite" style="margin:8px 0 0"><%= t('characterRace.targetLanguageHint') %></p>
   </section>
 
   <section>
-    <h2><span class="num">3</span>Preview</h2>
+    <h2><span class="num">3</span><%= t('characterRace.previewHeading') %></h2>
     <div id="preview"></div>
   </section>
 
   <section>
-    <h2><span class="num">4</span>Play &amp; export</h2>
+    <h2><span class="num">4</span><%= t('characterRace.playExportHeading') %></h2>
     <div class="row">
-      <button id="btnGame" class="dark">▶ Big-screen finding game</button>
-      <button id="btnPrint1" class="primary">Print one (wheel + grid)</button>
-      <button id="btnPrint4">Print four</button>
-      <button id="btnPPTX">Export PPTX</button>
-      <button id="btnPDF">PDF</button>
-      <button id="btnPNG">Image</button>
+      <button id="btnGame" class="dark">▶ <%= t('characterRace.btnGame') %></button>
+      <button id="btnPrint1" class="primary"><%= t('characterRace.btnPrint1') %></button>
+      <button id="btnPrint4"><%= t('characterRace.btnPrint4') %></button>
+      <button id="btnPPTX"><%= t('characterRace.btnPPTX') %></button>
+      <button id="btnPDF"><%= t('characterRace.btnPDF') %></button>
+      <button id="btnPNG"><%= t('characterRace.btnPNG') %></button>
     </div>
     <p class="hint" style="margin-top:10px">
-      Each printed A4 sheet has the wheel on top and a grid sheet below — one sheet per pair. The big-screen mode works well for a whole-class warm-up or game.
+      <%= t('characterRace.printHint') %>
     </p>
   </section>
 
-  <footer>Chen Laoshi's Teaching Toolkit · Term Race v1.0</footer>
+  <footer><%= t('characterRace.footer') %></footer>
   <div id="printArea"></div>
 </div>
 
@@ -96,20 +96,20 @@
 <div id="game">
   <div id="gstage"></div>
   <div id="gbar">
-    <button id="gNext" class="primary">Draw a term (Space)</button>
-    <button id="gSay" class="mini">Say it again</button>
-    <label class="check" style="color:#F2F6EF"><input type="checkbox" id="optSpeak" checked> Read aloud</label>
+    <button id="gNext" class="primary"><%= t('characterRace.gDrawTerm') %></button>
+    <button id="gSay" class="mini"><%= t('characterRace.gSayAgain') %></button>
+    <label class="check" style="color:#F2F6EF"><input type="checkbox" id="optSpeak" checked> <%= t('characterRace.gReadAloud') %></label>
     <span style="width:16px"></span>
-    <span class="big">Correct <span id="gscore">0</span></span>
-    <span class="big">Missed <span id="gmiss">0</span></span>
-    <span class="big">Time left <span id="gleft">60</span>s</span>
-    <span class="field" style="color:#F2F6EF">Duration
+    <span class="big"><%= t('characterRace.gCorrect') %> <span id="gscore">0</span></span>
+    <span class="big"><%= t('characterRace.gMissed') %> <span id="gmiss">0</span></span>
+    <span class="big"><%= t('characterRace.gTimeLeft') %> <span id="gleft">60</span>s</span>
+    <span class="field" style="color:#F2F6EF"><%= t('characterRace.gDuration') %>
       <select id="gtime"><option value="30">30</option><option value="60" selected>60</option><option value="120">120</option></select>
     </span>
-    <button id="gStart">Start timer</button>
-    <button id="gStop" class="mini">Pause</button>
-    <button id="gAgain" class="mini">Reset</button>
-    <button id="gExit">Exit</button>
+    <button id="gStart"><%= t('characterRace.gStartTimer') %></button>
+    <button id="gStop" class="mini"><%= t('characterRace.gPause') %></button>
+    <button id="gAgain" class="mini"><%= t('characterRace.gReset') %></button>
+    <button id="gExit"><%= t('characterRace.gExit') %></button>
   </div>
 </div>
 

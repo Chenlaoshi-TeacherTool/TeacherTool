@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,22 +42,22 @@
 </head>
 <body>
     <header class="header bingo-header">
-        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
-        <h1>🟨 Tear-Paper Bingo</h1>
-        <p>A quick listening and reading game with an activity guide and reusable blank word strips.</p>
+        <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('tearPaperBingo.backBtn') %></a>
+        <h1>🟨 <%= t('tearPaperBingo.title') %></h1>
+        <p><%= t('tearPaperBingo.subtitle') %></p>
     </header>
 
     <main class="bingo-main">
         <section class="bingo-overview" aria-labelledby="activity-overview-title">
             <div class="bingo-icon" aria-hidden="true">✂️</div>
             <div>
-                <h2 id="activity-overview-title">A little listening game with big energy</h2>
-                <p>Write eight target words in each blank strip, then read each word or clue aloud. Students listen and tear a matching word only from either end of their strip. The first player to tear away all eight words wins!</p>
+                <h2 id="activity-overview-title"><%= t('tearPaperBingo.overviewTitle') %></h2>
+                <p><%= t('tearPaperBingo.overviewText') %></p>
                 <div class="bingo-tags" aria-label="Activity details">
-                    <span class="tag">8–12 min</span>
-                    <span class="tag">Listening</span>
-                    <span class="tag">Reading</span>
-                    <span class="tag">Printable</span>
+                    <span class="tag"><%= t('tearPaperBingo.tag1') %></span>
+                    <span class="tag"><%= t('tearPaperBingo.tag2') %></span>
+                    <span class="tag"><%= t('tearPaperBingo.tag3') %></span>
+                    <span class="tag"><%= t('tearPaperBingo.tag4') %></span>
                 </div>
             </div>
         </section>
@@ -65,28 +65,28 @@
         <section class="how-to" aria-label="How to use Tear-Paper Bingo">
             <article class="how-to-step">
                 <span>1</span>
-                <p>Add eight familiar vocabulary words, characters, Pinyin, or pictures to each blank strip.</p>
+                <p><%= t('tearPaperBingo.step1') %></p>
             </article>
             <article class="how-to-step">
                 <span>2</span>
-                <p>Read a word, sentence, or clue aloud for students to listen and check both ends of their strip.</p>
+                <p><%= t('tearPaperBingo.step2') %></p>
             </article>
             <article class="how-to-step">
                 <span>3</span>
-                <p>Students may tear a match only from either end. The first player to tear all eight words wins!</p>
+                <p><%= t('tearPaperBingo.step3') %></p>
             </article>
         </section>
 
         <section class="preview-card" aria-labelledby="preview-title">
             <div class="preview-toolbar">
                 <div>
-                    <h2 id="preview-title">Printable template preview</h2>
-                    <p>Preview the activity guide and blank word strips below, or save a copy for class.</p>
+                    <h2 id="preview-title"><%= t('tearPaperBingo.previewTitle') %></h2>
+                    <p><%= t('tearPaperBingo.previewText') %></p>
                 </div>
-                <a class="btn download-btn" href="/pdf/tear-paper-bingo-listening-reading.pdf" download="tear-paper-bingo-listening-reading.pdf">↓ Download PDF</a>
+                <a class="btn download-btn" href="/pdf/tear-paper-bingo-listening-reading.pdf" download="tear-paper-bingo-listening-reading.pdf"><%= t('tearPaperBingo.downloadBtn') %></a>
             </div>
             <iframe class="pdf-frame" src="/pdf/tear-paper-bingo-listening-reading.pdf#view=FitH" title="Tear-Paper Bingo PDF resource preview">
-                <p class="pdf-fallback">Your browser cannot show the PDF preview. <a href="/pdf/tear-paper-bingo-listening-reading.pdf" download="tear-paper-bingo-listening-reading.pdf">Download the Tear-Paper Bingo PDF</a>.</p>
+                <p class="pdf-fallback"><%= t('tearPaperBingo.pdfFallbackPrefix') %><a href="/pdf/tear-paper-bingo-listening-reading.pdf" download="tear-paper-bingo-listening-reading.pdf"><%= t('tearPaperBingo.pdfFallbackLinkText') %></a><%= t('tearPaperBingo.pdfFallbackSuffix') %></p>
             </iframe>
         </section>
     </main>

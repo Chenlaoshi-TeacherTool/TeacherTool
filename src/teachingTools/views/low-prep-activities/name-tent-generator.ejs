@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,21 +13,21 @@
   <main class="tent-wrap">
     <header class="tent-hero">
       <div class="tent-hero-copy">
-        <a class="back-link" href="/teaching-tools#low-prep-activities">← Back to Teaching Tools</a>
-        <p class="eyebrow">Printable classroom setup</p>
-        <h1><span aria-hidden="true">🔺</span> Desk Name Tent Generator</h1>
-        <p>Paste in your class list and get a full set of desk name tents—one letter-size page per student, fold lines already marked, no cutting required. Fold twice and tape shut to make a standing triangle.</p>
+        <a class="back-link" href="/teaching-tools#low-prep-activities"><%= t('nameTentGenerator.backLink') %></a>
+        <p class="eyebrow"><%= t('nameTentGenerator.eyebrow') %></p>
+        <h1><span aria-hidden="true">🔺</span> <%= t('nameTentGenerator.title') %></h1>
+        <p><%= t('nameTentGenerator.subtitle') %></p>
         <div class="hero-points" aria-label="Tool highlights">
-          <span>One full page per student, no cutting</span>
-          <span>Chinese, English, pinyin, or all three</span>
-          <span>Pick a border color for each name</span>
+          <span><%= t('nameTentGenerator.heroPoint1') %></span>
+          <span><%= t('nameTentGenerator.heroPoint2') %></span>
+          <span><%= t('nameTentGenerator.heroPoint3') %></span>
         </div>
       </div>
     </header>
 
     <div class="privacy-banner" role="note">
       <span class="privacy-icon" aria-hidden="true">⚠️</span>
-      <p><strong>Privacy tip:</strong> please avoid using students' full legal names. Use a first name, nickname, initials, or student number instead—these sheets are meant to be seen (and sometimes photographed) by other people in the room.</p>
+      <p><strong><%= t('nameTentGenerator.privacyStrong') %></strong> <%= t('nameTentGenerator.privacyText') %></p>
     </div>
 
     <div class="tent-grid">
@@ -37,31 +37,31 @@
             <div class="panel-heading">
               <div>
                 <span class="step-number">1</span>
-                <p class="eyebrow">Class list</p>
-                <h2>Add your students</h2>
+                <p class="eyebrow"><%= t('nameTentGenerator.classListKicker') %></p>
+                <h2><%= t('nameTentGenerator.classListHeading') %></h2>
               </div>
-              <button id="load-example" class="ghost-button" type="button">Load example</button>
+              <button id="load-example" class="ghost-button" type="button"><%= t('nameTentGenerator.loadExample') %></button>
             </div>
-            <label for="names">One student per line
+            <label for="names"><%= t('nameTentGenerator.namesLabel') %>
               <textarea id="names" class="names-textarea" required placeholder="Lily | 丽丽&#10;Max | 马克斯&#10;Emma | 艾玛 | orange"></textarea>
             </label>
-            <p class="field-help">Format: <strong>name | Chinese name | color (optional)</strong>. Pinyin is generated automatically from the Chinese name. Leave a field blank if it doesn't apply—just a name on its own also works. Optional color words: red, orange, yellow, green, blue, purple.</p>
-            <p id="name-count" class="name-count" aria-live="polite">No names detected yet.</p>
+            <p class="field-help"><%= t('nameTentGenerator.fieldHelpPrefix') %><strong><%= t('nameTentGenerator.fieldHelpFormat') %></strong><%= t('nameTentGenerator.fieldHelpSuffix') %></p>
+            <p id="name-count" class="name-count" aria-live="polite"><%= t('nameTentGenerator.noNamesDetected') %></p>
           </section>
 
           <section class="panel">
             <div class="panel-heading">
               <div>
                 <span class="step-number">2</span>
-                <p class="eyebrow">Display</p>
-                <h2>What should each name tent show?</h2>
+                <p class="eyebrow"><%= t('nameTentGenerator.displayKicker') %></p>
+                <h2><%= t('nameTentGenerator.displayHeading') %></h2>
               </div>
             </div>
             <div class="mode-switch" role="radiogroup" aria-label="Display language">
-              <label><input type="radio" name="displayMode" value="zh"> Chinese only</label>
-              <label><input type="radio" name="displayMode" value="en"> English only</label>
-              <label><input type="radio" name="displayMode" value="py"> Pinyin only</label>
-              <label><input type="radio" name="displayMode" value="all" checked> Show all</label>
+              <label><input type="radio" name="displayMode" value="zh"> <%= t('nameTentGenerator.displayChineseOnly') %></label>
+              <label><input type="radio" name="displayMode" value="en"> <%= t('nameTentGenerator.displayEnglishOnly') %></label>
+              <label><input type="radio" name="displayMode" value="py"> <%= t('nameTentGenerator.displayPinyinOnly') %></label>
+              <label><input type="radio" name="displayMode" value="all" checked> <%= t('nameTentGenerator.displayShowAll') %></label>
             </div>
           </section>
 
@@ -69,58 +69,58 @@
             <div class="panel-heading">
               <div>
                 <span class="step-number">3</span>
-                <p class="eyebrow">Colors</p>
-                <h2>Border color</h2>
+                <p class="eyebrow"><%= t('nameTentGenerator.colorsKicker') %></p>
+                <h2><%= t('nameTentGenerator.colorsHeading') %></h2>
               </div>
             </div>
             <div class="color-mode-switch" role="radiogroup" aria-label="Color mode">
-              <label><input type="radio" name="colorMode" value="auto" checked> Cycle through a color palette</label>
-              <label><input type="radio" name="colorMode" value="single"> Use one color for everyone</label>
+              <label><input type="radio" name="colorMode" value="auto" checked> <%= t('nameTentGenerator.colorModeAuto') %></label>
+              <label><input type="radio" name="colorMode" value="single"> <%= t('nameTentGenerator.colorModeSingle') %></label>
             </div>
             <div id="single-color-row" style="display:none; margin-bottom: 14px;">
-              <label for="single-color-select">Color for every name tent
+              <label for="single-color-select"><%= t('nameTentGenerator.singleColorLabel') %>
                 <select id="single-color-select">
-                  <option value="red">Red</option>
-                  <option value="orange">Orange</option>
-                  <option value="yellow">Yellow</option>
-                  <option value="green" selected>Green</option>
-                  <option value="blue">Blue</option>
-                  <option value="purple">Purple</option>
+                  <option value="red"><%= t('nameTentGenerator.colorRed') %></option>
+                  <option value="orange"><%= t('nameTentGenerator.colorOrange') %></option>
+                  <option value="yellow"><%= t('nameTentGenerator.colorYellow') %></option>
+                  <option value="green" selected><%= t('nameTentGenerator.colorGreen') %></option>
+                  <option value="blue"><%= t('nameTentGenerator.colorBlue') %></option>
+                  <option value="purple"><%= t('nameTentGenerator.colorPurple') %></option>
                 </select>
               </label>
             </div>
-            <p class="field-help" style="margin-top:0;">Colors in the cycling palette (uncheck any you don't want used):</p>
+            <p class="field-help" style="margin-top:0;"><%= t('nameTentGenerator.paletteHelp') %></p>
             <div class="color-swatches" id="color-swatches">
-              <label class="color-swatch" style="--swatch-color:var(--tent-red)"><input type="checkbox" value="red" checked><span><span class="color-dot"></span>Red</span></label>
-              <label class="color-swatch" style="--swatch-color:var(--tent-orange)"><input type="checkbox" value="orange" checked><span><span class="color-dot"></span>Orange</span></label>
-              <label class="color-swatch" style="--swatch-color:var(--tent-yellow)"><input type="checkbox" value="yellow" checked><span><span class="color-dot"></span>Yellow</span></label>
-              <label class="color-swatch" style="--swatch-color:var(--tent-tgreen)"><input type="checkbox" value="green" checked><span><span class="color-dot"></span>Green</span></label>
-              <label class="color-swatch" style="--swatch-color:var(--tent-blue)"><input type="checkbox" value="blue" checked><span><span class="color-dot"></span>Blue</span></label>
-              <label class="color-swatch" style="--swatch-color:var(--tent-purple)"><input type="checkbox" value="purple" checked><span><span class="color-dot"></span>Purple</span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-red)"><input type="checkbox" value="red" checked><span><span class="color-dot"></span><%= t('nameTentGenerator.colorRed') %></span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-orange)"><input type="checkbox" value="orange" checked><span><span class="color-dot"></span><%= t('nameTentGenerator.colorOrange') %></span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-yellow)"><input type="checkbox" value="yellow" checked><span><span class="color-dot"></span><%= t('nameTentGenerator.colorYellow') %></span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-tgreen)"><input type="checkbox" value="green" checked><span><span class="color-dot"></span><%= t('nameTentGenerator.colorGreen') %></span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-blue)"><input type="checkbox" value="blue" checked><span><span class="color-dot"></span><%= t('nameTentGenerator.colorBlue') %></span></label>
+              <label class="color-swatch" style="--swatch-color:var(--tent-purple)"><input type="checkbox" value="purple" checked><span><span class="color-dot"></span><%= t('nameTentGenerator.colorPurple') %></span></label>
             </div>
           </section>
 
           <div class="form-footer">
-            <button class="generate-button" type="submit">Generate name tents</button>
+            <button class="generate-button" type="submit"><%= t('nameTentGenerator.generateButton') %></button>
             <p id="generation-status" class="generation-status" aria-live="polite"></p>
           </div>
           <div class="download-row">
-            <button id="print-pdf" class="download-button" type="button" disabled>Print / Save as PDF</button>
+            <button id="print-pdf" class="download-button" type="button" disabled><%= t('nameTentGenerator.printPdfButton') %></button>
           </div>
         </form>
       </section>
 
       <section class="preview-panel" aria-label="Generated name tents">
         <div class="preview-heading">
-          <h2>Preview</h2>
-          <p>Each card below prints on its own full letter-size, landscape page.</p>
+          <h2><%= t('nameTentGenerator.previewHeading') %></h2>
+          <p><%= t('nameTentGenerator.previewSubtext') %></p>
         </div>
         <div class="fold-instructions">
-          <strong>How to assemble:</strong> print landscape, then fold along both dashed lines so the sheet forms a triangle that lies flat on the desk, like a little tent with the ridge running left to right. The name shows on the two angled faces (visible to the student and to whoever is across the table); the third panel rests flat as the base. Fold the narrow end tab behind Panel 1 and tape or glue it there.
+          <strong><%= t('nameTentGenerator.assembleStrong') %></strong> <%= t('nameTentGenerator.assembleText') %>
         </div>
         <div id="preview-panel-body">
           <div id="preview-cards" class="preview-cards">
-            <p class="preview-empty">Add student names on the left, then click "Generate name tents" to see cards here.</p>
+            <p class="preview-empty"><%= t('nameTentGenerator.previewEmptyPrefix') %>"<%= t('nameTentGenerator.previewEmptyButtonText') %>"<%= t('nameTentGenerator.previewEmptySuffix') %></p>
           </div>
         </div>
       </section>
