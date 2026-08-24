@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,99 +12,99 @@
 </head>
 <body class="wyr-page">
   <header class="header wyr-header">
-    <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+    <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('wouldYouRather.backBtn') %></a>
     <div class="wyr-header-inner">
       <div class="wyr-header-icon" aria-hidden="true">🤔</div>
       <div>
-        <p class="wyr-kicker">A QUICK CLASSROOM CONVERSATION</p>
-        <h1>Would You Rather?</h1>
-        <p>Turn paired ideas into bright, ready-to-present speaking prompts.</p>
+        <p class="wyr-kicker"><%= t('wouldYouRather.kicker') %></p>
+        <h1><%= t('wouldYouRather.title') %></h1>
+        <p><%= t('wouldYouRather.subtitle') %></p>
       </div>
-      <div class="wyr-header-badge">Pairs · Prompts · Vocabulary</div>
+      <div class="wyr-header-badge"><%= t('wouldYouRather.headerBadge') %></div>
     </div>
   </header>
 
   <main class="wyr-main">
     <section class="wyr-intro" aria-labelledby="wyr-intro-title">
       <div>
-        <p class="wyr-kicker">ONE PAIR, ONE CONVERSATION</p>
-        <h2 id="wyr-intro-title">Build a deck in a few friendly steps.</h2>
-        <p>Add your own either-or choices, select a question style, or turn a saved Vocabulary Library list into quick pairings. Then present, print, or export your slides.</p>
+        <p class="wyr-kicker"><%= t('wouldYouRather.introKicker') %></p>
+        <h2 id="wyr-intro-title"><%= t('wouldYouRather.introTitle') %></h2>
+        <p><%= t('wouldYouRather.introText') %></p>
       </div>
       <div class="wyr-intro-tags" aria-label="Activity features">
-        <span>Saved list ready</span><span>Print friendly</span><span>PPTX &amp; PDF</span>
+        <span><%= t('wouldYouRather.tag1') %></span><span><%= t('wouldYouRather.tag2') %></span><span><%= t('wouldYouRather.tag3') %></span>
       </div>
     </section>
 
     <section class="wyr-workspace" aria-label="Would You Rather deck builder">
       <article class="wyr-panel wyr-template-panel">
-        <div class="wyr-step"><span>1</span><p>Question template</p></div>
+        <div class="wyr-step"><span>1</span><p><%= t('wouldYouRather.step1Label') %></p></div>
         <div class="wyr-template-layout">
           <div>
-            <h2>Write the question once.</h2>
-            <p class="wyr-help">Use <strong>{A}</strong> and <strong>{B}</strong> for the two choices. You can still edit each individual question below.</p>
-            <label for="questionTemplate">Question template</label>
+            <h2><%= t('wouldYouRather.templateHeading') %></h2>
+            <p class="wyr-help"><%= t('wouldYouRather.templateHelpPrefix') %><strong>{A}</strong><%= t('wouldYouRather.templateHelpMid') %><strong>{B}</strong><%= t('wouldYouRather.templateHelpSuffix') %></p>
+            <label for="questionTemplate"><%= t('wouldYouRather.questionTemplateLabel') %></label>
             <input id="questionTemplate" value="Would you rather {A} or {B}?" maxlength="90">
-            <p class="wyr-sample" id="templateSample">Sample: Would you rather explain with a diagram or a table?</p>
+            <p class="wyr-sample" id="templateSample"><%= t('wouldYouRather.templateSampleInitial') %></p>
           </div>
           <div>
-            <p class="wyr-label">Common templates</p>
+            <p class="wyr-label"><%= t('wouldYouRather.commonTemplatesLabel') %></p>
             <div class="wyr-template-grid">
-              <button class="wyr-template active" type="button" data-template="Would you rather {A} or {B}?">Would you rather A or B?</button>
-              <button class="wyr-template" type="button" data-template="Which would you choose: {A} or {B}?">Which would you choose?</button>
-              <button class="wyr-template" type="button" data-template="Which is more useful: {A} or {B}?">Which is more useful?</button>
-              <button class="wyr-template" type="button" data-template="Which is a better strategy: {A} or {B}?">Which is a better strategy?</button>
-              <button class="wyr-template" type="button" data-template="If you could choose only one, would you pick {A} or {B}?">If you could choose only one…</button>
-              <button class="wyr-template" type="button" data-template="Which is more interesting: {A} or {B}?">Which is more interesting?</button>
-              <button class="wyr-template" type="button" data-template="For this task, would you prefer {A} or {B}?">For this task…?</button>
+              <button class="wyr-template active" type="button" data-template="Would you rather {A} or {B}?"><%= t('wouldYouRather.templateButton1') %></button>
+              <button class="wyr-template" type="button" data-template="Which would you choose: {A} or {B}?"><%= t('wouldYouRather.templateButton2') %></button>
+              <button class="wyr-template" type="button" data-template="Which is more useful: {A} or {B}?"><%= t('wouldYouRather.templateButton3') %></button>
+              <button class="wyr-template" type="button" data-template="Which is a better strategy: {A} or {B}?"><%= t('wouldYouRather.templateButton4') %></button>
+              <button class="wyr-template" type="button" data-template="If you could choose only one, would you pick {A} or {B}?"><%= t('wouldYouRather.templateButton5') %></button>
+              <button class="wyr-template" type="button" data-template="Which is more interesting: {A} or {B}?"><%= t('wouldYouRather.templateButton6') %></button>
+              <button class="wyr-template" type="button" data-template="For this task, would you prefer {A} or {B}?"><%= t('wouldYouRather.templateButton7') %></button>
             </div>
-            <button class="wyr-secondary-btn wyr-apply-all" id="applyTemplate" type="button">Apply to all cards</button>
+            <button class="wyr-secondary-btn wyr-apply-all" id="applyTemplate" type="button"><%= t('wouldYouRather.applyToAll') %></button>
           </div>
         </div>
       </article>
 
       <article class="wyr-panel wyr-vocabulary-panel">
-        <div class="wyr-step"><span>2</span><p>Vocabulary</p></div>
+        <div class="wyr-step"><span>2</span><p><%= t('wouldYouRather.step2Label') %></p></div>
         <div class="wyr-vocabulary-layout">
           <div>
-            <h2>Build your choices.</h2>
-            <p class="wyr-help">Use one line per slide. Separate the two choices with a slash, vertical bar, comma, or Chinese comma.</p>
-            <label for="pairInput">Pairs</label>
+            <h2><%= t('wouldYouRather.buildChoicesHeading') %></h2>
+            <p class="wyr-help"><%= t('wouldYouRather.buildChoicesHelp') %></p>
+            <label for="pairInput"><%= t('wouldYouRather.pairsLabel') %></label>
             <textarea id="pairInput" rows="7" spellcheck="false" aria-describedby="pairInputHelp">explain with a diagram / explain with a table
 read a biography / read historical fiction
 work alone / work with a partner
 show your answer in writing / explain it aloud
 start with an example / start with a rule</textarea>
-            <p id="pairInputHelp" class="wyr-small">Up to 30 prompts per deck. Example: use a model / write an equation</p>
+            <p id="pairInputHelp" class="wyr-small"><%= t('wouldYouRather.pairInputHelp') %></p>
           </div>
           <div class="wyr-vocabulary-actions">
-            <button class="btn wyr-generate" id="generateDeck" type="button">✨ Generate cards</button>
-            <button class="wyr-secondary-btn" id="appendDeck" type="button">＋ Add to deck</button>
-            <button class="wyr-secondary-btn" id="shuffleDeck" type="button">↻ Shuffle order</button>
-            <button class="wyr-secondary-btn wyr-danger-button" id="clearDeck" type="button">Clear deck</button>
-            <button class="wyr-secondary-btn" id="addBlankCard" type="button">＋ Add one card</button>
-            <button class="wyr-secondary-btn" id="loadExample" type="button">Load example</button>
+            <button class="btn wyr-generate" id="generateDeck" type="button">✨ <%= t('wouldYouRather.generateCards') %></button>
+            <button class="wyr-secondary-btn" id="appendDeck" type="button">＋ <%= t('wouldYouRather.addToDeck') %></button>
+            <button class="wyr-secondary-btn" id="shuffleDeck" type="button">↻ <%= t('wouldYouRather.shuffleOrder') %></button>
+            <button class="wyr-secondary-btn wyr-danger-button" id="clearDeck" type="button"><%= t('wouldYouRather.clearDeck') %></button>
+            <button class="wyr-secondary-btn" id="addBlankCard" type="button">＋ <%= t('wouldYouRather.addOneCard') %></button>
+            <button class="wyr-secondary-btn" id="loadExample" type="button"><%= t('wouldYouRather.loadExample') %></button>
             <div id="wyrLibraryPicker"></div>
           </div>
         </div>
-        <p class="wyr-status" id="statusMessage" role="status">5 prompts are ready to preview.</p>
-        <p class="wyr-editing-help">Click a thumbnail to change its offline icon or upload a photo. Each question can be edited on its own. Click a card to preview it below.</p>
-        <div class="wyr-card-editor-heading"><strong id="cardCount">5 slides</strong><span>Editing each card</span></div>
+        <p class="wyr-status" id="statusMessage" role="status"><%= t('wouldYouRather.statusMessageInitial') %></p>
+        <p class="wyr-editing-help"><%= t('wouldYouRather.editingHelp') %></p>
+        <div class="wyr-card-editor-heading"><strong id="cardCount"><%= t('wouldYouRather.cardCountInitial') %></strong><span><%= t('wouldYouRather.editingEachCard') %></span></div>
         <div id="cardList" class="wyr-card-list wyr-card-editor" aria-label="Generated prompt list"></div>
       </article>
 
       <section class="wyr-deck-panel" aria-labelledby="preview-title">
         <div class="wyr-deck-toolbar">
           <div>
-            <p class="wyr-kicker">STEP 3</p>
-            <h2 id="preview-title">Preview your speaking deck</h2>
-            <p>Choose a slide to edit it, or start presenting straight away.</p>
+            <p class="wyr-kicker"><%= t('wouldYouRather.step3Kicker') %></p>
+            <h2 id="preview-title"><%= t('wouldYouRather.previewTitle') %></h2>
+            <p><%= t('wouldYouRather.previewSubtitle') %></p>
           </div>
           <div class="wyr-deck-actions">
-            <button class="wyr-secondary-btn" id="printDeck" type="button">🖨 Print</button>
-            <button class="wyr-secondary-btn" id="exportPdf" type="button">↓ PDF</button>
-            <button class="wyr-secondary-btn" id="exportPptx" type="button">↓ PPTX</button>
-            <button class="btn" id="presentDeck" type="button">▶ Present deck</button>
+            <button class="wyr-secondary-btn" id="printDeck" type="button">🖨 <%= t('wouldYouRather.printButton') %></button>
+            <button class="wyr-secondary-btn" id="exportPdf" type="button">↓ <%= t('wouldYouRather.exportPdf') %></button>
+            <button class="wyr-secondary-btn" id="exportPptx" type="button">↓ <%= t('wouldYouRather.exportPptx') %></button>
+            <button class="btn" id="presentDeck" type="button">▶ <%= t('wouldYouRather.presentDeck') %></button>
           </div>
         </div>
         <div class="wyr-preview-area"><div id="slidePreview" class="wyr-slide-preview" aria-label="Selected generated slide"></div></div>
@@ -117,26 +117,26 @@ start with an example / start with a rule</textarea>
   <div id="presentation" class="wyr-presentation" hidden aria-modal="true" role="dialog" aria-label="Would You Rather presentation">
     <div class="wyr-presentation-bar">
       <span id="presentationCount">1 / 5</span>
-      <button id="closePresentation" type="button">× Close</button>
+      <button id="closePresentation" type="button">× <%= t('wouldYouRather.close') %></button>
     </div>
     <div id="presentationSlide" class="wyr-presentation-slide"></div>
     <div class="wyr-presentation-controls">
-      <button id="previousSlide" type="button">← Previous</button>
-      <span>Click a side to vote, then ask: Why?</span>
-      <button id="nextSlide" type="button">Next →</button>
+      <button id="previousSlide" type="button">← <%= t('wouldYouRather.previous') %></button>
+      <span><%= t('wouldYouRather.votingHint') %></span>
+      <button id="nextSlide" type="button"><%= t('wouldYouRather.next') %> →</button>
     </div>
   </div>
   <div id="printArea" aria-hidden="true"></div>
   <div id="artPicker" class="wyr-art-picker" hidden role="dialog" aria-modal="true" aria-labelledby="artPickerTitle">
     <div class="wyr-picker-card">
-      <div class="wyr-picker-heading"><div><p class="wyr-kicker">OFFLINE MATERIAL SYMBOLS</p><h2 id="artPickerTitle">Choose an image</h2></div><button id="closePicker" type="button" aria-label="Close image picker">×</button></div>
-      <div class="wyr-picker-actions"><input id="iconSearch" type="search" placeholder="Search icons: book, sun, science, food…"><label class="wyr-upload-label" for="imageUpload">Upload a photo<input id="imageUpload" type="file" accept="image/*"></label></div>
-      <p class="wyr-small">139 Material Symbols are included offline. Uploaded images stay in this browser for this deck only (3 MB maximum).</p>
+      <div class="wyr-picker-heading"><div><p class="wyr-kicker"><%= t('wouldYouRather.artPickerKicker') %></p><h2 id="artPickerTitle"><%= t('wouldYouRather.chooseImage') %></h2></div><button id="closePicker" type="button" aria-label="Close image picker">×</button></div>
+      <div class="wyr-picker-actions"><input id="iconSearch" type="search" placeholder="<%= t('wouldYouRather.iconSearchPlaceholder') %>"><label class="wyr-upload-label" for="imageUpload"><%= t('wouldYouRather.uploadPhotoLabel') %><input id="imageUpload" type="file" accept="image/*"></label></div>
+      <p class="wyr-small"><%= t('wouldYouRather.pickerHelp') %></p>
       <div id="iconGrid" class="wyr-icon-grid" aria-label="Searchable icon choices"></div>
     </div>
   </div>
 
-  <footer><p>© 2026 Chen Laoshi's Teaching Toolkit · Made with care for curious classrooms.</p></footer>
+  <footer><p><%= t('wouldYouRather.footer') %></p></footer>
   <script src="/shared/wordlist-core.js"></script>
   <script src="/shared/deck-export.js"></script>
   <script src="/shared/library-picker.js"></script>

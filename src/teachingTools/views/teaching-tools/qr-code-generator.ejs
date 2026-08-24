@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -135,11 +135,11 @@
 
 <body>
 
-<a href="/teaching-tools" class="back-btn">← Back to Teaching Tools</a>
+<a href="/teaching-tools" class="back-btn"><%= t('qrCodeGenerator.backBtn') %></a>
 
 <section class="header">
-    <h1>QR Worksheet Generator</h1>
-    <p>Paste a list of "Title - URL" pairs to generate a printable QR code worksheet in bulk.</p>
+    <h1><%= t('qrCodeGenerator.title') %></h1>
+    <p><%= t('qrCodeGenerator.introPrefix') %>"<%= t('qrCodeGenerator.formatToken') %>"<%= t('qrCodeGenerator.introSuffix') %></p>
 </section>
 
 <main class="qr-workspace">
@@ -147,49 +147,49 @@
         <header class="qr-builder__header">
             <span class="qr-builder__icon" aria-hidden="true">🔗</span>
             <div class="qr-builder__heading">
-                <p class="qr-builder__eyebrow">One Step · Add your titles and links</p>
-                <h2 id="qr-builder-title">Build a classroom QR worksheet</h2>
-                <p>Paste several resources at once, then generate a clean printable set.</p>
+                <p class="qr-builder__eyebrow"><%= t('qrCodeGenerator.eyebrow') %></p>
+                <h2 id="qr-builder-title"><%= t('qrCodeGenerator.builderHeading') %></h2>
+                <p><%= t('qrCodeGenerator.builderSubtext') %></p>
             </div>
-            <span class="qr-count" id="link-count" aria-live="polite">0 links ready</span>
+            <span class="qr-count" id="link-count" aria-live="polite"><%= t('qrCodeGenerator.linksReadyInitial') %></span>
         </header>
 
         <div class="qr-builder__body">
             <div class="qr-input-panel">
-                <label for="batch-input">Resource titles and URLs</label>
-                <p class="qr-field-hint" id="batch-input-help">Add one resource per line using <strong>Title - URL</strong>.</p>
-                <textarea id="batch-input" aria-describedby="batch-input-help" spellcheck="false" placeholder="Weather video - https://example.com/weather&#10;Lab directions - https://example.com/lab&#10;Family survey - https://example.com/survey"></textarea>
+                <label for="batch-input"><%= t('qrCodeGenerator.batchInputLabel') %></label>
+                <p class="qr-field-hint" id="batch-input-help"><%= t('qrCodeGenerator.batchInputHintPrefix') %><strong><%= t('qrCodeGenerator.formatToken') %></strong><%= t('qrCodeGenerator.batchInputHintSuffix') %></p>
+                <textarea id="batch-input" aria-describedby="batch-input-help" spellcheck="false" placeholder="天气视频 - https://example.com/weather&#10;实验说明 - https://example.com/lab&#10;家庭调查 - https://example.com/survey"></textarea>
                 <div class="qr-input-footer">
-                    <p class="qr-input-note">Links beginning with http:// or https:// work best.</p>
-                    <button class="qr-text-action" id="use-example" type="button">Use an example</button>
+                    <p class="qr-input-note"><%= t('qrCodeGenerator.inputNote') %></p>
+                    <button class="qr-text-action" id="use-example" type="button"><%= t('qrCodeGenerator.useExample') %></button>
                 </div>
             </div>
 
             <aside class="qr-format-guide" aria-label="Input format help">
-                <p class="qr-format-guide__label"><span aria-hidden="true">✦</span> Quick format</p>
-                <h3>Keep each line simple</h3>
-                <p>The title appears above the QR code. The full link stays clickable in the Word export.</p>
+                <p class="qr-format-guide__label"><span aria-hidden="true">✦</span> <%= t('qrCodeGenerator.quickFormat') %></p>
+                <h3><%= t('qrCodeGenerator.keepLineSimple') %></h3>
+                <p><%= t('qrCodeGenerator.formatGuideText') %></p>
                 <code class="qr-format-example">Station 1 - https://example.com/task</code>
                 <ol>
-                    <li>Write a short student-facing title.</li>
-                    <li>Add a space, hyphen, and another space.</li>
-                    <li>Paste the complete destination URL.</li>
+                    <li><%= t('qrCodeGenerator.step1') %></li>
+                    <li><%= t('qrCodeGenerator.step2') %></li>
+                    <li><%= t('qrCodeGenerator.step3') %></li>
                 </ol>
             </aside>
         </div>
 
         <div class="qr-builder__footer">
-            <button class="qr-action qr-action--primary" id="generate-worksheet" type="button">✨ Generate worksheet</button>
-            <button class="qr-action qr-action--secondary" id="export-word" type="button" disabled>⬇ Export to Word</button>
-            <button class="qr-text-action" id="clear-builder" type="button">Clear</button>
-            <p class="qr-status" id="print-help" role="status" aria-live="polite">Add at least one correctly formatted link to begin.</p>
+            <button class="qr-action qr-action--primary" id="generate-worksheet" type="button">✨ <%= t('qrCodeGenerator.generateWorksheet') %></button>
+            <button class="qr-action qr-action--secondary" id="export-word" type="button" disabled>⬇ <%= t('qrCodeGenerator.exportToWord') %></button>
+            <button class="qr-text-action" id="clear-builder" type="button"><%= t('qrCodeGenerator.clear') %></button>
+            <p class="qr-status" id="print-help" role="status" aria-live="polite"><%= t('qrCodeGenerator.printHelpInitial') %></p>
         </div>
     </section>
 
     <section class="worksheet" id="worksheet" aria-labelledby="worksheet-title" hidden>
         <div class="worksheet-heading">
-            <h2 id="worksheet-title">Worksheet preview</h2>
-            <p>QR codes and titles will be included in your Word download.</p>
+            <h2 id="worksheet-title"><%= t('qrCodeGenerator.worksheetPreview') %></h2>
+            <p><%= t('qrCodeGenerator.worksheetPreviewNote') %></p>
         </div>
         <div class="worksheet-grid" id="worksheet-grid"></div>
     </section>

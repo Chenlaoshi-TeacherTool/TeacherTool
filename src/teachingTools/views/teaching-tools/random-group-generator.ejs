@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,18 +11,18 @@
 </head>
 <body class="group-page">
   <header class="header group-hero">
-    <a href="/teaching-tools" class="back-btn">← Back to Teaching Tools</a>
+    <a href="/teaching-tools" class="back-btn"><%= t('randomGroupGenerator.backBtn') %></a>
     <div class="group-hero__inner">
       <div class="group-hero__icon" aria-hidden="true">🎲</div>
       <div>
-        <p class="group-eyebrow">Classroom management tool</p>
-        <h1>Random Group Generator</h1>
-        <p>Paste your class list, choose how you want to divide it, and make fair groups in seconds.</p>
+        <p class="group-eyebrow"><%= t('randomGroupGenerator.eyebrow') %></p>
+        <h1><%= t('randomGroupGenerator.title') %></h1>
+        <p><%= t('randomGroupGenerator.subtitle') %></p>
       </div>
       <div class="group-hero__chips" aria-label="Tool features">
-        <span>Fair shuffle</span>
-        <span>Two grouping modes</span>
-        <span>Easy to copy</span>
+        <span><%= t('randomGroupGenerator.chip1') %></span>
+        <span><%= t('randomGroupGenerator.chip2') %></span>
+        <span><%= t('randomGroupGenerator.chip3') %></span>
       </div>
     </div>
   </header>
@@ -32,29 +32,29 @@
       <header class="group-builder__header">
         <span class="group-step-icon" aria-hidden="true">1</span>
         <div>
-          <p class="group-eyebrow">Add your class</p>
-          <h2 id="groupBuilderTitle">Who is here today?</h2>
-          <p>Enter one student per line. Blank lines are ignored.</p>
+          <p class="group-eyebrow"><%= t('randomGroupGenerator.addClassEyebrow') %></p>
+          <h2 id="groupBuilderTitle"><%= t('randomGroupGenerator.whoIsHereHeading') %></h2>
+          <p><%= t('randomGroupGenerator.enterOneStudentHelp') %></p>
         </div>
-        <span id="studentCount" class="group-count" aria-live="polite">0 students</span>
+        <span id="studentCount" class="group-count" aria-live="polite"><%= t('randomGroupGenerator.studentCountInitial') %></span>
       </header>
 
       <div class="group-builder__body">
         <section class="group-name-panel" aria-labelledby="nameListTitle">
           <div class="group-section-title">
             <div>
-              <p class="group-eyebrow">Student list</p>
-              <h3 id="nameListTitle">Paste or type names</h3>
+              <p class="group-eyebrow"><%= t('randomGroupGenerator.studentListEyebrow') %></p>
+              <h3 id="nameListTitle"><%= t('randomGroupGenerator.pasteNamesHeading') %></h3>
             </div>
             <span aria-hidden="true">✎</span>
           </div>
-          <label class="sr-only" for="names">Student names, one per line</label>
+          <label class="sr-only" for="names"><%= t('randomGroupGenerator.namesSrLabel') %></label>
           <textarea id="names" rows="12" spellcheck="false" placeholder="Ava&#10;Mateo&#10;Sofia&#10;Noah&#10;Liam"></textarea>
           <div class="group-input-footer">
-            <p>Tip: paste a column directly from your roster.</p>
+            <p><%= t('randomGroupGenerator.tipText') %></p>
             <div>
-              <button id="loadGroupSample" class="group-text-button" type="button">Use sample names</button>
-              <button id="clearGroupNames" class="group-text-button group-text-button--muted" type="button">Clear</button>
+              <button id="loadGroupSample" class="group-text-button" type="button"><%= t('randomGroupGenerator.useSampleNames') %></button>
+              <button id="clearGroupNames" class="group-text-button group-text-button--muted" type="button"><%= t('randomGroupGenerator.clear') %></button>
             </div>
           </div>
         </section>
@@ -62,22 +62,22 @@
         <aside class="group-settings" aria-labelledby="groupSettingsTitle">
           <div class="group-section-title">
             <div>
-              <p class="group-eyebrow">Step 2</p>
-              <h3 id="groupSettingsTitle">Choose a grouping method</h3>
+              <p class="group-eyebrow"><%= t('randomGroupGenerator.settingsEyebrow') %></p>
+              <h3 id="groupSettingsTitle"><%= t('randomGroupGenerator.chooseMethodHeading') %></h3>
             </div>
             <span aria-hidden="true">⚙️</span>
           </div>
 
           <fieldset class="group-mode-options">
-            <legend class="sr-only">Grouping method</legend>
+            <legend class="sr-only"><%= t('randomGroupGenerator.groupingMethodLegend') %></legend>
             <label class="group-mode-card is-selected" data-mode-card="size">
               <span class="group-mode-card__top">
                 <input type="radio" name="groupMode" value="size" checked>
-                <strong>Students per group</strong>
+                <strong><%= t('randomGroupGenerator.studentsPerGroupStrong') %></strong>
               </span>
-              <span class="group-mode-card__hint">Choose the maximum size of each team.</span>
+              <span class="group-mode-card__hint"><%= t('randomGroupGenerator.studentsPerGroupHint') %></span>
               <span class="group-number-field">
-                <span>Group size</span>
+                <span><%= t('randomGroupGenerator.groupSizeLabel') %></span>
                 <input id="groupSize" type="number" min="2" max="50" value="3" inputmode="numeric" aria-label="Students per group">
               </span>
             </label>
@@ -85,11 +85,11 @@
             <label class="group-mode-card" data-mode-card="count">
               <span class="group-mode-card__top">
                 <input type="radio" name="groupMode" value="count">
-                <strong>Number of groups</strong>
+                <strong><%= t('randomGroupGenerator.numberOfGroupsStrong') %></strong>
               </span>
-              <span class="group-mode-card__hint">Choose how many teams you need.</span>
+              <span class="group-mode-card__hint"><%= t('randomGroupGenerator.numberOfGroupsHint') %></span>
               <span class="group-number-field">
-                <span>Group count</span>
+                <span><%= t('randomGroupGenerator.groupCountLabel') %></span>
                 <input id="groupCount" type="number" min="2" max="50" value="4" inputmode="numeric" aria-label="Number of groups" disabled>
               </span>
             </label>
@@ -97,9 +97,9 @@
 
           <div class="group-plan" aria-live="polite">
             <span aria-hidden="true">✦</span>
-            <p id="groupingPreview">Add student names to preview your groups.</p>
+            <p id="groupingPreview"><%= t('randomGroupGenerator.groupingPreviewInitial') %></p>
           </div>
-          <button id="generateGroups" class="group-primary-button" type="button">🎲 Make random groups</button>
+          <button id="generateGroups" class="group-primary-button" type="button">🎲 <%= t('randomGroupGenerator.makeRandomGroups') %></button>
           <p id="groupStatus" class="group-status" role="status"></p>
         </aside>
       </div>
@@ -110,21 +110,21 @@
         <div class="group-results__heading">
           <span class="group-step-icon group-step-icon--leaf" aria-hidden="true">3</span>
           <div>
-            <p class="group-eyebrow">Ready for class</p>
-            <h2 id="groupResultsTitle">Your groups</h2>
-            <p id="resultSummary">Groups will appear here after you add names.</p>
+            <p class="group-eyebrow"><%= t('randomGroupGenerator.readyForClassEyebrow') %></p>
+            <h2 id="groupResultsTitle"><%= t('randomGroupGenerator.yourGroupsHeading') %></h2>
+            <p id="resultSummary"><%= t('randomGroupGenerator.resultSummaryInitial') %></p>
           </div>
         </div>
         <div class="group-results__actions">
-          <button id="reshuffleGroups" class="group-secondary-button" type="button" disabled>↻ Shuffle again</button>
-          <button id="copyGroups" class="group-secondary-button" type="button" disabled>⧉ Copy groups</button>
+          <button id="reshuffleGroups" class="group-secondary-button" type="button" disabled>↻ <%= t('randomGroupGenerator.shuffleAgain') %></button>
+          <button id="copyGroups" class="group-secondary-button" type="button" disabled>⧉ <%= t('randomGroupGenerator.copyGroups') %></button>
         </div>
       </header>
       <div id="groupOutput" class="group-output" aria-live="polite">
         <div class="group-empty-state">
           <span aria-hidden="true">🎲</span>
-          <strong>No groups yet</strong>
-          <p>Your shuffled teams will be easy to scan and copy from here.</p>
+          <strong><%= t('randomGroupGenerator.noGroupsYet') %></strong>
+          <p><%= t('randomGroupGenerator.emptyStateText') %></p>
         </div>
       </div>
     </section>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,52 +13,52 @@
 <body class="jp-page">
 <div class="jp-wrap">
   <header class="jp-header">
-    <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+    <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('jeopardy.backBtn') %></a>
     <div class="fl"><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg><svg viewBox="0 0 100 100"><g fill="#F6C43C" stroke="#1B2A47" stroke-width="3"><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(0 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(30 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(60 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(90 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(120 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(150 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(180 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(210 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(240 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(270 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(300 50 50)"/><ellipse cx="50" cy="20" rx="9" ry="17" transform="rotate(330 50 50)"/></g><circle cx="50" cy="50" r="15" fill="#4A3520" stroke="#1B2A47" stroke-width="3"/></svg></div>
-    <h1>Jeopardy</h1>
-    <p>Build your board, save a game, then play live with timed clues, Daily Doubles, and automatic scoring.</p>
+    <h1><%= t('jeopardy.title') %></h1>
+    <p><%= t('jeopardy.subtitle') %></p>
   </header>
 
   <div id="coreWarn" class="warn" style="display:none">
-    The vocabulary library could not be loaded. You can still create questions manually; automatic vocabulary questions require a saved list.
+    <%= t('jeopardy.coreWarn') %>
   </div>
 
   <section>
-    <h2><span class="num">1</span>Game name and saved boards</h2>
+    <h2><span class="num">1</span><%= t('jeopardy.step1Heading') %></h2>
     <div class="row">
-      <input type="text" id="gname" class="grow" placeholder="Board name, for example: Unit 3 Review">
+      <input type="text" id="gname" class="grow" placeholder="<%= t('jeopardy.boardNamePlaceholder') %>">
     </div>
     <div class="row" style="margin-top:10px">
-      <button id="btnSave" class="primary">Save board</button>
-      <button id="btnNew">New board</button>
+      <button id="btnSave" class="primary"><%= t('jeopardy.saveBoard') %></button>
+      <button id="btnNew"><%= t('jeopardy.newBoard') %></button>
     </div>
-    <p class="hint" style="margin:12px 0 6px">Saved boards:</p>
+    <p class="hint" style="margin:12px 0 6px"><%= t('jeopardy.savedBoards') %></p>
     <div id="saved" class="saved"></div>
   </section>
 
   <section>
-    <h2><span class="num">2</span>Build the board <span style="font-size:14px;font-weight:400;color:#5A6B57">Filled <b id="fillinfo">0 / 0</b></span></h2>
-    <p class="hint">Select any cell to add a question and answer. You can mark one cell as the Daily Double.</p>
+    <h2><span class="num">2</span><%= t('jeopardy.step2Heading') %> <span style="font-size:14px;font-weight:400;color:#5A6B57"><%= t('jeopardy.filled') %> <b id="fillinfo">0 / 0</b></span></h2>
+    <p class="hint"><%= t('jeopardy.step2Hint') %></p>
     <div class="row" style="margin-bottom:10px">
-      <span class="field">Categories <select id="optCats"><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
-      <span class="field">Questions per category <select id="optRows"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
-      <span class="field">Starting points <input type="number" id="optBase" value="100" step="50" style="width:88px"></span>
-      <span class="field">Point step <input type="number" id="optStep" value="100" step="50" style="width:88px"></span>
-      <span class="field">Answer time <input type="number" id="optSec" value="20" min="5" style="width:74px"></span>
-      <button id="btnBlank" class="ghost">Clear questions</button>
-      <button id="btnImport" class="ghost">Import JSON</button>
+      <span class="field"><%= t('jeopardy.categoriesLabel') %> <select id="optCats"><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
+      <span class="field"><%= t('jeopardy.questionsPerCategoryLabel') %> <select id="optRows"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></span>
+      <span class="field"><%= t('jeopardy.startingPointsLabel') %> <input type="number" id="optBase" value="100" step="50" style="width:88px"></span>
+      <span class="field"><%= t('jeopardy.pointStepLabel') %> <input type="number" id="optStep" value="100" step="50" style="width:88px"></span>
+      <span class="field"><%= t('jeopardy.answerTimeLabel') %> <input type="number" id="optSec" value="20" min="5" style="width:74px"></span>
+      <button id="btnBlank" class="ghost"><%= t('jeopardy.clearQuestions') %></button>
+      <button id="btnImport" class="ghost"><%= t('jeopardy.importJson') %></button>
       <input type="file" id="file" accept=".json" style="display:none">
     </div>
     <div class="row" style="margin-bottom:12px">
-      <button id="btnGen" class="dark">Build from a vocabulary list</button>
-      <span class="field">Question type
+      <button id="btnGen" class="dark"><%= t('jeopardy.buildFromVocabulary') %></button>
+      <span class="field"><%= t('jeopardy.questionTypeLabel') %>
         <select id="genMode" style="min-width:170px">
-          <option value="mixed" selected>Mixed language questions</option>
-          <option value="py2zh">Pinyin to Chinese</option>
-          <option value="en2zh">English to Chinese</option>
-          <option value="zh2en">Chinese to English</option>
-          <option value="zh2py">Chinese to pinyin</option>
-          <option value="sentence">Use the term in a sentence</option>
+          <option value="mixed" selected><%= t('jeopardy.modeMixed') %></option>
+          <option value="py2zh"><%= t('jeopardy.modePy2Zh') %></option>
+          <option value="en2zh"><%= t('jeopardy.modeEn2Zh') %></option>
+          <option value="zh2en"><%= t('jeopardy.modeZh2En') %></option>
+          <option value="zh2py"><%= t('jeopardy.modeZh2Py') %></option>
+          <option value="sentence"><%= t('jeopardy.modeSentence') %></option>
         </select>
       </span>
     </div>
@@ -67,44 +67,44 @@
   </section>
 
   <section>
-    <h2><span class="num">3</span>Teams</h2>
+    <h2><span class="num">3</span><%= t('jeopardy.step3Heading') %></h2>
     <div class="row" style="margin-bottom:10px">
-      <input type="text" id="teamName" placeholder="Team name, for example: Blue Team" style="flex:0 1 240px">
-      <button id="btnAddTeam">Add team</button>
+      <input type="text" id="teamName" placeholder="<%= t('jeopardy.teamNamePlaceholder') %>" style="flex:0 1 240px">
+      <button id="btnAddTeam"><%= t('jeopardy.addTeam') %></button>
     </div>
     <div id="teams" class="teams"></div>
   </section>
 
   <section>
-    <h2><span class="num">4</span>Play and export</h2>
+    <h2><span class="num">4</span><%= t('jeopardy.step4Heading') %></h2>
     <div class="row">
-      <button id="btnStart" class="dark">▶ Start full-screen game</button>
-      <button id="btnPPTX" class="primary">Export PPTX (questions + answers)</button>
-      <button id="btnPDF" class="primary">Export PDF question set</button>
-      <button id="btnJSON">Export JSON backup</button>
+      <button id="btnStart" class="dark">▶ <%= t('jeopardy.startFullScreenGame') %></button>
+      <button id="btnPPTX" class="primary"><%= t('jeopardy.exportPptx') %></button>
+      <button id="btnPDF" class="primary"><%= t('jeopardy.exportPdf') %></button>
+      <button id="btnJSON"><%= t('jeopardy.exportJson') %></button>
     </div>
     <p class="hint" style="margin-top:10px">
-      During play: choose a cell → press <b>T</b> to start the timer → press <b>Space</b> to reveal the answer → award points → press <b>Enter</b> to close and mark the cell complete. Press Esc to exit.
+      <%= t('jeopardy.playHintPrefix') %><b>T</b><%= t('jeopardy.playHintMid1') %><b>Space</b><%= t('jeopardy.playHintMid2') %><b>Enter</b><%= t('jeopardy.playHintSuffix') %>
     </p>
   </section>
 
-  <footer>Chen Laoshi's Teaching Toolkit · Jeopardy Review Game v1.0</footer>
+  <footer><%= t('jeopardy.footer') %></footer>
 </div>
 
 <!-- 出题弹窗 -->
 <div class="modal" id="modal">
   <div class="sheet">
-    <h3 id="mTitle">Edit question</h3>
-    <label class="hint" style="display:block;margin:0">Question shown to students</label>
-    <textarea id="mQ" placeholder="For example: What process changes liquid water into water vapor?"></textarea>
-    <label class="hint" style="display:block;margin:8px 0 0">Answer</label>
+    <h3 id="mTitle"><%= t('jeopardy.editQuestion') %></h3>
+    <label class="hint" style="display:block;margin:0"><%= t('jeopardy.questionShownLabel') %></label>
+    <textarea id="mQ" placeholder="<%= t('jeopardy.questionPlaceholder') %>"></textarea>
+    <label class="hint" style="display:block;margin:8px 0 0"><%= t('jeopardy.answerLabel') %></label>
     <textarea id="mA" placeholder="Evaporation" style="min-height:60px"></textarea>
     <div class="row" style="margin-top:10px">
-      <label class="check"><input type="checkbox" id="mDD"> Make this the Daily Double</label>
+      <label class="check"><input type="checkbox" id="mDD"> <%= t('jeopardy.dailyDoubleLabel') %></label>
       <span class="grow"></span>
-      <button id="mClear" class="ghost">Clear cell</button>
-      <button id="mCancel">Cancel</button>
-      <button id="mSave" class="primary">Save</button>
+      <button id="mClear" class="ghost"><%= t('jeopardy.clearCell') %></button>
+      <button id="mCancel"><%= t('jeopardy.cancel') %></button>
+      <button id="mSave" class="primary"><%= t('jeopardy.save') %></button>
     </div>
   </div>
 </div>
@@ -112,8 +112,8 @@
 <!-- 比赛界面 -->
 <div id="game">
   <div id="gtop">
-    <h2 id="gtitle">Jeopardy</h2>
-    <button id="gExit">Exit</button>
+    <h2 id="gtitle"><%= t('jeopardy.title') %></h2>
+    <button id="gExit"><%= t('jeopardy.exit') %></button>
   </div>
   <div id="gboard"></div>
   <div id="scores"></div>
@@ -130,15 +130,15 @@
   </div>
   <div id="timerbar"><div id="timerfill"></div></div>
   <div id="cfoot">
-    <button id="cTimer" class="primary">Start timer (T)</button>
-    <button id="cStop" class="mini">Pause</button>
-    <span style="font-weight:700"><span id="tleft">20</span> seconds left</span>
-    <button id="cReveal">Reveal answer (Space)</button>
+    <button id="cTimer" class="primary"><%= t('jeopardy.startTimer') %></button>
+    <button id="cStop" class="mini"><%= t('jeopardy.pause') %></button>
+    <span style="font-weight:700"><span id="tleft">20</span> <%= t('jeopardy.secondsLeft') %></span>
+    <button id="cReveal"><%= t('jeopardy.revealAnswer') %></button>
     <span style="width:14px"></span>
     <div id="cteams" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     <span style="width:14px"></span>
-    <button id="cDone" class="dark">Finish question (Enter)</button>
-    <button id="cBack" class="mini">Return without completing</button>
+    <button id="cDone" class="dark"><%= t('jeopardy.finishQuestion') %></button>
+    <button id="cBack" class="mini"><%= t('jeopardy.returnWithoutCompleting') %></button>
   </div>
 </div>
 

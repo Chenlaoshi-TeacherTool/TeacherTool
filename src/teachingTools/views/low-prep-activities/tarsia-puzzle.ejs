@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,14 +14,14 @@
   <main class="tarsia-wrap">
     <header class="tarsia-hero">
       <div class="tarsia-hero-copy">
-        <a class="back-link" href="/teaching-tools#low-prep-activities">← Back to Teaching Tools</a>
-        <p class="eyebrow">Printable matching puzzle</p>
-        <h1><span aria-hidden="true">🧩</span> Tarsia Puzzle Generator</h1>
-        <p>Build a set of triangular pieces from vocabulary or question-and-answer pairs. Students cut, mix, and rebuild the large triangle by matching every edge.</p>
+        <a class="back-link" href="/teaching-tools#low-prep-activities"><%= t('tarsiaPuzzle.backLink') %></a>
+        <p class="eyebrow"><%= t('tarsiaPuzzle.eyebrow') %></p>
+        <h1><span aria-hidden="true">🧩</span> <%= t('tarsiaPuzzle.title') %></h1>
+        <p><%= t('tarsiaPuzzle.subtitle') %></p>
         <div class="hero-points" aria-label="Tool highlights">
-          <span>9 or 18 matching pairs</span>
-          <span>Vocabulary + Q&amp;A modes</span>
-          <span>Cut sheet + answer key</span>
+          <span><%= t('tarsiaPuzzle.heroPoint1') %></span>
+          <span><%= t('tarsiaPuzzle.heroPoint2') %></span>
+          <span><%= t('tarsiaPuzzle.heroPoint3') %></span>
         </div>
       </div>
       <div class="hero-puzzle" aria-hidden="true">
@@ -41,24 +41,24 @@
           <div class="panel-heading">
             <div>
               <span class="step-number">1</span>
-              <p class="eyebrow">Puzzle setup</p>
-              <h2>Name and size your puzzle</h2>
+              <p class="eyebrow"><%= t('tarsiaPuzzle.setupKicker') %></p>
+              <h2><%= t('tarsiaPuzzle.nameSizeHeading') %></h2>
             </div>
           </div>
           <div class="form-grid">
-            <label for="puzzleTitle">Worksheet title
+            <label for="puzzleTitle"><%= t('tarsiaPuzzle.titleLabel') %>
               <input id="puzzleTitle" type="text" maxlength="60" value="Vocabulary Tarsia Puzzle">
             </label>
-            <label for="puzzleSize">Puzzle size
+            <label for="puzzleSize"><%= t('tarsiaPuzzle.sizeLabel') %>
               <select id="puzzleSize">
-                <option value="4" selected>Standard · 16 pieces / 18 pairs</option>
-                <option value="3">Quick · 9 pieces / 9 pairs</option>
+                <option value="4" selected><%= t('tarsiaPuzzle.sizeOption1') %></option>
+                <option value="3"><%= t('tarsiaPuzzle.sizeOption2') %></option>
               </select>
             </label>
           </div>
           <div class="mode-switch" role="group" aria-label="Choose content type">
-            <button type="button" class="active" data-mode="vocabulary" aria-pressed="true">Vocabulary</button>
-            <button type="button" data-mode="qa" aria-pressed="false">Sentences &amp; answers</button>
+            <button type="button" class="active" data-mode="vocabulary" aria-pressed="true"><%= t('tarsiaPuzzle.modeVocabulary') %></button>
+            <button type="button" data-mode="qa" aria-pressed="false"><%= t('tarsiaPuzzle.modeQa') %></button>
           </div>
         </section>
 
@@ -66,18 +66,18 @@
           <div class="panel-heading">
             <div>
               <span class="step-number">2</span>
-              <p class="eyebrow">Matching content</p>
-              <h2 id="contentHeading">Choose vocabulary</h2>
+              <p class="eyebrow"><%= t('tarsiaPuzzle.matchingContentKicker') %></p>
+              <h2 id="contentHeading"><%= t('tarsiaPuzzle.contentHeadingVocabulary') %></h2>
             </div>
-            <span class="pair-count" id="pairCount">0 / 18 ready</span>
+            <span class="pair-count" id="pairCount"><%= t('tarsiaPuzzle.pairCountInitial') %></span>
           </div>
 
           <div id="vocabularyControls">
             <button id="toggleWordLibrary" class="word-library-toggle" type="button" aria-expanded="false" aria-controls="wordLibraryPanel">
               <span class="word-library-toggle-icon" aria-hidden="true">🗂️</span>
               <span class="word-library-toggle-copy">
-                <small>Mandarin Library</small>
-                <strong>Create a puzzle from published vocabulary topics</strong>
+                <small><%= t('tarsiaPuzzle.wordLibraryToggleSmall') %></small>
+                <strong><%= t('tarsiaPuzzle.wordLibraryToggleStrong') %></strong>
               </span>
               <span class="word-library-toggle-arrow" aria-hidden="true">⌄</span>
             </button>
@@ -87,40 +87,40 @@
             </div>
 
             <label class="bulk-label" for="vocabularyInput">
-              <span>Paste or type vocabulary</span>
-              <span id="vocabularyFormat">One line each: Chinese | English | Pinyin | Emoji (only the first field is required)</span>
+              <span><%= t('tarsiaPuzzle.pasteVocabLabel') %></span>
+              <span id="vocabularyFormat"><%= t('tarsiaPuzzle.vocabularyFormat') %></span>
               <textarea id="vocabularyInput" rows="10" maxlength="3200" spellcheck="true" placeholder="苹果 | apple | píng guǒ | 🍎&#10;香蕉 | banana | xiāng jiāo | 🍌"></textarea>
             </label>
-            <button id="buildVocabularyPairs" class="btn-secondary inline-action" type="button">Auto-fill matches</button>
+            <button id="buildVocabularyPairs" class="btn-secondary inline-action" type="button"><%= t('tarsiaPuzzle.autoFillMatches') %></button>
 
             <fieldset class="side-choice" aria-describedby="sideChoiceHelp">
-              <legend>Choose exactly 2 sides to match</legend>
+              <legend><%= t('tarsiaPuzzle.sideChoiceLegend') %></legend>
               <div class="side-options">
-                <label class="side-option"><input type="checkbox" name="vocabSide" value="chinese" checked><span>Chinese</span></label>
-                <label class="side-option"><input type="checkbox" name="vocabSide" value="english" checked><span>English</span></label>
-                <label class="side-option"><input type="checkbox" name="vocabSide" value="pinyin"><span>Pinyin</span></label>
-                <label class="side-option"><input type="checkbox" name="vocabSide" value="emoji"><span>Emoji</span></label>
+                <label class="side-option"><input type="checkbox" name="vocabSide" value="chinese" checked><span><%= t('tarsiaPuzzle.sideChinese') %></span></label>
+                <label class="side-option"><input type="checkbox" name="vocabSide" value="english" checked><span><%= t('tarsiaPuzzle.sideEnglish') %></span></label>
+                <label class="side-option"><input type="checkbox" name="vocabSide" value="pinyin"><span><%= t('tarsiaPuzzle.sidePinyin') %></span></label>
+                <label class="side-option"><input type="checkbox" name="vocabSide" value="emoji"><span><%= t('tarsiaPuzzle.sideEmoji') %></span></label>
               </div>
-              <p id="sideChoiceHelp"><strong id="sideChoiceCount">2 selected</strong> · The first selected option appears on one edge and the second on its matching edge.</p>
+              <p id="sideChoiceHelp"><strong id="sideChoiceCount"><%= t('tarsiaPuzzle.sideChoiceCountInitial') %></strong><%= t('tarsiaPuzzle.sideChoiceHelpSuffix') %></p>
             </fieldset>
           </div>
 
           <div id="qaControls" hidden>
             <div id="questionBankPicker"></div>
             <label class="bulk-label" for="qaInput">
-              <span>Paste sentences, questions, and answers</span>
-              <span>One pair per line. Separate the two matching sides with | or →.</span>
+              <span><%= t('tarsiaPuzzle.pasteQaLabel') %></span>
+              <span><%= t('tarsiaPuzzle.qaHelp') %></span>
               <textarea id="qaInput" rows="10" maxlength="5200" spellcheck="true" placeholder="What is 1/2 as a decimal? | 0.5&#10;The capital of France is… | Paris"></textarea>
             </label>
-            <button id="buildQaPairs" class="btn-secondary inline-action" type="button">Build matching pairs</button>
+            <button id="buildQaPairs" class="btn-secondary inline-action" type="button"><%= t('tarsiaPuzzle.buildMatchingPairs') %></button>
           </div>
 
           <div class="review-heading">
             <div>
-              <p class="eyebrow">Review before generating</p>
-              <h3>Edit the two sides of each match</h3>
+              <p class="eyebrow"><%= t('tarsiaPuzzle.reviewHeadingKicker') %></p>
+              <h3><%= t('tarsiaPuzzle.editSidesHeading') %></h3>
             </div>
-            <button id="loadSample" class="text-button" type="button">Load a sample</button>
+            <button id="loadSample" class="text-button" type="button"><%= t('tarsiaPuzzle.loadSampleButton') %></button>
           </div>
           <div id="pairEditor" class="pair-editor" aria-live="polite"></div>
           <p id="validationMessage" class="validation-message" aria-live="polite"></p>
@@ -129,14 +129,14 @@
         <section class="panel generate-panel">
           <div>
             <span class="step-number">3</span>
-            <p class="eyebrow">Build the worksheet</p>
-            <h2>Generate the cut sheet and answer key</h2>
-            <p>Each matching pair is placed on one shared edge in the completed triangle. A fresh layout changes where the pairs appear and how the pieces are mixed.</p>
+            <p class="eyebrow"><%= t('tarsiaPuzzle.generatePanelKicker') %></p>
+            <h2><%= t('tarsiaPuzzle.generateHeading') %></h2>
+            <p><%= t('tarsiaPuzzle.generateHelp') %></p>
           </div>
           <div class="generate-actions">
-            <button id="generatePuzzle" class="btn-primary" type="button">Generate puzzle</button>
-            <button id="reshufflePuzzle" class="btn-secondary" type="button">Fresh layout</button>
-            <button id="clearPuzzle" class="text-button" type="button">Clear all</button>
+            <button id="generatePuzzle" class="btn-primary" type="button"><%= t('tarsiaPuzzle.generatePuzzleButton') %></button>
+            <button id="reshufflePuzzle" class="btn-secondary" type="button"><%= t('tarsiaPuzzle.freshLayoutButton') %></button>
+            <button id="clearPuzzle" class="text-button" type="button"><%= t('tarsiaPuzzle.clearAllButton') %></button>
           </div>
         </section>
       </section>
@@ -144,23 +144,23 @@
       <aside class="preview-panel" aria-label="Puzzle preview">
         <div class="preview-heading">
           <div>
-            <p class="eyebrow">Live preview</p>
-            <h2>Your printable pages</h2>
+            <p class="eyebrow"><%= t('tarsiaPuzzle.livePreviewKicker') %></p>
+            <h2><%= t('tarsiaPuzzle.printablePagesHeading') %></h2>
           </div>
-          <span id="previewStatus" class="ready-pill">Sample ready</span>
+          <span id="previewStatus" class="ready-pill"><%= t('tarsiaPuzzle.previewStatusInitial') %></span>
         </div>
         <div class="preview-tabs" role="tablist" aria-label="Preview page">
-          <button id="cutTab" class="active" type="button" role="tab" aria-selected="true" data-preview="cut">Cut-out pieces</button>
-          <button id="answerTab" type="button" role="tab" aria-selected="false" data-preview="answer">Answer key</button>
+          <button id="cutTab" class="active" type="button" role="tab" aria-selected="true" data-preview="cut"><%= t('tarsiaPuzzle.cutTab') %></button>
+          <button id="answerTab" type="button" role="tab" aria-selected="false" data-preview="answer"><%= t('tarsiaPuzzle.answerTab') %></button>
         </div>
         <div id="pagePreview" class="page-preview" aria-label="Tarsia worksheet preview"></div>
-        <p class="preview-note" id="previewNote">Print this page, cut out the triangles, and mix the pieces before students begin.</p>
+        <p class="preview-note" id="previewNote"><%= t('tarsiaPuzzle.previewNoteInitial') %></p>
         <div class="download-actions">
-          <button id="printPuzzle" class="btn-primary" type="button">Print / Save PDF</button>
-          <button id="downloadPdf" class="btn-secondary" type="button">Download PDF</button>
-          <button id="downloadPptx" class="btn-secondary" type="button">PowerPoint</button>
+          <button id="printPuzzle" class="btn-primary" type="button"><%= t('tarsiaPuzzle.printSavePdf') %></button>
+          <button id="downloadPdf" class="btn-secondary" type="button"><%= t('tarsiaPuzzle.downloadPdf') %></button>
+          <button id="downloadPptx" class="btn-secondary" type="button"><%= t('tarsiaPuzzle.downloadPptx') %></button>
         </div>
-        <p class="export-note">Downloads include both the student cut sheet and the completed answer key. PowerPoint pages are print-ready image slides.</p>
+        <p class="export-note"><%= t('tarsiaPuzzle.exportNote') %></p>
       </aside>
     </div>
   </main>
@@ -169,22 +169,22 @@
     <div class="emoji-picker-card" role="dialog" aria-modal="true" aria-labelledby="emojiPickerTitle">
       <div class="emoji-picker-heading">
         <div>
-          <p class="eyebrow">Open-source Twemoji</p>
-          <h2 id="emojiPickerTitle">Choose a picture</h2>
+          <p class="eyebrow"><%= t('tarsiaPuzzle.emojiPickerEyebrow') %></p>
+          <h2 id="emojiPickerTitle"><%= t('tarsiaPuzzle.chooseAPicture') %></h2>
         </div>
         <button id="closeEmojiPicker" class="picker-close" type="button" aria-label="Close emoji picker">×</button>
       </div>
-      <label for="emojiSearch">Search pictures
+      <label for="emojiSearch"><%= t('tarsiaPuzzle.searchPicturesLabel') %>
         <input id="emojiSearch" type="search" placeholder="Try apple, weather, 学校…" autocomplete="off">
       </label>
       <div id="emojiGrid" class="emoji-grid"></div>
-      <label class="custom-emoji" for="customEmoji">Or paste an emoji
+      <label class="custom-emoji" for="customEmoji"><%= t('tarsiaPuzzle.customEmojiLabel') %>
         <span>
           <input id="customEmoji" type="text" maxlength="12" placeholder="🐼">
-          <button id="useCustomEmoji" class="btn-secondary" type="button">Use</button>
+          <button id="useCustomEmoji" class="btn-secondary" type="button"><%= t('tarsiaPuzzle.useButton') %></button>
         </span>
       </label>
-      <p class="twemoji-credit">Twemoji graphics by Twitter, Inc. and contributors, licensed under CC BY 4.0.</p>
+      <p class="twemoji-credit"><%= t('tarsiaPuzzle.twemojiCredit') %></p>
     </div>
   </section>
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,16 +12,16 @@
 <body>
   <header class="pet-hero account-header-host">
     <div class="hero-shell">
-      <a class="back-btn" href="/teaching-tools">← All teaching tools</a>
+      <a class="back-btn" href="/teaching-tools"><%= t('classPetPoints.backAll') %></a>
       <div class="hero-copy">
-        <p class="eyebrow">A cheerful classroom motivator</p>
-        <h1>Class Pet Points</h1>
-        <p>Celebrate positive classroom moments as every pet hatches, grows, sparkles, and dresses up for teacher-chosen holidays.</p>
+        <p class="eyebrow"><%= t('classPetPoints.eyebrow') %></p>
+        <h1><%= t('classPetPoints.title') %></h1>
+        <p><%= t('classPetPoints.subtitle') %></p>
         <div class="hero-badges" aria-label="Tool highlights">
-          <span>24 original pets</span>
-          <span>6 growth forms</span>
-          <span>Holiday skins</span>
-          <span>Saved on this device</span>
+          <span><%= t('classPetPoints.badge1') %></span>
+          <span><%= t('classPetPoints.badge2') %></span>
+          <span><%= t('classPetPoints.badge3') %></span>
+          <span><%= t('classPetPoints.badge4') %></span>
         </div>
       </div>
       <div class="hero-pets" aria-hidden="true">
@@ -35,31 +35,31 @@
   <main class="pet-app" id="petApp">
     <section class="privacy-note" aria-label="Student privacy reminder">
       <span aria-hidden="true">🔒</span>
-      <p><strong>Teacher-managed and private by design.</strong> Every saved class stays only in this browser, with its own roster, pets, points, skins, and activity. Use nicknames, initials, or student numbers instead of full student names.</p>
+      <p><strong><%= t('classPetPoints.privacyNoteStrong') %></strong><%= t('classPetPoints.privacyNoteRest') %></p>
     </section>
 
     <section class="class-dashboard app-card" aria-labelledby="classSettingsTitle">
       <div class="class-name-control">
-        <label id="classSettingsTitle" for="classSwitcher">Saved class</label>
+        <label id="classSettingsTitle" for="classSwitcher"><%= t('classPetPoints.savedClassLabel') %></label>
         <div class="class-library-row">
           <select id="classSwitcher" aria-label="Choose a saved class"></select>
-          <button class="class-library-button" id="newClassButton" type="button">+ New</button>
-          <button class="class-library-button class-delete-button" id="deleteClassButton" type="button">Delete</button>
+          <button class="class-library-button" id="newClassButton" type="button">+ <%= t('classPetPoints.newButton') %></button>
+          <button class="class-library-button class-delete-button" id="deleteClassButton" type="button"><%= t('classPetPoints.deleteClassButton') %></button>
         </div>
-        <label class="class-name-label" for="className">Class name</label>
+        <label class="class-name-label" for="className"><%= t('classPetPoints.classNameLabel') %></label>
         <input id="className" maxlength="60" value="My Class" autocomplete="off">
-        <p id="saveStatus">1 class saved on this device</p>
+        <p id="saveStatus"><%= t('classPetPoints.saveStatusInitial') %></p>
       </div>
       <div class="class-stats" aria-live="polite">
-        <div><strong id="studentTotal">0</strong><span>students</span></div>
-        <div><strong id="classPointsTotal">0</strong><span>class points</span></div>
-        <div><strong id="topStageTotal">0</strong><span>200-point pets</span></div>
+        <div><strong id="studentTotal">0</strong><span><%= t('classPetPoints.studentsLabel') %></span></div>
+        <div><strong id="classPointsTotal">0</strong><span><%= t('classPetPoints.classPointsLabel') %></span></div>
+        <div><strong id="topStageTotal">0</strong><span><%= t('classPetPoints.topStageLabel') %></span></div>
       </div>
       <div class="dashboard-actions">
-        <button class="utility-button" id="privacyToggle" type="button" aria-pressed="false">◉ Privacy display</button>
-        <button class="utility-button" id="exportButton" type="button">↓ Export backup</button>
-        <button class="utility-button" id="importButton" type="button">↑ Import backup</button>
-        <button class="utility-button danger-button" id="resetButton" type="button">Reset class</button>
+        <button class="utility-button" id="privacyToggle" type="button" aria-pressed="false">◉ <%= t('classPetPoints.privacyToggle') %></button>
+        <button class="utility-button" id="exportButton" type="button">↓ <%= t('classPetPoints.exportButton') %></button>
+        <button class="utility-button" id="importButton" type="button">↑ <%= t('classPetPoints.importButton') %></button>
+        <button class="utility-button danger-button" id="resetButton" type="button"><%= t('classPetPoints.resetButton') %></button>
         <input id="importFile" type="file" accept="application/json,.json" hidden>
       </div>
     </section>
@@ -67,37 +67,37 @@
     <div class="pet-workspace">
       <aside class="pet-sidebar">
         <section class="app-card add-students-card" aria-labelledby="addStudentsTitle">
-          <p class="section-kicker">Set up your roster</p>
-          <h2 id="addStudentsTitle">Add students</h2>
+          <p class="section-kicker"><%= t('classPetPoints.setupRosterKicker') %></p>
+          <h2 id="addStudentsTitle"><%= t('classPetPoints.addStudentsHeading') %></h2>
           <form id="addStudentsForm">
-            <label for="studentNames">One nickname, initial, or number per line</label>
-            <textarea id="studentNames" rows="7" maxlength="1600" placeholder="Student 01&#10;Student 02&#10;Student 03"></textarea>
-            <p class="field-note">New students receive different pets until all 24 have been used.</p>
-            <button class="primary-button" type="submit">Add students &amp; assign pets</button>
+            <label for="studentNames"><%= t('classPetPoints.oneNicknameLabel') %></label>
+            <textarea id="studentNames" rows="7" maxlength="1600" placeholder="<%= t('classPetPoints.studentNamesPlaceholder') %>"></textarea>
+            <p class="field-note"><%= t('classPetPoints.fieldNote') %></p>
+            <button class="primary-button" type="submit"><%= t('classPetPoints.addStudentsSubmit') %></button>
           </form>
         </section>
 
         <section class="app-card growth-guide" aria-labelledby="growthGuideTitle">
-          <p class="section-kicker">Hatch, grow, and sparkle</p>
-          <h2 id="growthGuideTitle">Growth stages</h2>
+          <p class="section-kicker"><%= t('classPetPoints.hatchGrowKicker') %></p>
+          <h2 id="growthGuideTitle"><%= t('classPetPoints.growthStagesHeading') %></h2>
           <ol>
-            <li><span>🥚</span><div><strong>Egg</strong><small>0–9 points</small></div></li>
-            <li><span>🐣</span><div><strong>Cracked Egg</strong><small>10–19 points</small></div></li>
-            <li><span>🐾</span><div><strong>Baby</strong><small>20–49 points</small></div></li>
-            <li><span>💛</span><div><strong>Chubby Form</strong><small>50–99 points</small></div></li>
-            <li><span>🌟</span><div><strong>Cute Adult</strong><small>100–149 points</small></div></li>
-            <li><span>✨</span><div><strong>Sparkle Form</strong><small>150–199 · complete at 200</small></div></li>
-            <li><span>🎁</span><div><strong>Holiday Skin</strong><small>Teacher-selected anytime</small></div></li>
+            <li><span>🥚</span><div><strong><%= t('classPetPoints.stage1Name') %></strong><small><%= t('classPetPoints.stage1Points') %></small></div></li>
+            <li><span>🐣</span><div><strong><%= t('classPetPoints.stage2Name') %></strong><small><%= t('classPetPoints.stage2Points') %></small></div></li>
+            <li><span>🐾</span><div><strong><%= t('classPetPoints.stage3Name') %></strong><small><%= t('classPetPoints.stage3Points') %></small></div></li>
+            <li><span>💛</span><div><strong><%= t('classPetPoints.stage4Name') %></strong><small><%= t('classPetPoints.stage4Points') %></small></div></li>
+            <li><span>🌟</span><div><strong><%= t('classPetPoints.stage5Name') %></strong><small><%= t('classPetPoints.stage5Points') %></small></div></li>
+            <li><span>✨</span><div><strong><%= t('classPetPoints.stage6Name') %></strong><small><%= t('classPetPoints.stage6Points') %></small></div></li>
+            <li><span>🎁</span><div><strong><%= t('classPetPoints.stage7Name') %></strong><small><%= t('classPetPoints.stage7Points') %></small></div></li>
           </ol>
         </section>
 
         <section class="app-card history-card" aria-labelledby="historyTitle">
           <div class="section-heading-row">
             <div>
-              <p class="section-kicker">Easy to review</p>
-              <h2 id="historyTitle">Recent activity</h2>
+              <p class="section-kicker"><%= t('classPetPoints.easyReviewKicker') %></p>
+              <h2 id="historyTitle"><%= t('classPetPoints.recentActivityHeading') %></h2>
             </div>
-            <button class="text-button" id="clearHistoryButton" type="button">Clear</button>
+            <button class="text-button" id="clearHistoryButton" type="button"><%= t('classPetPoints.clearHistoryButton') %></button>
           </div>
           <div id="historyList" class="history-list"></div>
         </section>
@@ -106,50 +106,50 @@
       <section class="roster-panel app-card" aria-labelledby="rosterTitle">
         <div class="roster-heading">
           <div>
-            <p class="section-kicker">Your class</p>
-            <h2 id="rosterTitle">Pet roster <span id="visibleCount"></span></h2>
+            <p class="section-kicker"><%= t('classPetPoints.yourClassKicker') %></p>
+            <h2 id="rosterTitle"><%= t('classPetPoints.petRosterHeading') %> <span id="visibleCount"></span></h2>
           </div>
-          <button class="undo-button" id="undoButton" type="button" disabled>↶ Undo last points change</button>
+          <button class="undo-button" id="undoButton" type="button" disabled>↶ <%= t('classPetPoints.undoButton') %></button>
         </div>
 
         <div class="roster-toolbar">
           <label class="search-field">
             <span class="sr-only">Search students</span>
             <span aria-hidden="true">⌕</span>
-            <input id="studentSearch" type="search" placeholder="Find a student" autocomplete="off">
+            <input id="studentSearch" type="search" placeholder="<%= t('classPetPoints.findStudentPlaceholder') %>" autocomplete="off">
           </label>
           <label class="sort-field">
-            <span>Sort</span>
+            <span><%= t('classPetPoints.sortLabel') %></span>
             <select id="studentSort">
-              <option value="added">Recently added</option>
-              <option value="name">Name A–Z</option>
-              <option value="points-high">Points: high to low</option>
-              <option value="points-low">Points: low to high</option>
-              <option value="stage">Growth form</option>
+              <option value="added"><%= t('classPetPoints.sortRecentlyAdded') %></option>
+              <option value="name"><%= t('classPetPoints.sortNameAZ') %></option>
+              <option value="points-high"><%= t('classPetPoints.sortPointsHighLow') %></option>
+              <option value="points-low"><%= t('classPetPoints.sortPointsLowHigh') %></option>
+              <option value="stage"><%= t('classPetPoints.sortGrowthForm') %></option>
             </select>
           </label>
         </div>
 
         <div class="empty-state" id="emptyState">
           <div class="empty-pet" aria-hidden="true"></div>
-          <h3>Your pet class is ready to begin!</h3>
-          <p>Add nicknames or student numbers on the left. Each student will receive one of 24 original pets.</p>
+          <h3><%= t('classPetPoints.emptyStateHeading') %></h3>
+          <p><%= t('classPetPoints.emptyStateText') %></p>
         </div>
 
         <div class="pet-grid" id="petGrid" aria-live="polite"></div>
-        <p class="no-results" id="noResults" hidden>No students match that search.</p>
+        <p class="no-results" id="noResults" hidden><%= t('classPetPoints.noResultsText') %></p>
       </section>
     </div>
 
     <section class="teacher-tips app-card" aria-labelledby="teacherTipsTitle">
       <div>
-        <p class="section-kicker">Keep rewards meaningful</p>
-        <h2 id="teacherTipsTitle">A simple classroom rhythm</h2>
+        <p class="section-kicker"><%= t('classPetPoints.keepRewardsKicker') %></p>
+        <h2 id="teacherTipsTitle"><%= t('classPetPoints.simpleRhythmHeading') %></h2>
       </div>
       <ol>
-        <li><strong>Name the behavior.</strong><span>“You earned a point for helping your group get started.”</span></li>
-        <li><strong>Use small changes.</strong><span>Give +1 most often so each growth stage feels earned.</span></li>
-        <li><strong>Celebrate growth.</strong><span>Pause when a pet reaches a new form; avoid comparing students publicly.</span></li>
+        <li><strong><%= t('classPetPoints.tip1Strong') %></strong><span>“<%= t('classPetPoints.tip1Text') %>”</span></li>
+        <li><strong><%= t('classPetPoints.tip2Strong') %></strong><span><%= t('classPetPoints.tip2Text') %></span></li>
+        <li><strong><%= t('classPetPoints.tip3Strong') %></strong><span><%= t('classPetPoints.tip3Text') %></span></li>
       </ol>
     </section>
   </main>
@@ -157,8 +157,8 @@
   <dialog class="pet-picker" id="petPicker" aria-labelledby="petPickerTitle">
     <div class="dialog-heading">
       <div>
-        <p class="section-kicker">24 original companions</p>
-        <h2 id="petPickerTitle">Choose a pet</h2>
+        <p class="section-kicker"><%= t('classPetPoints.petPickerKicker') %></p>
+        <h2 id="petPickerTitle"><%= t('classPetPoints.choosePetHeading') %></h2>
         <p id="petPickerStudent"></p>
       </div>
       <button class="dialog-close" id="closePetPicker" type="button" aria-label="Close pet picker">×</button>
@@ -169,19 +169,19 @@
   <dialog class="pet-picker skin-picker" id="skinPicker" aria-labelledby="skinPickerTitle">
     <div class="dialog-heading">
       <div>
-        <p class="section-kicker">The animal stays the same</p>
-        <h2 id="skinPickerTitle">Choose a holiday skin</h2>
+        <p class="section-kicker"><%= t('classPetPoints.skinPickerKicker') %></p>
+        <h2 id="skinPickerTitle"><%= t('classPetPoints.chooseHolidaySkinHeading') %></h2>
         <p id="skinPickerStudent"></p>
       </div>
       <button class="dialog-close" id="closeSkinPicker" type="button" aria-label="Close holiday skin picker">×</button>
     </div>
-    <p class="skin-picker-note">Add or remove a seasonal decoration whenever it fits your class calendar. Holiday skins do not change points or growth.</p>
+    <p class="skin-picker-note"><%= t('classPetPoints.skinPickerNote') %></p>
     <div class="skin-picker-grid" id="skinPickerGrid"></div>
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <noscript><p class="noscript-note">Class Pet Points needs JavaScript enabled to save and update the roster.</p></noscript>
+  <noscript><p class="noscript-note"><%= t('classPetPoints.noscriptNote') %></p></noscript>
   <script src="/teaching-tools/class-pet-points/class-pet-points.js"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>

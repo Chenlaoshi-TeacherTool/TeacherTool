@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,14 +14,14 @@
   <main class="bingo-wrap">
     <header class="bingo-hero">
       <div class="bingo-hero-copy">
-        <a class="back-link" href="/teaching-tools#low-prep-activities">← Back to Teaching Tools</a>
-        <p class="eyebrow">Printable review game</p>
-        <h1><span aria-hidden="true">🎯</span> Bingo Generator</h1>
-        <p>Paste in your vocabulary or sentences, choose how many different sheets you need, and download a set of shuffled bingo cards as a Word document or a printable PDF.</p>
+        <a class="back-link" href="/teaching-tools#low-prep-activities"><%= t('bingoGenerator.backLink') %></a>
+        <p class="eyebrow"><%= t('bingoGenerator.eyebrow') %></p>
+        <h1><span aria-hidden="true">🎯</span> <%= t('bingoGenerator.title') %></h1>
+        <p><%= t('bingoGenerator.subtitle') %></p>
         <div class="hero-points" aria-label="Tool highlights">
-          <span>Every sheet is shuffled differently</span>
-          <span>Chinese, English, pinyin, or all three</span>
-          <span>Download Word or print to PDF</span>
+          <span><%= t('bingoGenerator.heroPoint1') %></span>
+          <span><%= t('bingoGenerator.heroPoint2') %></span>
+          <span><%= t('bingoGenerator.heroPoint3') %></span>
         </div>
       </div>
     </header>
@@ -33,29 +33,29 @@
             <div class="panel-heading">
               <div>
                 <span class="step-number">1</span>
-                <p class="eyebrow">Setup</p>
-                <h2>Name your game</h2>
+                <p class="eyebrow"><%= t('bingoGenerator.setupKicker') %></p>
+                <h2><%= t('bingoGenerator.nameYourGame') %></h2>
               </div>
-              <button id="load-example" class="ghost-button" type="button">Load example</button>
+              <button id="load-example" class="ghost-button" type="button"><%= t('bingoGenerator.loadExample') %></button>
             </div>
             <div class="form-grid">
-              <label for="title">Game title
-                <input id="title" type="text" maxlength="70" placeholder="e.g. Unit 3 Vocabulary Bingo" value="Vocabulary Bingo">
+              <label for="title"><%= t('bingoGenerator.titleLabel') %>
+                <input id="title" type="text" maxlength="70" placeholder="<%= t('bingoGenerator.titlePlaceholder') %>" value="Vocabulary Bingo">
               </label>
-              <label for="sheets">How many different bingo sheets?
+              <label for="sheets"><%= t('bingoGenerator.sheetsLabel') %>
                 <input id="sheets" type="number" min="1" max="60" step="1" value="10" required>
               </label>
             </div>
             <div class="form-grid">
-              <label for="gridSize">Grid size
+              <label for="gridSize"><%= t('bingoGenerator.gridSizeLabel') %>
                 <select id="gridSize">
-                  <option value="5" selected>5 × 5 (25 spaces)</option>
-                  <option value="4">4 × 4 (16 spaces)</option>
+                  <option value="5" selected><%= t('bingoGenerator.gridOption5') %></option>
+                  <option value="4"><%= t('bingoGenerator.gridOption4') %></option>
                 </select>
               </label>
               <label class="checkbox-field" for="freeSpace">
                 <input id="freeSpace" type="checkbox" checked>
-                Include a FREE space in the center
+                <%= t('bingoGenerator.freeSpaceLabel') %>
               </label>
             </div>
           </section>
@@ -64,15 +64,15 @@
             <div class="panel-heading">
               <div>
                 <span class="step-number">2</span>
-                <p class="eyebrow">Content</p>
-                <h2>Add your terms or sentences</h2>
+                <p class="eyebrow"><%= t('bingoGenerator.contentKicker') %></p>
+                <h2><%= t('bingoGenerator.addTermsHeading') %></h2>
               </div>
             </div>
-            <label for="terms">One term per line
+            <label for="terms"><%= t('bingoGenerator.termsLabel') %>
               <textarea id="terms" class="terms-textarea" required placeholder="猫 | māo | cat&#10;狗 | gǒu | dog&#10;鸟 | niǎo | bird"></textarea>
             </label>
-            <p class="field-help">Format: <strong>term | pinyin | English</strong>. Pinyin and English fill in automatically for common words if you leave them out — just typing the term on each line also works.</p>
-            <p id="term-count" class="term-count" aria-live="polite">No terms detected yet.</p>
+            <p class="field-help"><%= t('bingoGenerator.formatHelpPrefix') %><strong><%= t('bingoGenerator.formatHelpFields') %></strong><%= t('bingoGenerator.formatHelpSuffix') %></p>
+            <p id="term-count" class="term-count" aria-live="polite"><%= t('bingoGenerator.termCountEmpty') %></p>
             <div id="bingoLibraryPicker"></div>
           </section>
 
@@ -80,36 +80,36 @@
             <div class="panel-heading">
               <div>
                 <span class="step-number">3</span>
-                <p class="eyebrow">Display</p>
-                <h2>What should each space show?</h2>
+                <p class="eyebrow"><%= t('bingoGenerator.displayKicker') %></p>
+                <h2><%= t('bingoGenerator.displayHeading') %></h2>
               </div>
             </div>
             <div class="mode-switch" role="radiogroup" aria-label="Display language">
-              <label><input type="radio" name="displayMode" value="zh" checked> Term only</label>
-              <label><input type="radio" name="displayMode" value="en"> English only</label>
-              <label><input type="radio" name="displayMode" value="py"> Pinyin only</label>
-              <label><input type="radio" name="displayMode" value="all"> Show all</label>
+              <label><input type="radio" name="displayMode" value="zh" checked> <%= t('bingoGenerator.modeZh') %></label>
+              <label><input type="radio" name="displayMode" value="en"> <%= t('bingoGenerator.modeEn') %></label>
+              <label><input type="radio" name="displayMode" value="py"> <%= t('bingoGenerator.modePy') %></label>
+              <label><input type="radio" name="displayMode" value="all"> <%= t('bingoGenerator.modeAll') %></label>
             </div>
           </section>
 
           <div class="form-footer">
-            <button class="generate-button" type="submit">Generate bingo sheets</button>
+            <button class="generate-button" type="submit"><%= t('bingoGenerator.generateButton') %></button>
             <p id="generation-status" class="generation-status" aria-live="polite"></p>
           </div>
           <div class="download-row">
-            <button id="download-word" class="download-button" type="button" disabled>Download Word (.docx)</button>
-            <button id="print-pdf" class="download-button" type="button" disabled>Print / Save as PDF</button>
+            <button id="download-word" class="download-button" type="button" disabled><%= t('bingoGenerator.downloadWord') %></button>
+            <button id="print-pdf" class="download-button" type="button" disabled><%= t('bingoGenerator.printPdf') %></button>
           </div>
         </form>
       </section>
 
       <section class="preview-panel" aria-label="Generated bingo sheets">
         <div class="preview-heading">
-          <h2>Preview</h2>
-          <p>Generated sheets appear here and are what gets printed to PDF.</p>
+          <h2><%= t('bingoGenerator.previewHeading') %></h2>
+          <p><%= t('bingoGenerator.previewHelp') %></p>
         </div>
         <div id="preview-area" class="preview-area">
-          <p class="preview-empty">Fill out the form and click “Generate bingo sheets” to see your cards here.</p>
+          <p class="preview-empty"><%= t('bingoGenerator.previewEmptyPrefix') %>“<%= t('bingoGenerator.generateButton') %>”<%= t('bingoGenerator.previewEmptySuffix') %></p>
         </div>
       </section>
     </div>

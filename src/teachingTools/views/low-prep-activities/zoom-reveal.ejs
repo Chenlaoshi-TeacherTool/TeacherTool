@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,14 +13,14 @@
   <main class="reveal-wrap">
     <header class="reveal-header">
       <div class="reveal-header-content">
-        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
-        <p class="reveal-eyebrow">Guessing warm-up</p>
-        <h1>🔍 Zoom Reveal</h1>
-        <p>Upload a picture, click the spot you want to hide in plain sight, then zoom in until it's unrecognizable. Slowly zoom back out—manually or on autoplay—while students guess what the whole picture shows.</p>
+        <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('zoomReveal.backBtn') %></a>
+        <p class="reveal-eyebrow"><%= t('zoomReveal.eyebrow') %></p>
+        <h1>🔍 <%= t('zoomReveal.title') %></h1>
+        <p><%= t('zoomReveal.subtitle') %></p>
         <div class="reveal-hero-points" aria-label="Tool highlights">
-          <span>Images never leave your browser</span>
-          <span>Click anywhere to move the spotlight</span>
-          <span>Drag to zoom out, or let it play automatically</span>
+          <span><%= t('zoomReveal.heroPoint1') %></span>
+          <span><%= t('zoomReveal.heroPoint2') %></span>
+          <span><%= t('zoomReveal.heroPoint3') %></span>
         </div>
       </div>
     </header>
@@ -31,16 +31,16 @@
           <div class="reveal-panel-heading">
             <div>
               <span class="reveal-step">1</span>
-              <p class="reveal-kicker">Images</p>
-              <h2>Upload your pictures</h2>
+              <p class="reveal-kicker"><%= t('zoomReveal.imagesKicker') %></p>
+              <h2><%= t('zoomReveal.uploadHeading') %></h2>
             </div>
           </div>
           <label class="reveal-upload-drop" for="image-input">
             <input id="image-input" type="file" accept="image/*" multiple hidden>
             <span class="reveal-upload-icon" aria-hidden="true">＋</span>
-            <span class="reveal-upload-text">Click to choose images (you can select several at once)</span>
+            <span class="reveal-upload-text"><%= t('zoomReveal.uploadText') %></span>
           </label>
-          <p class="reveal-help">Images are read directly in your browser and are never uploaded anywhere.</p>
+          <p class="reveal-help"><%= t('zoomReveal.uploadHelp') %></p>
           <ul id="image-list" class="reveal-image-list" aria-label="Uploaded images"></ul>
         </section>
 
@@ -48,56 +48,56 @@
           <div class="reveal-panel-heading">
             <div>
               <span class="reveal-step">2</span>
-              <p class="reveal-kicker">Zoom</p>
-              <h2>How close should it start?</h2>
+              <p class="reveal-kicker"><%= t('zoomReveal.zoomKicker') %></p>
+              <h2><%= t('zoomReveal.zoomHeading') %></h2>
             </div>
           </div>
-          <label for="max-zoom">Maximum zoom: <output id="max-zoom-value">8</output>×
+          <label for="max-zoom"><%= t('zoomReveal.maxZoomLabel') %> <output id="max-zoom-value">8</output>×
             <input id="max-zoom" type="range" min="2" max="20" step="0.5" value="8">
           </label>
-          <p class="reveal-help">Click anywhere on the picture (right side) to move the spotlight—that's the spot it will zoom into. Once zoomed in, click and drag the picture to look around.</p>
+          <p class="reveal-help"><%= t('zoomReveal.maxZoomHelp') %></p>
         </section>
 
         <section class="reveal-panel">
           <div class="reveal-panel-heading">
             <div>
               <span class="reveal-step">3</span>
-              <p class="reveal-kicker">Autoplay</p>
-              <h2>Zoom-out speed</h2>
+              <p class="reveal-kicker"><%= t('zoomReveal.autoplayKicker') %></p>
+              <h2><%= t('zoomReveal.autoplayHeading') %></h2>
             </div>
           </div>
-          <label for="zoom-duration">Seconds to fully zoom out: <output id="duration-value">20</output>s
+          <label for="zoom-duration"><%= t('zoomReveal.durationLabel') %> <output id="duration-value">20</output>s
             <input id="zoom-duration" type="range" min="4" max="60" step="1" value="20">
           </label>
         </section>
 
-        <p id="setup-status" class="reveal-setup-status" aria-live="polite">Upload at least one image to begin.</p>
+        <p id="setup-status" class="reveal-setup-status" aria-live="polite"><%= t('zoomReveal.setupStatus') %></p>
       </section>
 
       <section class="reveal-preview-panel" aria-label="Reveal stage">
         <div class="reveal-preview-heading">
-          <h2>Reveal stage</h2>
-          <p id="progress-text" class="reveal-progress-text">No image loaded yet.</p>
+          <h2><%= t('zoomReveal.stageHeading') %></h2>
+          <p id="progress-text" class="reveal-progress-text"><%= t('zoomReveal.progressEmpty') %></p>
         </div>
 
         <div id="reveal-stage" class="reveal-stage">
-          <p class="reveal-stage-empty">Upload images on the left, then click Zoom In.</p>
+          <p class="reveal-stage-empty"><%= t('zoomReveal.stageEmpty') %></p>
         </div>
 
-        <label for="zoom-slider" class="reveal-zoom-slider-label">Zoom level
+        <label for="zoom-slider" class="reveal-zoom-slider-label"><%= t('zoomReveal.zoomLevelLabel') %>
           <input id="zoom-slider" type="range" min="1" max="8" step="0.05" value="8" disabled>
         </label>
 
         <div class="reveal-stage-controls">
-          <button id="start-button" class="reveal-primary" type="button" disabled>🔍 Zoom In</button>
-          <button id="play-button" class="reveal-secondary" type="button" disabled>▶ Auto Zoom Out</button>
-          <button id="reveal-all-button" class="reveal-secondary" type="button" disabled>⏭ Reveal Full Image</button>
-          <button id="restart-button" class="reveal-secondary" type="button" disabled>↺ Restart</button>
-          <button id="fullscreen-button" class="reveal-secondary" type="button" disabled>⛶ Fullscreen</button>
+          <button id="start-button" class="reveal-primary" type="button" disabled>🔍 <%= t('zoomReveal.zoomInButton') %></button>
+          <button id="play-button" class="reveal-secondary" type="button" disabled>▶ <%= t('zoomReveal.autoZoomOutButton') %></button>
+          <button id="reveal-all-button" class="reveal-secondary" type="button" disabled>⏭ <%= t('zoomReveal.revealFullButton') %></button>
+          <button id="restart-button" class="reveal-secondary" type="button" disabled>↺ <%= t('zoomReveal.restartButton') %></button>
+          <button id="fullscreen-button" class="reveal-secondary" type="button" disabled>⛶ <%= t('zoomReveal.fullscreenButton') %></button>
         </div>
         <div class="reveal-nav-controls">
-          <button id="prev-button" class="reveal-secondary" type="button" disabled>← Previous</button>
-          <button id="next-button" class="reveal-primary" type="button" disabled>Next image →</button>
+          <button id="prev-button" class="reveal-secondary" type="button" disabled>← <%= t('zoomReveal.previousButton') %></button>
+          <button id="next-button" class="reveal-primary" type="button" disabled><%= t('zoomReveal.nextImageButton') %> →</button>
         </div>
       </section>
     </div>

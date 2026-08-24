@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,14 +13,14 @@
   <main class="reveal-wrap">
     <header class="reveal-header">
       <div class="reveal-header-content">
-        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
-        <p class="reveal-eyebrow">Guessing warm-up</p>
-        <h1>🖼️ Image Revealer</h1>
-        <p>Upload as many pictures as you like, pick a grid size, then click Start and watch the tiles disappear one by one until the whole picture is revealed. Great for guess-the-picture warm-ups, vocabulary reviews, or "what do you see" discussions.</p>
+        <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('imageRevealer.backBtn') %></a>
+        <p class="reveal-eyebrow"><%= t('imageRevealer.eyebrow') %></p>
+        <h1>🖼️ <%= t('imageRevealer.title') %></h1>
+        <p><%= t('imageRevealer.subtitle') %></p>
         <div class="reveal-hero-points" aria-label="Tool highlights">
-          <span>Images never leave your browser</span>
-          <span>Any grid size, any reveal speed</span>
-          <span>Click Next Image to move on</span>
+          <span><%= t('imageRevealer.heroPoint1') %></span>
+          <span><%= t('imageRevealer.heroPoint2') %></span>
+          <span><%= t('imageRevealer.heroPoint3') %></span>
         </div>
       </div>
     </header>
@@ -31,16 +31,16 @@
           <div class="reveal-panel-heading">
             <div>
               <span class="reveal-step">1</span>
-              <p class="reveal-kicker">Images</p>
-              <h2>Upload your pictures</h2>
+              <p class="reveal-kicker"><%= t('imageRevealer.imagesKicker') %></p>
+              <h2><%= t('imageRevealer.uploadHeading') %></h2>
             </div>
           </div>
           <label class="reveal-upload-drop" for="image-input">
             <input id="image-input" type="file" accept="image/*" multiple hidden>
             <span class="reveal-upload-icon" aria-hidden="true">＋</span>
-            <span class="reveal-upload-text">Click to choose images (you can select several at once)</span>
+            <span class="reveal-upload-text"><%= t('imageRevealer.uploadText') %></span>
           </label>
-          <p class="reveal-help">Images are read directly in your browser and are never uploaded anywhere.</p>
+          <p class="reveal-help"><%= t('imageRevealer.uploadHelp') %></p>
           <ul id="image-list" class="reveal-image-list" aria-label="Uploaded images"></ul>
         </section>
 
@@ -48,8 +48,8 @@
           <div class="reveal-panel-heading">
             <div>
               <span class="reveal-step">2</span>
-              <p class="reveal-kicker">Grid</p>
-              <h2>How many tiles?</h2>
+              <p class="reveal-kicker"><%= t('imageRevealer.gridKicker') %></p>
+              <h2><%= t('imageRevealer.gridHeading') %></h2>
             </div>
           </div>
           <div class="reveal-preset-row" role="group" aria-label="Grid presets">
@@ -59,10 +59,10 @@
             <button type="button" class="reveal-preset" data-rows="8" data-cols="10">8 × 10</button>
           </div>
           <div class="reveal-form-grid">
-            <label for="grid-rows">Rows
+            <label for="grid-rows"><%= t('imageRevealer.rowsLabel') %>
               <input id="grid-rows" type="number" min="1" max="14" step="1" value="5">
             </label>
-            <label for="grid-cols">Columns
+            <label for="grid-cols"><%= t('imageRevealer.colsLabel') %>
               <input id="grid-cols" type="number" min="1" max="14" step="1" value="5">
             </label>
           </div>
@@ -72,42 +72,42 @@
           <div class="reveal-panel-heading">
             <div>
               <span class="reveal-step">3</span>
-              <p class="reveal-kicker">Reveal</p>
-              <h2>How should it reveal?</h2>
+              <p class="reveal-kicker"><%= t('imageRevealer.revealKicker') %></p>
+              <h2><%= t('imageRevealer.revealHeading') %></h2>
             </div>
           </div>
           <div class="reveal-mode-switch" role="radiogroup" aria-label="Reveal order">
-            <label><input type="radio" name="revealOrder" value="random" checked> Random tiles</label>
-            <label><input type="radio" name="revealOrder" value="sequential"> Row by row</label>
+            <label><input type="radio" name="revealOrder" value="random" checked> <%= t('imageRevealer.revealRandom') %></label>
+            <label><input type="radio" name="revealOrder" value="sequential"> <%= t('imageRevealer.revealSequential') %></label>
           </div>
-          <label for="reveal-speed">Seconds between tiles: <output id="speed-value">1.0</output>s
+          <label for="reveal-speed"><%= t('imageRevealer.speedLabel') %> <output id="speed-value">1.0</output>s
             <input id="reveal-speed" type="range" min="0.2" max="4" step="0.1" value="1">
           </label>
         </section>
 
-        <p id="setup-status" class="reveal-setup-status" aria-live="polite">Upload at least one image to begin.</p>
+        <p id="setup-status" class="reveal-setup-status" aria-live="polite"><%= t('imageRevealer.setupStatus') %></p>
       </section>
 
       <section class="reveal-preview-panel" aria-label="Reveal stage">
         <div class="reveal-preview-heading">
-          <h2>Reveal stage</h2>
-          <p id="progress-text" class="reveal-progress-text">No image loaded yet.</p>
+          <h2><%= t('imageRevealer.stageHeading') %></h2>
+          <p id="progress-text" class="reveal-progress-text"><%= t('imageRevealer.progressEmpty') %></p>
         </div>
 
         <div id="reveal-stage" class="reveal-stage">
-          <p class="reveal-stage-empty">Upload images on the left, then click Start.</p>
+          <p class="reveal-stage-empty"><%= t('imageRevealer.stageEmpty') %></p>
         </div>
 
         <div class="reveal-stage-controls">
-          <button id="start-button" class="reveal-primary" type="button" disabled>▶ Start</button>
-          <button id="pause-button" class="reveal-secondary" type="button" disabled>⏸ Pause</button>
-          <button id="reveal-all-button" class="reveal-secondary" type="button" disabled>⏭ Reveal all</button>
-          <button id="restart-button" class="reveal-secondary" type="button" disabled>↺ Restart image</button>
-          <button id="fullscreen-button" class="reveal-secondary" type="button" disabled>⛶ Fullscreen</button>
+          <button id="start-button" class="reveal-primary" type="button" disabled>▶ <%= t('imageRevealer.startButton') %></button>
+          <button id="pause-button" class="reveal-secondary" type="button" disabled>⏸ <%= t('imageRevealer.pauseButton') %></button>
+          <button id="reveal-all-button" class="reveal-secondary" type="button" disabled>⏭ <%= t('imageRevealer.revealAllButton') %></button>
+          <button id="restart-button" class="reveal-secondary" type="button" disabled>↺ <%= t('imageRevealer.restartButton') %></button>
+          <button id="fullscreen-button" class="reveal-secondary" type="button" disabled>⛶ <%= t('imageRevealer.fullscreenButton') %></button>
         </div>
         <div class="reveal-nav-controls">
-          <button id="prev-button" class="reveal-secondary" type="button" disabled>← Previous</button>
-          <button id="next-button" class="reveal-primary" type="button" disabled>Next image →</button>
+          <button id="prev-button" class="reveal-secondary" type="button" disabled>← <%= t('imageRevealer.previousButton') %></button>
+          <button id="next-button" class="reveal-primary" type="button" disabled><%= t('imageRevealer.nextImageButton') %> →</button>
         </div>
       </section>
     </div>
