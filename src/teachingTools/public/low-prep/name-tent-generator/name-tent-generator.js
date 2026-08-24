@@ -97,18 +97,33 @@
     });
   }
 
-  function nameBoxLines(item, mode) {
+  function selectedDisplayModes() {
+    return Array.prototype.map.call(
+      form.querySelectorAll('input[name="displayMode"]:checked'),
+      function (input) { return input.value; }
+    );
+  }
+
+  function nameBoxLines(item, modes) {
     var lines = [];
-    if (mode === "zh") {
-      lines.push({ cls: "chinese", text: item.chinese || item.name });
-    } else if (mode === "en") {
-      lines.push({ cls: "name", text: item.name || item.chinese });
-    } else if (mode === "py") {
-      lines.push({ cls: "pinyin", text: item.pinyin || item.name });
-    } else {
-      if (item.chinese) lines.push({ cls: "chinese", text: item.chinese });
-      if (item.pinyin) lines.push({ cls: "pinyin", text: item.pinyin });
-      if (item.name && item.name !== item.chinese) lines.push({ cls: "name", text: item.name });
+    if (modes.indexOf("zh") !== -1 && item.chinese) {
+      lines.push({ cls: "chinese", text: item.chinese });
+    }
+    if (modes.indexOf("py") !== -1 && item.pinyin) {
+      lines.push({ cls: "pinyin", text: item.pinyin });
+    }
+    if (modes.indexOf("en") !== -1 && item.name && item.name !== item.chinese) {
+      lines.push({ cls: "name", text: item.name });
+    }
+
+    if (!lines.length) {
+      if (modes.indexOf("zh") !== -1) {
+        lines.push({ cls: "chinese", text: item.chinese || item.name });
+      } else if (modes.indexOf("py") !== -1) {
+        lines.push({ cls: "pinyin", text: item.pinyin || item.name || item.chinese });
+      } else if (modes.indexOf("en") !== -1) {
+        lines.push({ cls: "name", text: item.name || item.chinese });
+      }
     }
     return lines.filter(function (l) { return l.text; });
   }
@@ -120,10 +135,10 @@
     return node;
   }
 
-  function buildNameBox(item, mode, boxClass, lineWrapClass) {
+  function buildNameBox(item, modes, boxClass, lineWrapClass) {
     var box = el("div", boxClass);
     box.style.setProperty("--swatch-color", item.color.css);
-    var lines = nameBoxLines(item, mode);
+    var lines = nameBoxLines(item, modes);
     lines.forEach(function (line) {
       var lineClass = lineWrapClass + " " + lineWrapClass + "-" + line.cls;
       box.appendChild(el("span", lineClass, line.text));
@@ -131,13 +146,13 @@
     return box;
   }
 
-  function buildMiniCard(item, mode) {
+  function buildMiniCard(item, modes) {
     var wrap = el("div", "mini-tent");
     var strip = el("div", "mini-tent-strip");
 
     [1, 2].forEach(function () {
       var panel = el("div", "mini-panel");
-      panel.appendChild(buildNameBox(item, mode, "mini-name-box", "mini-line"));
+      panel.appendChild(buildNameBox(item, modes, "mini-name-box", "mini-line"));
       strip.appendChild(panel);
       strip.appendChild(el("div", "mini-fold-spacer"));
     });
@@ -151,13 +166,13 @@
     return wrap;
   }
 
-  function buildPrintPage(item, mode) {
+  function buildPrintPage(item, modes) {
     var page = el("section", "tent-page");
     var strip = el("div", "tent-strip");
 
     function panel(withBox) {
       var p = el("div", "tent-panel");
-      if (withBox) p.appendChild(buildNameBox(item, mode, "tent-name-box", "tent-line"));
+      if (withBox) p.appendChild(buildNameBox(item, modes, "tent-name-box", "tent-line"));
       return p;
     }
     function fold() { return el("div", "tent-fold"); }
@@ -193,7 +208,15 @@
       return;
     }
 
-    var mode = (form.querySelector('input[name="displayMode"]:checked') || {}).value || "all";
+    var displayModes = selectedDisplayModes();
+    if (!displayModes.length) {
+      previewCards.innerHTML = '<p class="preview-empty">Select at least one display language to generate name tents.</p>';
+      printArea.innerHTML = "";
+      printBtn.disabled = true;
+      status.textContent = "Select at least one display language.";
+      status.setAttribute("data-state", "error");
+      return;
+    }
     var colorMode = (form.querySelector('input[name="colorMode"]:checked') || {}).value || "auto";
     var singleColorKey = (form.querySelector("#single-color-select") || {}).value || "green";
     var palette = checkedPalette();
@@ -204,8 +227,8 @@
     var frag = document.createDocumentFragment();
     var printFrag = document.createDocumentFragment();
     data.forEach(function (item) {
-      frag.appendChild(buildMiniCard(item, mode));
-      printFrag.appendChild(buildPrintPage(item, mode));
+      frag.appendChild(buildMiniCard(item, displayModes));
+      printFrag.appendChild(buildPrintPage(item, displayModes));
     });
     previewCards.appendChild(frag);
     printArea.appendChild(printFrag);

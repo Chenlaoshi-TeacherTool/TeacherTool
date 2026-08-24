@@ -57,11 +57,10 @@
                 <h2><%= t('nameTentGenerator.displayHeading') %></h2>
               </div>
             </div>
-            <div class="mode-switch" role="radiogroup" aria-label="Display language">
-              <label><input type="radio" name="displayMode" value="zh"> <%= t('nameTentGenerator.displayChineseOnly') %></label>
-              <label><input type="radio" name="displayMode" value="en"> <%= t('nameTentGenerator.displayEnglishOnly') %></label>
-              <label><input type="radio" name="displayMode" value="py"> <%= t('nameTentGenerator.displayPinyinOnly') %></label>
-              <label><input type="radio" name="displayMode" value="all" checked> <%= t('nameTentGenerator.displayShowAll') %></label>
+            <div class="mode-switch" role="group" aria-label="Display languages">
+              <label><input type="checkbox" name="displayMode" value="zh" checked> <%= t('nameTentGenerator.displayChinese') %></label>
+              <label><input type="checkbox" name="displayMode" value="en" checked> <%= t('nameTentGenerator.displayEnglish') %></label>
+              <label><input type="checkbox" name="displayMode" value="py" checked> <%= t('nameTentGenerator.displayPinyin') %></label>
             </div>
           </section>
 
