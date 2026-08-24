@@ -101,6 +101,7 @@
       id: uid('profile'),
       name: name || '',
       cover: '',
+      coverPosition: { x: 50, y: 50 },
       avatar: '',
       intro: ['Born: click here to add!', 'Family: click here to add!'],
       friendsTitle: 'Friends',
@@ -190,6 +191,8 @@
       els.coverPhoto.style.backgroundImage = '';
       els.coverPhoto.classList.remove('has-image');
     }
+    var coverPos = profile.coverPosition || { x: 50, y: 50 };
+    els.coverPhoto.style.backgroundPosition = coverPos.x + '% ' + coverPos.y + '%';
 
     if (profile.avatar) {
       els.avatarPhoto.style.backgroundImage = 'url(' + profile.avatar + ')';
@@ -585,7 +588,66 @@
       renderSwitcherOptionLabel(profile);
     });
 
-    els.coverPhoto.addEventListener('click', triggerCoverPick);
+    var coverDrag = null;
+    var coverJustDragged = false;
+
+    function clampPercent(n) {
+      return Math.max(0, Math.min(100, n));
+    }
+
+    els.coverPhoto.addEventListener('pointerdown', function (evt) {
+      var profile = activeProfile();
+      if (!profile || !profile.cover) return;
+      var rect = els.coverPhoto.getBoundingClientRect();
+      var pos = profile.coverPosition || { x: 50, y: 50 };
+      coverDrag = {
+        startX: evt.clientX,
+        startY: evt.clientY,
+        startPosX: pos.x,
+        startPosY: pos.y,
+        rectWidth: rect.width || 1,
+        rectHeight: rect.height || 1,
+        moved: false,
+        currentX: pos.x,
+        currentY: pos.y
+      };
+      els.coverPhoto.setPointerCapture(evt.pointerId);
+    });
+    els.coverPhoto.addEventListener('pointermove', function (evt) {
+      if (!coverDrag) return;
+      var dx = evt.clientX - coverDrag.startX;
+      var dy = evt.clientY - coverDrag.startY;
+      if (!coverDrag.moved && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+        coverDrag.moved = true;
+        els.coverPhoto.classList.add('dragging');
+      }
+      if (!coverDrag.moved) return;
+      evt.preventDefault();
+      coverDrag.currentX = clampPercent(coverDrag.startPosX - (dx / coverDrag.rectWidth) * 100);
+      coverDrag.currentY = clampPercent(coverDrag.startPosY - (dy / coverDrag.rectHeight) * 100);
+      els.coverPhoto.style.backgroundPosition = coverDrag.currentX + '% ' + coverDrag.currentY + '%';
+    });
+    function endCoverDrag() {
+      if (!coverDrag) return;
+      els.coverPhoto.classList.remove('dragging');
+      if (coverDrag.moved) {
+        var profile = activeProfile();
+        profile.coverPosition = { x: coverDrag.currentX, y: coverDrag.currentY };
+        persist(true);
+        coverJustDragged = true;
+      }
+      coverDrag = null;
+    }
+    els.coverPhoto.addEventListener('pointerup', endCoverDrag);
+    els.coverPhoto.addEventListener('pointercancel', endCoverDrag);
+
+    els.coverPhoto.addEventListener('click', function () {
+      if (coverJustDragged) {
+        coverJustDragged = false;
+        return;
+      }
+      triggerCoverPick();
+    });
     els.coverEditButton.addEventListener('click', function (evt) {
       evt.stopPropagation();
       triggerCoverPick();
@@ -597,6 +659,7 @@
       pickImage(function (dataUrl) {
         var profile = activeProfile();
         profile.cover = dataUrl;
+        profile.coverPosition = { x: 50, y: 50 };
         persist(true);
         renderActiveProfile();
       }, MAX_COVER_DIMENSION);
@@ -704,6 +767,9 @@
           if (!parsed || typeof parsed !== 'object') throw new Error('bad file');
           var profile = blankProfile(parsed.name || 'Imported character');
           profile.cover = parsed.cover || '';
+          profile.coverPosition = (parsed.coverPosition && typeof parsed.coverPosition.x === 'number' && typeof parsed.coverPosition.y === 'number')
+            ? parsed.coverPosition
+            : { x: 50, y: 50 };
           profile.avatar = parsed.avatar || '';
           profile.intro = Array.isArray(parsed.intro) ? parsed.intro : profile.intro;
           profile.friendsTitle = parsed.friendsTitle || 'Friends';

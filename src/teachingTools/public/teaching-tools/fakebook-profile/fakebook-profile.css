@@ -112,6 +112,11 @@
   justify-content: center;
   cursor: pointer;
 }
+.fb-cover.has-image {
+  cursor: grab;
+  touch-action: none;
+}
+.fb-cover.has-image.dragging { cursor: grabbing; }
 .fb-cover-hint {
   color: rgba(255,255,255,0.92);
   font-weight: 900;
