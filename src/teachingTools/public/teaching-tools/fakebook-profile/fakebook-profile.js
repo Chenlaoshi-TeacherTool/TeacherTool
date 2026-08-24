@@ -381,6 +381,21 @@
     var replyName = document.createElement('input');
     replyName.className = 'fb-reply-name';
     replyName.placeholder = 'Reply as…';
+    var friendNames = (profile.friends || [])
+      .map(function (f) { return (f.name || '').trim(); })
+      .filter(function (n) { return n; });
+    if (friendNames.length) {
+      var datalistId = 'friendNames-' + post.id;
+      var datalist = document.createElement('datalist');
+      datalist.id = datalistId;
+      friendNames.forEach(function (n) {
+        var opt = document.createElement('option');
+        opt.value = n;
+        datalist.appendChild(opt);
+      });
+      replyForm.appendChild(datalist);
+      replyName.setAttribute('list', datalistId);
+    }
     var replyText = document.createElement('input');
     replyText.className = 'fb-reply-text';
     replyText.placeholder = 'Write a reply…';
