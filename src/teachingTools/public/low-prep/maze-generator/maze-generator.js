@@ -230,19 +230,35 @@
     properties.insertBefore(fill, properties.firstChild);
   }
 
-  function slotValues(data) {
+  function buildSlotLayout() {
+    var offset = 1 + Math.floor(Math.random() * (PAIR_COUNT - 1));
+    var swaps = [];
+    for (var index = 0; index < PAIR_COUNT; index += 1) swaps.push(Math.random() < 0.5);
+    return { offset: offset, swaps: swaps };
+  }
+
+  function isSlotPhysicallyCorrect(slot, layout) {
+    return layout.swaps[slot.pair] ? !slot.correct : slot.correct;
+  }
+
+  function slotValues(data, layout) {
     var values = {};
-    slotDefinitions.forEach(function (slot) { values[slot.source] = data.pairs[slot.pair].answer; });
+    slotDefinitions.forEach(function (slot) {
+      var distractorIndex = (slot.pair + layout.offset) % PAIR_COUNT;
+      var correctText = data.pairs[slot.pair].answer;
+      var distractorText = data.pairs[distractorIndex].answer;
+      values[slot.source] = isSlotPhysicallyCorrect(slot, layout) ? correctText : distractorText;
+    });
     return values;
   }
 
-  function updateSlideXml(xmlString, data, slideNumber) {
+  function updateSlideXml(xmlString, data, slideNumber, layout) {
     var parser = new DOMParser();
     var documentNode = parser.parseFromString(xmlString, 'application/xml');
     if (documentNode.getElementsByTagName('parsererror').length) throw new Error('The PowerPoint template could not be read.');
-    var answerValues = slotValues(data);
+    var answerValues = slotValues(data, layout);
     var answerKey = slideNumber === 3;
-    var correctSlots = new Set(slotDefinitions.filter(function (slot) { return slot.correct; }).map(function (slot) { return slot.source; }));
+    var correctSlots = new Set(slotDefinitions.filter(function (slot) { return isSlotPhysicallyCorrect(slot, layout); }).map(function (slot) { return slot.source; }));
     var questionMap = {};
     sourceQuestions.forEach(function (source, index) { questionMap[source] = data.pairs[index].question; });
     Array.prototype.slice.call(documentNode.getElementsByTagNameNS(P_NS, 'sp')).forEach(function (shape) {
@@ -304,11 +320,12 @@
       var response = await fetch(TEMPLATE_URL);
       if (!response.ok) throw new Error('Template download failed.');
       var zip = await window.JSZip.loadAsync(await response.arrayBuffer());
+      var layout = buildSlotLayout();
       for (var slideNumber = 1; slideNumber <= 3; slideNumber += 1) {
         var slidePath = 'ppt/slides/slide' + slideNumber + '.xml';
         var slideFile = zip.file(slidePath);
         if (!slideFile) throw new Error('A template slide is missing.');
-        zip.file(slidePath, updateSlideXml(await slideFile.async('string'), data, slideNumber));
+        zip.file(slidePath, updateSlideXml(await slideFile.async('string'), data, slideNumber, layout));
       }
       var output = await zip.generateAsync({
         type: 'blob',
