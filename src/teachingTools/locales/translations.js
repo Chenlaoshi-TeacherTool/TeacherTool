@@ -755,7 +755,12 @@ module.exports = {
       secondsLeft: 'seconds left',
       revealAnswer: 'Reveal answer (Space)',
       finishQuestion: 'Finish question (Enter)',
-      returnWithoutCompleting: 'Return without completing'
+      returnWithoutCompleting: 'Return without completing',
+      bankSourceToggle: 'Create a board from published question banks (click to expand)',
+      bulkToggle: 'Paste your own questions and answers (click to expand)',
+      bulkHint: 'Paste one question per line, with the answer after a tab or a "|" — for example: What is the capital of France? | Paris. You can also paste plain paragraphs: put the question on one line and the answer on the next line, leaving a blank line between pairs. Works in any language. Click "Generate" and the questions will be shuffled into the board below.',
+      bulkPlaceholder: 'What is the capital of France? | Paris\nWhat is 12 x 12? | 144\n\nOr:\nWhat is the capital of France?\nParis\n\nWhat is 12 x 12?\n144',
+      bulkGenerate: 'Generate board from pasted text'
     },
     wouldYouRather: {
       backBtn: '← Back to Teaching Tools',
@@ -1774,7 +1779,12 @@ module.exports = {
       secondsLeft: '秒剩余',
       revealAnswer: '显示答案（空格键）',
       finishQuestion: '完成问题（Enter）',
-      returnWithoutCompleting: '返回但不标记完成'
+      returnWithoutCompleting: '返回但不标记完成',
+      bankSourceToggle: '从已发布题库创建题板（点击展开）',
+      bulkToggle: '粘贴您自己的问题和答案（点击展开）',
+      bulkHint: '每行一题，问题和答案之间用 Tab 键或 "|" 分隔，例如：法国的首都是哪里？| 巴黎。也可以直接粘贴整段文字：一行写问题，下一行写答案，题与题之间空一行即可，支持任何语言。点击"生成"后，问题会被随机打乱并填入下方的题板预览中。',
+      bulkPlaceholder: '法国的首都是哪里？| 巴黎\n12乘以12等于多少？| 144\n\n或者：\n法国的首都是哪里？\n巴黎\n\n12乘以12等于多少？\n144',
+      bulkGenerate: '根据粘贴的文字生成题板'
     },
     wouldYouRather: {
       backBtn: '← 返回教学工具',

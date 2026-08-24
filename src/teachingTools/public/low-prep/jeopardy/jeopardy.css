@@ -37,6 +37,14 @@
 .jp-page .warn{background:#FCEDEB;border:2px solid var(--jp-red);border-radius:8px;padding:8px 12px;color:#8E2C21;
  font-size:13.5px;margin-top:14px}
 
+.jp-page details.jp-collapsible{border:2px solid var(--jp-ink);border-radius:10px;padding:10px 14px;margin-bottom:12px;background:var(--jp-sageL)}
+.jp-page details.jp-collapsible>summary{cursor:pointer;font-weight:700;list-style:none;font-size:14.5px}
+.jp-page details.jp-collapsible>summary::-webkit-details-marker{display:none}
+.jp-page details.jp-collapsible>summary::before{content:'▸ ';color:var(--jp-muted)}
+.jp-page details.jp-collapsible[open]>summary{margin-bottom:10px}
+.jp-page details.jp-collapsible[open]>summary::before{content:'▾ '}
+.jp-page #bulkText{min-height:180px;font-family:inherit;resize:vertical}
+
 /* editor board */
 .jp-page .cats{display:grid;gap:10px;overflow-x:auto}
 .jp-page .cat{border:2.5px solid var(--jp-ink);border-radius:10px;background:var(--jp-cream);padding:8px}

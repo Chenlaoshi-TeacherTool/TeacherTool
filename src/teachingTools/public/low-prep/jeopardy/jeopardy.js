@@ -128,6 +128,52 @@ function genFromList() {
   toast('Questions created from “' + list.name + '.”');
 }
 
+/* ---------------- from pasted text ---------------- */
+function stripQLabel(s) { return s.replace(/^(?:Q\d*|Question|问题?)\s*[:：.、)-]\s*/i, ''); }
+function stripALabel(s) { return s.replace(/^(?:A\d*|Answer|答案?)\s*[:：.、)-]\s*/i, ''); }
+function parseBulkQA(text) {
+  var lines = String(text || '').replace(/\r/g, '').split('\n').map(function (l) { return l.trim(); });
+  var delim = /\t|[|｜]/;
+  var pairs = [];
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i];
+    if (!l) continue;
+    var idx = l.search(delim);
+    if (idx !== -1) {
+      var q = stripQLabel(l.slice(0, idx).trim());
+      var a = stripALabel(l.slice(idx + 1).replace(/^[|｜]/, '').trim());
+      if (q) pairs.push({ q: q, a: a });
+      continue;
+    }
+    var q2 = stripQLabel(l);
+    var j = i + 1;
+    while (j < lines.length && !lines[j]) j++;
+    var a2 = '';
+    if (j < lines.length && lines[j].search(delim) === -1) { a2 = stripALabel(lines[j]); i = j; }
+    pairs.push({ q: q2, a: a2 });
+  }
+  return pairs;
+}
+function genFromText() {
+  var box = $('#bulkText');
+  var pairs = parseBulkQA(box.value);
+  if (!pairs.length) { toast('Paste at least one question and answer first.'); return; }
+  pairs = shuffleQuestions(pairs);
+  var need = G.categories.length * G.rows;
+  if (pairs.length < need) toast('Only ' + pairs.length + ' question(s) were found; ' + (need - pairs.length) + ' cell(s) will stay empty.');
+  else if (pairs.length > need) toast('Using ' + need + ' of ' + pairs.length + ' pasted questions to fill the board.');
+  else toast('Questions were added to the Jeopardy board.');
+  var i = 0;
+  G.categories.forEach(function (cat) {
+    cat.clues.forEach(function (cl) {
+      var p = pairs[i++];
+      if (!p) return;
+      cl.q = p.q; cl.a = p.a; cl.dd = false; cl.used = false;
+    });
+  });
+  renderEditor();
+}
+
 /* ---------------- from Chen Laoshi question banks ---------------- */
 function shuffleQuestions(items) {
   var copy = (items || []).slice();
@@ -500,6 +546,7 @@ document.addEventListener('DOMContentLoaded', function () {
     G.teams.push({ name: n, score: 0 }); $('#teamName').value = ''; renderTeams();
   });
   $('#btnGen').addEventListener('click', genFromList);
+  $('#btnBulkGen').addEventListener('click', genFromText);
   $('#btnBlank').addEventListener('click', function () {
     if (!confirm('Clear every question?')) return;
     var t = G.teams, n = G.name;

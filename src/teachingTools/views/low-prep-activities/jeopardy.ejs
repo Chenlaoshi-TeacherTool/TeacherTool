@@ -62,7 +62,18 @@
         </select>
       </span>
     </div>
-    <div id="bankSource"></div>
+    <details class="jp-collapsible">
+      <summary><%= t('jeopardy.bankSourceToggle') %></summary>
+      <div id="bankSource"></div>
+    </details>
+    <details class="jp-collapsible">
+      <summary><%= t('jeopardy.bulkToggle') %></summary>
+      <p class="hint"><%= t('jeopardy.bulkHint') %></p>
+      <textarea id="bulkText" placeholder="<%= t('jeopardy.bulkPlaceholder') %>"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button id="btnBulkGen" class="dark"><%= t('jeopardy.bulkGenerate') %></button>
+      </div>
+    </details>
     <div id="cats" class="cats"></div>
   </section>
 
