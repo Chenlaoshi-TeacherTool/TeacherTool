@@ -258,7 +258,7 @@ function startGame() {
   $('#game').classList.add('open');
   $('#gtitle').textContent = G.name || 'Jeopardy';
   renderBoard(); renderScores();
-  if ($('#game').requestFullscreen) $('#game').requestFullscreen().catch(function () {});
+  if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
 }
 function exitGame() {
   $('#game').classList.remove('open');
