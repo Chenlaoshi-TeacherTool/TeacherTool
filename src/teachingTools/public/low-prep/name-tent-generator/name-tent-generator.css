@@ -225,7 +225,7 @@ input:focus, select:focus, textarea:focus {
 /* ---- Full-size printable tent page ---- */
 .tent-print-area { display: none; }
 
-.tent-page {
+.tent-print-area > .tent-page {
   width: 11in;
   height: 8.5in;
   padding: .35in;
@@ -297,6 +297,6 @@ input:focus, select:focus, textarea:focus {
   body.tent-page * { visibility: hidden; }
   .tent-print-area, .tent-print-area * { visibility: visible; }
   .tent-print-area { display: block; position: absolute; top: 0; left: 0; width: 100%; }
-  .tent-page { page-break-after: always; margin: 0; }
-  .tent-page:last-child { page-break-after: auto; }
+  .tent-print-area > .tent-page { page-break-after: always; margin: 0; }
+  .tent-print-area > .tent-page:last-child { page-break-after: auto; }
 }
