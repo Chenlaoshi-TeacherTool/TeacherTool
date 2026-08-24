@@ -431,7 +431,15 @@
     row.className = 'fb-reply';
     var avatar = document.createElement('div');
     avatar.className = 'fb-reply-avatar';
-    avatar.textContent = initials(reply.author);
+    var matchedFriend = (profile.friends || []).find(function (f) {
+      return (f.name || '').trim().toLowerCase() === (reply.author || '').trim().toLowerCase();
+    });
+    if (matchedFriend && matchedFriend.avatar) {
+      avatar.style.backgroundImage = 'url(' + matchedFriend.avatar + ')';
+      avatar.textContent = '';
+    } else {
+      avatar.textContent = initials(reply.author);
+    }
     var bubble = document.createElement('div');
     bubble.className = 'fb-reply-bubble';
     var strong = document.createElement('strong');

@@ -450,7 +450,10 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #6f9e72;
+  background-color: #6f9e72;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   flex: 0 0 auto;
   display: flex;
   align-items: center;
