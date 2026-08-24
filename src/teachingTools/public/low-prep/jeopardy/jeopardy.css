@@ -100,6 +100,8 @@
 .jp-page #timerfill.low{background:var(--jp-red)}
 .jp-page #cfoot{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
 .jp-page #cfoot button{background:#fff}
+.jp-page #cfoot button.dark{background:var(--jp-board);color:#F2F6EF}
+.jp-page #cfoot button.dark:hover{background:var(--jp-board2)}
 .jp-page .tscore{display:flex;gap:4px;align-items:center;background:var(--jp-cream);color:var(--jp-ink);border:2.5px solid var(--jp-ink);
  border-radius:10px;padding:3px 6px;font-weight:700}
 .jp-page .dd-splash{font-size:clamp(34px,8vw,96px);font-weight:800;color:var(--jp-sun);text-align:center}
