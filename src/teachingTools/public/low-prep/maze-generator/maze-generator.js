@@ -8,6 +8,15 @@
   var A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main';
   var $ = function (selector) { return document.querySelector(selector); };
   var toastTimer;
+  var lastRouteIndex = -1;
+
+  // The template has two complete routes from START to FINISH. Arbitrarily
+  // swapping individual answer slots can create loops or reach FINISH before
+  // all eight questions have been answered, so only use these valid routes.
+  var validRouteSwaps = [
+    [false, false, false, false, false, false, false, false],
+    [false, false, false, false, false, true, true, true]
+  ];
 
   var sourceQuestions = [
     '春天到了，小草和小树在做什么？',
@@ -201,6 +210,15 @@
     for (var index = 1; index < textNodes.length; index += 1) textNodes[index].textContent = '';
   }
 
+  function setShapeFontSize(shape, points) {
+    var size = String(Math.round(points * 100));
+    ['rPr', 'defRPr', 'endParaRPr'].forEach(function (localName) {
+      Array.prototype.slice.call(shape.getElementsByTagNameNS(A_NS, localName)).forEach(function (node) {
+        node.setAttribute('sz', size);
+      });
+    });
+  }
+
   function setStartQuestionText(shape, value) {
     var textNodes = Array.prototype.slice.call(shape.getElementsByTagNameNS(A_NS, 't'));
     if (textNodes.length < 2) {
@@ -220,21 +238,49 @@
   function setShapeFill(documentNode, shape, hex) {
     var properties = directChildByName(shape, P_NS, 'spPr');
     if (!properties) return;
-    Array.prototype.slice.call(properties.childNodes).forEach(function (child) {
-      if (child.namespaceURI === A_NS && /Fill$/.test(child.localName || '')) properties.removeChild(child);
+    var existingFill = Array.prototype.slice.call(properties.childNodes).find(function (child) {
+      return child.namespaceURI === A_NS && /Fill$/.test(child.localName || '');
     });
     var fill = documentNode.createElementNS(A_NS, 'a:solidFill');
     var color = documentNode.createElementNS(A_NS, 'a:srgbClr');
     color.setAttribute('val', hex);
     fill.appendChild(color);
-    properties.insertBefore(fill, properties.firstChild);
+    if (existingFill) {
+      properties.replaceChild(fill, existingFill);
+      return;
+    }
+    var insertBefore = Array.prototype.slice.call(properties.childNodes).find(function (child) {
+      return child.namespaceURI === A_NS && /^(ln|effectLst|effectDag|scene3d|sp3d|extLst)$/.test(child.localName || '');
+    });
+    properties.insertBefore(fill, insertBefore || null);
+  }
+
+  function answerBackgroundShape(textShape) {
+    var sibling = textShape.previousSibling;
+    while (sibling) {
+      if (sibling.namespaceURI === P_NS && sibling.localName === 'sp') {
+        return getShapeText(sibling).trim() ? null : sibling;
+      }
+      sibling = sibling.previousSibling;
+    }
+    return null;
+  }
+
+  function setAnswerSlotFill(documentNode, textShape, hex) {
+    // Each answer consists of a coloured freeform followed by a transparent
+    // text box. Colour the freeform; filling the text box covers its text in
+    // some PowerPoint renderers, which produced blank answer cells.
+    var background = answerBackgroundShape(textShape);
+    setShapeFill(documentNode, background || textShape, hex);
   }
 
   function buildSlotLayout() {
     var offset = 1 + Math.floor(Math.random() * (PAIR_COUNT - 1));
-    var swaps = [];
-    for (var index = 0; index < PAIR_COUNT; index += 1) swaps.push(Math.random() < 0.5);
-    return { offset: offset, swaps: swaps };
+    var routeIndex = lastRouteIndex === -1
+      ? Math.floor(Math.random() * validRouteSwaps.length)
+      : (lastRouteIndex + 1) % validRouteSwaps.length;
+    lastRouteIndex = routeIndex;
+    return { offset: offset, swaps: validRouteSwaps[routeIndex].slice() };
   }
 
   function isSlotPhysicallyCorrect(slot, layout) {
@@ -266,8 +312,10 @@
       if (!original) return;
       if (original === '四季词语迷宫') {
         setShapeText(shape, data.title);
+        setShapeFontSize(shape, 28);
       } else if (original === '四季词语迷宫：参考答案') {
-        setShapeText(shape, data.title + ': Answer Key');
+        setShapeText(shape, data.title + (document.documentElement.lang === 'zh' ? '：答案' : ' — Key'));
+        setShapeFontSize(shape, 30);
       } else if (original.indexOf('从开始出发') === 0) {
         setShapeText(shape, 'Start at the beginning, choose each correct answer, and follow the path to the finish.');
       } else if (original.indexOf('开始') === 0 && original.indexOf(sourceQuestions[0]) !== -1) {
@@ -276,7 +324,7 @@
         setShapeText(shape, questionMap[original]);
       } else if (Object.prototype.hasOwnProperty.call(answerValues, original)) {
         setShapeText(shape, answerValues[original]);
-        if (answerKey) setShapeFill(documentNode, shape, correctSlots.has(original) ? 'F8C63F' : 'FFFFFF');
+        if (answerKey) setAnswerSlotFill(documentNode, shape, correctSlots.has(original) ? 'F8C63F' : 'FFFFFF');
       }
     });
     return new XMLSerializer().serializeToString(documentNode);
