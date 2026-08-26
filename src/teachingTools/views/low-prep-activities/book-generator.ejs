@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>Book Generator - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Students turn their own pictures, captions, and read-aloud recordings into a shareable audiobook.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/book-generator/book-generator.css?v=1">
+</head>
+<body class="book-gen-page">
+  <main class="book-gen-wrap">
+    <header class="book-gen-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('bookGenerator.backBtn') %></a>
+      <p class="book-gen-eyebrow"><%= t('bookGenerator.eyebrow') %></p>
+      <h1>📖 <%= t('bookGenerator.title') %></h1>
+      <p><%= t('bookGenerator.subtitle') %></p>
+    </header>
+
+    <section class="book-gen-panel">
+      <div class="book-gen-panel-heading">
+        <h2><%= t('bookGenerator.pageLabel') %>s</h2>
+        <button id="addPageBtn" class="book-gen-secondary" type="button"><%= t('bookGenerator.addPageButton') %></button>
+      </div>
+      <div id="pagesList" class="book-gen-pages-list"></div>
+    </section>
+
+    <section class="book-gen-panel">
+      <p class="book-gen-kicker"><%= t('bookGenerator.musicKicker') %></p>
+      <h2><%= t('bookGenerator.musicHeading') %></h2>
+      <p class="book-gen-help"><%= t('bookGenerator.musicHelp') %></p>
+      <div class="book-gen-music-row">
+        <button id="chooseMusicBtn" class="book-gen-secondary" type="button"><%= t('bookGenerator.chooseMusic') %></button>
+        <input id="musicInput" type="file" accept="audio/*" hidden>
+        <audio id="musicPreview" controls hidden></audio>
+        <span id="musicFileName" class="book-gen-file-name"></span>
+      </div>
+    </section>
+
+    <section class="book-gen-panel">
+      <p class="book-gen-kicker"><%= t('bookGenerator.shareKicker') %></p>
+      <h2><%= t('bookGenerator.shareHeading') %></h2>
+      <label class="book-gen-field" for="bookTitle"><%= t('bookGenerator.titleLabel') %>
+        <input id="bookTitle" type="text" maxlength="200" placeholder="<%= t('bookGenerator.titlePlaceholder') %>">
+      </label>
+      <label class="book-gen-field" for="bookPassword"><%= t('bookGenerator.passwordLabel') %>
+        <input id="bookPassword" type="text" maxlength="100" autocomplete="off">
+      </label>
+      <p class="book-gen-help"><%= t('bookGenerator.passwordHelp') %></p>
+      <button id="generateBtn" class="book-gen-primary" type="button"><%= t('bookGenerator.generateButton') %></button>
+      <div id="shareResult" class="book-gen-share-result" hidden>
+        <p class="book-gen-share-ready"><%= t('bookGenerator.shareLinkReady') %></p>
+        <div class="book-gen-share-row">
+          <input id="shareLinkInput" type="text" readonly>
+          <button id="copyLinkBtn" class="book-gen-secondary" type="button"><%= t('bookGenerator.copyLink') %></button>
+        </div>
+        <div class="book-gen-share-row">
+          <input id="sharePasswordInput" type="text" readonly>
+          <button id="copyPasswordBtn" class="book-gen-secondary" type="button"><%= t('bookGenerator.copyPassword') %></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <div id="bookGenToast" class="book-gen-toast" role="status" aria-live="polite"></div>
+
+  <template id="pageRowTemplate">
+    <article class="book-gen-page-row">
+      <div class="book-gen-page-row-header">
+        <span class="book-gen-page-number"></span>
+        <div class="book-gen-page-move">
+          <button class="book-gen-icon-btn" data-action="move-up" type="button" title="<%= t('bookGenerator.moveUp') %>">↑</button>
+          <button class="book-gen-icon-btn" data-action="move-down" type="button" title="<%= t('bookGenerator.moveDown') %>">↓</button>
+          <button class="book-gen-icon-btn book-gen-icon-btn-danger" data-action="remove" type="button" title="<%= t('bookGenerator.removePage') %>">✕</button>
+        </div>
+      </div>
+      <div class="book-gen-page-body">
+        <div class="book-gen-page-image-col">
+          <p class="book-gen-mini-label"><%= t('bookGenerator.imageLabel') %></p>
+          <div class="book-gen-image-drop" data-action="choose-image">
+            <img class="book-gen-page-thumb" hidden>
+            <span class="book-gen-image-placeholder"><%= t('bookGenerator.chooseImage') %></span>
+          </div>
+          <input type="file" accept="image/*" class="book-gen-image-input" hidden>
+        </div>
+        <div class="book-gen-page-text-col">
+          <label class="book-gen-mini-label"><%= t('bookGenerator.captionLabel') %>
+            <textarea class="book-gen-caption-input" rows="3" maxlength="2000" placeholder="<%= t('bookGenerator.captionPlaceholder') %>"></textarea>
+          </label>
+          <p class="book-gen-mini-label"><%= t('bookGenerator.narrationLabel') %></p>
+          <div class="book-gen-narration-row">
+            <button class="book-gen-secondary" data-action="record" type="button"><%= t('bookGenerator.startRecording') %></button>
+            <audio class="book-gen-narration-preview" controls hidden></audio>
+            <span class="book-gen-recording-indicator" hidden><%= t('bookGenerator.recording') %></span>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script>
+    window.__BOOK_GEN_I18N__ = <%- JSON.stringify({
+      pageLabel: t('bookGenerator.pageLabel'),
+      startRecording: t('bookGenerator.startRecording'),
+      stopRecording: t('bookGenerator.stopRecording'),
+      reRecord: t('bookGenerator.reRecord'),
+      micPermissionError: t('bookGenerator.micPermissionError'),
+      uploadError: t('bookGenerator.uploadError'),
+      needAtLeastOnePage: t('bookGenerator.needAtLeastOnePage'),
+      needImageOnEveryPage: t('bookGenerator.needImageOnEveryPage'),
+      tooManyPages: t('bookGenerator.tooManyPages'),
+      passwordTooShort: t('bookGenerator.passwordTooShort'),
+      generating: t('bookGenerator.generating'),
+      generateButton: t('bookGenerator.generateButton'),
+      copied: t('bookGenerator.copied')
+    }) %>;
+  </script>
+  <script src="/low-prep/book-generator/book-generator.js?v=1"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

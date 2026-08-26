@@ -8,6 +8,7 @@ var i18n = require('./services/i18n');
 var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
 var adminRouter = require('./routes/admin');
+var bookGeneratorRouter = require('./routes/bookGenerator');
 
 var app = express();
 
@@ -19,7 +20,7 @@ app.set('trust proxy', 1);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET || 'dev-only-cookie-secret-change-in-production'));
 app.use(function(req, res, next) {
   var forwardedProto = (req.get('x-forwarded-proto') || '').split(',')[0].trim();
   var forwardedHost = (req.get('x-forwarded-host') || req.get('host') || '').split(',')[0].trim();
@@ -45,6 +46,7 @@ app.use(function(req, res, next) {
 app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));
 
 app.use('/', indexRouter);
+app.use('/', bookGeneratorRouter);
 app.use('/api', apiRouter);
 app.use('/admin', adminRouter);
 
