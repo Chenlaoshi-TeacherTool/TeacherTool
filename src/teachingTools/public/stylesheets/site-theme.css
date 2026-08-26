@@ -15,9 +15,14 @@
   --muted: #5d7168;
   --line: #e5ddc9;
   --shadow: 0 14px 30px rgba(24, 66, 55, 0.12);
+  --site-nav-height: 76px;
 }
 
 * { box-sizing: border-box; }
+
+html body {
+  padding-top: var(--site-nav-height) !important;
+}
 
 body {
   min-height: 100vh;
@@ -30,6 +35,153 @@ body {
 }
 
 body::selection { background: #ffe08b; color: var(--chalk-deep); }
+
+/*
+ * The navigation is added by milk-tea-footer.js. Keep it outside normal flow
+ * and reserve its space before JavaScript runs so it cannot shift the page.
+ */
+.site-main-nav {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--site-nav-height);
+  padding: 12px 20px;
+  border-bottom: 1px solid #d7e3c7;
+  background: #fffdf7;
+  color: #194f45;
+}
+
+.site-main-nav,
+.site-main-nav * { box-sizing: border-box; }
+
+.site-main-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(1160px, calc(100% - 16px));
+  height: 100%;
+  margin: 0 auto;
+  gap: 22px;
+}
+
+.site-main-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+  color: #194f45;
+  font-weight: 900;
+  line-height: 1.15;
+  text-decoration: none;
+}
+
+.site-main-nav-brand img {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #f8c63f;
+  border-radius: 50%;
+  background: #edf5df;
+}
+
+.site-main-nav-brand small {
+  display: block;
+  margin-top: 2px;
+  color: #6a7d74;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.site-main-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  gap: 3px;
+  list-style: none;
+}
+
+.site-main-nav-links a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 999px;
+  color: #29463d;
+  font-size: .85rem;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-main-nav-links a:hover,
+.site-main-nav-links a[aria-current="page"] { background: #edf5df; color: #194f45; }
+
+.site-lang-switch {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #d7e3c7;
+  border-radius: 999px;
+  background: #fffdf7;
+}
+
+.site-lang-switch a {
+  padding: 5px 11px !important;
+  border-radius: 999px;
+  color: #5d7168;
+  font-size: .78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.site-lang-switch a:hover { color: #194f45; background: transparent; }
+.site-lang-switch a.is-active { background: #194f45; color: #fffdf7; }
+
+@media (max-width: 1040px) {
+  :root { --site-nav-height: 106px; }
+
+  .site-main-nav { padding: 8px 12px; }
+
+  .site-main-nav-inner {
+    grid-template-areas:
+      "brand language"
+      "links links";
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 42px 36px;
+    display: grid;
+    width: 100%;
+    gap: 6px 10px;
+  }
+
+  .site-main-nav-brand { grid-area: brand; overflow: hidden; }
+  .site-main-nav-brand img { width: 36px; height: 36px; }
+  .site-main-nav-brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .site-lang-switch { grid-area: language; }
+
+  .site-main-nav-links {
+    grid-area: links;
+    justify-content: flex-start;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+
+  .site-main-nav-links::-webkit-scrollbar { display: none; }
+  .site-main-nav-links a { padding: 6px 9px; font-size: .78rem; }
+}
+
+@media print {
+  html body { padding-top: 0 !important; }
+  .site-main-nav { display: none !important; }
+}
 
 .account-header-host { position: relative; }
 .account-coming-soon {

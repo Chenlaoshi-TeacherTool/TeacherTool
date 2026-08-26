@@ -65,19 +65,6 @@
     var style = document.createElement('style');
     style.textContent = [
       '.site-legal-footer { margin: 0; padding: 24px 20px; background: #0f4b43; color: #fffdf7; }',
-      '.site-main-nav { position: relative; z-index: 100; padding: 12px 20px; border-bottom: 1px solid #d7e3c7; background: #fffdf7; color: #194f45; }',
-      '.site-main-nav, .site-main-nav * { box-sizing: border-box; }',
-      '.site-main-nav-inner { width: min(1160px, calc(100% - 16px)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 22px; }',
-      '.site-main-nav-brand { display: inline-flex; align-items: center; gap: 10px; color: #194f45; font-weight: 900; line-height: 1.15; text-decoration: none; }',
-      '.site-main-nav-brand img { width: 42px; height: 42px; border: 2px solid #f8c63f; border-radius: 50%; background: #edf5df; }',
-      '.site-main-nav-brand small { display: block; margin-top: 2px; color: #6a7d74; font-size: .68rem; font-weight: 800; letter-spacing: .04em; }',
-      '.site-main-nav-links { display: flex; align-items: center; justify-content: flex-end; gap: 3px; margin: 0; padding: 0; list-style: none; }',
-      '.site-main-nav-links a { display: block; padding: 8px 10px; border-radius: 999px; color: #29463d; font-size: .85rem; font-weight: 900; text-decoration: none; white-space: nowrap; }',
-      '.site-main-nav-links a:hover, .site-main-nav-links a[aria-current="page"] { background: #edf5df; color: #194f45; }',
-      '.site-lang-switch { display: flex; flex-shrink: 0; align-items: center; gap: 2px; padding: 3px; border: 1px solid #d7e3c7; border-radius: 999px; background: #fffdf7; }',
-      '.site-lang-switch a { padding: 5px 11px !important; border-radius: 999px; color: #5d7168; font-size: .78rem; font-weight: 800; text-decoration: none; }',
-      '.site-lang-switch a:hover { color: #194f45; background: transparent; }',
-      '.site-lang-switch a.is-active { background: #194f45; color: #fffdf7; }',
       '.site-legal-footer, .site-legal-footer * { box-sizing: border-box; }',
       '.site-legal-footer-inner { width: min(1140px, calc(100% - 40px)); margin: 0 auto; }',
       '.site-legal-footer p { margin: 0; color: inherit; font-size: .92rem; line-height: 1.6; }',
@@ -105,8 +92,7 @@
       '.milk-tea-option:hover { background: #fff2c5; }',
       '.milk-tea-option.primary { border-color: transparent; background: #bf7f35; color: #fff; }',
       '.milk-tea-option.primary:hover { background: #a96828; }',
-      '@media (max-width: 860px) { .site-main-nav-inner { align-items: flex-start; flex-direction: column; gap: 9px; } .site-main-nav-links { width: 100%; justify-content: flex-start; flex-wrap: wrap; overflow: visible; padding-bottom: 3px; } }',
-      '@media (max-width: 640px) { .site-main-nav { padding: 10px 12px; } .site-main-nav-inner { width: 100%; } .site-main-nav-brand img { width: 36px; height: 36px; } .site-main-nav-links a { padding: 7px 9px; font-size: .78rem; } .site-legal-footer { padding: 22px 18px; } .site-legal-footer-inner { width: min(100%, 1140px); } .milk-tea-site-footer { padding: 24px 14px; } .milk-tea-footer-inner { width: min(100%, 1140px); align-items: stretch; flex-direction: column; gap: 15px; } .milk-tea-footer-actions, .milk-tea-footer-toggle { width: 100%; } .milk-tea-menu { right: 0; left: 0; width: 100%; } }',
+      '@media (max-width: 640px) { .site-legal-footer { padding: 22px 18px; } .site-legal-footer-inner { width: min(100%, 1140px); } .milk-tea-site-footer { padding: 24px 14px; } .milk-tea-footer-inner { width: min(100%, 1140px); align-items: stretch; flex-direction: column; gap: 15px; } .milk-tea-footer-actions, .milk-tea-footer-toggle { width: 100%; } .milk-tea-menu { right: 0; left: 0; width: 100%; } }',
       '@media print { .site-main-nav, .milk-tea-site-footer, .site-legal-footer { display: none !important; } }'
     ].join('\n');
     document.head.appendChild(style);
@@ -118,7 +104,7 @@
       nav.setAttribute('aria-label', 'Main navigation');
       nav.innerHTML = [
         '<div class="site-main-nav-inner">',
-        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" alt=""><span>' + t.brand + '<small>' + t.tagline + '</small></span></a>',
+        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" width="42" height="42" alt=""><span>' + t.brand + '<small>' + t.tagline + '</small></span></a>',
         '  <ul class="site-main-nav-links">',
         '    <li><a href="/">' + t.home + '</a></li>',
         '    <li><a href="/teaching-tools">' + t.tools + '</a></li>',
