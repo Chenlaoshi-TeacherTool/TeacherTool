@@ -170,6 +170,25 @@
   font-family: inherit;
 }
 
+.book-gen-my-books-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.book-gen-my-book-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  flex-wrap: wrap;
+}
+.book-gen-my-book-info { display: flex; flex-direction: column; gap: 0.15rem; }
+.book-gen-my-book-title { font-weight: 800; }
+.book-gen-my-book-date { color: var(--muted); font-size: 0.82rem; }
+.book-gen-my-book-actions { display: flex; gap: 0.5rem; }
+.book-gen-danger { background: #fff; color: var(--coral); border: 1px solid var(--coral); }
+.book-gen-danger:hover { background: var(--coral); color: #fff; }
+
 .book-gen-toast {
   position: fixed;
   bottom: 1.25rem;

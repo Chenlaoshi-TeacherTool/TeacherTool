@@ -86,5 +86,26 @@
   prevBtn.addEventListener('click', function () { goToPage(currentIndex - 1); });
   nextBtn.addEventListener('click', function () { goToPage(currentIndex + 1); });
 
+  // ===== Fullscreen =====
+
+  var playerWrap = $('#playerWrap');
+  var fullscreenBtn = $('#fullscreenBtn');
+
+  if (fullscreenBtn && playerWrap.requestFullscreen) {
+    fullscreenBtn.addEventListener('click', function () {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        playerWrap.requestFullscreen().catch(function () {});
+      }
+    });
+    document.addEventListener('fullscreenchange', function () {
+      var isFullscreen = document.fullscreenElement === playerWrap;
+      fullscreenBtn.textContent = isFullscreen ? (I18N.exitFullscreen || 'Exit fullscreen') : (I18N.fullscreen || 'Fullscreen');
+    });
+  } else if (fullscreenBtn) {
+    fullscreenBtn.hidden = true;
+  }
+
   renderPage(false);
 })();

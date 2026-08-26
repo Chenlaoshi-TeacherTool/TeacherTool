@@ -638,7 +638,17 @@ module.exports = {
       needAtLeastOnePage: 'Add at least one page before generating a link.',
       needImageOnEveryPage: 'Every page needs a picture.',
       tooManyPages: 'A book can have at most 20 pages.',
-      passwordTooShort: 'Password must be at least 4 characters.'
+      passwordTooShort: 'Password must be at least 4 characters.',
+      myBooksHeading: 'My books',
+      myBooksHelp: 'Books you’ve generated on this device. This list only lives in this browser—clearing your browser data will remove it.',
+      myBooksEmpty: 'You haven’t generated any books on this device yet.',
+      untitledBook: 'Untitled book',
+      createdOn: 'Created {date}',
+      openBook: 'Open',
+      deleteBook: 'Delete',
+      deleteConfirm: 'Delete this book? Anyone with the link will no longer be able to open it. This cannot be undone.',
+      deleteError: 'Could not delete this book. Please try again.',
+      deletedToast: 'Book deleted.'
     },
     bookPlayer: {
       passwordGateTitle: 'This book is password-protected',
@@ -652,7 +662,9 @@ module.exports = {
       pause: 'Pause',
       previousPage: 'Previous page',
       nextPage: 'Next page',
-      pageOf: 'Page {current} of {total}'
+      pageOf: 'Page {current} of {total}',
+      fullscreen: 'Fullscreen',
+      exitFullscreen: 'Exit fullscreen'
     },
     bingoGenerator: {
       backLink: '← Back to Teaching Tools',
@@ -1720,7 +1732,17 @@ module.exports = {
       needAtLeastOnePage: '生成链接前请至少添加一页。',
       needImageOnEveryPage: '每一页都需要一张图片。',
       tooManyPages: '一本书最多 20 页。',
-      passwordTooShort: '密码至少需要 4 个字符。'
+      passwordTooShort: '密码至少需要 4 个字符。',
+      myBooksHeading: '我生成的书',
+      myBooksHelp: '在这台设备上生成过的书。这份列表只保存在当前浏览器里——清除浏览器数据后会丢失。',
+      myBooksEmpty: '你还没有在这台设备上生成过任何书。',
+      untitledBook: '未命名的书',
+      createdOn: '创建于 {date}',
+      openBook: '打开',
+      deleteBook: '删除',
+      deleteConfirm: '确定要删除这本书吗？拿到链接的人将无法再打开它，此操作无法撤销。',
+      deleteError: '删除失败，请重试。',
+      deletedToast: '已删除。'
     },
     bookPlayer: {
       passwordGateTitle: '这本书需要密码才能打开',
@@ -1734,7 +1756,9 @@ module.exports = {
       pause: '暂停',
       previousPage: '上一页',
       nextPage: '下一页',
-      pageOf: '第 {current} / {total} 页'
+      pageOf: '第 {current} / {total} 页',
+      fullscreen: '全屏',
+      exitFullscreen: '退出全屏'
     },
     bingoGenerator: {
       backLink: '← 返回教学工具',

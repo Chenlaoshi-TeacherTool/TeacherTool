@@ -7,11 +7,15 @@
   <title><%= title %> - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'A student-made picture book with read-aloud narration.', noindex: true }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/book-generator/book-generator.css?v=1">
   <link rel="stylesheet" href="/low-prep/book-generator/book-player.css?v=1">
 </head>
 <body class="book-player-page">
-  <main class="book-player-wrap">
-    <h1 class="book-player-title"><%= bookData.title %></h1>
+  <main class="book-player-wrap" id="playerWrap">
+    <div class="book-player-title-row">
+      <h1 class="book-player-title"><%= bookData.title %></h1>
+      <button id="fullscreenBtn" class="book-gen-secondary" type="button"><%= t('bookPlayer.fullscreen') %></button>
+    </div>
 
     <div class="book-player-stage">
       <img id="playerImage" class="book-player-image" alt="">
@@ -34,7 +38,9 @@
     window.__BOOK_PLAYER_I18N__ = <%- JSON.stringify({
       startReading: t('bookPlayer.startReading'),
       pause: t('bookPlayer.pause'),
-      pageOf: t('bookPlayer.pageOf')
+      pageOf: t('bookPlayer.pageOf'),
+      fullscreen: t('bookPlayer.fullscreen'),
+      exitFullscreen: t('bookPlayer.exitFullscreen')
     }) %>;
   </script>
   <script src="/low-prep/book-generator/book-player.js?v=1"></script>

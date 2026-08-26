@@ -61,6 +61,13 @@
         </div>
       </div>
     </section>
+
+    <section class="book-gen-panel">
+      <h2><%= t('bookGenerator.myBooksHeading') %></h2>
+      <p class="book-gen-help"><%= t('bookGenerator.myBooksHelp') %></p>
+      <div id="myBooksList" class="book-gen-my-books-list"></div>
+      <p id="myBooksEmpty" class="book-gen-help" hidden><%= t('bookGenerator.myBooksEmpty') %></p>
+    </section>
   </main>
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
@@ -115,7 +122,15 @@
       passwordTooShort: t('bookGenerator.passwordTooShort'),
       generating: t('bookGenerator.generating'),
       generateButton: t('bookGenerator.generateButton'),
-      copied: t('bookGenerator.copied')
+      copied: t('bookGenerator.copied'),
+      myBooksEmpty: t('bookGenerator.myBooksEmpty'),
+      untitledBook: t('bookGenerator.untitledBook'),
+      createdOn: t('bookGenerator.createdOn'),
+      openBook: t('bookGenerator.openBook'),
+      deleteBook: t('bookGenerator.deleteBook'),
+      deleteConfirm: t('bookGenerator.deleteConfirm'),
+      deleteError: t('bookGenerator.deleteError'),
+      deletedToast: t('bookGenerator.deletedToast')
     }) %>;
   </script>
   <script src="/low-prep/book-generator/book-generator.js?v=1"></script>

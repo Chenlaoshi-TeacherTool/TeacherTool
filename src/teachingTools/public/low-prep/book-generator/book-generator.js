@@ -2,6 +2,7 @@
   'use strict';
 
   var STORAGE_KEY = 'chen-laoshi-book-generator-v1';
+  var MY_BOOKS_KEY = 'chen-laoshi-book-generator-my-books-v1';
   var I18N = window.__BOOK_GEN_I18N__ || {};
   var $ = function (selector, root) { return (root || document).querySelector(selector); };
 
@@ -281,6 +282,13 @@
         $('#shareLinkInput').value = origin + result.url;
         $('#sharePasswordInput').value = password;
         $('#shareResult').hidden = false;
+        addMyBook({
+          bookId: result.bookId,
+          title: $('#bookTitle').value,
+          url: result.url,
+          deleteToken: result.deleteToken,
+          createdAt: new Date().toISOString()
+        });
       }).catch(function (err) {
         showToast(err.message);
       }).finally(function () {
@@ -291,6 +299,94 @@
 
     $('#copyLinkBtn').addEventListener('click', function () { copyField('#shareLinkInput'); });
     $('#copyPasswordBtn').addEventListener('click', function () { copyField('#sharePasswordInput'); });
+  }
+
+  // ===== My Books (locally tracked, this browser only) =====
+
+  function loadMyBooks() {
+    try {
+      var raw = localStorage.getItem(MY_BOOKS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (err) { return []; }
+  }
+
+  function saveMyBooks(list) {
+    try { localStorage.setItem(MY_BOOKS_KEY, JSON.stringify(list)); } catch (err) { /* ignore */ }
+  }
+
+  function addMyBook(entry) {
+    var list = loadMyBooks();
+    list.unshift(entry);
+    saveMyBooks(list);
+    renderMyBooks();
+  }
+
+  function removeMyBook(bookId) {
+    saveMyBooks(loadMyBooks().filter(function (b) { return b.bookId !== bookId; }));
+    renderMyBooks();
+  }
+
+  function formatDate(iso) {
+    try { return new Date(iso).toLocaleDateString(); } catch (err) { return ''; }
+  }
+
+  function renderMyBooks() {
+    var list = loadMyBooks();
+    var container = $('#myBooksList');
+    var emptyState = $('#myBooksEmpty');
+    container.innerHTML = '';
+    emptyState.hidden = list.length > 0;
+
+    list.forEach(function (book) {
+      var row = document.createElement('div');
+      row.className = 'book-gen-my-book-row';
+
+      var info = document.createElement('div');
+      info.className = 'book-gen-my-book-info';
+      var titleEl = document.createElement('span');
+      titleEl.className = 'book-gen-my-book-title';
+      titleEl.textContent = book.title || I18N.untitledBook || 'Untitled book';
+      var dateEl = document.createElement('span');
+      dateEl.className = 'book-gen-my-book-date';
+      dateEl.textContent = (I18N.createdOn || 'Created {date}').replace('{date}', formatDate(book.createdAt));
+      info.appendChild(titleEl);
+      info.appendChild(dateEl);
+
+      var actions = document.createElement('div');
+      actions.className = 'book-gen-my-book-actions';
+
+      var openLink = document.createElement('a');
+      openLink.className = 'book-gen-secondary';
+      openLink.href = book.url;
+      openLink.target = '_blank';
+      openLink.rel = 'noopener';
+      openLink.textContent = I18N.openBook || 'Open';
+
+      var deleteBtn = document.createElement('button');
+      deleteBtn.className = 'book-gen-secondary book-gen-danger';
+      deleteBtn.type = 'button';
+      deleteBtn.textContent = I18N.deleteBook || 'Delete';
+      deleteBtn.addEventListener('click', function () {
+        if (!window.confirm(I18N.deleteConfirm || 'Delete this book? This cannot be undone.')) return;
+        fetch('/api/book-generator/books/' + encodeURIComponent(book.bookId), {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deleteToken: book.deleteToken })
+        }).then(function (res) {
+          if (!res.ok) throw new Error(I18N.deleteError || 'Could not delete this book.');
+          removeMyBook(book.bookId);
+          showToast(I18N.deletedToast || 'Book deleted.');
+        }).catch(function (err) {
+          showToast(err.message);
+        });
+      });
+
+      actions.appendChild(openLink);
+      actions.appendChild(deleteBtn);
+      row.appendChild(info);
+      row.appendChild(actions);
+      container.appendChild(row);
+    });
   }
 
   function copyField(selector) {
@@ -319,6 +415,7 @@
     $('#addPageBtn').addEventListener('click', function () { addPage(); });
     initMusic();
     initPublish();
+    renderMyBooks();
   }
 
   init();

@@ -1,5 +1,6 @@
 'use strict';
 
+var crypto = require('crypto');
 var express = require('express');
 var multer = require('multer');
 var bcrypt = require('bcryptjs');
@@ -97,11 +98,13 @@ router.post('/api/book-generator/publish', async function (req, res) {
     }
 
     var passwordHash = await bcrypt.hash(String(password), 10);
+    var deleteToken = crypto.randomUUID();
     var now = new Date();
     var manifest = {
       bookId: draftId,
       title: typeof body.title === 'string' ? body.title.slice(0, 200) : '',
       passwordHash: passwordHash,
+      deleteToken: deleteToken,
       createdAt: now.toISOString(),
       expiresAt: new Date(now.getTime() + BOOK_TTL_MS).toISOString(),
       pages: pages.map(function (page) {
@@ -116,10 +119,31 @@ router.post('/api/book-generator/publish', async function (req, res) {
     };
 
     await bookStorage.saveManifest(draftId, manifest);
-    res.json({ bookId: draftId, url: '/book/' + draftId });
+    res.json({ bookId: draftId, url: '/book/' + draftId, deleteToken: deleteToken });
   } catch (err) {
     console.error('book-generator publish error:', err);
     res.status(500).json({ error: 'Could not publish this book.' });
+  }
+});
+
+// ===== Delete a book (requires the delete token issued at publish time) =====
+
+router.delete('/api/book-generator/books/:id', async function (req, res) {
+  try {
+    var bookId = req.params.id;
+    var manifest = await bookStorage.getManifest(bookId);
+    if (!manifest) return res.status(404).json({ error: 'Book not found.' });
+
+    var deleteToken = req.body && req.body.deleteToken;
+    if (!deleteToken || deleteToken !== manifest.deleteToken) {
+      return res.status(403).json({ error: 'Not authorized to delete this book.' });
+    }
+
+    await bookStorage.deleteBook(bookId);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('book-generator delete error:', err);
+    res.status(500).json({ error: 'Could not delete this book.' });
   }
 });
 
