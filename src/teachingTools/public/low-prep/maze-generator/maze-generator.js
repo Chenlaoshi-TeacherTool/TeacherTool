@@ -6,17 +6,11 @@
   var STORAGE_KEY = 'chen-laoshi-maze-generator-v1';
   var P_NS = 'http://schemas.openxmlformats.org/presentationml/2006/main';
   var A_NS = 'http://schemas.openxmlformats.org/drawingml/2006/main';
+  var FINISH_NODE = -1;
   var $ = function (selector) { return document.querySelector(selector); };
   var toastTimer;
   var lastRouteIndex = -1;
-
-  // The template has two complete routes from START to FINISH. Arbitrarily
-  // swapping individual answer slots can create loops or reach FINISH before
-  // all eight questions have been answered, so only use these valid routes.
-  var validRouteSwaps = [
-    [false, false, false, false, false, false, false, false],
-    [false, false, false, false, false, true, true, true]
-  ];
+  var routeQueue = [];
 
   var sourceQuestions = [
     '春天到了，小草和小树在做什么？',
@@ -29,23 +23,44 @@
     '天气太热了，小朋友们喜欢做什么运动来消暑？'
   ];
 
+  // The question cards are numbered down each column in the supplied route
+  // reference: Q1/Q2/Q3, Q4/Q5/Q6, Q7/Q8/FINISH. The indexes below match the
+  // order of sourceQuestions and the eight pairs shown in the generated deck.
   var slotDefinitions = [
-    { source: '发芽', pair: 0, correct: true },
-    { source: '变黄', pair: 1, correct: true },
-    { source: '寒冷', pair: 2, correct: true },
-    { source: '开花', pair: 3, correct: true },
-    { source: '丰收', pair: 4, correct: true },
-    { source: '堆雪人', pair: 5, correct: true },
-    { source: '炎热', pair: 6, correct: true },
-    { source: '游泳', pair: 7, correct: true },
-    { source: '打雷', pair: 0, correct: false },
-    { source: '结冰', pair: 1, correct: false },
-    { source: '凉爽', pair: 2, correct: false },
-    { source: '枯萎', pair: 3, correct: false },
-    { source: '插秧', pair: 4, correct: false },
-    { source: '下雪', pair: 5, correct: false },
-    { source: '播种', pair: 6, correct: false },
-    { source: '滑雪', pair: 7, correct: false }
+    { source: '发芽', nodes: [0, 3] },
+    { source: '打雷', nodes: [0, 1] },
+    { source: '结冰', nodes: [0, 4] },
+    { source: '开花', nodes: [3, 6] },
+    { source: '枯萎', nodes: [3, 4] },
+    { source: '炎热', nodes: [6, 7] },
+    { source: '凉爽', nodes: [6, 4] },
+    { source: '丰收', nodes: [4, 1] },
+    { source: '变黄', nodes: [1, 2] },
+    { source: '游泳', nodes: [7, 4] },
+    { source: '插秧', nodes: [4, 2] },
+    { source: '播种', nodes: [4, 5] },
+    { source: '滑雪', nodes: [7, FINISH_NODE] },
+    { source: '寒冷', nodes: [2, 5] },
+    { source: '堆雪人', nodes: [5, FINISH_NODE] },
+    { source: '下雪', nodes: [4, FINISH_NODE] }
+  ];
+
+  // These are the 13 approved START-to-FINISH paths from the supplied deck.
+  // Route 8's duplicated "4" label is represented here in its visual order.
+  var validRoutes = [
+    ['发芽', '开花', '炎热', '滑雪'],
+    ['发芽', '枯萎', '播种', '堆雪人'],
+    ['发芽', '开花', '凉爽', '播种', '堆雪人'],
+    ['发芽', '开花', '凉爽', '游泳', '滑雪'],
+    ['发芽', '开花', '凉爽', '插秧', '寒冷', '堆雪人'],
+    ['结冰', '枯萎', '开花', '炎热', '滑雪'],
+    ['打雷', '丰收', '凉爽', '炎热', '滑雪'],
+    ['打雷', '变黄', '插秧', '凉爽', '炎热', '滑雪'],
+    ['打雷', '丰收', '游泳', '滑雪'],
+    ['打雷', '变黄', '寒冷', '堆雪人'],
+    ['打雷', '变黄', '寒冷', '播种', '枯萎', '开花', '炎热', '滑雪'],
+    ['打雷', '变黄', '插秧', '播种', '堆雪人'],
+    ['发芽', '开花', '炎热', '游泳', '丰收', '变黄', '寒冷', '堆雪人']
   ];
 
   var sample = {
@@ -274,37 +289,90 @@
     setShapeFill(documentNode, background || textShape, hex);
   }
 
-  function buildSlotLayout() {
-    var offset = 1 + Math.floor(Math.random() * (PAIR_COUNT - 1));
-    var routeIndex = lastRouteIndex === -1
-      ? Math.floor(Math.random() * validRouteSwaps.length)
-      : (lastRouteIndex + 1) % validRouteSwaps.length;
-    lastRouteIndex = routeIndex;
-    return { offset: offset, swaps: validRouteSwaps[routeIndex].slice() };
+  function nextRouteIndex() {
+    if (!routeQueue.length) {
+      routeQueue = shuffle(Array.from({ length: validRoutes.length }, function (_, index) { return index; }));
+      if (routeQueue.length > 1 && routeQueue[0] === lastRouteIndex) {
+        var replacement = routeQueue[0];
+        routeQueue[0] = routeQueue[1];
+        routeQueue[1] = replacement;
+      }
+    }
+    lastRouteIndex = routeQueue.shift();
+    return lastRouteIndex;
   }
 
-  function isSlotPhysicallyCorrect(slot, layout) {
-    return layout.swaps[slot.pair] ? !slot.correct : slot.correct;
+  function routeSteps(route) {
+    var currentNode = 0;
+    var visited = new Set([currentNode]);
+    var steps = route.map(function (source, index) {
+      var slot = slotDefinitions.find(function (candidate) { return candidate.source === source; });
+      if (!slot || slot.nodes.indexOf(currentNode) === -1) throw new Error('A maze route is disconnected.');
+      var nextNode = slot.nodes[0] === currentNode ? slot.nodes[1] : slot.nodes[0];
+      if (nextNode === FINISH_NODE && index !== route.length - 1) throw new Error('A maze route reaches the finish too early.');
+      if (nextNode !== FINISH_NODE && visited.has(nextNode)) throw new Error('A maze route contains a loop.');
+      var step = { source: source, pair: currentNode };
+      currentNode = nextNode;
+      if (currentNode !== FINISH_NODE) visited.add(currentNode);
+      return step;
+    });
+    if (currentNode !== FINISH_NODE) throw new Error('A maze route does not reach the finish.');
+    return steps;
   }
 
-  function slotValues(data, layout) {
+  function distractorAssignments(routeStepList) {
+    var values = {};
+    var correctSlots = new Set();
+    var remaining = Array.from({ length: PAIR_COUNT }, function () { return 2; });
+    routeStepList.forEach(function (step) {
+      correctSlots.add(step.source);
+      remaining[step.pair] -= 1;
+    });
+    var unusedSlots = shuffle(slotDefinitions.filter(function (slot) { return !correctSlots.has(slot.source); }));
+
+    function assign(slotIndex) {
+      if (slotIndex === unusedSlots.length) return true;
+      var slot = unusedSlots[slotIndex];
+      var candidates = shuffle(Array.from({ length: PAIR_COUNT }, function (_, pair) { return pair; }))
+        .filter(function (pair) { return remaining[pair] > 0 && slot.nodes.indexOf(pair) === -1; })
+        .sort(function (left, right) { return remaining[right] - remaining[left]; });
+      for (var index = 0; index < candidates.length; index += 1) {
+        var pair = candidates[index];
+        remaining[pair] -= 1;
+        values[slot.source] = pair;
+        if (assign(slotIndex + 1)) return true;
+        remaining[pair] += 1;
+        delete values[slot.source];
+      }
+      return false;
+    }
+
+    if (!assign(0)) throw new Error('The maze distractors could not be arranged.');
+    return values;
+  }
+
+  function buildSlotLayout(data) {
+    var routeIndex = nextRouteIndex();
+    var steps = routeSteps(validRoutes[routeIndex]);
+    var pairBySlot = distractorAssignments(steps);
+    var correctSlots = new Set();
+    steps.forEach(function (step) {
+      correctSlots.add(step.source);
+      pairBySlot[step.source] = step.pair;
+    });
     var values = {};
     slotDefinitions.forEach(function (slot) {
-      var distractorIndex = (slot.pair + layout.offset) % PAIR_COUNT;
-      var correctText = data.pairs[slot.pair].answer;
-      var distractorText = data.pairs[distractorIndex].answer;
-      values[slot.source] = isSlotPhysicallyCorrect(slot, layout) ? correctText : distractorText;
+      values[slot.source] = data.pairs[pairBySlot[slot.source]].answer;
     });
-    return values;
+    return { routeIndex: routeIndex, steps: steps, values: values, correctSlots: correctSlots };
   }
 
   function updateSlideXml(xmlString, data, slideNumber, layout) {
     var parser = new DOMParser();
     var documentNode = parser.parseFromString(xmlString, 'application/xml');
     if (documentNode.getElementsByTagName('parsererror').length) throw new Error('The PowerPoint template could not be read.');
-    var answerValues = slotValues(data, layout);
+    var answerValues = layout.values;
     var answerKey = slideNumber === 3;
-    var correctSlots = new Set(slotDefinitions.filter(function (slot) { return isSlotPhysicallyCorrect(slot, layout); }).map(function (slot) { return slot.source; }));
     var questionMap = {};
     sourceQuestions.forEach(function (source, index) { questionMap[source] = data.pairs[index].question; });
     Array.prototype.slice.call(documentNode.getElementsByTagNameNS(P_NS, 'sp')).forEach(function (shape) {
@@ -324,7 +392,7 @@
         setShapeText(shape, questionMap[original]);
       } else if (Object.prototype.hasOwnProperty.call(answerValues, original)) {
         setShapeText(shape, answerValues[original]);
-        if (answerKey) setAnswerSlotFill(documentNode, shape, correctSlots.has(original) ? 'F8C63F' : 'FFFFFF');
+        if (answerKey) setAnswerSlotFill(documentNode, shape, layout.correctSlots.has(original) ? 'F8C63F' : 'FFFFFF');
       }
     });
     return new XMLSerializer().serializeToString(documentNode);
@@ -368,7 +436,7 @@
       var response = await fetch(TEMPLATE_URL);
       if (!response.ok) throw new Error('Template download failed.');
       var zip = await window.JSZip.loadAsync(await response.arrayBuffer());
-      var layout = buildSlotLayout();
+      var layout = buildSlotLayout(data);
       for (var slideNumber = 1; slideNumber <= 3; slideNumber += 1) {
         var slidePath = 'ppt/slides/slide' + slideNumber + '.xml';
         var slideFile = zip.file(slidePath);
