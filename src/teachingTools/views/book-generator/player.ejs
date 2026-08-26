@@ -12,6 +12,9 @@
 </head>
 <body class="book-player-page">
   <main class="book-player-wrap" id="playerWrap">
+    <% if (bookData.musicUrl) { %>
+    <button id="muteBtn" class="book-player-mute-btn" type="button" title="<%= t('bookPlayer.muteMusic') %>">🔊</button>
+    <% } %>
     <div class="book-player-title-row">
       <h1 class="book-player-title"><%= bookData.title %></h1>
       <button id="fullscreenBtn" class="book-gen-secondary" type="button"><%= t('bookPlayer.fullscreen') %></button>
@@ -40,7 +43,9 @@
       pause: t('bookPlayer.pause'),
       pageOf: t('bookPlayer.pageOf'),
       fullscreen: t('bookPlayer.fullscreen'),
-      exitFullscreen: t('bookPlayer.exitFullscreen')
+      exitFullscreen: t('bookPlayer.exitFullscreen'),
+      muteMusic: t('bookPlayer.muteMusic'),
+      unmuteMusic: t('bookPlayer.unmuteMusic')
     }) %>;
   </script>
   <script src="/low-prep/book-generator/book-player.js?v=1"></script>

@@ -117,5 +117,17 @@
     fullscreenBtn.hidden = true;
   }
 
+  // ===== Mute background music =====
+
+  var muteBtn = $('#muteBtn');
+  if (muteBtn) {
+    muteBtn.addEventListener('click', function () {
+      musicAudio.muted = !musicAudio.muted;
+      muteBtn.textContent = musicAudio.muted ? '🔇' : '🔊';
+      muteBtn.title = musicAudio.muted ? (I18N.unmuteMusic || 'Unmute music') : (I18N.muteMusic || 'Mute music');
+      muteBtn.classList.toggle('is-muted', musicAudio.muted);
+    });
+  }
+
   renderPage(false);
 })();

@@ -664,7 +664,9 @@ module.exports = {
       nextPage: 'Next page',
       pageOf: 'Page {current} of {total}',
       fullscreen: 'Fullscreen',
-      exitFullscreen: 'Exit fullscreen'
+      exitFullscreen: 'Exit fullscreen',
+      muteMusic: 'Mute background music',
+      unmuteMusic: 'Unmute background music'
     },
     bingoGenerator: {
       backLink: '← Back to Teaching Tools',
@@ -1758,7 +1760,9 @@ module.exports = {
       nextPage: '下一页',
       pageOf: '第 {current} / {total} 页',
       fullscreen: '全屏',
-      exitFullscreen: '退出全屏'
+      exitFullscreen: '退出全屏',
+      muteMusic: '静音背景音乐',
+      unmuteMusic: '取消静音'
     },
     bingoGenerator: {
       backLink: '← 返回教学工具',
