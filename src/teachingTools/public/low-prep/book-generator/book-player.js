@@ -23,6 +23,17 @@
     musicAudio.volume = 0.35;
   }
 
+  // Background music plays continuously once it can start—independent of
+  // page turns and of pausing the narration. Browsers block audible
+  // autoplay before any user interaction, so try immediately and again on
+  // the first interaction with the page.
+  function tryStartMusic() {
+    if (musicAudio.src && musicAudio.paused) musicAudio.play().catch(function () {});
+  }
+  tryStartMusic();
+  document.addEventListener('pointerdown', tryStartMusic, { once: true });
+  document.addEventListener('keydown', tryStartMusic, { once: true });
+
   function renderPage(withTurnAnimation) {
     var page = pages[currentIndex];
     if (!page) return;
@@ -64,11 +75,10 @@
   function setPlaying(next) {
     isPlaying = next;
     playPauseBtn.textContent = isPlaying ? (I18N.pause || 'Pause') : (I18N.startReading || 'Start reading');
+    tryStartMusic();
     if (isPlaying) {
-      if (musicAudio.src) musicAudio.play().catch(function () {});
       if (narrationAudio.src) narrationAudio.play().catch(function () {});
     } else {
-      musicAudio.pause();
       narrationAudio.pause();
     }
   }
