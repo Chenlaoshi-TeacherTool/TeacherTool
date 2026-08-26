@@ -43,6 +43,12 @@ app.use(function(req, res, next) {
 
 // Let application routes own clean directory-style URLs instead of having
 // express.static add a trailing-slash redirect before the router can respond.
+app.get('/fonts/Yu_DuoYinZi_Collection.ttc', function(req, res) {
+  var fontDownloadUrl = process.env.YU_DUOYINZI_FONT_URL ||
+    'https://chenlaoshitteaching.blob.core.windows.net/fonts/Yu_DuoYinZi_Collection.ttc';
+  res.redirect(302, fontDownloadUrl);
+});
+
 app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));
 
 app.use('/', indexRouter);
