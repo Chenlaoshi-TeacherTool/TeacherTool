@@ -656,7 +656,12 @@ router.get('/toolguides', async function (req, res, next) {
 });
 
 router.get('/toolguides/new', function (req, res) {
-  res.render('admin/toolguides-edit', { title: 'New Tool Guide', guide: null, adminUser: req.adminUser });
+  var prefill = {
+    slug: typeof req.query.slug === 'string' ? req.query.slug : '',
+    title: typeof req.query.title === 'string' ? req.query.title : '',
+    appUrl: typeof req.query.appUrl === 'string' ? req.query.appUrl : ''
+  };
+  res.render('admin/toolguides-edit', { title: 'New Tool Guide', guide: null, prefill: prefill, adminUser: req.adminUser });
 });
 
 router.post('/toolguides/new', async function (req, res, next) {

@@ -1,11 +1,12 @@
+<% var newGuidePrefill = typeof prefill !== 'undefined' && prefill ? prefill : { slug: '', title: '', appUrl: '' }; %>
 <%- include('layout-head') %>
 <h1><%= guide ? 'Edit: ' + guide.title : 'New Tool Guide' %></h1>
 
 <form method="POST" action="<%= guide ? '/admin/toolguides/' + encodeURIComponent(guide.slug) : '/admin/toolguides/new' %>">
   <label>Slug (used in URLs, no spaces)</label>
-  <input type="text" name="slug" value="<%= guide ? guide.slug : '' %>" <%= guide ? 'readonly' : 'required' %>>
+  <input type="text" name="slug" value="<%= guide ? guide.slug : newGuidePrefill.slug %>" <%= guide ? 'readonly' : 'required' %>>
   <label>Title</label>
-  <input type="text" name="title" value="<%= guide ? guide.title : '' %>" required>
+  <input type="text" name="title" value="<%= guide ? guide.title : newGuidePrefill.title %>" required>
   <label>Eyebrow (small label above the title)</label>
   <input type="text" name="eyebrow" value="<%= guide ? (guide.eyebrow || '') : '' %>">
   <label>Grades</label>
@@ -21,7 +22,7 @@
   <label>Example</label>
   <textarea name="example" rows="3"><%= guide ? (guide.example || '') : '' %></textarea>
   <label>App URL (optional, if this guide links to a standalone tool page)</label>
-  <input type="text" name="app_url" value="<%= guide ? (guide.app_url || '') : '' %>">
+  <input type="text" name="app_url" value="<%= guide ? (guide.app_url || '') : newGuidePrefill.appUrl %>">
   <label>Steps (one per line)</label>
   <textarea name="steps" rows="4"><%= guide ? guide.stepsText : '' %></textarea>
   <label>Tips (one per line)</label>

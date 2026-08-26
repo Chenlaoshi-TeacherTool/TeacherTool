@@ -1,6 +1,9 @@
 <%- include('layout-head') %>
 <h1>Tool Guides</h1>
 <p><a class="button" href="/admin/toolguides/new">+ New tool guide</a></p>
+<% if (!guides.some(function (g) { return g.slug === 'book-generator'; })) { %>
+<p><a class="button" href="/admin/toolguides/new?slug=book-generator&title=Book+Generator&appUrl=%2Fteaching-tools%2Fbook-generator">+ Create guide for Book Generator</a></p>
+<% } %>
 <table>
   <thead><tr><th>Title</th><th>Slug</th><th>Eyebrow</th><th>App URL</th><th></th></tr></thead>
   <tbody>
