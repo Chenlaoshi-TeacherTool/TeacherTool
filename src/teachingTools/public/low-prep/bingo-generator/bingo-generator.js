@@ -150,7 +150,7 @@
     var byAnnotation = Object.create(null);
 
     rows.forEach(function (row, order) {
-      if (!row || !row.emoji || !row.hexcode || row.skintone || /^E[0-9A-F]/i.test(row.hexcode)) return;
+      if (!row || !row.emoji || !row.hexcode || row.skintone || /^extras-/i.test(row.group || "") || /^E[0-9A-F]/i.test(row.hexcode)) return;
       var annotation = normalizeSearch(row.annotation);
       var tags = String((row.tags || "") + "," + (row.openmoji_tags || ""))
         .split(",")
@@ -207,11 +207,17 @@
     var queryWords = query.split(" ").filter(Boolean);
     if (!queryWords.length) return 0;
     if (entry.normalizedAnnotation === query) return 1200;
-    if (entry.tags.indexOf(query) >= 0) return 900 - Math.min(100, entry.annotationWords.length * 3);
 
     var annotationContainsAll = queryWords.every(function (word) {
       return entry.annotationWords.indexOf(word) >= 0;
     });
+    var colorWords = { black: 1, blue: 1, brown: 1, green: 1, grey: 1, orange: 1, purple: 1, red: 1, white: 1, yellow: 1 };
+    var colorQualifiedLabel = queryWords.length === 1
+      && entry.annotationWords[entry.annotationWords.length - 1] === queryWords[0]
+      && entry.annotationWords.slice(0, -1).length > 0
+      && entry.annotationWords.slice(0, -1).every(function (word) { return colorWords[word]; });
+    if (colorQualifiedLabel) return 1000 - Math.min(120, entry.annotationWords.length * 4);
+    if (entry.tags.indexOf(query) >= 0) return 900 - Math.min(100, entry.annotationWords.length * 3);
     if (annotationContainsAll) return 760 - Math.min(120, entry.annotationWords.length * 4);
 
     var tagsContainAll = queryWords.every(function (word) {
