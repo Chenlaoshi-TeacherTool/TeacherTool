@@ -259,6 +259,20 @@
     return { matched: matched, unmatched: items.length - matched };
   }
 
+  function termLineWithEmoji(item) {
+    var fields = [item.zh || "", item.py || "", item.en || ""];
+    var emoji = item.emoji || (item.openmoji && item.openmoji.emoji) || "";
+    if (emoji) fields.push(emoji);
+    return fields.join(" | ");
+  }
+
+  function emojiMatchText(stats) {
+    if (!stats) return "";
+    var text = " OpenMoji matched " + stats.matched + " of " + (stats.matched + stats.unmatched) + " terms.";
+    if (stats.unmatched) text += " Lines without a fourth field need a manual emoji.";
+    return text;
+  }
+
   function openMojiSvgUrl(hexcode) {
     return OPENMOJI_SVG_BASE + encodeURIComponent(hexcode) + ".svg";
   }
@@ -519,33 +533,44 @@
       title: "Add terms from the library",
       hint: "Choose one or more vocabulary topics to add their terms to your bingo list.",
       importLabel: "Add terms from selected topics",
-      onImport: function (lists) {
+      onImport: async function (lists) {
         var existing = String(termsInput.value || "").split(/\r?\n/).map(function (line) { return line.trim(); }).filter(Boolean);
         var seen = {};
         existing.forEach(function (line) { seen[line.split(/\s*[|｜,，]\s*/)[0]] = true; });
-        var added = 0;
+        var addedItems = [];
         lists.forEach(function (list) {
           (list.items || []).forEach(function (item) {
             if (!item.zh || seen[item.zh]) return;
-            existing.push([item.zh, item.py || "", item.en || ""].join(" | "));
+            addedItems.push({ zh: item.zh, py: item.py || "", en: item.en || "", emoji: "" });
             seen[item.zh] = true;
-            added += 1;
           });
         });
-        termsInput.value = existing.join("\n");
-        updateTermCount();
-        if (added) {
-          status.dataset.state = "";
-          status.textContent = "Added " + added + " term" + (added === 1 ? "" : "s") + " from the library.";
-        }
         picker.reset();
+
+        if (addedItems.length) {
+          status.dataset.state = "";
+          status.textContent = "Matching imported terms with OpenMoji…";
+          var emojiStats = null;
+          try {
+            emojiStats = await prepareOpenMoji(addedItems);
+          } catch (error) {
+            console.error(error);
+          }
+          addedItems.forEach(function (item) { existing.push(termLineWithEmoji(item)); });
+          termsInput.value = existing.join("\n");
+          updateTermCount();
+          status.dataset.state = emojiStats ? "success" : "error";
+          status.textContent = "Added " + addedItems.length + " term" + (addedItems.length === 1 ? "" : "s") + " from the library.";
+          if (emojiStats) status.textContent += emojiMatchText(emojiStats);
+          else status.textContent += " Emoji matching is unavailable right now; the terms were still imported.";
+        }
       }
     });
   }
 
-  function loadExample() {
+  async function loadExample() {
     titleInput.value = "Animals Bingo";
-    termsInput.value = [
+    var exampleText = [
       "猫 | māo | cat",
       "狗 | gǒu | dog",
       "鸟 | niǎo | bird",
@@ -572,9 +597,24 @@
       "蜜蜂 | mìfēng | bee",
       "蝴蝶 | húdié | butterfly",
     ].join("\n");
-    updateTermCount();
+    var exampleItems = parseTerms(exampleText);
+    loadExampleBtn.disabled = true;
     status.dataset.state = "";
+    status.textContent = "Matching the example terms with OpenMoji…";
+    var emojiStats = null;
+    try {
+      emojiStats = await prepareOpenMoji(exampleItems);
+      termsInput.value = exampleItems.map(termLineWithEmoji).join("\n");
+    } catch (error) {
+      console.error(error);
+      termsInput.value = exampleText;
+    }
+    loadExampleBtn.disabled = false;
+    updateTermCount();
+    status.dataset.state = emojiStats ? "success" : "error";
     status.textContent = "Example loaded. Adjust anything before generating.";
+    if (emojiStats) status.textContent += emojiMatchText(emojiStats);
+    else status.textContent += " Emoji matching is unavailable right now.";
   }
 
   async function handleSubmit(event) {
@@ -629,8 +669,7 @@
     status.dataset.state = "success";
     status.textContent = count + " bingo sheet" + (count === 1 ? "" : "s") + " generated below.";
     if (emojiStats) {
-      status.textContent += " OpenMoji matched " + emojiStats.matched + " of " + items.length + " terms.";
-      if (emojiStats.unmatched) status.textContent += " Add an emoji as the fourth field to fill unmatched terms.";
+      status.textContent += emojiMatchText(emojiStats);
     }
   }
 
