@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#315f4f">
   <title>Bingo Generator - Chen Laoshi's Teaching Toolkit</title>
-  <%- include('../partials/seo', { pageDescription: 'Turn any list of vocabulary or sentences into a set of unique, printable bingo sheets in Chinese, English, pinyin, or all three.' }) %>
+  <%- include('../partials/seo', { pageDescription: 'Turn any list of vocabulary or sentences into unique, printable bingo sheets with your choice of terms, English, pinyin, and automatically matched OpenMoji artwork.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="/low-prep/bingo-generator/bingo-generator.css">
@@ -69,7 +69,7 @@
               </div>
             </div>
             <label for="terms"><%= t('bingoGenerator.termsLabel') %>
-              <textarea id="terms" class="terms-textarea" required placeholder="猫 | māo | cat&#10;狗 | gǒu | dog&#10;鸟 | niǎo | bird"></textarea>
+              <textarea id="terms" class="terms-textarea" required placeholder="猫 | māo | cat | 🐈&#10;狗 | gǒu | dog&#10;鸟 | niǎo | bird"></textarea>
             </label>
             <p class="field-help"><%= t('bingoGenerator.formatHelpPrefix') %><strong><%= t('bingoGenerator.formatHelpFields') %></strong><%= t('bingoGenerator.formatHelpSuffix') %></p>
             <p id="term-count" class="term-count" aria-live="polite"><%= t('bingoGenerator.termCountEmpty') %></p>
@@ -84,12 +84,14 @@
                 <h2><%= t('bingoGenerator.displayHeading') %></h2>
               </div>
             </div>
-            <div class="mode-switch" role="radiogroup" aria-label="Display language">
-              <label><input type="radio" name="displayMode" value="zh" checked> <%= t('bingoGenerator.modeZh') %></label>
-              <label><input type="radio" name="displayMode" value="en"> <%= t('bingoGenerator.modeEn') %></label>
-              <label><input type="radio" name="displayMode" value="py"> <%= t('bingoGenerator.modePy') %></label>
-              <label><input type="radio" name="displayMode" value="all"> <%= t('bingoGenerator.modeAll') %></label>
+            <div class="mode-switch" role="group" aria-label="Display fields">
+              <label><input type="checkbox" name="displayField" value="zh" checked> <%= t('bingoGenerator.modeZh') %></label>
+              <label><input type="checkbox" name="displayField" value="en"> <%= t('bingoGenerator.modeEn') %></label>
+              <label><input type="checkbox" name="displayField" value="py"> <%= t('bingoGenerator.modePy') %></label>
+              <label class="emoji-mode"><input type="checkbox" name="displayField" value="emoji"> <%= t('bingoGenerator.modeEmoji') %> <span class="openmoji-badge">OpenMoji</span></label>
             </div>
+            <p class="field-help display-help"><%= t('bingoGenerator.displayHelp') %></p>
+            <p class="openmoji-attribution"><%= t('bingoGenerator.openMojiCreditPrefix') %><a href="https://openmoji.org/" target="_blank" rel="noopener noreferrer">OpenMoji</a><%= t('bingoGenerator.openMojiCreditSuffix') %><a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>.</p>
           </section>
 
           <div class="form-footer">
