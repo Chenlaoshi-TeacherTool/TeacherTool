@@ -48,6 +48,8 @@
     return picked.length ? picked : COLORS.slice();
   }
 
+  var CJK_RE = /[㐀-鿿]/;
+
   function parseLines(text) {
     return String(text || "")
       .split(/\r?\n/)
@@ -55,6 +57,9 @@
       .filter(Boolean)
       .map(function (line) {
         var parts = line.split(/\s*\|\s*/);
+        if (parts.length === 1 && CJK_RE.test(parts[0])) {
+          return { name: "", chinese: parts[0], colorHint: "" };
+        }
         return {
           name: parts[0] || "",
           chinese: parts[1] || "",
