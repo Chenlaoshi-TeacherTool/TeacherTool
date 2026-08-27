@@ -24,184 +24,9 @@
     "⭐", "🎯", "🔔", "🎈", "🎁", "💡", "🧩", "🌱", "☂️", "⏰"
   ];
 
-  const emojiSearchTerms = {
-    "🐼": "panda 熊猫 animal 动物",
-    "🐧": "penguin 企鹅 animal 动物",
-    "🦁": "lion 狮子 animal 动物",
-    "🐭": "mouse 老鼠 animal 动物",
-    "🦉": "owl 猫头鹰 animal 动物",
-    "🐰": "rabbit 兔子 animal 动物",
-    "🐶": "dog 狗 animal 动物",
-    "🐱": "cat 猫 animal 动物",
-    "🐵": "monkey 猴子 animal 动物",
-    "🐟": "fish 鱼 animal 动物",
-    "🍎": "apple 苹果 fruit 水果 red",
-    "🍌": "banana 香蕉 fruit 水果 yellow",
-    "🍇": "grape 葡萄 fruit 水果 purple",
-    "🍉": "watermelon 西瓜 fruit 水果",
-    "🍓": "strawberry 草莓 fruit 水果 berry",
-    "🍒": "cherry 樱桃 fruit 水果",
-    "🍑": "peach 桃子 fruit 水果",
-    "🍊": "orange 橙子 桔子 橘子 fruit 水果",
-    "🍍": "pineapple 菠萝 凤梨 fruit 水果",
-    "🍐": "pear 梨 fruit 水果",
-    "🥕": "carrot 胡萝卜 vegetable 蔬菜 food 食物",
-    "📦": "box 箱子 package",
-    "🏠": "house home 家 房子",
-    "🏫": "school 学校 教室 classroom",
-    "📚": "books book 书 阅读 read",
-    "✏️": "pencil 笔 写字 write",
-    "🎒": "backpack school 书包 学校",
-    "🪑": "chair 椅子 classroom 教室",
-    "🧸": "teddy toy 玩具",
-    "⚽": "ball football soccer 球 足球",
-    "🎵": "music 音乐 song 唱歌",
-    "☀️": "sun sunny 太阳 晴天 weather 天气",
-    "🌧️": "rain 雨 weather 天气",
-    "❄️": "snow 雪 weather 天气",
-    "🌈": "rainbow 彩虹 weather 天气",
-    "🌳": "tree 树 plant 植物",
-    "🌸": "flower 花 plant 植物",
-    "🚗": "car 汽车 车 transport 交通",
-    "🚌": "bus 公交 巴士 transport 交通",
-    "🚲": "bike 自行车 单车 transport 交通",
-    "✈️": "airplane 飞机 transport 交通",
-    "🍚": "rice 米饭 food 食物",
-    "🍜": "noodles 面条 food 食物",
-    "🥟": "dumpling 饺子 food 食物",
-    "🍞": "bread 面包 food 食物",
-    "🥛": "milk 牛奶 drink 饮料",
-    "💧": "water 水 drink 饮料",
-    "🧃": "juice 果汁 drink 饮料",
-    "🎂": "cake 蛋糕 birthday 生日",
-    "🍦": "ice cream 冰淇淋 dessert 甜点",
-    "🍬": "candy 糖果 sweet 甜",
-    "👨": "man father 爸爸 男 人 family 家庭",
-    "👩": "woman mother 妈妈 女 人 family 家庭",
-    "👧": "girl 女孩 姐姐 妹妹 family 家庭",
-    "👦": "boy 男孩 哥哥 弟弟 family 家庭",
-    "👶": "baby 婴儿 宝宝 family 家庭",
-    "👵": "grandma 奶奶 祖母 family 家庭",
-    "👴": "grandpa 爷爷 祖父 family 家庭",
-    "👨‍🏫": "teacher 老师 男教师 school 学校",
-    "👩‍🏫": "teacher 老师 女教师 school 学校",
-    "👨‍👩‍👧": "family 家庭 家人",
-    "👀": "eyes eye 眼睛 身体",
-    "👂": "ear 耳朵 身体",
-    "👃": "nose 鼻子 身体",
-    "👄": "mouth 嘴巴 身体",
-    "✋": "hand 手 身体",
-    "🦶": "foot 脚 身体",
-    "❤️": "heart 爱 心 feeling",
-    "🧠": "brain 大脑 身体",
-    "🦷": "tooth 牙齿 身体",
-    "💪": "muscle 强壮 手臂 身体",
-    "⬆️": "up 上面 上方 direction 方向",
-    "⬇️": "down 下面 下方 direction 方向",
-    "⬅️": "left 左边 direction 方向",
-    "➡️": "right 右边 direction 方向",
-    "↔️": "between 之间 旁边 direction 方向",
-    "📍": "near 附近 近 location 地点",
-    "🔭": "far 远 telescope 望远镜",
-    "🚪": "door 门 outside 外面",
-    "🗺️": "map 地图 far 远",
-    "🧭": "compass 指南针 direction 方向",
-    "🏃": "run 跑 action 动作",
-    "🚶": "walk 走 action 动作",
-    "🧘": "yoga 瑜伽 action 动作",
-    "💃": "dance 跳舞 action 动作",
-    "🎨": "paint draw 画画 action 动作",
-    "📖": "read book 阅读 书",
-    "✍️": "write 写字 action 动作",
-    "👋": "hello wave 你好 挥手",
-    "👏": "clap 鼓掌",
-    "💬": "speak talk 说话 聊天",
-    "⭐": "star 星星 reward 奖励",
-    "🎯": "target 目标",
-    "🔔": "bell 铃铛",
-    "🎈": "balloon 气球",
-    "🎁": "gift 礼物",
-    "💡": "idea light 灯 想法",
-    "🧩": "puzzle 拼图",
-    "🌱": "plant seed 幼苗 植物",
-    "☂️": "umbrella 雨伞 weather 天气",
-    "⏰": "clock time 时间 钟"
-  };
-
-  const iconRules = [
-    { words: ["苹果", "apple"], icons: ["🍎", "🍏"] },
-    { words: ["香蕉", "banana"], icons: ["🍌"] },
-    { words: ["葡萄", "grape"], icons: ["🍇"] },
-    { words: ["西瓜", "watermelon"], icons: ["🍉"] },
-    { words: ["草莓", "strawberry"], icons: ["🍓"] },
-    { words: ["樱桃", "cherry"], icons: ["🍒"] },
-    { words: ["桃", "peach"], icons: ["🍑"] },
-    { words: ["橙", "桔", "橘", "orange"], icons: ["🍊"] },
-    { words: ["菠萝", "凤梨", "pineapple"], icons: ["🍍"] },
-    { words: ["梨", "pear"], icons: ["🍐"] },
-    { words: ["熊猫", "panda"], icons: ["🐼"] },
-    { words: ["企鹅", "penguin"], icons: ["🐧"] },
-    { words: ["狮子", "lion"], icons: ["🦁"] },
-    { words: ["老鼠", "mouse"], icons: ["🐭"] },
-    { words: ["猫头鹰", "owl"], icons: ["🦉"] },
-    { words: ["兔", "rabbit"], icons: ["🐰"] },
-    { words: ["狗", "dog"], icons: ["🐶"] },
-    { words: ["猫", "cat"], icons: ["🐱"] },
-    { words: ["猴", "monkey"], icons: ["🐵"] },
-    { words: ["鱼", "fish"], icons: ["🐟"] },
-    { words: ["前面", "前方", "front"], icons: ["🐧📦", "➡️"] },
-    { words: ["后面", "后方", "behind", "back"], icons: ["📦🐭", "⬅️"] },
-    { words: ["上面", "上方", "above", "top"], icons: ["🐟⬆️", "⬆️"] },
-    { words: ["下面", "下方", "below", "under"], icons: ["🦉⬇️", "⬇️"] },
-    { words: ["旁边", "旁", "beside", "next to"], icons: ["🦁📦", "↔️"] },
-    { words: ["里面", "内", "inside", "in"], icons: ["📦🦉", "📦"] },
-    { words: ["外面", "outside"], icons: ["🚪", "🏠"] },
-    { words: ["之间", "between"], icons: ["↔️", "📦🐟📦"] },
-    { words: ["附近", "近", "near"], icons: ["📍", "🚶"] },
-    { words: ["远", "far"], icons: ["🔭", "🗺️"] },
-    { words: ["学校", "教室", "school", "classroom"], icons: ["🏫", "🎒"] },
-    { words: ["书", "阅读", "read", "book"], icons: ["📚", "📖"] },
-    { words: ["写", "笔", "write", "pencil"], icons: ["✏️", "✍️"] },
-    { words: ["老师", "teacher"], icons: ["👩‍🏫", "👨‍🏫"] },
-    { words: ["家", "房子", "home", "house"], icons: ["🏠"] },
-    { words: ["爸爸", "父亲", "father", "dad"], icons: ["👨"] },
-    { words: ["妈妈", "母亲", "mother", "mom"], icons: ["👩"] },
-    { words: ["哥哥", "弟弟", "男孩", "boy"], icons: ["👦"] },
-    { words: ["姐姐", "妹妹", "女孩", "girl"], icons: ["👧"] },
-    { words: ["爷爷", "祖父", "grandpa"], icons: ["👴"] },
-    { words: ["奶奶", "祖母", "grandma"], icons: ["👵"] },
-    { words: ["眼", "eye"], icons: ["👀"] },
-    { words: ["耳", "ear"], icons: ["👂"] },
-    { words: ["鼻", "nose"], icons: ["👃"] },
-    { words: ["嘴", "mouth"], icons: ["👄"] },
-    { words: ["手", "hand"], icons: ["✋"] },
-    { words: ["脚", "foot"], icons: ["🦶"] },
-    { words: ["太阳", "晴", "sunny", "sun"], icons: ["☀️"] },
-    { words: ["雨", "rain"], icons: ["🌧️", "☂️"] },
-    { words: ["雪", "snow"], icons: ["❄️"] },
-    { words: ["彩虹", "rainbow"], icons: ["🌈"] },
-    { words: ["树", "tree"], icons: ["🌳"] },
-    { words: ["花", "flower"], icons: ["🌸"] },
-    { words: ["汽车", "车", "car"], icons: ["🚗"] },
-    { words: ["公交", "巴士", "bus"], icons: ["🚌"] },
-    { words: ["自行车", "单车", "bike"], icons: ["🚲"] },
-    { words: ["飞机", "airplane"], icons: ["✈️"] },
-    { words: ["米饭", "rice"], icons: ["🍚"] },
-    { words: ["面条", "noodle"], icons: ["🍜"] },
-    { words: ["饺子", "dumpling"], icons: ["🥟"] },
-    { words: ["面包", "bread"], icons: ["🍞"] },
-    { words: ["牛奶", "milk"], icons: ["🥛"] },
-    { words: ["水", "water"], icons: ["💧"] },
-    { words: ["生日", "蛋糕", "birthday", "cake"], icons: ["🎂"] },
-    { words: ["跑", "run"], icons: ["🏃"] },
-    { words: ["走", "walk"], icons: ["🚶"] },
-    { words: ["跳舞", "舞", "dance"], icons: ["💃"] },
-    { words: ["画", "paint", "draw"], icons: ["🎨"] },
-    { words: ["说", "聊天", "speak", "talk"], icons: ["💬"] },
-    { words: ["音乐", "唱歌", "music", "sing"], icons: ["🎵"] },
-    { words: ["球", "足球", "ball"], icons: ["⚽"] },
-    { words: ["时间", "钟", "time", "clock"], icons: ["⏰"] }
-  ];
+  // Emoji 由通用模块 ChenEmoji（/shared/emoji-core.js）提供：搜索、自动匹配、显示都用 OpenMoji。
+  const CE = window.ChenEmoji;
+  let emojiIndex = null;
 
   const difficultyTargets = { easy: 46, medium: 36, hard: 28 };
   const difficultyNames = { easy: "Easy", medium: "Medium", hard: "Hard" };
@@ -478,17 +303,20 @@
 
   function suggestIcon(word, index, items = state.items) {
     const value = normalized(word);
-    const match = iconRules.find((rule) =>
-      rule.words.some((keyword) => value.includes(keyword))
-    );
     const used = new Set(
       items
         .filter((_, itemIndex) => itemIndex !== index)
         .map((item) => item.icon)
     );
-    const candidates = match
-      ? match.icons.concat(iconPalette)
-      : iconPalette.slice(index).concat(iconPalette.slice(0, index));
+    // 用通用 emoji 模块按词搜索（中文自动翻译），挑第一个还没被占用的——
+    // 数独要求 9 个符号各不相同。
+    if (CE && emojiIndex && value) {
+      const results = CE.search(value, emojiIndex, { limit: 24 });
+      const pick = results.find((entry) => !used.has(entry.emoji));
+      if (pick) return pick.emoji;
+    }
+    // 兜底（索引未就绪或没搜到）：从精选调色板里轮流取一个没被占用的。
+    const candidates = iconPalette.slice(index).concat(iconPalette.slice(0, index));
     return (
       candidates.find((icon) => !used.has(icon)) ||
       iconPalette[index % iconPalette.length]
@@ -537,7 +365,7 @@
     });
 
     updateValidation();
-    renderTwemoji(elements.wordGrid);
+    renderEmojiArt(elements.wordGrid);
   }
 
   function openPicker(index) {
@@ -562,16 +390,25 @@
 
   function renderPickerOptions() {
     elements.pickerGrid.replaceChildren();
-    const query = normalized(elements.emojiSearchInput.value);
-    const matches = iconPalette.filter((icon) => {
-      if (!query) return true;
-      const terms = `${icon} ${emojiSearchTerms[icon] || ""}`.toLocaleLowerCase();
-      return terms.includes(query);
-    });
+    const raw = elements.emojiSearchInput.value.trim();
+    const query = normalized(raw);
 
-    elements.emojiSearchStatus.textContent = query
-      ? `${matches.length} Twemoji result${matches.length === 1 ? "" : "s"} for “${elements.emojiSearchInput.value.trim()}”`
-      : "Search in English or Chinese to find a classroom-ready emoji.";
+    let matches;
+    if (!query) {
+      // 空查询：展示精选的课堂常用 emoji 作为起点。
+      matches = iconPalette.slice();
+      elements.emojiSearchStatus.textContent =
+        "Search in English or Chinese to find a classroom-ready emoji.";
+    } else if (CE && emojiIndex) {
+      // 有查询：搜整个 OpenMoji 库（中文自动翻译）。
+      matches = CE.search(raw, emojiIndex, { limit: 80 }).map((entry) => entry.emoji);
+      elements.emojiSearchStatus.textContent =
+        `${matches.length} OpenMoji result${matches.length === 1 ? "" : "s"} for “${raw}”`;
+    } else {
+      // 索引还没加载好：先在精选集里做子串匹配。
+      matches = iconPalette.filter((icon) => icon.includes(query));
+      elements.emojiSearchStatus.textContent = "Loading emoji library…";
+    }
 
     if (!matches.length) {
       const emptyState = document.createElement("p");
@@ -597,7 +434,7 @@
       elements.pickerGrid.append(button);
     });
 
-    renderTwemoji(elements.pickerGrid);
+    renderEmojiArt(elements.pickerGrid);
   }
 
   function applyIcon(icon) {
@@ -663,8 +500,8 @@
       elements.screenLegend.append(makeLegendItem(item));
       elements.printLegend.append(makeLegendItem(item));
     });
-    renderTwemoji(elements.screenLegend);
-    renderTwemoji(elements.printLegend);
+    renderEmojiArt(elements.screenLegend);
+    renderEmojiArt(elements.printLegend);
   }
 
   function renderPuzzle() {
@@ -697,11 +534,12 @@
     elements.paperTitle.textContent = state.showAnswer
       ? `${state.title} (Answer)`
       : state.title;
-    renderTwemoji(elements.sudoku);
+    renderEmojiArt(elements.sudoku);
   }
 
-  function renderTwemoji(container) {
-    if (!container || !window.Intl?.Segmenter) return;
+  function renderEmojiArt(container) {
+    // 把容器里的 emoji 字符替换成 OpenMoji SVG 图。索引未就绪时保持原生 emoji。
+    if (!container || !CE || !emojiIndex || !window.Intl?.Segmenter) return;
     const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
     const emojiPattern = /\p{Extended_Pictographic}/u;
     const textNodes = [];
@@ -722,15 +560,19 @@
           continue;
         }
 
+        // 用 OpenMoji 自己的 hexcode，保证文件名正确（含 ZWJ 序列）。
+        const entry = emojiIndex.byEmoji[segment.replace(/️/g, "")];
+        if (!entry) {
+          // OpenMoji 没有这个字符（少数 ZWJ 组合等）→ 保留原生 emoji。
+          fragment.append(segment);
+          continue;
+        }
+
         const image = document.createElement("img");
-        const codepoints = Array.from(segment)
-          .map((character) => character.codePointAt(0).toString(16))
-          .filter((codepoint) => codepoint !== "fe0f")
-          .join("-");
         image.className = "twemoji";
         image.alt = segment;
         image.draggable = false;
-        image.src = `https://raw.githubusercontent.com/twitter/twemoji/master/assets/svg/${codepoints}.svg`;
+        image.src = CE.svgUrl(entry.hexcode);
         fragment.append(image);
         changed = true;
       }
@@ -801,4 +643,19 @@
   renderLegends();
   generatePuzzle();
   initLibraryPicker();
+
+  // 异步加载 OpenMoji 索引；就绪后重绘，把原生 emoji 升级成 OpenMoji 图。
+  if (CE) {
+    CE.load()
+      .then((index) => {
+        emojiIndex = index;
+        renderInputs();
+        renderLegends();
+        renderPuzzle();
+        if (!elements.iconPicker.hidden) renderPickerOptions();
+      })
+      .catch(() => {
+        // 加载失败：继续用系统原生 emoji 显示，功能不受影响。
+      });
+  }
 })();

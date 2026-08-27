@@ -394,6 +394,10 @@ module.exports = {
       bingoTitle: 'Bingo Generator',
       bingoScope: '10–15 min · Any subject · Printable',
       bingoDesc: 'Turn your vocabulary or sentences into a set of unique bingo sheets, shown in Chinese, English, pinyin, or all three—download as Word or print to PDF.',
+      emojiSearchTitle: 'Emoji Search',
+      emojiSearchScope: 'Any device · Free commercial use',
+      emojiSearchDesc: 'Search thousands of OpenMoji emoji by English or Chinese keyword, then tap to copy the emoji or its image link—free for commercial use in your materials.',
+      openTool: 'Open Tool',
       imageRevealerTitle: 'Image Revealer',
       imageRevealerDesc: 'Upload photos and reveal them tile by tile for a guess-the-picture warm-up or vocabulary review—images never leave your browser.',
       zoomRevealTitle: 'Zoom Reveal',
@@ -709,6 +713,16 @@ module.exports = {
       previewHelp: 'Generated sheets appear here and are what gets printed to PDF.',
       previewEmptyPrefix: 'Fill out the form and click ',
       previewEmptySuffix: ' to see your cards here.'
+    },
+    emojiSearch: {
+      backLink: '← Back to Teaching Tools',
+      eyebrow: 'Free commercial-use emoji',
+      title: 'Emoji Search',
+      subtitle: 'Search thousands of OpenMoji emoji by English or Chinese keyword. Tap an emoji to copy it, or copy its image link.',
+      licensePrefix: 'Emoji artwork by ',
+      licenseMid: ', licensed ',
+      licenseSuffix: ' — free for commercial use.',
+      placeholder: 'Search e.g. cat, 太阳, birthday…'
     },
     imageRevealer: {
       backBtn: '← Back to Teaching Tools',
@@ -1493,6 +1507,10 @@ module.exports = {
       bingoTitle: '宾果生成器',
       bingoScope: '10–15 分钟 · 任意学科 · 可打印',
       bingoDesc: '将您的词汇或句子转换为一套独特的宾果卡，可显示中文、英文、拼音或三者结合——可下载为 Word 或打印为 PDF。',
+      emojiSearchTitle: 'Emoji 搜索',
+      emojiSearchScope: '任意设备 · 免费商用',
+      emojiSearchDesc: '用中文或英文关键词搜索几千个 OpenMoji 表情，点一下即可复制 emoji 或它的图片链接——可免费商用于您的教学材料。',
+      openTool: '打开工具',
       imageRevealerTitle: '图片揭秘',
       imageRevealerDesc: '上传照片并逐格揭示，用于猜图热身或词汇复习——图片不会离开您的浏览器。',
       zoomRevealTitle: '缩放揭秘',
@@ -1808,6 +1826,16 @@ module.exports = {
       previewHelp: '生成的卡片会显示在这里，也是打印为 PDF 时的内容。',
       previewEmptyPrefix: '填写表单并点击 ',
       previewEmptySuffix: ' 即可在此查看您的卡片。'
+    },
+    emojiSearch: {
+      backLink: '← 返回教学工具',
+      eyebrow: '免费商用 emoji',
+      title: 'Emoji 搜索',
+      subtitle: '用中文或英文关键词搜索几千个 OpenMoji 表情。点一下即可复制 emoji，或复制它的图片链接。',
+      licensePrefix: 'Emoji 图案来自 ',
+      licenseMid: '，授权 ',
+      licenseSuffix: '，可免费商用。',
+      placeholder: '搜索，例如：猫、太阳、生日…'
     },
     imageRevealer: {
       backBtn: '← 返回教学工具',

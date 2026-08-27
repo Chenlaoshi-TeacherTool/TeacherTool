@@ -153,6 +153,10 @@ router.get('/teaching-tools/bingo-generator', function(req, res, next) {
   res.render('low-prep-activities/bingo-generator', { title: 'Bingo Generator', toolGuide: siteContentStore.get().toolGuides['bingo-generator'] });
 });
 
+router.get('/teaching-tools/emoji-search', function(req, res, next) {
+  res.render('low-prep-activities/emoji-search', { title: 'Emoji Search', toolGuide: siteContentStore.get().toolGuides['emoji-search'] });
+});
+
 router.get('/teaching-tools/image-revealer', function(req, res, next) {
   res.render('low-prep-activities/image-revealer', { title: 'Image Revealer', toolGuide: siteContentStore.get().toolGuides['image-revealer'] });
 });
@@ -215,7 +219,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',
     '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle',
-    '/teaching-tools/bingo-generator', '/teaching-tools/image-revealer', '/teaching-tools/zoom-reveal',
+    '/teaching-tools/bingo-generator', '/teaching-tools/emoji-search', '/teaching-tools/image-revealer', '/teaching-tools/zoom-reveal',
     '/teaching-tools/name-tent-generator', '/teaching-tools/sentence-reorder'
   ].concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var urls = paths.map(function(path) {

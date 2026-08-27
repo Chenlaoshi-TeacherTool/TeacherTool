@@ -1,0 +1,206 @@
+/* Emoji Search — OpenMoji 搜索。移动优先。 */
+.emoji-page {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.emoji-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 16px 80px;
+}
+
+.emoji-hero {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.emoji-hero .back-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--leaf);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.emoji-hero .back-link:hover { text-decoration: underline; }
+
+.emoji-hero .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+
+.emoji-hero h1 {
+  font-size: clamp(1.6rem, 5vw, 2.3rem);
+  margin: 0 0 8px;
+  color: var(--chalk);
+}
+
+.emoji-hero .subtitle {
+  color: var(--muted);
+  margin: 0 auto 10px;
+  max-width: 46ch;
+  line-height: 1.5;
+}
+
+.emoji-license {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0;
+}
+.emoji-license a { color: var(--leaf); }
+
+/* 搜索栏，粘顶 */
+.emoji-searchbar {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  margin: 18px 0 10px;
+}
+.emoji-search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 4px 4px 4px 14px;
+}
+.emoji-search-field:focus-within { border-color: var(--leaf-light); }
+.emoji-search-icon {
+  font-size: 1.2rem;
+  margin-right: 8px;
+  opacity: 0.7;
+}
+#emoji-search-input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 1.05rem;
+  padding: 12px 4px;
+  color: var(--ink);
+  min-width: 0;
+}
+#emoji-search-input:disabled { opacity: 0.6; }
+.emoji-clear {
+  border: 0;
+  background: var(--line);
+  color: var(--chalk);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+  flex: none;
+}
+.emoji-clear.is-visible { display: block; }
+
+.emoji-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 20px;
+  margin: 0 4px 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.emoji-status { color: var(--muted); }
+.emoji-count { color: var(--leaf); font-weight: 600; }
+
+/* 结果网格 */
+.emoji-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+
+.emoji-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.08s ease, box-shadow 0.15s ease;
+}
+.emoji-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.emoji-copy-main {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 12px 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+.emoji-art {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  pointer-events: none;
+}
+.emoji-name {
+  font-size: 0.72rem;
+  line-height: 1.2;
+  color: var(--muted);
+  text-align: center;
+  word-break: break-word;
+  min-height: 1.8em;
+}
+
+.emoji-copy-link {
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: var(--cream);
+  color: var(--leaf);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+.emoji-copy-link:hover { background: #f4eeda; }
+.emoji-copy-link:active { background: #ece3c9; }
+
+/* Toast */
+.emoji-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--chalk);
+  color: #fff;
+  padding: 11px 20px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  box-shadow: 0 10px 24px rgba(16, 62, 55, 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 50;
+  max-width: 90vw;
+}
+.emoji-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 480px) {
+  .emoji-results {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 8px;
+  }
+  .emoji-art { width: 40px; height: 40px; }
+}

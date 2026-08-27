@@ -2,12 +2,8 @@
   "use strict";
 
   var CW = window.ChenWordlist;
-  var OPENMOJI_VERSION = "17.0.0";
-  var OPENMOJI_BASE = "https://cdn.jsdelivr.net/npm/openmoji@" + OPENMOJI_VERSION;
-  var OPENMOJI_DATA_URL = OPENMOJI_BASE + "/data/openmoji.json";
-  var OPENMOJI_SVG_BASE = OPENMOJI_BASE + "/color/svg/";
-  var OPENMOJI_PNG_BASE = OPENMOJI_BASE + "/color/72x72/";
-  var OPENMOJI_CREDIT = "Emoji artwork by OpenMoji · CC BY-SA 4.0 · openmoji.org";
+  var CE = window.ChenEmoji;
+  var OPENMOJI_CREDIT = (CE && CE.CREDIT) || "Emoji artwork by OpenMoji · CC BY-SA 4.0 · openmoji.org";
 
   var form = document.querySelector("#bingo-form");
   var titleInput = document.querySelector("#title");
@@ -28,8 +24,6 @@
   }
 
   var state = { cards: null, meta: null };
-  var openMojiIndexPromise = null;
-  var openMojiPngCache = Object.create(null);
 
   function shuffle(items) {
     if (CW && CW.shuffle) {
@@ -103,166 +97,14 @@
     });
   }
 
-  function normalizeEmoji(value) {
-    return String(value || "").replace(/\uFE0F/g, "").trim();
-  }
-
-  function emojiToHex(value) {
-    var emoji = String(value || "").trim();
-    if (!emoji) return "";
-    var hex = Array.from(emoji).map(function (character) {
-      return character.codePointAt(0).toString(16).padStart(4, "0").toUpperCase();
-    }).join("-");
-    return hex.length === 10 ? hex.replace("-FE0F", "") : hex;
-  }
-
-  function stemWord(word) {
-    if (word.length > 5 && /ing$/.test(word)) {
-      var stem = word.slice(0, -3);
-      if (stem.length > 2 && stem[stem.length - 1] === stem[stem.length - 2]) stem = stem.slice(0, -1);
-      return stem;
+  function prepareOpenMoji(items) {
+    if (!CE) {
+      items.forEach(function (item) { item.openmoji = null; });
+      return Promise.resolve({ matched: 0, unmatched: items.length });
     }
-    if (word.length > 4 && /ied$/.test(word)) return word.slice(0, -3) + "y";
-    if (word.length > 4 && /ed$/.test(word)) return word.slice(0, -2);
-    if (word.length > 4 && /ies$/.test(word)) return word.slice(0, -3) + "y";
-    if (word.length > 3 && /s$/.test(word) && !/ss$/.test(word)) return word.slice(0, -1);
-    return word;
-  }
-
-  function normalizeSearch(value) {
-    var stopWords = { a: 1, an: 1, the: 1, to: 1, of: 1, with: 1, and: 1, or: 1, for: 1, in: 1, on: 1 };
-    return String(value || "")
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\([^)]*\)/g, " ")
-      .replace(/[_-]/g, " ")
-      .replace(/[^a-z0-9 ]+/g, " ")
-      .split(/\s+/)
-      .filter(function (word) { return word && !stopWords[word]; })
-      .map(stemWord)
-      .join(" ");
-  }
-
-  function buildOpenMojiIndex(rows) {
-    var entries = [];
-    var byEmoji = Object.create(null);
-    var byAnnotation = Object.create(null);
-
-    rows.forEach(function (row, order) {
-      if (!row || !row.emoji || !row.hexcode || row.skintone || /^extras-/i.test(row.group || "") || /^E[0-9A-F]/i.test(row.hexcode)) return;
-      var annotation = normalizeSearch(row.annotation);
-      var tags = String((row.tags || "") + "," + (row.openmoji_tags || ""))
-        .split(",")
-        .map(normalizeSearch)
-        .filter(Boolean);
-      var entry = {
-        emoji: row.emoji,
-        hexcode: row.hexcode.toUpperCase(),
-        annotation: row.annotation || "emoji",
-        normalizedAnnotation: annotation,
-        annotationWords: annotation.split(" ").filter(Boolean),
-        tags: tags,
-        tagWords: normalizeSearch(tags.join(" ")).split(" ").filter(Boolean),
-        group: row.group || "",
-        order: order,
-      };
-      entries.push(entry);
-      byEmoji[normalizeEmoji(row.emoji)] = entry;
-      if (annotation && !byAnnotation[annotation]) byAnnotation[annotation] = entry;
-    });
-
-    return { entries: entries, byEmoji: byEmoji, byAnnotation: byAnnotation };
-  }
-
-  function loadOpenMojiIndex() {
-    if (!openMojiIndexPromise) {
-      openMojiIndexPromise = fetch(OPENMOJI_DATA_URL, { mode: "cors", credentials: "omit" })
-        .then(function (response) {
-          if (!response.ok) throw new Error("OpenMoji metadata returned " + response.status);
-          return response.json();
-        })
-        .then(buildOpenMojiIndex)
-        .catch(function (error) {
-          openMojiIndexPromise = null;
-          throw error;
-        });
-    }
-    return openMojiIndexPromise;
-  }
-
-  function queryVariants(value) {
-    var raw = String(value || "").trim();
-    if (!raw) return [];
-    var variants = [raw].concat(raw.split(/[\/,;]+/));
-    var seen = Object.create(null);
-    return variants.map(normalizeSearch).filter(function (query) {
-      if (!query || seen[query]) return false;
-      seen[query] = true;
-      return true;
-    });
-  }
-
-  function entryScore(entry, query) {
-    var queryWords = query.split(" ").filter(Boolean);
-    if (!queryWords.length) return 0;
-    if (entry.normalizedAnnotation === query) return 1200;
-
-    var annotationContainsAll = queryWords.every(function (word) {
-      return entry.annotationWords.indexOf(word) >= 0;
-    });
-    var colorWords = { black: 1, blue: 1, brown: 1, green: 1, grey: 1, orange: 1, purple: 1, red: 1, white: 1, yellow: 1 };
-    var colorQualifiedLabel = queryWords.length === 1
-      && entry.annotationWords[entry.annotationWords.length - 1] === queryWords[0]
-      && entry.annotationWords.slice(0, -1).length > 0
-      && entry.annotationWords.slice(0, -1).every(function (word) { return colorWords[word]; });
-    if (colorQualifiedLabel) return 1000 - Math.min(120, entry.annotationWords.length * 4);
-    if (entry.tags.indexOf(query) >= 0) return 900 - Math.min(100, entry.annotationWords.length * 3);
-    if (annotationContainsAll) return 760 - Math.min(120, entry.annotationWords.length * 4);
-
-    var tagsContainAll = queryWords.every(function (word) {
-      return entry.tagWords.indexOf(word) >= 0;
-    });
-    if (tagsContainAll) return 560 - Math.min(100, entry.annotationWords.length * 2);
-    return 0;
-  }
-
-  function matchOpenMoji(item, index) {
-    var override = String(item.emoji || "").trim();
-    if (override) {
-      var exact = index.byEmoji[normalizeEmoji(override)];
-      return exact || {
-        emoji: override,
-        hexcode: emojiToHex(override),
-        annotation: item.en || item.zh || "emoji",
-      };
-    }
-
-    var queries = queryVariants(item.en || item.zh);
-    var best = null;
-    var bestScore = 0;
-    for (var q = 0; q < queries.length; q++) {
-      var exactAnnotation = index.byAnnotation[queries[q]];
-      if (exactAnnotation) return exactAnnotation;
-      for (var i = 0; i < index.entries.length; i++) {
-        var score = entryScore(index.entries[i], queries[q]);
-        if (score > bestScore || (score === bestScore && best && index.entries[i].order < best.order)) {
-          best = index.entries[i];
-          bestScore = score;
-        }
-      }
-    }
-    return bestScore >= 500 ? best : null;
-  }
-
-  async function prepareOpenMoji(items) {
-    var index = await loadOpenMojiIndex();
-    var matched = 0;
-    items.forEach(function (item) {
-      item.openmoji = matchOpenMoji(item, index);
-      if (item.openmoji && item.openmoji.hexcode) matched += 1;
-    });
-    return { matched: matched, unmatched: items.length - matched };
+    // 复用共享的 ChenEmoji 模块（/shared/emoji-core.js）做匹配。
+    // translate: 只填中文、没填英文的词也会先经 ChenWordlist 翻成英文再配 emoji。
+    return CE.matchAll(items, { translate: true });
   }
 
   function termLineWithEmoji(item) {
@@ -280,7 +122,7 @@
   }
 
   function openMojiSvgUrl(hexcode) {
-    return OPENMOJI_SVG_BASE + encodeURIComponent(hexcode) + ".svg";
+    return CE ? CE.svgUrl(hexcode) : "";
   }
 
   function requiredTermCount(gridSize, includeFree) {
@@ -381,21 +223,7 @@
   }
 
   function fetchOpenMojiPng(hexcode) {
-    if (!hexcode) return Promise.resolve(null);
-    if (!openMojiPngCache[hexcode]) {
-      openMojiPngCache[hexcode] = fetch(OPENMOJI_PNG_BASE + encodeURIComponent(hexcode) + ".png", {
-        mode: "cors",
-        credentials: "omit",
-      }).then(function (response) {
-        if (!response.ok) throw new Error("OpenMoji image returned " + response.status);
-        return response.arrayBuffer();
-      }).then(function (buffer) {
-        return new Uint8Array(buffer);
-      }).catch(function () {
-        return null;
-      });
-    }
-    return openMojiPngCache[hexcode];
+    return CE ? CE.fetchPng(hexcode) : Promise.resolve(null);
   }
 
   async function preloadOpenMojiPngs(cards, fields) {

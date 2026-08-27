@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#315f4f">
+  <title><%= t('emojiSearch.title') %> - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Search thousands of free, commercial-use OpenMoji emoji by English or Chinese keyword, then tap to copy the emoji or its image link.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/emoji-search/emoji-search.css">
+</head>
+<body class="emoji-page">
+  <main class="emoji-wrap">
+    <header class="emoji-hero">
+      <a class="back-link" href="/teaching-tools#low-prep-activities"><%= t('emojiSearch.backLink') %></a>
+      <p class="eyebrow"><%= t('emojiSearch.eyebrow') %></p>
+      <h1><span aria-hidden="true">🔎</span> <%= t('emojiSearch.title') %></h1>
+      <p class="subtitle"><%= t('emojiSearch.subtitle') %></p>
+      <p class="emoji-license"><%= t('emojiSearch.licensePrefix') %><a href="https://openmoji.org/" target="_blank" rel="noopener noreferrer">OpenMoji</a><%= t('emojiSearch.licenseMid') %><a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a><%= t('emojiSearch.licenseSuffix') %></p>
+    </header>
+
+    <div class="emoji-searchbar">
+      <div class="emoji-search-field">
+        <span class="emoji-search-icon" aria-hidden="true">🔍</span>
+        <input id="emoji-search-input" type="search" autocomplete="off"
+               placeholder="<%= t('emojiSearch.placeholder') %>"
+               aria-label="<%= t('emojiSearch.placeholder') %>">
+        <button id="emoji-clear" class="emoji-clear" type="button" aria-label="Clear">×</button>
+      </div>
+    </div>
+
+    <div class="emoji-meta">
+      <span id="emoji-status" class="emoji-status" aria-live="polite"></span>
+      <span id="emoji-count" class="emoji-count"></span>
+    </div>
+
+    <div id="emoji-results" class="emoji-results" aria-live="polite"></div>
+  </main>
+
+  <div id="emoji-toast" class="emoji-toast" role="status" aria-live="polite"></div>
+
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/emoji-core.js"></script>
+  <script src="/low-prep/emoji-search/emoji-search.js" defer></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
