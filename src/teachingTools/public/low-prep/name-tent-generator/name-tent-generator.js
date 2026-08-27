@@ -139,6 +139,7 @@
     var box = el("div", boxClass);
     box.style.setProperty("--swatch-color", item.color.css);
     var lines = nameBoxLines(item, modes);
+    box.dataset.lines = String(lines.length);
     lines.forEach(function (line) {
       var lineClass = lineWrapClass + " " + lineWrapClass + "-" + line.cls;
       box.appendChild(el("span", lineClass, line.text));

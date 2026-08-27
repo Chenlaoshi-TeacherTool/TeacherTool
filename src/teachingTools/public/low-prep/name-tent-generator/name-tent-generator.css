@@ -212,9 +212,17 @@ input:focus, select:focus, textarea:focus {
 .mini-fold-spacer { height: 0; border-top: 1px dashed #b9c7be; flex: 0 0 auto; }
 .mini-name-box { border: 2px solid var(--swatch-color, var(--tent-green)); border-radius: 8px; padding: 4px 6px; width: 100%; }
 .mini-line { display: block; overflow-wrap: break-word; line-height: 1.15; }
-.mini-line-chinese { font-weight: 800; font-size: .78rem; color: var(--tent-green-dark); }
-.mini-line-name { font-weight: 750; font-size: .72rem; color: var(--tent-green-dark); }
-.mini-line-pinyin { font-size: .62rem; font-style: italic; color: var(--tent-muted); }
+.mini-line-chinese { font-weight: 800; font-size: 1.1rem; color: var(--tent-green-dark); }
+.mini-line-name { font-weight: 750; font-size: 1rem; color: var(--tent-green-dark); }
+.mini-line-pinyin { font-size: .85rem; font-style: italic; color: var(--tent-muted); }
+
+.mini-name-box[data-lines="2"] .mini-line-chinese { font-size: 1rem; }
+.mini-name-box[data-lines="2"] .mini-line-name { font-size: .92rem; }
+.mini-name-box[data-lines="2"] .mini-line-pinyin { font-size: .76rem; }
+
+.mini-name-box[data-lines="3"] .mini-line-chinese { font-size: .92rem; }
+.mini-name-box[data-lines="3"] .mini-line-name { font-size: .82rem; }
+.mini-name-box[data-lines="3"] .mini-line-pinyin { font-size: .68rem; }
 .mini-tent-label { margin: 8px 0 0; text-align: center; font-size: .78rem; font-weight: 750; color: var(--tent-green-dark); }
 
 @media (max-width: 980px) {
@@ -258,9 +266,17 @@ input:focus, select:focus, textarea:focus {
 /* Name text reads normally, left-to-right—parallel to the horizontal fold lines below—
    so it stays upright and legible once the strip is folded into a flat-lying triangle. */
 .tent-line { display: block; overflow-wrap: break-word; line-height: 1.2; }
-.tent-line-chinese { font-size: clamp(1.6rem, 6vh, 3.2rem); font-weight: 800; color: var(--tent-green-dark); font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif; }
-.tent-line-pinyin { font-size: clamp(.9rem, 2.6vh, 1.3rem); color: var(--tent-muted); font-style: italic; }
-.tent-line-name { font-size: clamp(1.2rem, 4vh, 2rem); font-weight: 700; color: var(--tent-green-dark); }
+.tent-line-chinese { font-size: clamp(2.2rem, 8vh, 4rem); font-weight: 800; color: var(--tent-green-dark); font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+.tent-line-pinyin { font-size: clamp(1.3rem, 4vh, 2rem); color: var(--tent-muted); font-style: italic; }
+.tent-line-name { font-size: clamp(1.8rem, 6vh, 3rem); font-weight: 700; color: var(--tent-green-dark); }
+
+.tent-name-box[data-lines="2"] .tent-line-chinese { font-size: clamp(2rem, 7vh, 3.6rem); }
+.tent-name-box[data-lines="2"] .tent-line-pinyin { font-size: clamp(1.1rem, 3.4vh, 1.7rem); }
+.tent-name-box[data-lines="2"] .tent-line-name { font-size: clamp(1.6rem, 5vh, 2.6rem); }
+
+.tent-name-box[data-lines="3"] .tent-line-chinese { font-size: clamp(1.8rem, 6vh, 3.2rem); }
+.tent-name-box[data-lines="3"] .tent-line-pinyin { font-size: clamp(1rem, 2.8vh, 1.4rem); }
+.tent-name-box[data-lines="3"] .tent-line-name { font-size: clamp(1.4rem, 4.2vh, 2.2rem); }
 
 .tent-fold {
   height: 0;
