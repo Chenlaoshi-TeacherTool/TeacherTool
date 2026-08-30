@@ -24,6 +24,44 @@
     "⭐", "🎯", "🔔", "🎈", "🎁", "💡", "🧩", "🌱", "☂️", "⏰"
   ];
 
+  // Prefer clear classroom-friendly pictures for common vocabulary before
+  // falling back to the wider OpenMoji search results.
+  const preferredIconsByTerm = {
+    "你好": ["👋"], hello: ["👋"], "谢谢": ["🙏"], "thank you": ["🙏"],
+    "再见": ["👋", "🚪"], goodbye: ["👋", "🚪"], "老师": ["👩‍🏫"], teacher: ["👩‍🏫"],
+    "学生": ["🧑‍🎓"], student: ["🧑‍🎓"], "朋友": ["🧑‍🤝‍🧑"], friend: ["🧑‍🤝‍🧑"],
+    "人": ["🧑"], person: ["🧑"], "喜欢": ["❤️"], like: ["❤️"],
+    "苹果": ["🍎"], apple: ["🍎"], "香蕉": ["🍌"], banana: ["🍌"],
+    "草莓": ["🍓"], strawberry: ["🍓"], "西瓜": ["🍉"], watermelon: ["🍉"],
+    "葡萄": ["🍇"], grape: ["🍇"], grapes: ["🍇"], "橘子": ["🍊"], orange: ["🍊"],
+    "梨": ["🍐"], pear: ["🍐"], "桃子": ["🍑"], peach: ["🍑"],
+    "米饭": ["🍚"], rice: ["🍚"], "面条": ["🍜"], noodles: ["🍜"],
+    "饺子": ["🥟"], dumpling: ["🥟"], dumplings: ["🥟"], "水": ["💧"], water: ["💧"],
+    "果汁": ["🧃"], juice: ["🧃"], "茶": ["🍵"], tea: ["🍵"],
+    "书": ["📖"], book: ["📖"], "本子": ["📓"], notebook: ["📓"],
+    "铅笔": ["✏️"], pencil: ["✏️"], "橡皮": ["🧽"], eraser: ["🧽"],
+    "尺子": ["📏"], ruler: ["📏"], "桌子": ["🪑"], desk: ["🪑"],
+    "椅子": ["💺"], chair: ["💺"], "黑板": ["⬛"], blackboard: ["⬛"],
+    "请坐": ["🪑"], "sit down": ["🪑"], "请听": ["👂"], listen: ["👂"],
+    "请说": ["💬"], speak: ["💬"], "请看": ["👀"], look: ["👀"],
+    "请读": ["📖"], read: ["📖"], "请写": ["✍️"], write: ["✍️"],
+    "头": ["👤"], head: ["👤"], "眼睛": ["👀"], eye: ["👀"], eyes: ["👀"],
+    "耳朵": ["👂"], ear: ["👂"], ears: ["👂"], "鼻子": ["👃"], nose: ["👃"],
+    "嘴": ["👄"], mouth: ["👄"], "牙": ["🦷"], tooth: ["🦷"], teeth: ["🦷"],
+    "手": ["✋"], hand: ["✋"], "脚": ["🦶"], foot: ["🦶"], "腿": ["🦵"], leg: ["🦵"],
+    "天气": ["🌦️"], weather: ["🌦️"], "太阳": ["☀️"], sun: ["☀️"],
+    "云": ["☁️"], cloud: ["☁️"], "雨": ["🌧️"], rain: ["🌧️"],
+    "雪": ["❄️"], snow: ["❄️"], "风": ["💨"], wind: ["💨"],
+    "热": ["🔥"], hot: ["🔥"], "冷": ["🥶"], cold: ["🥶"],
+    "春天": ["🌸"], spring: ["🌸"], "夏天": ["🏖️", "☀️"], summer: ["🏖️", "☀️"],
+    "秋天": ["🍂"], autumn: ["🍂"], fall: ["🍂"], "冬天": ["⛄", "❄️"], winter: ["⛄", "❄️"],
+    "一": ["1️⃣"], one: ["1️⃣"], "二": ["2️⃣"], two: ["2️⃣"],
+    "三": ["3️⃣"], three: ["3️⃣"], "四": ["4️⃣"], four: ["4️⃣"],
+    "五": ["5️⃣"], five: ["5️⃣"], "六": ["6️⃣"], six: ["6️⃣"],
+    "七": ["7️⃣"], seven: ["7️⃣"], "八": ["8️⃣"], eight: ["8️⃣"],
+    "九": ["9️⃣"], nine: ["9️⃣"], "十": ["🔟"], ten: ["🔟"]
+  };
+
   // Emoji 由通用模块 ChenEmoji（/shared/emoji-core.js）提供：搜索、自动匹配、显示都用 OpenMoji。
   const CE = window.ChenEmoji;
   let emojiIndex = null;
@@ -86,25 +124,63 @@
     elements.topicLibraryPanel.hidden = !expanded;
   }
 
-  function useSelectedTopics(lists) {
+  function balancedTopicEntries(lists, limit = 9) {
     const entries = [];
     const seen = new Set();
-    lists.forEach((list) => {
-      (list.items || []).forEach((item) => {
-        const word = item.zh || item.en || item.py;
-        if (!word || seen.has(word) || entries.length >= 9) return;
-        seen.add(word);
-        entries.push(word);
-      });
-    });
+    const queues = lists.map((list) => (list.items || []).slice());
+    const positions = queues.map(() => 0);
+    let foundCandidate = true;
+
+    // Take one term from each selected topic in turn. With two topics this
+    // produces a 5/4 split; with three topics it produces a 3/3/3 split.
+    while (entries.length < limit && foundCandidate) {
+      foundCandidate = false;
+      for (let listIndex = 0; listIndex < queues.length && entries.length < limit; listIndex += 1) {
+        const queue = queues[listIndex];
+        while (positions[listIndex] < queue.length) {
+          const item = queue[positions[listIndex]] || {};
+          positions[listIndex] += 1;
+          foundCandidate = true;
+          const word = item.zh || item.en || item.py;
+          const key = normalized(word || "");
+          if (!key || seen.has(key)) continue;
+          seen.add(key);
+          entries.push({
+            word,
+            zh: item.zh || "",
+            en: item.en || "",
+            py: item.py || "",
+            theme: item.theme || lists[listIndex].theme || "",
+            icon: item.emoji || (item.openmoji && item.openmoji.emoji) || "",
+            manual: Boolean(item.emoji || (item.openmoji && item.openmoji.emoji))
+          });
+          break;
+        }
+      }
+    }
+    return entries;
+  }
+
+  async function useSelectedTopics(lists) {
+    const entries = balancedTopicEntries(lists);
     if (entries.length < 9) {
       showToast("Choose topics with at least 9 combined terms");
       return;
     }
-    const nextItems = entries.map((word) => ({ word, icon: "", manual: false }));
-    nextItems.forEach((item, index) => {
-      item.icon = suggestIcon(item.word, index, nextItems);
-    });
+
+    // Do not lock in random fallback icons just because the OpenMoji index is
+    // still loading. Wait briefly for the same shared load promise instead.
+    if (CE && !emojiIndex) {
+      showToast("Matching the selected words with pictures…");
+      try {
+        emojiIndex = await CE.load();
+      } catch (_error) {
+        // The curated fallback palette still keeps the activity usable offline.
+      }
+    }
+
+    const nextItems = entries.map((item) => ({ ...item }));
+    autoMatchItems(nextItems);
     state.items = nextItems;
     state.seed = (state.seed * 1664525 + 1013904223) >>> 0;
     state.title = `${lists.map((list) => list.theme || list.name).join(" · ")} Word Sudoku`;
@@ -124,11 +200,10 @@
       min: 1,
       max: 6,
       title: "Create a Sudoku from published vocabulary topics",
-      hint: "Choose one or more topics. The first 9 combined terms become the Sudoku words and are automatically matched with icons.",
+      hint: "Choose one or more topics. Nine terms are shared as evenly as possible across your selections and automatically matched with icons.",
       importLabel: "Use selected topics",
       onImport: (lists) => {
-        useSelectedTopics(lists);
-        picker.reset();
+        useSelectedTopics(lists).then(() => picker.reset());
       }
     });
   }
@@ -301,19 +376,68 @@
     return words.every(Boolean) && new Set(words).size === 9;
   }
 
-  function suggestIcon(word, index, items = state.items) {
-    const value = normalized(word);
+  function semanticQueries(item) {
+    const values = [item.en, item.zh, item.word];
+    const seen = new Set();
+    const queries = [];
+    values.forEach((value) => {
+      String(value || "").split(/[;,/]+/).forEach((part) => {
+        const query = part.trim();
+        const key = normalized(query);
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        queries.push(query);
+      });
+    });
+    return queries;
+  }
+
+  function preferredIconCandidates(item) {
+    const colorIcons = {
+      red: "🔴", yellow: "🟡", blue: "🔵", green: "🟢", black: "⚫",
+      white: "⚪", purple: "🟣", orange: "🟠", brown: "🟤", pink: "🩷"
+    };
+    if (normalized(item.theme || "").includes("color")) {
+      const color = semanticQueries(item)
+        .map((query) => colorIcons[normalized(query)])
+        .find(Boolean);
+      if (color) return [color];
+    }
+    return semanticQueries(item).flatMap((query) =>
+      preferredIconsByTerm[normalized(query)] || []
+    );
+  }
+
+  function suggestIcon(itemOrWord, index, items = state.items) {
+    const item = typeof itemOrWord === "string"
+      ? { word: itemOrWord }
+      : (itemOrWord || {});
+    const value = normalized(item.word || item.zh || item.en || "");
     const used = new Set(
       items
         .filter((_, itemIndex) => itemIndex !== index)
         .map((item) => item.icon)
+        .filter(Boolean)
     );
-    // 用通用 emoji 模块按词搜索（中文自动翻译），挑第一个还没被占用的——
-    // 数独要求 9 个符号各不相同。
+
+    const preferred = preferredIconCandidates(item).find((icon) => !used.has(icon));
+    if (preferred) return preferred;
+
+    // First use the strict matcher with the list's English definition. It is
+    // much more reliable than searching only the displayed Chinese word.
     if (CE && emojiIndex && value) {
-      const results = CE.search(value, emojiIndex, { limit: 24 });
-      const pick = results.find((entry) => !used.has(entry.emoji));
-      if (pick) return pick.emoji;
+      const exact = CE.match({
+        zh: item.zh || (/[一-鿿]/.test(item.word || "") ? item.word : ""),
+        en: item.en || (!/[一-鿿]/.test(item.word || "") ? item.word : "")
+      }, emojiIndex, { translate: true });
+      if (exact && !used.has(exact.emoji)) return exact.emoji;
+
+      const queries = semanticQueries(item);
+      for (let queryIndex = 0; queryIndex < queries.length; queryIndex += 1) {
+        const results = CE.search(queries[queryIndex], emojiIndex, { limit: 40 });
+        const pick = results.find((entry) => !used.has(entry.emoji));
+        if (pick) return pick.emoji;
+      }
     }
     // 兜底（索引未就绪或没搜到）：从精选调色板里轮流取一个没被占用的。
     const candidates = iconPalette.slice(index).concat(iconPalette.slice(0, index));
@@ -321,6 +445,15 @@
       candidates.find((icon) => !used.has(icon)) ||
       iconPalette[index % iconPalette.length]
     );
+  }
+
+  function autoMatchItems(items) {
+    items.forEach((item) => {
+      if (!item.manual) item.icon = "";
+    });
+    items.forEach((item, index) => {
+      if (!item.manual) item.icon = suggestIcon(item, index, items);
+    });
   }
 
   function renderInputs() {
@@ -351,8 +484,11 @@
       input.setAttribute("aria-label", `Word ${index + 1}`);
       input.addEventListener("input", (event) => {
         state.items[index].word = event.target.value;
+        state.items[index].zh = "";
+        state.items[index].en = "";
+        state.items[index].py = "";
         if (!state.items[index].manual) {
-          state.items[index].icon = suggestIcon(event.target.value, index);
+          state.items[index].icon = suggestIcon(state.items[index], index);
           iconButton.textContent = state.items[index].icon;
         }
         updateValidation();
@@ -450,10 +586,10 @@
   }
 
   function rematchAll() {
-    state.items.forEach((item, index) => {
+    state.items.forEach((item) => {
       item.manual = false;
-      item.icon = suggestIcon(item.word, index);
     });
+    autoMatchItems(state.items);
     renderInputs();
     renderLegends();
     renderPuzzle();
@@ -649,6 +785,7 @@
     CE.load()
       .then((index) => {
         emojiIndex = index;
+        autoMatchItems(state.items);
         renderInputs();
         renderLegends();
         renderPuzzle();
