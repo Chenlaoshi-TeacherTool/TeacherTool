@@ -106,6 +106,7 @@
     paperTitle: document.getElementById("paperTitle"),
     answerButton: document.getElementById("answerButton"),
     generateButton: document.getElementById("generateButton"),
+    shareButton: document.getElementById("shareButton"),
     printButton: document.getElementById("printButton"),
     toast: document.getElementById("toast")
   };
@@ -614,6 +615,7 @@
       : "Please check your words";
     elements.printButton.disabled = !isValid;
     elements.generateButton.disabled = !isValid;
+    elements.shareButton.disabled = !isValid;
   }
 
   function makeLegendItem(item) {
@@ -773,6 +775,27 @@
       return;
     }
     window.print();
+  });
+
+  elements.shareButton.addEventListener("click", () => {
+    if (!validWords() || !window.TeacherGameShare) {
+      showToast("Please enter 9 different words first");
+      return;
+    }
+    window.TeacherGameShare.openPublisher({
+      gameType: "word-sudoku",
+      version: 1,
+      title: () => state.title,
+      getData: () => ({
+        title: state.title,
+        items: state.items.map((item) => ({ word: item.word, icon: item.icon })),
+        level: state.level,
+        seed: state.seed,
+        puzzle: state.puzzle.slice(),
+        solution: state.solution.slice()
+      }),
+      onPublished: () => showToast("Student game link created")
+    });
   });
 
   renderInputs();

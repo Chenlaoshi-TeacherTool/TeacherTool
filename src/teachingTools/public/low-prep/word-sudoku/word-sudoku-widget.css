@@ -940,6 +940,7 @@ img.twemoji {
   .actions {
     width: 100%;
     justify-content: flex-end;
+    flex-wrap: wrap;
   }
 }
 
@@ -1008,7 +1009,6 @@ img.twemoji {
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
-  .actions .btn-primary { grid-column: 1 / -1; }
   .btn {
     width: 100%;
     min-width: 0;

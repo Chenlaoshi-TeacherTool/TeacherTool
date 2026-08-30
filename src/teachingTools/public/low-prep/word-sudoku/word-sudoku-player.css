@@ -1,0 +1,168 @@
+.sudoku-player-header {
+  min-height: 160px;
+  padding: 34px max(24px, calc((100vw - 1180px) / 2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  color: #fff;
+  background: linear-gradient(120deg, var(--game-green), var(--game-leaf) 60%, #6f9e72);
+}
+
+.sudoku-player-header .game-share-eyebrow { color: #fff2b5; }
+.sudoku-player-header h1 { margin: 0; font-size: clamp(28px, 4vw, 42px); line-height: 1.15; }
+.sudoku-player-header p:last-child { margin: 9px 0 0; color: rgba(255, 255, 255, .84); }
+
+.sudoku-player-progress {
+  min-width: 130px;
+  padding: 13px 18px;
+  border: 1px solid rgba(255, 255, 255, .28);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, .14);
+  text-align: center;
+}
+
+.sudoku-player-progress strong { display: block; font-size: 22px; }
+.sudoku-player-progress span { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; }
+
+.sudoku-player-main {
+  width: min(1180px, calc(100% - 40px));
+  margin: -18px auto 36px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px;
+  align-items: start;
+  position: relative;
+}
+
+.sudoku-player-card {
+  padding: 24px;
+  border: 1px solid var(--game-line);
+  border-radius: 22px;
+  background: var(--game-paper);
+  box-shadow: 0 18px 45px rgba(25, 79, 69, .13);
+}
+
+.sudoku-card-heading { margin-bottom: 18px; display: flex; justify-content: space-between; gap: 18px; }
+.sudoku-player-card h2 { margin: 0; font-size: 20px; }
+.sudoku-status { margin: 0; color: var(--game-muted); font-size: 12px; text-align: right; }
+.sudoku-status.is-error { color: #a43d31; font-weight: 700; }
+.sudoku-status.is-success { color: var(--game-leaf); font-weight: 800; }
+
+.student-sudoku {
+  width: min(100%, 680px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-rows: repeat(9, minmax(0, 1fr));
+  border: 3px solid var(--game-green);
+  background: #fff;
+}
+
+.student-cell {
+  min-width: 0;
+  min-height: 0;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 0;
+  border-right: 1px solid #aebcae;
+  border-bottom: 1px solid #aebcae;
+  border-radius: 0;
+  background: #fff;
+  color: var(--game-ink);
+  font-size: clamp(8px, 1.15vw, 14px);
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.student-cell.block-right { border-right: 3px solid var(--game-green); }
+.student-cell.last-column { border-right: 0; }
+.student-cell.block-bottom { border-bottom: 3px solid var(--game-green); }
+.student-cell.last-row { border-bottom: 0; }
+.student-cell.given { background: #fff7dd; }
+.student-cell.given.is-picture { font-size: clamp(15px, 2.4vw, 27px); }
+.student-cell.editable { background: #f7fbf3; }
+.student-cell.editable:hover { background: #edf5df; }
+.student-cell.selected { position: relative; z-index: 1; background: #dcebd0; box-shadow: inset 0 0 0 3px var(--game-gold); }
+.student-cell.incorrect { background: #ffe4df; color: #a43d31; }
+.student-cell.correct { background: #e4f2d7; }
+
+.sudoku-board-actions { margin-top: 18px; display: flex; justify-content: flex-end; gap: 10px; }
+.sudoku-primary,
+.sudoku-secondary,
+.sudoku-reset {
+  min-height: 43px;
+  padding: 10px 16px;
+  border-radius: 11px;
+  font-weight: 800;
+}
+
+.sudoku-primary { border: 0; background: linear-gradient(135deg, var(--game-coral), #a83d31); color: #fff; }
+.sudoku-secondary { border: 1px solid #c8d2c5; background: #fff; color: var(--game-green); }
+.sudoku-secondary:disabled { cursor: not-allowed; opacity: .48; }
+
+.sudoku-choices-card { position: sticky; top: 20px; }
+.sudoku-choice-help { margin: 7px 0 16px; color: var(--game-muted); font-size: 12px; line-height: 1.5; }
+.sudoku-answer-choices { display: grid; gap: 8px; }
+.sudoku-choice {
+  min-width: 0;
+  padding: 9px 10px;
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #d6dfd2;
+  border-radius: 11px;
+  background: #fff;
+  color: var(--game-ink);
+  text-align: left;
+}
+
+.sudoku-choice:hover:not(:disabled) { border-color: var(--game-gold); background: #fff9e9; }
+.sudoku-choice:disabled { cursor: not-allowed; opacity: .55; }
+.sudoku-choice-icon { width: 35px; height: 35px; display: grid; place-items: center; border-radius: 9px; background: #edf5df; font-size: 20px; }
+.sudoku-choice-word { overflow: hidden; text-overflow: ellipsis; font-weight: 800; white-space: nowrap; }
+.sudoku-reset { width: 100%; margin-top: 18px; border: 0; background: transparent; color: #8b4b42; font-size: 12px; }
+
+.sudoku-completion {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(17, 48, 42, .65);
+}
+
+.sudoku-completion[hidden] { display: none; }
+.sudoku-completion-card { width: min(100%, 420px); padding: 38px; border-radius: 24px; background: var(--game-paper); box-shadow: 0 28px 80px rgba(0, 0, 0, .25); text-align: center; }
+.sudoku-completion-icon { font-size: 50px; }
+.sudoku-completion-card h2 { margin: 12px 0 0; font-size: 28px; }
+.sudoku-completion-card p { margin: 9px 0 22px; color: var(--game-muted); }
+
+@media (max-width: 900px) {
+  .sudoku-player-main { grid-template-columns: 1fr; }
+  .sudoku-choices-card { position: static; }
+  .sudoku-answer-choices { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .sudoku-player-header { padding: 28px 18px 42px; align-items: flex-start; flex-direction: column; }
+  .sudoku-player-progress { min-width: 0; align-self: stretch; }
+  .sudoku-player-main { width: calc(100% - 18px); margin-top: -20px; }
+  .sudoku-player-card { padding: 13px; border-radius: 16px; }
+  .sudoku-card-heading { align-items: flex-start; flex-direction: column; }
+  .sudoku-status { text-align: left; }
+  .student-cell { font-size: clamp(6px, 2.15vw, 10px); }
+  .student-cell.given.is-picture { font-size: clamp(12px, 4.5vw, 20px); }
+  .sudoku-board-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .sudoku-answer-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sudoku-choice { grid-template-columns: 28px minmax(0, 1fr); padding: 7px; gap: 6px; }
+  .sudoku-choice-icon { width: 28px; height: 28px; font-size: 17px; }
+  .sudoku-choice-word { font-size: 12px; }
+}

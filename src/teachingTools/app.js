@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
 var adminRouter = require('./routes/admin');
 var bookGeneratorRouter = require('./routes/bookGenerator');
+var gameSharesRouter = require('./routes/gameShares');
 
 var app = express();
 
@@ -53,6 +54,7 @@ app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));
 
 app.use('/', indexRouter);
 app.use('/', bookGeneratorRouter);
+app.use('/', gameSharesRouter);
 app.use('/api', apiRouter);
 app.use('/admin', adminRouter);
 

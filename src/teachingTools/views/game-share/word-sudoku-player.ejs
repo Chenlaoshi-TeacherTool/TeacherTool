@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title><%= title %> - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Complete a shared Word Sudoku game online.', noindex: true }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-share.css?v=1">
+  <link rel="stylesheet" href="/low-prep/word-sudoku/word-sudoku-player.css?v=1">
+</head>
+<body class="game-share-page sudoku-player-page">
+  <header class="sudoku-player-header">
+    <div>
+      <p class="game-share-eyebrow">Word Sudoku · Online game</p>
+      <h1 id="gameTitle"><%= title %></h1>
+      <p>Fill every row, column, and 3×3 box with all nine words exactly once.</p>
+    </div>
+    <div class="sudoku-player-progress" aria-live="polite">
+      <strong id="progressCount">0 / 0</strong>
+      <span>blanks filled</span>
+    </div>
+  </header>
+
+  <main class="sudoku-player-main">
+    <section class="sudoku-player-card sudoku-board-card" aria-labelledby="boardHeading">
+      <div class="sudoku-card-heading">
+        <div>
+          <p class="game-share-eyebrow">Puzzle</p>
+          <h2 id="boardHeading">Choose a square, then choose a word</h2>
+        </div>
+        <p id="gameStatus" class="sudoku-status" role="status">Your progress is saved on this device.</p>
+      </div>
+      <div id="studentSudoku" class="student-sudoku" role="grid" aria-label="9 by 9 Word Sudoku"></div>
+      <div class="sudoku-board-actions">
+        <button id="clearCellButton" type="button" class="sudoku-secondary" disabled>Clear selected square</button>
+        <button id="checkButton" type="button" class="sudoku-primary">Check my work</button>
+      </div>
+    </section>
+
+    <aside class="sudoku-player-card sudoku-choices-card" aria-labelledby="choicesHeading">
+      <p class="game-share-eyebrow">Word bank</p>
+      <h2 id="choicesHeading">Pick an answer</h2>
+      <p class="sudoku-choice-help">Select an empty square in the puzzle first.</p>
+      <div id="answerChoices" class="sudoku-answer-choices"></div>
+      <button id="resetButton" type="button" class="sudoku-reset">Reset my progress</button>
+    </aside>
+  </main>
+
+  <div id="completionPanel" class="sudoku-completion" hidden role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+    <div class="sudoku-completion-card">
+      <div class="sudoku-completion-icon" aria-hidden="true">🎉</div>
+      <h2 id="completionTitle">Puzzle complete!</h2>
+      <p>Excellent work — every word is in the right place.</p>
+      <button id="closeCompletionButton" type="button" class="sudoku-primary">Review my puzzle</button>
+    </div>
+  </div>
+
+  <script>window.__SHARED_GAME__ = <%- gameDataJson %>;</script>
+  <script src="/low-prep/word-sudoku/word-sudoku-player.js?v=1"></script>
+</body>
+</html>
