@@ -49,7 +49,9 @@ function toPublicQuestion(row, bankTheme, labels) {
 
 async function getAllPublicBankSummaries() {
   var banks = await dabGet('/questionbanks');
-  var questions = await dabGet('/questions?$select=bank_id');
+  // DAB returns 100 rows by default. Request its configured maximum so every
+  // bank is counted without loading the unused question fields.
+  var questions = await dabGet('/questions?$first=-1&$select=bank_id');
   var countByBankId = {};
   questions.forEach(function (q) {
     countByBankId[q.bank_id] = (countByBankId[q.bank_id] || 0) + 1;
@@ -72,7 +74,7 @@ async function getPublicBankBySlug(slug) {
   var bank = banks[0];
   if (!bank) return null;
   var labels = await getLabelMaps();
-  var questionRows = await dabGet('/questions?$filter=bank_id eq ' + bank.id + '&$orderby=sort_order');
+  var questionRows = await dabGet('/questions?$first=-1&$filter=bank_id eq ' + bank.id + '&$orderby=sort_order');
   return {
     id: bank.slug,
     name: bank.name,
