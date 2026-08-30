@@ -29,21 +29,22 @@
   updateSetupStatus();
   initLibraryPicker();
 
-  var SENTENCE_TEMPLATES = [
-    'I like the {word}.',
-    'This is a {word}.',
-    'I can see a {word}.',
-    'She has a {word}.',
-    'We need a {word}.',
-    'Where is the {word}?'
+  var CHINESE_SENTENCE_TEMPLATES = [
+    '我 喜欢 {word}。',
+    '这 是 {word}。',
+    '我 能 看到 {word}。',
+    '她 有 {word}。',
+    '我们 需要 {word}。',
+    '{word} 在 哪里？'
   ];
 
   function sentencesFromWordList(list, templateOffset) {
     return (list.items || [])
-      .filter(function (item) { return item.en; })
+      .filter(function (item) { return item.zh; })
       .map(function (item, index) {
-        var template = SENTENCE_TEMPLATES[(templateOffset + index) % SENTENCE_TEMPLATES.length];
-        return template.replace('{word}', String(item.en).trim().toLowerCase());
+        var template = CHINESE_SENTENCE_TEMPLATES[(templateOffset + index) % CHINESE_SENTENCE_TEMPLATES.length];
+        var chineseWord = String(item.zh).trim().replace(/\s+/g, ' ');
+        return template.replace('{word}', chineseWord);
       });
   }
 
@@ -53,9 +54,9 @@
       root: document.getElementById('sentenceLibraryPicker'),
       source: 'wordlists',
       min: 1,
-      title: 'Add example sentences from the library',
-      hint: 'Choose one or more vocabulary topics. Each term becomes a simple sentence you can shuffle into a word-order puzzle.',
-      importLabel: 'Add sentences from selected topics',
+      title: 'Add Chinese example sentences from the library',
+      hint: 'Choose one or more vocabulary topics. Each Chinese term becomes a simple sentence you can shuffle into a word-order puzzle.',
+      importLabel: 'Add Chinese sentences from selected topics',
       onImport: function (lists) {
         var lines = [];
         lists.forEach(function (list, listIndex) {
