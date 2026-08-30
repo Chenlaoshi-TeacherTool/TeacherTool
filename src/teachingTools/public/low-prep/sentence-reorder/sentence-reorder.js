@@ -16,6 +16,9 @@
   var fullscreenButton = document.getElementById('fullscreen-button');
   var prevButton = document.getElementById('prev-button');
   var nextButton = document.getElementById('next-button');
+  var fullscreenShell = document.getElementById('reorder-fullscreen-shell');
+  var celebration = document.getElementById('reorder-celebration');
+  var confetti = document.getElementById('reorder-confetti');
 
   var state = {
     sentences: [],   // [{ words: ['The','quick',...] }]
@@ -24,10 +27,12 @@
   };
 
   var drag = null; // { chip, pointerId }
+  var celebrationTimer = null;
 
   sentenceInput.addEventListener('input', updateSetupStatus);
   updateSetupStatus();
   initLibraryPicker();
+  buildCelebrationConfetti();
 
   var CHINESE_SENTENCE_TEMPLATES = [
     '我 喜欢 {word}。',
@@ -123,6 +128,7 @@
   function loadPuzzle(index) {
     var entry = state.sentences[index];
     if (!entry) return;
+    hideCelebration();
     state.currentIndex = index;
     state.order = shuffle(entry.words);
     renderStage();
@@ -224,7 +230,7 @@
     chip.style.width = rect.width + 'px';
     chip.style.height = rect.height + 'px';
     chip.style.margin = '0';
-    document.body.appendChild(chip);
+    (isFullscreenActive() ? fullscreenShell : document.body).appendChild(chip);
 
     drag.started = true;
   }
@@ -321,6 +327,7 @@
     if (correctCount === total) {
       feedbackText.textContent = '🎉 Correct! All ' + total + ' words are in the right order.';
       feedbackText.className = 'reorder-feedback is-success';
+      showCelebration();
     } else {
       feedbackText.textContent = correctCount + ' of ' + total + ' words are in the correct position. Keep dragging!';
       feedbackText.className = 'reorder-feedback is-partial';
@@ -368,19 +375,66 @@
     nextButton.disabled = !hasPuzzle || state.currentIndex >= state.sentences.length - 1;
   }
 
+  function buildCelebrationConfetti() {
+    if (!confetti) return;
+    var colors = ['#ffcf56', '#f47c68', '#8fca78', '#65b9d7', '#b78ce2', '#fffdf7'];
+    for (var i = 0; i < 36; i++) {
+      var piece = document.createElement('span');
+      piece.className = 'reorder-confetti-piece';
+      piece.style.left = ((i * 29) % 97 + 1) + '%';
+      piece.style.backgroundColor = colors[i % colors.length];
+      piece.style.setProperty('--confetti-delay', ((i % 9) * 0.07) + 's');
+      piece.style.setProperty('--confetti-drift', (((i % 7) - 3) * 24) + 'px');
+      piece.style.setProperty('--confetti-spin', ((i % 2 ? 1 : -1) * (360 + i * 19)) + 'deg');
+      confetti.appendChild(piece);
+    }
+  }
+
+  function isFullscreenActive() {
+    return document.fullscreenElement === fullscreenShell || fullscreenShell.classList.contains('is-pseudo-fullscreen');
+  }
+
+  function updateFullscreenUi() {
+    var active = isFullscreenActive();
+    fullscreenButton.textContent = active ? fullscreenButton.dataset.exitLabel : fullscreenButton.dataset.enterLabel;
+    fullscreenButton.setAttribute('aria-pressed', active ? 'true' : 'false');
+    if (!active) hideCelebration();
+  }
+
+  function hideCelebration() {
+    if (!celebration) return;
+    celebration.classList.remove('is-active');
+    celebration.setAttribute('aria-hidden', 'true');
+    if (celebrationTimer) {
+      window.clearTimeout(celebrationTimer);
+      celebrationTimer = null;
+    }
+  }
+
+  function showCelebration() {
+    if (!celebration) return;
+    hideCelebration();
+    // Restart the animation when a student checks the same correct answer again.
+    void celebration.offsetWidth;
+    celebration.classList.add('is-active');
+    celebration.setAttribute('aria-hidden', 'false');
+    celebrationTimer = window.setTimeout(hideCelebration, 2800);
+  }
+
   fullscreenButton.addEventListener('click', function () {
-    var isActive = document.fullscreenElement === stage || stage.classList.contains('is-pseudo-fullscreen');
-    if (isActive) {
-      if (document.fullscreenElement) document.exitFullscreen();
-      stage.classList.remove('is-pseudo-fullscreen');
+    if (isFullscreenActive()) {
+      if (document.fullscreenElement === fullscreenShell) document.exitFullscreen();
+      fullscreenShell.classList.remove('is-pseudo-fullscreen');
+      updateFullscreenUi();
       return;
     }
     var fallback = function () {
-      stage.classList.add('is-pseudo-fullscreen');
+      fullscreenShell.classList.add('is-pseudo-fullscreen');
+      updateFullscreenUi();
     };
-    if (stage.requestFullscreen) {
+    if (fullscreenShell.requestFullscreen) {
       try {
-        var result = stage.requestFullscreen();
+        var result = fullscreenShell.requestFullscreen();
         if (result && result.catch) {
           result.catch(fallback);
           return;
@@ -394,9 +448,12 @@
     fallback();
   });
 
+  document.addEventListener('fullscreenchange', updateFullscreenUi);
+
   document.addEventListener('keydown', function (event) {
-    if (event.code === 'Escape' && stage.classList.contains('is-pseudo-fullscreen')) {
-      stage.classList.remove('is-pseudo-fullscreen');
+    if (event.code === 'Escape' && fullscreenShell.classList.contains('is-pseudo-fullscreen')) {
+      fullscreenShell.classList.remove('is-pseudo-fullscreen');
+      updateFullscreenUi();
     }
   });
 })();

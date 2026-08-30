@@ -472,8 +472,11 @@ module.exports = {
       shuffleButton: 'Shuffle Again',
       revealButton: 'Show Answer',
       fullscreenButton: 'Fullscreen',
+      exitFullscreenButton: 'Exit Fullscreen',
       prevButton: 'Previous',
-      nextButton: 'Next sentence'
+      nextButton: 'Next sentence',
+      celebrationTitle: 'You got it!',
+      celebrationSubtitle: 'Excellent work — the sentence is in the correct order.'
     },
     nameTentGenerator: {
       backLink: '← Back to Teaching Tools',
@@ -1585,8 +1588,11 @@ module.exports = {
       shuffleButton: '重新打乱',
       revealButton: '显示答案',
       fullscreenButton: '全屏',
+      exitFullscreenButton: '退出全屏',
       prevButton: '上一句',
-      nextButton: '下一句'
+      nextButton: '下一句',
+      celebrationTitle: '答对了！',
+      celebrationSubtitle: '太棒了，句子顺序完全正确！'
     },
     nameTentGenerator: {
       backLink: '← 返回教学工具',

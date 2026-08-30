@@ -8,7 +8,7 @@
   <%- include('../partials/seo', { pageDescription: 'Type in sentences and turn them into drag-and-drop word puzzles. Students drag the scrambled words back into the correct order, right in the browser.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
-  <link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder.css?v=3">
+  <link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder.css?v=4">
 </head>
 <body class="reorder-page">
   <main class="reorder-wrap">
@@ -60,7 +60,7 @@
         <p id="setup-status" class="reorder-setup-status" aria-live="polite"><%= t('sentenceReorder.setupStatusDefault') %></p>
       </section>
 
-      <section class="reorder-preview-panel" aria-label="Puzzle stage">
+      <section id="reorder-fullscreen-shell" class="reorder-preview-panel" aria-label="Puzzle stage">
         <div class="reorder-preview-heading">
           <h2><%= t('sentenceReorder.stageHeading') %></h2>
           <p id="progress-text" class="reorder-progress-text"><%= t('sentenceReorder.noPuzzleYet') %></p>
@@ -76,11 +76,28 @@
           <button id="check-button" class="reorder-primary" type="button" disabled>✓ <%= t('sentenceReorder.checkButton') %></button>
           <button id="shuffle-button" class="reorder-secondary" type="button" disabled>🔀 <%= t('sentenceReorder.shuffleButton') %></button>
           <button id="reveal-button" class="reorder-secondary" type="button" disabled>👀 <%= t('sentenceReorder.revealButton') %></button>
-          <button id="fullscreen-button" class="reorder-secondary" type="button" disabled>⛶ <%= t('sentenceReorder.fullscreenButton') %></button>
+          <button
+            id="fullscreen-button"
+            class="reorder-secondary"
+            type="button"
+            aria-pressed="false"
+            data-enter-label="⛶ <%= t('sentenceReorder.fullscreenButton') %>"
+            data-exit-label="✕ <%= t('sentenceReorder.exitFullscreenButton') %>"
+            disabled
+          >⛶ <%= t('sentenceReorder.fullscreenButton') %></button>
         </div>
         <div class="reorder-nav-controls">
           <button id="prev-button" class="reorder-secondary" type="button" disabled>← <%= t('sentenceReorder.prevButton') %></button>
           <button id="next-button" class="reorder-primary" type="button" disabled><%= t('sentenceReorder.nextButton') %> →</button>
+        </div>
+
+        <div id="reorder-celebration" class="reorder-celebration" aria-hidden="true" role="status">
+          <div id="reorder-confetti" class="reorder-confetti" aria-hidden="true"></div>
+          <div class="reorder-celebration-card">
+            <span class="reorder-celebration-icon" aria-hidden="true">🎉</span>
+            <p class="reorder-celebration-title"><%= t('sentenceReorder.celebrationTitle') %></p>
+            <p class="reorder-celebration-subtitle"><%= t('sentenceReorder.celebrationSubtitle') %></p>
+          </div>
         </div>
       </section>
     </div>
@@ -89,7 +106,7 @@
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script src="/shared/library-picker.js" defer></script>
-  <script src="/low-prep/sentence-reorder/sentence-reorder.js?v=5" defer></script>
+  <script src="/low-prep/sentence-reorder/sentence-reorder.js?v=6" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
