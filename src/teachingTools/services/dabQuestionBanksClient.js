@@ -49,7 +49,7 @@ function toPublicQuestion(row, bankTheme, labels) {
 
 async function getAllPublicBankSummaries() {
   var banks = await dabGet('/questionbanks');
-  var questions = await dabGet('/questions');
+  var questions = await dabGet('/questions?$select=bank_id');
   var countByBankId = {};
   questions.forEach(function (q) {
     countByBankId[q.bank_id] = (countByBankId[q.bank_id] || 0) + 1;
