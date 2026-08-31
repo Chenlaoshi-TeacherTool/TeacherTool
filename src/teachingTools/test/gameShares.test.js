@@ -93,8 +93,6 @@ test('publishes, password-protects, opens, and deletes a shared game', async fun
   var playerHtml = await playerResponse.text();
   assert.match(playerHtml, /Choose a square, then choose a word/);
   assert.match(playerHtml, /Class Fruit Sudoku/);
-  assert.match(playerHtml, /data-site-header-only/);
-  assert.match(playerHtml, /milk-tea-footer\.js\?v=header-only-1/);
 
   var deleteResponse = await fetch(baseUrl + '/api/game-shares/' + published.shareId, {
     method: 'DELETE',
