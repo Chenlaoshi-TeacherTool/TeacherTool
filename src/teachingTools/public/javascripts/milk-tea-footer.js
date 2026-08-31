@@ -126,6 +126,10 @@
       document.body.prepend(nav);
     }
 
+    // Focused student activities use the shared branded navigation without
+    // adding promotional or legal footers beneath the game surface.
+    if (document.body.hasAttribute('data-site-header-only')) return;
+
     var legalFooters = document.querySelectorAll('footer');
     var legalFooter = legalFooters.length ? legalFooters[legalFooters.length - 1] : document.createElement('footer');
     legalFooter.id = 'siteLegalFooter';
