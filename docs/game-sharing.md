@@ -13,6 +13,12 @@ Local development stores manifests under `src/teachingTools/tmp/game-share-stora
 
 Production must also set a strong, private `COOKIE_SECRET`. The app creates the Blob container on first publish when the configured storage identity has permission. Configure an Azure lifecycle rule to remove blobs older than the product retention period; opening an expired link also removes that share on demand.
 
+## Browser-local link management
+
+After publishing, `/shared/game-sharing.js` saves the share URL, delete token, title, and expiration time in that teacher's browser. Generators can call `TeacherGameShare.openManager()` to let the teacher open, copy, or delete those links. Passwords are never stored.
+
+This list is intentionally browser-local. It cannot discover links created before the manager was added, links created in another browser, or links removed by clearing browser data. Deleting a listed link calls the server API and then removes the local record.
+
 ## Adding another online game
 
 Create an adapter under `services/games/` that exports:

@@ -9,6 +9,8 @@
   background: #fffdf7;
   box-shadow: 0 28px 90px rgba(13, 50, 43, .3);
 }
+.game-share-dialog,
+.game-share-dialog * { box-sizing: border-box; }
 
 .game-share-dialog::backdrop { background: rgba(18, 53, 47, .64); backdrop-filter: blur(3px); }
 .game-share-dialog-card { padding: 28px; position: relative; }
@@ -35,7 +37,32 @@
 .game-share-dialog-result-actions button:hover,
 .game-share-dialog-result-actions a:hover { border-color: #f8c63f; background: #fff9e9; }
 
+.game-share-manager-dialog { width: min(760px, calc(100% - 28px)); }
+.game-share-manager-note { margin: 18px 0 0; padding: 10px 12px; border-radius: 10px; background: #f5f1e4; color: #5d7168; font-size: 12px; line-height: 1.55; }
+.game-share-manager-list { min-width: 0; margin-top: 18px; display: grid; gap: 11px; }
+.game-share-manager-item { min-width: 0; padding: 15px; border: 1px solid #d8dfd5; border-radius: 13px; background: #fff; }
+.game-share-manager-item-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.game-share-manager-item-heading h3 { min-width: 0; margin: 0; overflow-wrap: anywhere; color: #193d38; font-size: 16px; }
+.game-share-manager-item-heading span { padding: 4px 8px; flex: 0 0 auto; border-radius: 999px; background: #edf5df; color: #356e57; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+.game-share-manager-item-heading span.is-expired { background: #f1eee4; color: #786f64; }
+.game-share-manager-url { min-width: 0; max-width: 100%; margin: 8px 0 0; overflow: hidden; color: #4e6c64; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.game-share-manager-meta { margin: 5px 0 0; color: #7b887f; font-size: 11px; }
+.game-share-manager-actions { margin-top: 12px; display: flex; justify-content: flex-end; gap: 7px; }
+.game-share-manager-actions a,
+.game-share-manager-actions button { min-height: 36px; padding: 7px 11px; display: inline-grid; place-items: center; border: 1px solid #d3dccf; border-radius: 9px; background: #fff; color: #194f45; font-size: 11px; font-weight: 800; text-decoration: none; }
+.game-share-manager-actions a:hover,
+.game-share-manager-actions button:hover:not(:disabled) { border-color: #f8c63f; background: #fff9e9; }
+.game-share-manager-actions button.is-delete { border-color: #edc7c0; color: #a33d31; }
+.game-share-manager-actions button:disabled { cursor: wait; opacity: .65; }
+.game-share-manager-empty { padding: 28px 18px; border: 1px dashed #cbd5c8; border-radius: 13px; color: #5d7168; text-align: center; }
+.game-share-manager-empty span { font-size: 30px; }
+.game-share-manager-empty h3 { margin: 8px 0 0; color: #294f47; font-size: 17px; }
+.game-share-manager-empty p { margin: 5px 0 0; font-size: 12px; }
+
 @media (max-width: 480px) {
   .game-share-dialog-card { padding: 23px 18px; }
   .game-share-dialog-result-actions { grid-template-columns: 1fr; }
+  .game-share-manager-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .game-share-manager-actions a,
+  .game-share-manager-actions button { min-width: 0; padding-inline: 5px; }
 }

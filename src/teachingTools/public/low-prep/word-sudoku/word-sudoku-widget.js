@@ -107,6 +107,8 @@
     answerButton: document.getElementById("answerButton"),
     generateButton: document.getElementById("generateButton"),
     shareButton: document.getElementById("shareButton"),
+    manageLinksButton: document.getElementById("manageLinksButton"),
+    managedLinkCount: document.getElementById("managedLinkCount"),
     printButton: document.getElementById("printButton"),
     toast: document.getElementById("toast")
   };
@@ -118,6 +120,12 @@
     elements.toast.textContent = message;
     elements.toast.classList.add("show");
     toastTimer = setTimeout(() => elements.toast.classList.remove("show"), 1900);
+  }
+
+  function updateManagedLinkCount() {
+    if (!window.TeacherGameShare) return;
+    const count = window.TeacherGameShare.listShares().length;
+    elements.managedLinkCount.textContent = count ? `(${count})` : "";
   }
 
   function setTopicLibraryExpanded(expanded) {
@@ -794,7 +802,17 @@
         puzzle: state.puzzle.slice(),
         solution: state.solution.slice()
       }),
-      onPublished: () => showToast("Student game link created")
+      onPublished: () => {
+        updateManagedLinkCount();
+        showToast("Student game link created");
+      }
+    });
+  });
+
+  elements.manageLinksButton.addEventListener("click", () => {
+    if (!window.TeacherGameShare) return;
+    window.TeacherGameShare.openManager({
+      onChanged: () => updateManagedLinkCount()
     });
   });
 
@@ -802,6 +820,7 @@
   renderLegends();
   generatePuzzle();
   initLibraryPicker();
+  updateManagedLinkCount();
 
   // 异步加载 OpenMoji 索引；就绪后重绘，把原生 emoji 升级成 OpenMoji 图。
   if (CE) {
