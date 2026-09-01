@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title><%= lang === 'zh' ? '中文生词卡生成器' : 'Chinese Flash Card Generator' %> - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Paste Chinese vocabulary and automatically create a Letter-size 2-by-4 duplex-ready flash card PDF with matching pinyin backs and your choice of border color.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/library-picker.css">
+  <link rel="stylesheet" href="/low-prep/flash-card-generator/flash-card-generator.css">
+</head>
+<body class="flash-card-page">
+  <% var isZh = lang === 'zh'; %>
+  <main class="flash-card-wrap">
+    <header class="flash-hero account-header-host">
+      <a class="back-link" href="/teaching-tools#low-prep-activities"><%= isZh ? '← 返回教学工具' : '← Back to Teaching Tools' %></a>
+      <div class="hero-copy">
+        <p class="eyebrow"><%= isZh ? '剪好就能用的双面词卡' : 'Cut-and-go duplex vocabulary cards' %></p>
+        <h1><span aria-hidden="true">🗂️</span> <%= isZh ? '中文生词卡生成器' : 'Chinese Flash Card Generator' %></h1>
+        <p><%= isZh ? '粘贴中文生词，自动配上拼音，生成每页 2×4 的 Letter 双面打印 PDF。' : 'Paste Chinese vocabulary, add pinyin automatically, and download a Letter-size 2×4 PDF ready for double-sided printing.' %></p>
+        <div class="hero-points" aria-label="Tool highlights">
+          <span>Letter size</span>
+          <span>2 × 4</span>
+          <span><%= isZh ? '正反面自动对齐' : 'Auto-aligned backs' %></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="workspace-grid">
+      <section class="builder" aria-label="Flash card builder">
+        <section class="panel input-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step-number">1</span>
+              <p class="eyebrow"><%= isZh ? '输入生词' : 'Add vocabulary' %></p>
+              <h2><%= isZh ? '把中文生词贴进来' : 'Paste your Chinese words' %></h2>
+            </div>
+            <button id="load-example" class="ghost-button" type="button"><%= isZh ? '试用示例' : 'Load example' %></button>
+          </div>
+          <label class="field-label" for="terms"><%= isZh ? '一行一个词，也可以用顿号、逗号或分号分开' : 'Use one term per line, or separate terms with commas or semicolons' %></label>
+          <textarea id="terms" class="terms-textarea" placeholder="苹果&#10;香蕉&#10;草莓&#10;西瓜" spellcheck="false"></textarea>
+          <div class="input-meta">
+            <p class="field-help"><%= isZh ? '拼音会自动生成。需要指定读音时可输入：' : 'Pinyin is automatic. To specify a reading, use: ' %><strong>银行 | yín háng</strong></p>
+            <p id="term-count" class="term-count" aria-live="polite"><%= isZh ? '还没有生词' : 'No terms yet' %></p>
+          </div>
+
+          <details class="library-drawer">
+            <summary>
+              <span aria-hidden="true">🌻</span>
+              <span><strong><%= isZh ? '从主题词库添加' : 'Add from a vocabulary topic' %></strong><small><%= isZh ? '复用通用主题词功能' : 'Use the shared topic library' %></small></span>
+            </summary>
+            <div id="flashCardLibraryPicker"></div>
+          </details>
+        </section>
+
+        <section class="panel detected-panel">
+          <div class="panel-heading compact">
+            <div>
+              <span class="step-number">2</span>
+              <p class="eyebrow"><%= isZh ? '检查拼音' : 'Check pinyin' %></p>
+              <h2><%= isZh ? '确认每张卡的正反面' : 'Review each card pair' %></h2>
+            </div>
+          </div>
+          <p class="field-help"><%= isZh ? '左边是正面中文，右边是背面拼音；拼音可以直接修改。' : 'Chinese prints on the front and the editable pinyin prints on the back.' %></p>
+          <div id="detected-list" class="detected-list" aria-live="polite">
+            <p class="empty-state"><%= isZh ? '输入生词后，这里会显示自动生成的拼音。' : 'Your automatically generated pinyin will appear here.' %></p>
+          </div>
+        </section>
+
+        <section class="panel style-panel">
+          <div class="panel-heading compact">
+            <div>
+              <span class="step-number">3</span>
+              <p class="eyebrow"><%= isZh ? '选择样式' : 'Choose a style' %></p>
+              <h2><%= isZh ? '设置卡片边框颜色' : 'Pick the card border color' %></h2>
+            </div>
+          </div>
+          <div class="color-controls">
+            <div class="color-swatches" aria-label="Border color presets">
+              <button class="color-swatch is-selected" type="button" data-color="#2f6f5e" style="--swatch:#2f6f5e" aria-label="Green"></button>
+              <button class="color-swatch" type="button" data-color="#3f6fa8" style="--swatch:#3f6fa8" aria-label="Blue"></button>
+              <button class="color-swatch" type="button" data-color="#8b5aa7" style="--swatch:#8b5aa7" aria-label="Purple"></button>
+              <button class="color-swatch" type="button" data-color="#d15f4c" style="--swatch:#d15f4c" aria-label="Coral"></button>
+              <button class="color-swatch" type="button" data-color="#e39b28" style="--swatch:#e39b28" aria-label="Orange"></button>
+              <button class="color-swatch" type="button" data-color="#222222" style="--swatch:#222222" aria-label="Black"></button>
+            </div>
+            <label class="custom-color" for="border-color"><%= isZh ? '自定义' : 'Custom' %><input id="border-color" type="color" value="#2f6f5e"></label>
+          </div>
+        </section>
+
+        <section class="download-panel" aria-labelledby="download-heading">
+          <div class="download-icon" aria-hidden="true">↕</div>
+          <div>
+            <h2 id="download-heading"><%= isZh ? '双面打印设置' : 'Double-sided print settings' %></h2>
+            <p><%= isZh ? 'PDF 已按“正面、背面”交替排列。打印时请选择：双面打印、长边翻页、实际大小 100%。' : 'PDF pages alternate front, back. Print double-sided, flip on the long edge, at Actual Size (100%).' %></p>
+          </div>
+          <button id="download-pdf" class="download-button" type="button" disabled><%= isZh ? '下载双面打印 PDF' : 'Download duplex PDF' %></button>
+          <p id="generation-status" class="generation-status" aria-live="polite"></p>
+        </section>
+      </section>
+
+      <aside class="preview-panel" aria-label="Flash card preview">
+        <div class="preview-heading">
+          <div>
+            <p class="eyebrow"><%= isZh ? '实时预览' : 'Live preview' %></p>
+            <h2><%= isZh ? 'Letter 纸张预览' : 'Letter sheet preview' %></h2>
+          </div>
+          <div class="side-switch" role="group" aria-label="Preview side">
+            <button type="button" data-side="front" class="is-active"><%= isZh ? '正面' : 'Front' %></button>
+            <button type="button" data-side="back"><%= isZh ? '背面' : 'Back' %></button>
+          </div>
+        </div>
+        <div class="preview-note"><span aria-hidden="true">✦</span> <span id="preview-note-text"><%= isZh ? '背面会自动左右镜像，确保拼音和中文一一对应。' : 'Backs are mirrored automatically so every answer stays behind its matching word.' %></span></div>
+        <div id="sheet-preview" class="sheet-preview" style="--card-border:#2f6f5e">
+          <div id="preview-grid" class="preview-grid"></div>
+        </div>
+        <div class="page-navigation">
+          <button id="prev-sheet" type="button" aria-label="Previous sheet">←</button>
+          <span id="page-status"><%= isZh ? '第 1 / 1 组' : 'Sheet 1 of 1' %></span>
+          <button id="next-sheet" type="button" aria-label="Next sheet">→</button>
+        </div>
+        <div class="print-key">
+          <span><i class="front-dot"></i><%= isZh ? '正面：中文' : 'Front: Chinese' %></span>
+          <span><i class="back-dot"></i><%= isZh ? '背面：拼音' : 'Back: Pinyin' %></span>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script>window.FLASH_CARD_LANG = '<%= isZh ? 'zh' : 'en' %>';</script>
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/library-picker.js"></script>
+  <script src="/shared/deck-export.js"></script>
+  <script src="/low-prep/flash-card-generator/flash-card-core.js"></script>
+  <script src="/low-prep/flash-card-generator/flash-card-generator.js" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
