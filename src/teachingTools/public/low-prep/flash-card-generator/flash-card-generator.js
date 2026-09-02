@@ -19,15 +19,30 @@
   var nextButton = document.getElementById('next-sheet');
   var pageStatus = document.getElementById('page-status');
   var sideButtons = Array.prototype.slice.call(document.querySelectorAll('[data-side]'));
+  var displayInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="frontDisplay"], input[name="backDisplay"]'));
+  var displayStatus = document.getElementById('display-status');
+  var frontKey = document.getElementById('front-key');
+  var backKey = document.getElementById('back-key');
   var swatches = Array.prototype.slice.call(document.querySelectorAll('.color-swatch'));
   var loadExampleButton = document.getElementById('load-example');
-  var state = { entries: [], page: 0, side: 'front', borderColor: '#2f6f5e', overrides: Object.create(null) };
+  var state = {
+    entries: [],
+    page: 0,
+    side: 'front',
+    borderColor: '#2f6f5e',
+    overrides: { py: Object.create(null), en: Object.create(null) }
+  };
   var updateTimer = null;
 
   function pinyinFor(value) {
     if (Wordlist && typeof Wordlist.toPinyin === 'function') {
       return Wordlist.toPinyin(value, { spaced: true });
     }
+    return '';
+  }
+
+  function englishFor(value) {
+    if (Wordlist && typeof Wordlist.toEnglish === 'function') return Wordlist.toEnglish(value);
     return '';
   }
 
@@ -47,9 +62,10 @@
   }
 
   function refreshEntries() {
-    var entries = Core.parseEntries(termsInput.value, pinyinFor);
+    var entries = Core.parseEntries(termsInput.value, pinyinFor, englishFor);
     entries.forEach(function (item) {
-      if (Object.prototype.hasOwnProperty.call(state.overrides, item.zh)) item.py = state.overrides[item.zh];
+      if (Object.prototype.hasOwnProperty.call(state.overrides.py, item.zh)) item.py = state.overrides.py[item.zh];
+      if (Object.prototype.hasOwnProperty.call(state.overrides.en, item.zh)) item.en = state.overrides.en[item.zh];
     });
     state.entries = entries;
     var pageCount = Math.max(1, Core.paginate(entries).length);
@@ -77,7 +93,7 @@
     if (!state.entries.length) {
       var empty = document.createElement('p');
       empty.className = 'empty-state';
-      empty.textContent = isZh ? '输入生词后，这里会显示自动生成的拼音。' : 'Your automatically generated pinyin will appear here.';
+      empty.textContent = isZh ? '输入生词后，这里会显示自动生成的拼音和英文。' : 'Your automatically generated pinyin and English will appear here.';
       detectedList.appendChild(empty);
       return;
     }
@@ -94,18 +110,30 @@
       arrow.className = 'detected-arrow';
       arrow.textContent = '→';
       arrow.setAttribute('aria-hidden', 'true');
-      var input = document.createElement('input');
-      input.type = 'text';
-      input.value = item.py;
-      input.setAttribute('aria-label', (isZh ? '修改拼音：' : 'Edit pinyin for ') + item.zh);
-      input.addEventListener('input', function () {
-        state.entries[index].py = input.value.trim();
-        state.overrides[item.zh] = input.value.trim();
+      var pinyinInput = document.createElement('input');
+      pinyinInput.type = 'text';
+      pinyinInput.value = item.py;
+      pinyinInput.placeholder = isZh ? '拼音' : 'Pinyin';
+      pinyinInput.setAttribute('aria-label', (isZh ? '修改拼音：' : 'Edit pinyin for ') + item.zh);
+      pinyinInput.addEventListener('input', function () {
+        state.entries[index].py = pinyinInput.value.trim();
+        state.overrides.py[item.zh] = pinyinInput.value.trim();
+        renderPreview();
+      });
+      var englishInput = document.createElement('input');
+      englishInput.type = 'text';
+      englishInput.value = item.en;
+      englishInput.placeholder = isZh ? '英文' : 'English';
+      englishInput.setAttribute('aria-label', (isZh ? '修改英文：' : 'Edit English for ') + item.zh);
+      englishInput.addEventListener('input', function () {
+        state.entries[index].en = englishInput.value.trim();
+        state.overrides.en[item.zh] = englishInput.value.trim();
         renderPreview();
       });
       row.appendChild(zh);
       row.appendChild(arrow);
-      row.appendChild(input);
+      row.appendChild(pinyinInput);
+      row.appendChild(englishInput);
       fragment.appendChild(row);
     });
     detectedList.appendChild(fragment);
@@ -118,6 +146,27 @@
     return state.side === 'back' ? Core.mirrorBackSlots(frontSlots) : frontSlots;
   }
 
+  function selectedDisplayTypes(side) {
+    var name = side === 'front' ? 'frontDisplay' : 'backDisplay';
+    return displayInputs.filter(function (input) {
+      return input.name === name && input.checked;
+    }).map(function (input) { return input.value; });
+  }
+
+  function displayValues(item, side) {
+    return selectedDisplayTypes(side).map(function (type) {
+      return { type: type, text: String(item[type] || '').trim() || '—' };
+    });
+  }
+
+  function displayLabel(side) {
+    var labels = isZh
+      ? { zh: '中文', py: '拼音', en: '英文' }
+      : { zh: 'Chinese', py: 'Pinyin', en: 'English' };
+    var selected = selectedDisplayTypes(side).map(function (type) { return labels[type]; }).join(' + ');
+    return (side === 'front' ? (isZh ? '正面：' : 'Front: ') : (isZh ? '背面：' : 'Back: ')) + selected;
+  }
+
   function renderPreview() {
     sheetPreview.style.setProperty('--card-border', state.borderColor);
     sheetPreview.dataset.side = state.side;
@@ -127,10 +176,17 @@
       var card = document.createElement('div');
       card.className = 'preview-card' + (item ? '' : ' is-empty');
       if (item) {
-        var text = document.createElement('span');
-        text.className = 'preview-card-main';
-        text.textContent = state.side === 'front' ? item.zh : (item.py || '—');
-        card.appendChild(text);
+        var values = displayValues(item, state.side);
+        var content = document.createElement('div');
+        content.className = 'preview-card-content';
+        content.dataset.count = String(values.length);
+        values.forEach(function (value) {
+          var line = document.createElement('span');
+          line.className = 'preview-line preview-line--' + value.type;
+          line.textContent = value.text;
+          content.appendChild(line);
+        });
+        card.appendChild(content);
       }
       previewGrid.appendChild(card);
     });
@@ -144,6 +200,8 @@
     sideButtons.forEach(function (button) {
       button.classList.toggle('is-active', button.dataset.side === state.side);
     });
+    frontKey.textContent = displayLabel('front');
+    backKey.textContent = displayLabel('back');
   }
 
   function setBorderColor(color, selectedSwatch) {
@@ -187,18 +245,47 @@
     return { lines: lines, size: text.length <= 18 ? 28 : (text.length <= 38 ? 22 : 17) };
   }
 
+  function wrapEnglish(value) {
+    var wrapped = wrapPinyin(value);
+    wrapped.size = String(value || '').length <= 20 ? 24 : (String(value || '').length <= 42 ? 19 : 16);
+    return wrapped;
+  }
+
   function svgText(item, side, centerX, centerY) {
-    var wrapped = side === 'front' ? wrapChinese(item.zh) : wrapPinyin(item.py);
-    var lineHeight = wrapped.size * 1.28;
-    var startY = centerY - ((wrapped.lines.length - 1) * lineHeight / 2);
-    var family = side === 'front'
-      ? "'Noto Sans SC','Microsoft YaHei','SimHei',sans-serif"
-      : "'Nunito','Arial',sans-serif";
-    return wrapped.lines.map(function (line, index) {
-      return '<text x="' + centerX.toFixed(2) + '" y="' + (startY + index * lineHeight).toFixed(2) + '" ' +
-        'text-anchor="middle" dominant-baseline="middle" fill="#173d34" font-family="' + family + '" ' +
-        'font-size="' + wrapped.size + '" font-weight="700">' + escapeXml(line) + '</text>';
-    }).join('');
+    var values = displayValues(item, side);
+    var blocks = values.map(function (value) {
+      var wrapped = value.type === 'zh' ? wrapChinese(value.text) : (value.type === 'py' ? wrapPinyin(value.text) : wrapEnglish(value.text));
+      if (values.length > 1) {
+        if (value.type === 'zh') wrapped.size = Math.min(wrapped.size, 34);
+        if (value.type === 'py') wrapped.size = Math.min(wrapped.size, 20);
+        if (value.type === 'en') wrapped.size = Math.min(wrapped.size, 17);
+      }
+      return { type: value.type, lines: wrapped.lines, size: wrapped.size };
+    });
+    var gap = blocks.length > 1 ? 8 : 0;
+    var totalHeight = blocks.reduce(function (sum, block) {
+      return sum + block.lines.length * block.size * 1.2;
+    }, 0) + gap * Math.max(0, blocks.length - 1);
+    var cursorY = centerY - totalHeight / 2;
+    var output = '';
+
+    blocks.forEach(function (block, blockIndex) {
+      var family = block.type === 'zh'
+        ? "'KaiTi','STKaiti','Kaiti SC','楷体',serif"
+        : "'Nunito','Arial',sans-serif";
+      var fill = block.type === 'zh' ? '#c3c3c3' : (block.type === 'en' ? '#60756d' : '#315f55');
+      var weight = block.type === 'zh' ? '400' : '700';
+      var lineHeight = block.size * 1.2;
+      block.lines.forEach(function (line) {
+        var y = cursorY + lineHeight / 2;
+        output += '<text x="' + centerX.toFixed(2) + '" y="' + y.toFixed(2) + '" ' +
+          'text-anchor="middle" dominant-baseline="middle" fill="' + fill + '" font-family="' + family + '" ' +
+          'font-size="' + block.size + '" font-weight="' + weight + '">' + escapeXml(line) + '</text>';
+        cursorY += lineHeight;
+      });
+      if (blockIndex < blocks.length - 1) cursorY += gap;
+    });
+    return output;
   }
 
   function buildPageSvg(entries, side) {
@@ -268,7 +355,7 @@
       source: 'wordlists',
       min: 1,
       title: isZh ? '从已发布主题中添加生词' : 'Add words from published topics',
-      hint: isZh ? '选择一个或多个主题，词语和已有拼音会自动加入上方输入框。' : 'Choose one or more topics. Terms and saved pinyin will be added above.',
+      hint: isZh ? '选择一个或多个主题，词语、拼音和英文会自动加入上方输入框。' : 'Choose one or more topics. Terms, pinyin, and English will be added above.',
       importLabel: isZh ? '添加所选主题词' : 'Add selected topic words',
       libraryLinkText: isZh ? '浏览完整词库' : 'Browse the full word list library',
       onImport: function (lists) {
@@ -282,7 +369,8 @@
             var zh = String(item.zh || '').trim();
             if (!zh || seen[zh]) return;
             var py = String(item.py || '').trim() || pinyinFor(zh);
-            lines.push(zh + (py ? ' | ' + py : ''));
+            var en = String(item.en || '').trim() || englishFor(zh);
+            lines.push(zh + ' | ' + py + ' | ' + en);
             seen[zh] = true;
             added++;
           });
@@ -310,6 +398,19 @@
     });
   });
 
+  displayInputs.forEach(function (input) {
+    input.addEventListener('change', function () {
+      var side = input.name === 'frontDisplay' ? 'front' : 'back';
+      if (!selectedDisplayTypes(side).length) {
+        input.checked = true;
+        displayStatus.textContent = isZh ? '正面和反面都要至少选择一项。' : 'Choose at least one item for both the front and back.';
+      } else {
+        displayStatus.textContent = '';
+      }
+      renderPreview();
+    });
+  });
+
   swatches.forEach(function (button) {
     button.addEventListener('click', function () { setBorderColor(button.dataset.color, button); });
   });
@@ -321,7 +422,7 @@
   downloadButton.addEventListener('click', downloadPdf);
   loadExampleButton.addEventListener('click', function () {
     termsInput.value = ['苹果', '香蕉', '草莓', '西瓜', '葡萄', '橘子', '桃子', '梨'].join('\n');
-    state.overrides = Object.create(null);
+    state.overrides = { py: Object.create(null), en: Object.create(null) };
     refreshEntries();
     setStatus('');
   });

@@ -10,15 +10,20 @@ test('parses Chinese terms, common separators, manual pinyin, and removes duplic
     '香蕉、草莓，西瓜',
     '银行 | yín háng',
     '苹果'
-  ].join('\n'), function (word) { return 'auto-' + word; });
+  ].join('\n'), function (word) { return 'auto-' + word; }, function (word) { return 'english-' + word; });
 
   assert.deepEqual(entries, [
-    { zh: '苹果', py: 'auto-苹果' },
-    { zh: '香蕉', py: 'auto-香蕉' },
-    { zh: '草莓', py: 'auto-草莓' },
-    { zh: '西瓜', py: 'auto-西瓜' },
-    { zh: '银行', py: 'yín háng' }
+    { zh: '苹果', py: 'auto-苹果', en: 'english-苹果' },
+    { zh: '香蕉', py: 'auto-香蕉', en: 'english-香蕉' },
+    { zh: '草莓', py: 'auto-草莓', en: 'english-草莓' },
+    { zh: '西瓜', py: 'auto-西瓜', en: 'english-西瓜' },
+    { zh: '银行', py: 'yín háng', en: 'english-银行' }
   ]);
+});
+
+test('preserves manually supplied pinyin and English', function () {
+  var entries = core.parseEntries('苹果 | píng guǒ | apple', function () { return 'auto'; }, function () { return 'automatic English'; });
+  assert.deepEqual(entries, [{ zh: '苹果', py: 'píng guǒ', en: 'apple' }]);
 });
 
 test('mirrors every two-card row for long-edge duplex printing', function () {

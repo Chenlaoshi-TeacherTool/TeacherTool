@@ -25,13 +25,14 @@
     return parts.length > 1 ? parts : [line];
   }
 
-  function parseOne(value, pinyinFn) {
+  function parseOne(value, pinyinFn, englishFn) {
     var line = stripListMarker(value);
     if (!line) return null;
 
     var pieces = line.split(/\s*(?:\||｜|\t)\s*/).map(clean);
     var zh = pieces[0] || '';
     var py = pieces[1] || '';
+    var en = pieces[2] || '';
 
     if (pieces.length === 1) {
       var spaced = line.match(/^(.+?[\u3400-\u9fff])\s+([A-Za-zÜüVvāáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜńňǹḿ][A-Za-zÜüVvāáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜńňǹḿ\s'-]*)$/);
@@ -43,10 +44,11 @@
 
     if (!zh) return null;
     if (!py && typeof pinyinFn === 'function') py = clean(pinyinFn(zh));
-    return { zh: zh, py: py };
+    if (!en && typeof englishFn === 'function') en = clean(englishFn(zh));
+    return { zh: zh, py: py, en: en };
   }
 
-  function parseEntries(text, pinyinFn) {
+  function parseEntries(text, pinyinFn, englishFn) {
     var items = [];
     var seen = Object.create(null);
     String(text || '').split(/\r?\n/).forEach(function (rawLine) {
@@ -55,7 +57,7 @@
 
       var candidates = /(?:\||｜|\t)/.test(line) ? [line] : splitPlainLine(line);
       candidates.forEach(function (candidate) {
-        var item = parseOne(candidate, pinyinFn);
+        var item = parseOne(candidate, pinyinFn, englishFn);
         if (!item || seen[item.zh]) return;
         seen[item.zh] = true;
         items.push(item);

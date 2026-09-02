@@ -41,7 +41,7 @@
           <label class="field-label" for="terms"><%= isZh ? '一行一个词，也可以用顿号、逗号或分号分开' : 'Use one term per line, or separate terms with commas or semicolons' %></label>
           <textarea id="terms" class="terms-textarea" placeholder="苹果&#10;香蕉&#10;草莓&#10;西瓜" spellcheck="false"></textarea>
           <div class="input-meta">
-            <p class="field-help"><%= isZh ? '拼音会自动生成。需要指定读音时可输入：' : 'Pinyin is automatic. To specify a reading, use: ' %><strong>银行 | yín háng</strong></p>
+            <p class="field-help"><%= isZh ? '拼音和常用英文会自动生成。也可以输入：' : 'Pinyin and common English meanings are automatic. You can also use: ' %><strong>银行 | yín háng | bank</strong></p>
             <p id="term-count" class="term-count" aria-live="polite"><%= isZh ? '还没有生词' : 'No terms yet' %></p>
           </div>
 
@@ -58,20 +58,46 @@
           <div class="panel-heading compact">
             <div>
               <span class="step-number">2</span>
-              <p class="eyebrow"><%= isZh ? '检查拼音' : 'Check pinyin' %></p>
-              <h2><%= isZh ? '确认每张卡的正反面' : 'Review each card pair' %></h2>
+              <p class="eyebrow"><%= isZh ? '检查内容' : 'Check the content' %></p>
+              <h2><%= isZh ? '确认拼音和英文' : 'Review pinyin and English' %></h2>
             </div>
           </div>
-          <p class="field-help"><%= isZh ? '左边是正面中文，右边是背面拼音；拼音可以直接修改。' : 'Chinese prints on the front and the editable pinyin prints on the back.' %></p>
+          <p class="field-help"><%= isZh ? '拼音和英文都可以直接修改；没有自动释义的词可以手动补充英文。' : 'Pinyin and English are both editable. Add a meaning manually when one is not found.' %></p>
           <div id="detected-list" class="detected-list" aria-live="polite">
-            <p class="empty-state"><%= isZh ? '输入生词后，这里会显示自动生成的拼音。' : 'Your automatically generated pinyin will appear here.' %></p>
+            <p class="empty-state"><%= isZh ? '输入生词后，这里会显示自动生成的拼音和英文。' : 'Your automatically generated pinyin and English will appear here.' %></p>
           </div>
+        </section>
+
+        <section class="panel display-panel">
+          <div class="panel-heading compact">
+            <div>
+              <span class="step-number">3</span>
+              <p class="eyebrow"><%= isZh ? '选择正反面' : 'Choose each side' %></p>
+              <h2><%= isZh ? '每一面显示什么？' : 'What should each side show?' %></h2>
+            </div>
+          </div>
+          <p class="field-help"><%= isZh ? '正面和反面都可以多选。默认正面显示中文，反面显示拼音。' : 'Choose one or more items for each side. The default is Chinese on the front and pinyin on the back.' %></p>
+          <div class="side-options-grid">
+            <fieldset class="side-options" data-display-side="front">
+              <legend><span aria-hidden="true">A</span><%= isZh ? '正面' : 'Front' %></legend>
+              <label><input type="checkbox" name="frontDisplay" value="zh" checked> <span><%= isZh ? '中文' : 'Chinese' %></span></label>
+              <label><input type="checkbox" name="frontDisplay" value="py"> <span><%= isZh ? '拼音' : 'Pinyin' %></span></label>
+              <label><input type="checkbox" name="frontDisplay" value="en"> <span><%= isZh ? '英文' : 'English' %></span></label>
+            </fieldset>
+            <fieldset class="side-options" data-display-side="back">
+              <legend><span aria-hidden="true">B</span><%= isZh ? '反面' : 'Back' %></legend>
+              <label><input type="checkbox" name="backDisplay" value="zh"> <span><%= isZh ? '中文' : 'Chinese' %></span></label>
+              <label><input type="checkbox" name="backDisplay" value="py" checked> <span><%= isZh ? '拼音' : 'Pinyin' %></span></label>
+              <label><input type="checkbox" name="backDisplay" value="en"> <span><%= isZh ? '英文' : 'English' %></span></label>
+            </fieldset>
+          </div>
+          <p id="display-status" class="display-status" aria-live="polite"></p>
         </section>
 
         <section class="panel style-panel">
           <div class="panel-heading compact">
             <div>
-              <span class="step-number">3</span>
+              <span class="step-number">4</span>
               <p class="eyebrow"><%= isZh ? '选择样式' : 'Choose a style' %></p>
               <h2><%= isZh ? '设置卡片边框颜色' : 'Pick the card border color' %></h2>
             </div>
@@ -83,6 +109,7 @@
               <button class="color-swatch" type="button" data-color="#8b5aa7" style="--swatch:#8b5aa7" aria-label="Purple"></button>
               <button class="color-swatch" type="button" data-color="#d15f4c" style="--swatch:#d15f4c" aria-label="Coral"></button>
               <button class="color-swatch" type="button" data-color="#e39b28" style="--swatch:#e39b28" aria-label="Orange"></button>
+              <button class="color-swatch" type="button" data-color="#d4b31f" style="--swatch:#d4b31f" aria-label="Yellow"></button>
               <button class="color-swatch" type="button" data-color="#222222" style="--swatch:#222222" aria-label="Black"></button>
             </div>
             <label class="custom-color" for="border-color"><%= isZh ? '自定义' : 'Custom' %><input id="border-color" type="color" value="#2f6f5e"></label>
@@ -121,8 +148,8 @@
           <button id="next-sheet" type="button" aria-label="Next sheet">→</button>
         </div>
         <div class="print-key">
-          <span><i class="front-dot"></i><%= isZh ? '正面：中文' : 'Front: Chinese' %></span>
-          <span><i class="back-dot"></i><%= isZh ? '背面：拼音' : 'Back: Pinyin' %></span>
+          <span><i class="front-dot"></i><span id="front-key"><%= isZh ? '正面：中文' : 'Front: Chinese' %></span></span>
+          <span><i class="back-dot"></i><span id="back-key"><%= isZh ? '背面：拼音' : 'Back: Pinyin' %></span></span>
         </div>
       </aside>
     </div>
