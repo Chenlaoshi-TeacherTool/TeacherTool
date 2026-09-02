@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>译码练习生成器 · Decode Practice Generator - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Turn any Chinese vocabulary list into a printable decode (译码) worksheet. Words are scattered into a numbered-and-lettered code grid; students use the row/column codes to find each word.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/decode-practice/decode-practice.css?v=1">
+</head>
+<body class="dp-page">
+  <main class="dp-wrap">
+    <header class="dp-header">
+      <div class="dp-header-content">
+        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+        <p class="dp-eyebrow">Vocabulary puzzle worksheet</p>
+        <h1>🔡 译码练习生成器 · Decode Practice</h1>
+        <p>Paste a Chinese vocabulary list and generate a printable 译码练习 worksheet. Every character is scattered into a grid whose columns are numbered and rows are lettered—students read the codes (like <strong>3D&nbsp;5B</strong>) to decode each word.</p>
+        <div class="dp-hero-points" aria-label="Tool highlights">
+          <span>Numbered columns · Lettered rows</span>
+          <span>Auto-fills with distractor characters</span>
+          <span>Decode or Encode mode · Printable</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="dp-layout">
+      <section class="dp-builder" aria-label="Build your worksheet">
+
+        <section class="dp-panel">
+          <div class="dp-panel-heading">
+            <span class="dp-step">1</span>
+            <p class="dp-kicker">Enter your words</p>
+            <h2>Vocabulary list</h2>
+          </div>
+          <div class="dp-instructions">
+            <p><strong>Instructions:</strong> Type or paste one word per line. Words may be any length.</p>
+            <p>You can also separate words with commas or spaces (中文、逗号 or spaces都可以).</p>
+          </div>
+          <label for="dp-title">Worksheet title (optional)</label>
+          <input type="text" id="dp-title" placeholder="e.g. 4下 · 词语表 · 阅读19 小英雄雨来">
+          <label for="dp-text-input">Words</label>
+          <textarea id="dp-text-input" rows="9" placeholder="芦花&#10;发愣&#10;铅笔&#10;摇晃&#10;鬼脸&#10;戒指&#10;胳膊&#10;劫难"></textarea>
+        </section>
+
+        <section class="dp-panel">
+          <div class="dp-panel-heading">
+            <span class="dp-step">2</span>
+            <p class="dp-kicker">Choose how it works</p>
+            <h2>Worksheet settings</h2>
+          </div>
+
+          <label>Mode</label>
+          <div class="dp-mode-toggle" role="group" aria-label="Worksheet mode">
+            <button type="button" class="dp-mode-card is-active" data-mode="decode">
+              <span class="dp-mode-icon">🔍</span>
+              <span class="dp-mode-title">译码 Decode</span>
+              <span class="dp-mode-sub">Show codes → write the word</span>
+            </button>
+            <button type="button" class="dp-mode-card" data-mode="encode">
+              <span class="dp-mode-icon">✏️</span>
+              <span class="dp-mode-title">编码 Encode</span>
+              <span class="dp-mode-sub">Show word → write the codes</span>
+            </button>
+          </div>
+
+          <label for="dp-columns" class="dp-columns-field">Grid columns</label>
+          <input type="number" id="dp-columns" class="dp-columns-field" min="3" max="12" value="7">
+
+          <label>Options</label>
+          <div class="dp-options">
+            <label class="dp-check">
+              <input type="checkbox" id="dp-distractor-toggle" checked>
+              <span>Fill empty cells with distractor characters
+                <small>Makes the grid harder to skim. Turn off to keep only your words.</small>
+              </span>
+            </label>
+            <label class="dp-check">
+              <input type="checkbox" id="dp-answer-toggle">
+              <span>Show answer key
+                <small>Reveal the answers on screen (hidden again when unchecked).</small>
+              </span>
+            </label>
+          </div>
+
+          <button id="dp-build-button" class="dp-primary" type="button">🎲 Build / Reshuffle Worksheet</button>
+        </section>
+      </section>
+
+      <section class="dp-preview-panel" aria-label="Worksheet preview">
+        <div class="dp-preview-toolbar">
+          <div class="dp-count-box">
+            <span class="dp-count-label">Words</span>
+            <span id="dp-word-count">0</span>
+          </div>
+          <button id="dp-print-button" class="dp-secondary" type="button" style="width:auto;margin:0;" disabled>🖨️ Print Worksheet</button>
+        </div>
+        <p id="dp-status" class="dp-status" aria-live="polite">Type at least one word, then build the worksheet.</p>
+
+        <div id="dp-empty-state" class="dp-empty-state">
+          <div class="dp-empty-icon" aria-hidden="true">🔡</div>
+          <h2>No worksheet yet</h2>
+          <p>Enter a word list on the left, then click Build Worksheet.</p>
+        </div>
+
+        <article id="dp-worksheet" class="dp-worksheet" hidden>
+          <div class="dp-sheet-head">
+            <h3 id="dp-sheet-title">译码练习</h3>
+            <span class="dp-name-line"><b>姓名 Name:</b> <span class="dp-blank"></span> &nbsp; <b>日期 Date:</b> <span class="dp-blank"></span></span>
+          </div>
+          <div id="dp-grid-host" class="dp-grid-host"></div>
+          <p id="dp-questions-prompt" class="dp-questions-prompt"></p>
+          <ol id="dp-questions-host" class="dp-questions"></ol>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/low-prep/decode-practice/decode-practice.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
