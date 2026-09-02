@@ -179,13 +179,23 @@ table.dp-grid .dp-cell { font-family: 'Noto Sans SC', sans-serif; font-size: 1.5
 }
 
 /* ---------- print ---------- */
+/* The print packet lives outside the app chrome and is hidden on screen. */
+.dp-print-root { display: none; }
+
 @media print {
   @page { margin: 12mm; }
-  body * { visibility: hidden; }
-  .dp-worksheet, .dp-worksheet * { visibility: visible; }
-  .dp-worksheet { position: absolute; left: 0; top: 0; width: 100%; border: none; border-radius: 0; padding: 0; box-shadow: none; }
   .dp-page { background: #fff; }
+
+  /* Hide everything except the generated two-page packet. */
+  body > *:not(.dp-print-root) { display: none !important; }
+  .dp-print-root { display: block !important; }
+
+  .dp-print-page { border: none; border-radius: 0; padding: 0; box-shadow: none; }
+  /* Student page first, answer-key page on a fresh sheet. */
+  .dp-print-page + .dp-print-page { break-before: page; }
+
   table.dp-grid th, table.dp-grid td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .dp-grid-host { break-inside: avoid; }
   .dp-questions { break-inside: auto; }
   .dp-question { break-inside: avoid; }
 }

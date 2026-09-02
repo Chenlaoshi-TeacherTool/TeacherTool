@@ -7,7 +7,7 @@
   <title>译码练习生成器 · Decode Practice Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Turn any Chinese vocabulary list into a printable decode (译码) worksheet. Words are scattered into a numbered-and-lettered code grid; students use the row/column codes to find each word.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/decode-practice/decode-practice.css?v=1">
+  <link rel="stylesheet" href="/low-prep/decode-practice/decode-practice.css?v=2">
 </head>
 <body class="dp-page">
   <main class="dp-wrap">
@@ -119,7 +119,10 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
-  <script src="/low-prep/decode-practice/decode-practice.js?v=1" defer></script>
+  <!-- Populated on print with a blank student page + an answer-key page. -->
+  <div id="dp-print-root" class="dp-print-root" aria-hidden="true"></div>
+
+  <script src="/low-prep/decode-practice/decode-practice.js?v=2" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

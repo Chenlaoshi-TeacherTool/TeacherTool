@@ -40,6 +40,7 @@
     el.printButton = document.getElementById('dp-print-button');
     el.emptyState = document.getElementById('dp-empty-state');
     el.worksheet = document.getElementById('dp-worksheet');
+    el.printRoot = document.getElementById('dp-print-root');
     el.sheetTitle = document.getElementById('dp-sheet-title');
     el.gridHost = document.getElementById('dp-grid-host');
     el.questionsHost = document.getElementById('dp-questions-host');
@@ -66,8 +67,39 @@
     });
 
     el.buildButton.addEventListener('click', build);
-    el.printButton.addEventListener('click', function () { window.print(); });
+    el.printButton.addEventListener('click', function () {
+      buildPrintPages();
+      window.print();
+    });
   });
+
+  // Prints a two-page packet regardless of the on-screen answer toggle:
+  // page 1 is the blank student worksheet, page 2 is the answer key.
+  function buildPrintPages() {
+    if (!el.printRoot || !state.built) return;
+    el.printRoot.innerHTML = '';
+
+    var student = makePrintPage(false, null);
+    var key = makePrintPage(true, '（答案 Answer Key）');
+
+    el.printRoot.appendChild(student);
+    el.printRoot.appendChild(key);
+  }
+
+  function makePrintPage(showAnswers, titleSuffix) {
+    var page = el.worksheet.cloneNode(true);
+    page.removeAttribute('id');
+    page.hidden = false;
+    page.classList.add('dp-print-page');
+    page.classList.toggle('dp-show-answers', showAnswers);
+    // Strip duplicated ids from the clone so the live document stays valid.
+    page.querySelectorAll('[id]').forEach(function (node) { node.removeAttribute('id'); });
+    if (titleSuffix) {
+      var title = page.querySelector('.dp-sheet-head h3');
+      if (title) title.textContent = title.textContent + ' ' + titleSuffix;
+    }
+    return page;
+  }
 
   function build() {
     var words = parseWords(el.textInput.value);
