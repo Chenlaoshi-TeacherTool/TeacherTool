@@ -44,3 +44,26 @@ test('paginates vocabulary into groups of eight', function () {
   var entries = Array.from({ length: 17 }, function (_, index) { return { zh: String(index) }; });
   assert.deepEqual(core.paginate(entries).map(function (page) { return page.length; }), [8, 8, 1]);
 });
+
+test('scales Chinese text by character count and wraps long sentences', function () {
+  var single = core.layoutChinese('山');
+  var word = core.layoutChinese('苹果');
+  var phrase = core.layoutChinese('我们一起认真学习中文');
+  var sentence = core.layoutChinese('今天下午我们一起去图书馆看书然后回家吃饭');
+
+  assert.equal(single.size, 96);
+  assert.ok(single.size > word.size);
+  assert.equal(word.lines.length, 1);
+  assert.equal(phrase.lines.length, 2);
+  assert.equal(phrase.lines.join(''), '我们一起认真学习中文');
+  assert.equal(sentence.lines.length, 3);
+  assert.equal(sentence.lines.join(''), '今天下午我们一起去图书馆看书然后回家吃饭');
+});
+
+test('limits very long Chinese text to four lines with an ellipsis', function () {
+  var layout = core.layoutChinese('学'.repeat(60));
+  assert.equal(layout.lines.length, 4);
+  assert.equal(layout.lines.join('').length, 48);
+  assert.ok(layout.lines[3].endsWith('…'));
+  assert.equal(layout.truncated, true);
+});

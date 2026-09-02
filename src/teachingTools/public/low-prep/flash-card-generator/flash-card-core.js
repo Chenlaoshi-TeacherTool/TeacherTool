@@ -96,11 +96,50 @@
     return pages;
   }
 
+  function chineseSizeForLine(length) {
+    if (length <= 1) return 96;
+    if (length === 2) return 70;
+    if (length === 3) return 56;
+    if (length === 4) return 47;
+    if (length === 5) return 41;
+    if (length === 6) return 36;
+    if (length === 7) return 32;
+    return 29;
+  }
+
+  function layoutChinese(value) {
+    var characters = Array.from(clean(value) || '—');
+    var truncated = characters.length > 48;
+    if (truncated) characters = characters.slice(0, 47).concat('…');
+
+    var lineCount = characters.length <= 8
+      ? 1
+      : (characters.length <= 16 ? 2 : (characters.length <= 27 ? 3 : 4));
+    var charactersPerLine = Math.ceil(characters.length / lineCount);
+    var lines = [];
+    for (var index = 0; index < characters.length; index += charactersPerLine) {
+      lines.push(characters.slice(index, index + charactersPerLine).join(''));
+    }
+
+    var longestLine = lines.reduce(function (longest, line) {
+      return Math.max(longest, Array.from(line).length);
+    }, 1);
+    var lineCaps = { 1: 96, 2: 40, 3: 28, 4: 21 };
+
+    return {
+      lines: lines,
+      size: Math.min(chineseSizeForLine(longestLine), lineCaps[lines.length] || 21),
+      length: Array.from(clean(value)).length,
+      truncated: truncated
+    };
+  }
+
   return {
     CARD_COUNT: CARD_COUNT,
     parseEntries: parseEntries,
     makeSlots: makeSlots,
     mirrorBackSlots: mirrorBackSlots,
-    paginate: paginate
+    paginate: paginate,
+    layoutChinese: layoutChinese
   };
 });

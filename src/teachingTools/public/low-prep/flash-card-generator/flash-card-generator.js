@@ -176,14 +176,18 @@
       var card = document.createElement('div');
       card.className = 'preview-card' + (item ? '' : ' is-empty');
       if (item) {
-        var values = displayValues(item, state.side);
+        var blocks = textBlocks(item, state.side);
         var content = document.createElement('div');
         content.className = 'preview-card-content';
-        content.dataset.count = String(values.length);
-        values.forEach(function (value) {
+        content.dataset.count = String(blocks.length);
+        blocks.forEach(function (block) {
           var line = document.createElement('span');
-          line.className = 'preview-line preview-line--' + value.type;
-          line.textContent = value.text;
+          line.className = 'preview-line preview-line--' + block.type;
+          line.textContent = block.lines.join('\n');
+          line.dataset.layoutSize = String(block.size);
+          line.style.setProperty('--line-size-min', (block.size * 0.018).toFixed(3) + 'rem');
+          line.style.setProperty('--line-size-fluid', (block.size * 0.068).toFixed(3) + 'vw');
+          line.style.setProperty('--line-size-max', (block.size * 0.048).toFixed(3) + 'rem');
           content.appendChild(line);
         });
         card.appendChild(content);
@@ -209,17 +213,6 @@
     borderColorInput.value = state.borderColor;
     swatches.forEach(function (button) { button.classList.toggle('is-selected', button === selectedSwatch); });
     renderPreview();
-  }
-
-  function wrapChinese(value) {
-    var text = String(value || '').trim();
-    if (text.length <= 5) return { lines: [text], size: text.length <= 3 ? 51 : 41 };
-    if (text.length <= 9) return { lines: [text], size: 30 };
-    var chunkSize = text.length <= 16 ? Math.ceil(text.length / 2) : Math.ceil(text.length / 3);
-    var lines = [];
-    for (var i = 0; i < text.length && lines.length < 3; i += chunkSize) lines.push(text.slice(i, i + chunkSize));
-    if (lines.join('').length < text.length) lines[2] = lines[2].slice(0, Math.max(1, lines[2].length - 1)) + '…';
-    return { lines: lines, size: lines.length === 2 ? 27 : 21 };
   }
 
   function wrapPinyin(value) {
@@ -251,10 +244,12 @@
     return wrapped;
   }
 
-  function svgText(item, side, centerX, centerY) {
+  function textBlocks(item, side) {
     var values = displayValues(item, side);
     var blocks = values.map(function (value) {
-      var wrapped = value.type === 'zh' ? wrapChinese(value.text) : (value.type === 'py' ? wrapPinyin(value.text) : wrapEnglish(value.text));
+      var wrapped = value.type === 'zh'
+        ? Core.layoutChinese(value.text)
+        : (value.type === 'py' ? wrapPinyin(value.text) : wrapEnglish(value.text));
       if (values.length > 1) {
         if (value.type === 'zh') wrapped.size = Math.min(wrapped.size, 34);
         if (value.type === 'py') wrapped.size = Math.min(wrapped.size, 20);
@@ -262,6 +257,24 @@
       }
       return { type: value.type, lines: wrapped.lines, size: wrapped.size };
     });
+
+    var gap = blocks.length > 1 ? 8 : 0;
+    var availableTextHeight = 142 - gap * Math.max(0, blocks.length - 1);
+    var textHeight = blocks.reduce(function (sum, block) {
+      return sum + block.lines.length * block.size * 1.16;
+    }, 0);
+    if (textHeight > availableTextHeight) {
+      var scale = availableTextHeight / textHeight;
+      blocks.forEach(function (block) {
+        block.size = Math.max(8, Math.floor(block.size * scale));
+      });
+    }
+
+    return blocks;
+  }
+
+  function svgText(item, side, centerX, centerY) {
+    var blocks = textBlocks(item, side);
     var gap = blocks.length > 1 ? 8 : 0;
     var totalHeight = blocks.reduce(function (sum, block) {
       return sum + block.lines.length * block.size * 1.2;

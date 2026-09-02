@@ -41,7 +41,7 @@
           <label class="field-label" for="terms"><%= isZh ? '一行一个词，也可以用顿号、逗号或分号分开' : 'Use one term per line, or separate terms with commas or semicolons' %></label>
           <textarea id="terms" class="terms-textarea" placeholder="苹果&#10;香蕉&#10;草莓&#10;西瓜" spellcheck="false"></textarea>
           <div class="input-meta">
-            <p class="field-help"><%= isZh ? '拼音和常用英文会自动生成。也可以输入：' : 'Pinyin and common English meanings are automatic. You can also use: ' %><strong>银行 | yín háng | bank</strong></p>
+            <p class="field-help"><%= isZh ? '拼音和常用英文会自动生成；汉字会按字数自动调整大小，长句自动换行。也可以输入：' : 'Pinyin and common English meanings are automatic. Chinese text resizes by length and long sentences wrap automatically. You can also use: ' %><strong>银行 | yín háng | bank</strong></p>
             <p id="term-count" class="term-count" aria-live="polite"><%= isZh ? '还没有生词' : 'No terms yet' %></p>
           </div>
 
