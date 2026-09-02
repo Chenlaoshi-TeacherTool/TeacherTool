@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>生词表生成器 · Article Vocabulary Builder - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Paste any Chinese article and automatically pull out its words. Edit the list, then download a Word document with the full text plus a vocabulary table of pinyin and English meanings.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/vocab-glossary/vocab-glossary.css?v=1">
+</head>
+<body class="vg-page">
+  <main class="vg-wrap">
+    <header class="vg-header">
+      <div class="vg-header-content">
+        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+        <p class="vg-eyebrow">Reading &amp; vocabulary support</p>
+        <h1>📖 生词表生成器 · Article Vocabulary Builder</h1>
+        <p>Paste a Chinese article and the tool automatically finds the words inside it, looks up the pinyin and English meaning of each, and lets you edit the list. Download a Word document with the full text plus a ready-to-print vocabulary table.</p>
+        <div class="vg-hero-points" aria-label="Tool highlights">
+          <span>Automatic word detection</span>
+          <span>Pinyin + English from CC-CEDICT</span>
+          <span>Editable list · Word (.docx) download</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="vg-layout">
+      <section class="vg-builder" aria-label="Build your glossary">
+
+        <section class="vg-panel">
+          <div class="vg-panel-heading">
+            <span class="vg-step">1</span>
+            <p class="vg-kicker">Paste your text</p>
+            <h2>Article</h2>
+          </div>
+          <div class="vg-instructions">
+            <p><strong>Instructions:</strong> Paste a Chinese article or passage below. Punctuation, numbers and English are kept in the text but skipped in the word list.</p>
+          </div>
+          <label for="vg-title">Document title (optional)</label>
+          <input type="text" id="vg-title" placeholder="e.g. 4下 · 阅读19 · 小英雄雨来">
+          <label for="vg-text-input">Article text</label>
+          <textarea id="vg-text-input" rows="12" placeholder="在这里粘贴课文……"></textarea>
+        </section>
+
+        <section class="vg-panel">
+          <div class="vg-panel-heading">
+            <span class="vg-step">2</span>
+            <p class="vg-kicker">Choose what to include</p>
+            <h2>Word list settings</h2>
+          </div>
+
+          <label for="vg-min-length">Shortest word to include</label>
+          <select id="vg-min-length">
+            <option value="2" selected>Two characters and longer (词组)</option>
+            <option value="1">Include single characters too</option>
+          </select>
+
+          <label>Options</label>
+          <div class="vg-options">
+            <label class="vg-check">
+              <input type="checkbox" id="vg-pinyin-toggle" checked>
+              <span>Include pinyin column
+                <small>Shows the tone-marked pinyin for each word.</small>
+              </span>
+            </label>
+            <label class="vg-check">
+              <input type="checkbox" id="vg-stopwords-toggle" checked>
+              <span>Skip very common function words
+                <small>Leaves out words like 的、了、这、那、就 when they appear.</small>
+              </span>
+            </label>
+          </div>
+
+          <button id="vg-build-button" class="vg-primary" type="button">🔍 Find words</button>
+          <p id="vg-dict-status" class="vg-dict-status" aria-live="polite">Loading the dictionary…</p>
+        </section>
+      </section>
+
+      <section class="vg-preview-panel" aria-label="Glossary preview">
+        <div class="vg-preview-toolbar">
+          <div class="vg-count-box">
+            <span class="vg-count-label">Words</span>
+            <span id="vg-word-count">0</span>
+          </div>
+          <button id="vg-download-button" class="vg-secondary" type="button" disabled>⬇️ Download Word (.docx)</button>
+        </div>
+        <p id="vg-status" class="vg-status" aria-live="polite">Paste an article, then click “Find words”.</p>
+
+        <div id="vg-empty-state" class="vg-empty-state">
+          <div class="vg-empty-icon" aria-hidden="true">📖</div>
+          <h2>No word list yet</h2>
+          <p>Paste an article on the left, then click Find words. You can edit every row before downloading.</p>
+        </div>
+
+        <div id="vg-result" class="vg-result" hidden>
+          <p class="vg-edit-hint">💡 Tip: click any cell to edit it. Use ✕ to remove a word, or “＋ Add word” for one the tool missed.</p>
+          <div class="vg-table-scroll">
+            <table class="vg-table" aria-label="Editable vocabulary list">
+              <thead>
+                <tr>
+                  <th class="vg-col-num">#</th>
+                  <th class="vg-col-word">词语 Word</th>
+                  <th class="vg-col-pinyin">拼音 Pinyin</th>
+                  <th class="vg-col-meaning">英文 English meaning</th>
+                  <th class="vg-col-remove" aria-label="Remove"></th>
+                </tr>
+              </thead>
+              <tbody id="vg-table-body"></tbody>
+            </table>
+          </div>
+          <button id="vg-add-row" class="vg-add-row" type="button">＋ Add word</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/low-prep/vocab-glossary/docx.umd.js"></script>
+  <script src="/low-prep/vocab-glossary/vocab-glossary.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
