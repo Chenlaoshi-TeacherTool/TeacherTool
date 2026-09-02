@@ -71,6 +71,8 @@
       buildPrintPages();
       window.print();
     });
+    // Also support Ctrl/Cmd+P and headless PDF export after a worksheet is built.
+    window.addEventListener('beforeprint', buildPrintPages);
   });
 
   // Prints a two-page packet regardless of the on-screen answer toggle:
@@ -92,6 +94,7 @@
     page.hidden = false;
     page.classList.add('dp-print-page');
     page.classList.toggle('dp-show-answers', showAnswers);
+    page.classList.toggle('dp-answer-key', showAnswers);
     // Strip duplicated ids from the clone so the live document stays valid.
     page.querySelectorAll('[id]').forEach(function (node) { node.removeAttribute('id'); });
     if (titleSuffix) {
@@ -124,18 +127,50 @@
   }
 
   function parseWords(text) {
-    // Split on newlines, commas (both widths), and spaces.
-    var raw = text.split(/[\n,，、\s]+/);
     var seen = {};
     var words = [];
-    raw.forEach(function (piece) {
-      var word = piece.trim();
-      if (!word) return;
-      if (seen[word]) return;
-      seen[word] = true;
-      words.push({ text: word, chars: Array.from(word) });
+
+    // A line can be either a single word or a complete sentence. Short word
+    // lists can still be separated by commas, dunhao, semicolons, or spaces.
+    String(text || '').replace(/\r/g, '').split('\n').forEach(function (line) {
+      splitInputLine(line).forEach(function (piece) {
+        var word = piece.trim();
+        if (!word || seen[word]) return;
+        seen[word] = true;
+        words.push({
+          text: word,
+          chars: Array.from(word).filter(function (ch) { return !/\s/.test(ch); }),
+          kind: looksLikeSentence(word) ? 'sentence' : 'word'
+        });
+      });
     });
+
     return words;
+  }
+
+  function splitInputLine(line) {
+    var value = String(line || '').trim();
+    if (!value) return [];
+    if (looksLikeSentence(value)) return [value];
+    return value.split(/[，,、；;\t ]+/).filter(Boolean);
+  }
+
+  function looksLikeSentence(text) {
+    var value = String(text || '').trim();
+    var compact = value.replace(/\s/g, '');
+    if (!compact) return false;
+
+    // Sentence punctuation is decisive. Without it, five or more continuous
+    // Chinese characters are treated as a sentence; this keeps common 2-4
+    // character words and idioms in the space-saving two-column layout.
+    if (/[。！？!?…]/.test(value)) return true;
+
+    var segments = value.split(/[，,、；;\t ]+/).filter(Boolean);
+    if (segments.length === 1) return Array.from(compact).length > 4;
+
+    return segments.some(function (segment) {
+      return Array.from(segment.replace(/\s/g, '')).length > 4;
+    });
   }
 
   function buildGrid() {
@@ -202,7 +237,7 @@
     var n = state.words.length;
     el.wordCount.textContent = String(n);
     el.status.textContent = 'Built a ' + state.grid.length + '×' + state.columns +
-      ' code table for ' + n + ' word' + (n === 1 ? '' : 's') + '.';
+      ' code table for ' + n + ' item' + (n === 1 ? '' : 's') + '.';
   }
 
   function renderGrid() {
@@ -240,13 +275,14 @@
     var html = '';
     state.words.forEach(function (word, index) {
       var codes = word.chars.map(function (ch) { return state.charToCode[ch] || '—'; });
+      var questionClass = 'dp-question' + (word.kind === 'sentence' ? ' dp-question--sentence' : '');
 
       if (isDecode) {
         var codeCells = codes.map(function (code) {
           return '<span class="dp-code">' + escapeHtml(code) + '</span>';
         }).join('');
         html +=
-          '<li class="dp-question">' +
+          '<li class="' + questionClass + '">' +
             '<span class="dp-q-num">' + (index + 1) + '</span>' +
             '<span class="dp-codes">' + codeCells + '</span>' +
             '<span class="dp-answer-line"><span class="dp-answer-text">' + escapeHtml(word.text) + '</span></span>' +
@@ -259,7 +295,7 @@
             '</span>';
         }).join('');
         html +=
-          '<li class="dp-question dp-question--encode">' +
+          '<li class="' + questionClass + ' dp-question--encode">' +
             '<span class="dp-q-num">' + (index + 1) + '</span>' +
             '<span class="dp-encode-word">' + wordCells + '</span>' +
           '</li>';

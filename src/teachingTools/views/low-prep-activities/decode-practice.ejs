@@ -7,7 +7,7 @@
   <title>译码练习生成器 · Decode Practice Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Turn any Chinese vocabulary list into a printable decode (译码) worksheet. Words are scattered into a numbered-and-lettered code grid; students use the row/column codes to find each word.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/decode-practice/decode-practice.css?v=2">
+  <link rel="stylesheet" href="/low-prep/decode-practice/decode-practice.css?v=3">
 </head>
 <body class="dp-page">
   <main class="dp-wrap">
@@ -35,8 +35,8 @@
             <h2>Vocabulary list</h2>
           </div>
           <div class="dp-instructions">
-            <p><strong>Instructions:</strong> Type or paste one word per line. Words may be any length.</p>
-            <p>You can also separate words with commas or spaces (中文、逗号 or spaces都可以).</p>
+            <p><strong>Instructions:</strong> Put one word or one sentence on each line.</p>
+            <p>Short word lists may also use commas、顿号 or spaces. Words print two per row; sentences use a full row.</p>
           </div>
           <label for="dp-title">Worksheet title (optional)</label>
           <input type="text" id="dp-title" placeholder="e.g. 4下 · 词语表 · 阅读19 小英雄雨来">
@@ -91,10 +91,10 @@
       <section class="dp-preview-panel" aria-label="Worksheet preview">
         <div class="dp-preview-toolbar">
           <div class="dp-count-box">
-            <span class="dp-count-label">Words</span>
+            <span class="dp-count-label">Items</span>
             <span id="dp-word-count">0</span>
           </div>
-          <button id="dp-print-button" class="dp-secondary" type="button" style="width:auto;margin:0;" disabled>🖨️ Print Worksheet</button>
+          <button id="dp-print-button" class="dp-secondary" type="button" disabled>🖨️ Print / Save PDF</button>
         </div>
         <p id="dp-status" class="dp-status" aria-live="polite">Type at least one word, then build the worksheet.</p>
 
@@ -105,13 +105,43 @@
         </div>
 
         <article id="dp-worksheet" class="dp-worksheet" hidden>
-          <div class="dp-sheet-head">
-            <h3 id="dp-sheet-title">译码练习</h3>
-            <span class="dp-name-line"><b>姓名 Name:</b> <span class="dp-blank"></span> &nbsp; <b>日期 Date:</b> <span class="dp-blank"></span></span>
-          </div>
-          <div id="dp-grid-host" class="dp-grid-host"></div>
-          <p id="dp-questions-prompt" class="dp-questions-prompt"></p>
-          <ol id="dp-questions-host" class="dp-questions"></ol>
+          <header class="dp-sheet-head">
+            <div class="dp-sheet-title-block">
+              <span class="dp-sheet-mark" aria-hidden="true">译</span>
+              <div>
+                <p class="dp-sheet-kicker">CHEN LAOSHI'S TEACHING TOOLKIT</p>
+                <h3 id="dp-sheet-title">译码练习</h3>
+              </div>
+            </div>
+            <div class="dp-student-meta">
+              <span class="dp-meta-field"><b>姓名 Name</b><span class="dp-blank"></span></span>
+              <span class="dp-meta-field"><b>日期 Date</b><span class="dp-blank dp-blank--date"></span></span>
+            </div>
+          </header>
+
+          <section class="dp-sheet-section dp-grid-section" aria-labelledby="dp-grid-heading">
+            <div class="dp-section-heading">
+              <span class="dp-section-number">01</span>
+              <div>
+                <p class="dp-section-kicker">CODE TABLE</p>
+                <h4 id="dp-grid-heading">先找到每个汉字的位置</h4>
+              </div>
+            </div>
+            <div id="dp-grid-host" class="dp-grid-host"></div>
+          </section>
+
+          <section class="dp-sheet-section dp-question-section" aria-labelledby="dp-questions-prompt">
+            <div class="dp-section-heading dp-question-heading">
+              <span class="dp-section-number">02</span>
+              <p id="dp-questions-prompt" class="dp-questions-prompt"></p>
+            </div>
+            <ol id="dp-questions-host" class="dp-questions"></ol>
+          </section>
+
+          <footer class="dp-sheet-footer">
+            <span>陈老师的教学工具箱</span>
+            <span>Decode Practice · 译码练习</span>
+          </footer>
         </article>
       </section>
     </div>
@@ -122,7 +152,7 @@
   <!-- Populated on print with a blank student page + an answer-key page. -->
   <div id="dp-print-root" class="dp-print-root" aria-hidden="true"></div>
 
-  <script src="/low-prep/decode-practice/decode-practice.js?v=2" defer></script>
+  <script src="/low-prep/decode-practice/decode-practice.js?v=3" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
