@@ -34,6 +34,22 @@ test('counts poison and antidote cards when checking capacity', function () {
   assert.equal(game.canPlaceCards(4, 4, 1, 0), true);
 });
 
+test('keeps only the last poison/antidote setting for a card', function () {
+  var poison = new Set();
+  var antidote = new Set();
+  // Group 1 poisons card 1.
+  game.applyCardSetting(poison, antidote, 1, 'poison');
+  assert.equal(poison.has(1), true);
+  // Group 2 puts an antidote on the same card -> no longer poison.
+  game.applyCardSetting(poison, antidote, 1, 'antidote');
+  assert.equal(poison.has(1), false);
+  assert.equal(antidote.has(1), true);
+  // Group 3 poisons it again -> poison wins, antidote cleared.
+  game.applyCardSetting(poison, antidote, 1, 'poison');
+  assert.equal(poison.has(1), true);
+  assert.equal(antidote.has(1), false);
+});
+
 test('builds a fresh group roster', function () {
   assert.deepEqual(game.makeGroups(2), [
     { poisoned: false, antidotes: 0 },

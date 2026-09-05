@@ -41,6 +41,19 @@
     return cardCount >= groupCount * (poisonsPerGroup + Number(antidotesPerGroup || 0));
   }
 
+  // Apply a placement, keeping only the LAST setting for a card: setting it as
+  // poison clears any antidote on it and vice versa. A card set as antidote (or
+  // never set) is not poisonous.
+  function applyCardSetting(poisonSet, antidoteSet, cardNumber, kind) {
+    if (kind === 'antidote') {
+      poisonSet.delete(cardNumber);
+      antidoteSet.add(cardNumber);
+    } else {
+      antidoteSet.delete(cardNumber);
+      poisonSet.add(cardNumber);
+    }
+  }
+
   function makeGroups(groupCount) {
     var groups = [];
     for (var i = 0; i < groupCount; i += 1) {
@@ -124,7 +137,6 @@
     var saveButton = doc.getElementById('poison-save-cards');
     var loadButton = doc.getElementById('poison-load-cards');
     var groupInput = doc.getElementById('poison-group-count');
-    var studentsInput = doc.getElementById('poison-students-per-group');
     var poisonInput = doc.getElementById('poison-cards-per-group');
     var antidoteInput = doc.getElementById('poison-antidote-toggle');
     var setupStatus = doc.getElementById('poison-setup-status');
@@ -153,7 +165,6 @@
       return {
         cards: [],
         groupCount: 0,
-        studentsPerGroup: 4,
         poisonsPerGroup: 1,
         antidotesPerGroup: 0,
         poisonCards: new Set(),
@@ -227,13 +238,11 @@
         avatar.className = 'poison-team-avatar';
         var people = doc.createElement('div');
         people.className = 'poison-team-people';
-        for (var p = 0; p < state.studentsPerGroup; p += 1) {
-          var person = doc.createElement('span');
-          person.className = 'poison-person';
-          person.setAttribute('aria-hidden', 'true');
-          person.textContent = '🧒';
-          people.appendChild(person);
-        }
+        var person = doc.createElement('span');
+        person.className = 'poison-person';
+        person.setAttribute('aria-hidden', 'true');
+        person.textContent = '🧒';
+        people.appendChild(person);
         avatar.appendChild(people);
 
         var status = doc.createElement('span');
@@ -416,20 +425,32 @@
       }
     }
 
+    // Turn every card face-up-as-plain-word again so the next group cannot see
+    // what the previous group set. Cards can be re-selected by later groups.
+    function resetPlacementBoard() {
+      Array.from(cardGrid.querySelectorAll('button')).forEach(function (button) {
+        button.disabled = false;
+        button.classList.remove('is-poison-setup', 'is-antidote-setup', 'is-poison-flash', 'is-antidote-flash');
+        var index = Number(button.dataset.cardNumber) - 1;
+        button.textContent = state.cards[index];
+      });
+    }
+
     function choosePlacementCard(cardButton) {
       var kind = placingKind();
       if (!kind) return;
       var cardNumber = Number(cardButton.dataset.cardNumber);
       cardButton.disabled = true;
 
+      applyCardSetting(state.poisonCards, state.antidoteCards, cardNumber, kind);
       if (kind === 'antidote') {
-        state.antidoteCards.add(cardNumber);
         state.setupAntidotePicks += 1;
+        cardButton.classList.remove('is-poison-setup');
         cardButton.classList.add('is-antidote-setup');
         cardButton.textContent = '💊';
       } else {
-        state.poisonCards.add(cardNumber);
         state.setupPoisonPicks += 1;
+        cardButton.classList.remove('is-antidote-setup');
         cardButton.classList.add('is-poison-setup');
         cardButton.textContent = '☠️';
       }
@@ -444,7 +465,10 @@
         state.setupGroup += 1;
         state.setupPoisonPicks = 0;
         state.setupAntidotePicks = 0;
+        // Hide this group's picks before the next group takes over.
+        resetPlacementBoard();
         updatePlacementPrompt();
+        showBanner('handoff', format(app.dataset.handoffTitle, { group: state.setupGroup }), app.dataset.handoffSub);
         return;
       }
 
@@ -468,7 +492,7 @@
       state.ended = false;
       Array.from(cardGrid.querySelectorAll('button')).forEach(function (button) {
         button.disabled = false;
-        button.classList.remove('is-poison-setup', 'is-antidote-setup');
+        button.classList.remove('is-poison-setup', 'is-antidote-setup', 'is-poison-flash', 'is-antidote-flash');
         // Restore the original card text hidden during placement.
         var index = Number(button.dataset.cardNumber) - 1;
         button.textContent = state.cards[index];
@@ -666,7 +690,6 @@
       }
 
       var groupCount = Number(groupInput.value);
-      var studentsPerGroup = Number(studentsInput.value);
       var poisonsPerGroup = Number(poisonInput.value);
       var antidotesPerGroup = currentAntidotesPerGroup();
 
@@ -674,9 +697,6 @@
         setSetupStatus(app.dataset.invalidGroups, true);
         groupInput.focus();
         return;
-      }
-      if (!Number.isInteger(studentsPerGroup) || studentsPerGroup < 1) {
-        studentsPerGroup = 1;
       }
       if (!Number.isInteger(poisonsPerGroup) || poisonsPerGroup < 1
         || !canPlaceCards(cards.length, groupCount, poisonsPerGroup, antidotesPerGroup)) {
@@ -691,7 +711,6 @@
       state = blankState();
       state.cards = cards;
       state.groupCount = groupCount;
-      state.studentsPerGroup = studentsPerGroup;
       state.poisonsPerGroup = poisonsPerGroup;
       state.antidotesPerGroup = antidotesPerGroup;
       state.groups = makeGroups(groupCount);
@@ -727,6 +746,7 @@
     getTextClass: getTextClass,
     canPlacePoisons: canPlacePoisons,
     canPlaceCards: canPlaceCards,
+    applyCardSetting: applyCardSetting,
     makeGroups: makeGroups,
     getAliveCount: getAliveCount,
     canStillRecover: canStillRecover,
