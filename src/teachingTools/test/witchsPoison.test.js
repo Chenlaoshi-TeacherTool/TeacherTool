@@ -20,3 +20,8 @@ test('sizes short words and long sentences for the card grid', function () {
   assert.equal(game.getTextClass('苹果'), '');
   assert.equal(game.getTextClass('我喜欢在学校和朋友一起学习中文。'), 'is-long');
 });
+
+test('requires enough cards for each group to place poison', function () {
+  assert.equal(game.canPlacePoisons(10, 5, 2), true);
+  assert.equal(game.canPlacePoisons(9, 5, 2), false);
+});

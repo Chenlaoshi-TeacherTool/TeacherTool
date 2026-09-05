@@ -29,6 +29,10 @@
     return '';
   }
 
+  function canPlacePoisons(cardCount, groupCount, poisonsPerGroup) {
+    return cardCount >= groupCount * poisonsPerGroup;
+  }
+
   function format(template, values) {
     return template.replace(/\{(\w+)\}/g, function (_, key) {
       return values[key] === undefined ? '' : values[key];
@@ -45,18 +49,30 @@
     var cardInput = doc.getElementById('poison-card-input');
     var cardCount = doc.getElementById('poison-card-count');
     var groupInput = doc.getElementById('poison-group-count');
-    var poisonInput = doc.getElementById('poison-card-number');
+    var poisonInput = doc.getElementById('poison-cards-per-group');
     var setupStatus = doc.getElementById('poison-setup-status');
     var defaultSetupStatus = setupStatus.textContent;
     var currentGroup = doc.getElementById('poison-current-group');
     var progress = doc.getElementById('poison-progress');
+    var boardPrompt = doc.getElementById('poison-board-prompt');
     var cardGrid = doc.getElementById('poison-card-grid');
     var gameStatus = doc.getElementById('poison-game-status');
     var defaultGameStatus = gameStatus.textContent;
     var resetButton = doc.getElementById('poison-reset-button');
     var alert = doc.getElementById('poison-alert');
     var alertGroup = doc.getElementById('poison-alert-group');
-    var state = { cards: [], groupCount: 0, poisonNumber: 0, picks: 0, ended: false, timer: null };
+    var state = {
+      cards: [],
+      groupCount: 0,
+      poisonsPerGroup: 1,
+      poisonCards: new Set(),
+      phase: 'play',
+      setupGroup: 1,
+      setupPicks: 0,
+      picks: 0,
+      ended: false,
+      timer: null
+    };
 
     function setSetupStatus(message, isError) {
       setupStatus.textContent = message;
@@ -67,11 +83,12 @@
       var cards = parseCards(cardInput.value);
       if (setupStatus.classList.contains('is-error')) setSetupStatus(defaultSetupStatus, false);
       cardCount.textContent = format(app.dataset.cardCountTemplate, { count: cards.length });
-      poisonInput.max = Math.max(cards.length, 1);
-      var poisonNumber = Number(poisonInput.value);
-      var invalid = cards.length > 0 && poisonNumber > cards.length;
+      var groupCount = Number(groupInput.value);
+      var poisonsPerGroup = Number(poisonInput.value);
+      var invalid = cards.length > 0 && Number.isInteger(groupCount) && Number.isInteger(poisonsPerGroup)
+        && !canPlacePoisons(cards.length, groupCount, poisonsPerGroup);
       poisonInput.setCustomValidity(invalid
-        ? format(app.dataset.invalidPoisonTemplate, { count: cards.length })
+        ? format(app.dataset.invalidPoisonCountTemplate, { count: cards.length, total: groupCount * poisonsPerGroup })
         : '');
     }
 
@@ -79,6 +96,30 @@
       var turn = getTurn(state.picks, state.groupCount);
       currentGroup.textContent = format(app.dataset.groupTemplate, { group: turn.groupNumber });
       progress.textContent = format(app.dataset.progressTemplate, { current: state.picks, total: state.cards.length });
+    }
+
+    function updatePoisonSetupTurn() {
+      currentGroup.textContent = format(app.dataset.groupTemplate, { group: state.setupGroup });
+      progress.textContent = format(app.dataset.poisonSetupProgressTemplate, {
+        current: state.setupPicks,
+        total: state.poisonsPerGroup
+      });
+      boardPrompt.textContent = format(app.dataset.poisonSetupPromptTemplate, {
+        group: state.setupGroup,
+        total: state.poisonsPerGroup
+      });
+    }
+
+    function startPlay() {
+      state.phase = 'play';
+      state.picks = 0;
+      Array.from(cardGrid.querySelectorAll('button')).forEach(function (button) {
+        button.disabled = false;
+        button.classList.remove('is-poison-setup');
+      });
+      boardPrompt.textContent = app.dataset.playPrompt;
+      gameStatus.textContent = defaultGameStatus;
+      updateTurn();
     }
 
     function showPoison(turn, cardButton) {
@@ -99,13 +140,39 @@
       }, 1800);
     }
 
+    function choosePoisonCard(cardButton) {
+      var cardNumber = Number(cardButton.dataset.cardNumber);
+      state.poisonCards.add(cardNumber);
+      state.setupPicks += 1;
+      cardButton.disabled = true;
+      cardButton.classList.add('is-poison-setup');
+
+      if (state.setupPicks < state.poisonsPerGroup) {
+        updatePoisonSetupTurn();
+        return;
+      }
+
+      if (state.setupGroup < state.groupCount) {
+        state.setupGroup += 1;
+        state.setupPicks = 0;
+        updatePoisonSetupTurn();
+        return;
+      }
+
+      startPlay();
+    }
+
     function chooseCard(event) {
       var cardButton = event.target.closest('button');
       if (!cardButton || state.ended || cardButton.disabled) return;
+      if (state.phase === 'poison-setup') {
+        choosePoisonCard(cardButton);
+        return;
+      }
 
       var cardNumber = Number(cardButton.dataset.cardNumber);
       var turn = getTurn(state.picks, state.groupCount);
-      if (cardNumber === state.poisonNumber) {
+      if (state.poisonCards.has(cardNumber)) {
         showPoison(turn, cardButton);
         return;
       }
@@ -128,17 +195,29 @@
         button.textContent = text;
         cardGrid.appendChild(button);
       });
-      updateTurn();
+      updatePoisonSetupTurn();
     }
 
     function resetGame() {
       if (state.timer !== null) cancelSchedule(state.timer);
-      state = { cards: [], groupCount: 0, poisonNumber: 0, picks: 0, ended: false, timer: null };
+      state = {
+        cards: [],
+        groupCount: 0,
+        poisonsPerGroup: 1,
+        poisonCards: new Set(),
+        phase: 'play',
+        setupGroup: 1,
+        setupPicks: 0,
+        picks: 0,
+        ended: false,
+        timer: null
+      };
       alert.hidden = true;
       alert.setAttribute('aria-hidden', 'true');
       game.hidden = true;
       setup.hidden = false;
       cardGrid.textContent = '';
+      boardPrompt.textContent = app.dataset.playPrompt;
       gameStatus.classList.remove('is-ended');
       setSetupStatus(defaultSetupStatus, false);
       form.querySelector('button[type="submit"]').focus();
@@ -146,6 +225,7 @@
 
     cardInput.addEventListener('input', updateCardCount);
     poisonInput.addEventListener('input', updateCardCount);
+    groupInput.addEventListener('input', updateCardCount);
 
     form.addEventListener('submit', function (event) {
       event.preventDefault();
@@ -156,21 +236,26 @@
         return;
       }
 
-      var poisonNumber = Number(poisonInput.value);
-      if (!Number.isInteger(poisonNumber) || poisonNumber < 1 || poisonNumber > cards.length) {
-        setSetupStatus(format(app.dataset.invalidPoisonTemplate, { count: cards.length }), true);
+      var groupCount = Number(groupInput.value);
+      var poisonsPerGroup = Number(poisonInput.value);
+      if (!Number.isInteger(poisonsPerGroup) || poisonsPerGroup < 1 || !canPlacePoisons(cards.length, groupCount, poisonsPerGroup)) {
+        setSetupStatus(format(app.dataset.invalidPoisonCountTemplate, { count: cards.length, total: groupCount * poisonsPerGroup }), true);
         poisonInput.focus();
         return;
       }
 
       state.cards = cards;
-      state.groupCount = Number(groupInput.value);
-      state.poisonNumber = poisonNumber;
+      state.groupCount = groupCount;
+      state.poisonsPerGroup = poisonsPerGroup;
+      state.poisonCards = new Set();
+      state.phase = 'poison-setup';
+      state.setupGroup = 1;
+      state.setupPicks = 0;
       state.picks = 0;
       state.ended = false;
       setup.hidden = true;
       game.hidden = false;
-      gameStatus.textContent = defaultGameStatus;
+      gameStatus.textContent = '';
       gameStatus.classList.remove('is-ended');
       renderBoard();
       cardGrid.querySelector('button').focus();
@@ -185,6 +270,7 @@
     parseCards: parseCards,
     getTurn: getTurn,
     getTextClass: getTextClass,
+    canPlacePoisons: canPlacePoisons,
     init: init
   };
 });
