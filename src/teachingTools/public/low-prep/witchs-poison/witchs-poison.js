@@ -422,6 +422,7 @@
 
     var musicMuted = false;
     try { musicMuted = storage && storage.getItem(MUTE_KEY) === '1'; } catch (_) { musicMuted = false; }
+    var fadeTimer = null;
 
     function updateMuteButtons() {
       muteButtons.forEach(function (button) {
@@ -432,6 +433,8 @@
 
     function startMusic() {
       if (!music) return;
+      if (fadeTimer !== null) { cancelSchedule(fadeTimer); fadeTimer = null; }
+      music.volume = 1;
       music.muted = musicMuted;
       try {
         var p = music.play();
@@ -440,9 +443,33 @@
     }
 
     function stopMusic() {
+      if (fadeTimer !== null) { cancelSchedule(fadeTimer); fadeTimer = null; }
       if (!music) return;
       music.pause();
       try { music.currentTime = 0; } catch (_) {}
+      music.volume = 1;
+    }
+
+    // Ease the music down before stopping, instead of cutting it off abruptly.
+    function fadeOutMusic(duration) {
+      if (!music || music.paused) { stopMusic(); return; }
+      if (fadeTimer !== null) { cancelSchedule(fadeTimer); fadeTimer = null; }
+      if (prefersReducedMotion || !duration) { stopMusic(); return; }
+      var stepMs = 60;
+      var steps = Math.max(1, Math.round(duration / stepMs));
+      var startVol = music.volume || 1;
+      var i = 0;
+      (function tick() {
+        i += 1;
+        var v = startVol * (1 - i / steps);
+        try { music.volume = v > 0 ? v : 0; } catch (_) {}
+        if (i >= steps) {
+          fadeTimer = null;
+          stopMusic();
+        } else {
+          fadeTimer = schedule(tick, stepMs);
+        }
+      })();
     }
 
     function toggleMute() {
@@ -608,8 +635,8 @@
       state.flipped = 0;
       state.turnGroup = 1;
       state.ended = false;
-      // The game has begun — stop the setup music.
-      stopMusic();
+      // The game has begun — fade the setup music out.
+      fadeOutMusic(1400);
       Array.from(cardGrid.querySelectorAll('button')).forEach(function (button) {
         button.disabled = false;
         button.classList.remove('is-poison-setup', 'is-antidote-setup', 'is-poison-flash', 'is-antidote-flash');
