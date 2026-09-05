@@ -15,10 +15,13 @@ test('ignores empty lines and rotates cards through the groups', function () {
   }), [1, 2, 3, 1]);
 });
 
-test('sizes short words and long sentences for the card grid', function () {
-  assert.equal(game.getTextClass('风'), 'is-single');
-  assert.equal(game.getTextClass('苹果'), '');
-  assert.equal(game.getTextClass('我喜欢在学校和朋友一起学习中文。'), 'is-long');
+test('sizes cards by text length across tiers', function () {
+  assert.equal(game.getTextClass('风'), 'is-xshort');                 // 1 char
+  assert.equal(game.getTextClass('苹果'), 'is-short');                // 2–4 chars
+  assert.equal(game.getTextClass('我喜欢中文'), '');                  // 5–8 chars (base)
+  assert.equal(game.getTextClass('我今天很开心去上学'), 'is-long');   // 9–14 chars
+  assert.equal(game.getTextClass('我喜欢在学校和朋友一起学习中文。'), 'is-xlong'); // 15+ chars
+  assert.equal(game.getTextClass('  水  '), 'is-xshort');            // trims whitespace
 });
 
 test('requires enough cards for each group to place poison', function () {

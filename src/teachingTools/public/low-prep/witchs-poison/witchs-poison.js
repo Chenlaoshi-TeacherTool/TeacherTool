@@ -24,11 +24,16 @@
     };
   }
 
+  // Pick a size tier from the card's length so short words show big and long
+  // sentences shrink (and get a wider card). Counts code points so it works for
+  // Chinese characters and Latin letters alike.
   function getTextClass(text) {
-    var length = Array.from(text).length;
-    if (length === 1) return 'is-single';
-    if (length > 12) return 'is-long';
-    return '';
+    var length = Array.from(String(text || '').trim()).length;
+    if (length <= 1) return 'is-xshort';
+    if (length <= 4) return 'is-short';
+    if (length <= 8) return '';
+    if (length <= 14) return 'is-long';
+    return 'is-xlong';
   }
 
   // Backwards-compatible helper: enough cards for the poison cards alone.
@@ -487,7 +492,7 @@
         } else {
           finishPlacement();
         }
-      }, prefersReducedMotion ? 1500 : 3000);
+      }, prefersReducedMotion ? 1200 : 2000);
     }
 
     // Which groups still need to place their cards.

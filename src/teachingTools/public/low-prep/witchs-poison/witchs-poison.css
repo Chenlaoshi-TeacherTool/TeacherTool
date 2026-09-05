@@ -237,9 +237,9 @@
   color: #201835;
   cursor: pointer;
   font: inherit;
-  font-size: 2.1rem;
+  font-size: 1.85rem; /* base tier: 5–8 chars */
   font-weight: 900;
-  line-height: 1.18;
+  line-height: 1.22;
   overflow-wrap: anywhere;
   text-align: center;
   white-space: pre-wrap;
@@ -254,8 +254,16 @@
 }
 
 .poison-grid-card:disabled { cursor: not-allowed; }
-.poison-grid-card.is-single { font-size: 2.55rem; }
-.poison-grid-card.is-long { font-size: 1.05rem; }
+
+/* Size tiers by text length: short = big text, long = smaller text + wider card */
+.poison-grid-card.is-xshort { font-size: 2.9rem; }
+.poison-grid-card.is-short { font-size: 2.3rem; }
+.poison-grid-card.is-long { font-size: 1.35rem; }
+.poison-grid-card.is-xlong { font-size: 1.02rem; grid-column: span 2; }
+
+/* Placement markers (☠️/💊) always show at a comfortable size regardless of tier. */
+.poison-grid-card.is-poison-setup,
+.poison-grid-card.is-antidote-setup { font-size: 2.1rem; grid-column: auto; }
 
 .poison-grid-card.is-poison-setup {
   border-color: #9478f2;
@@ -595,9 +603,13 @@
   .poison-library-row { grid-template-columns: 1fr; }
   .poison-panel { padding: 23px; }
   .poison-card-grid { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 9px; }
-  .poison-grid-card { min-height: 82px; font-size: 1.65rem; }
-  .poison-grid-card.is-single { font-size: 2.05rem; }
-  .poison-grid-card.is-long { font-size: .92rem; }
+  .poison-grid-card { min-height: 82px; font-size: 1.55rem; }
+  .poison-grid-card.is-xshort { font-size: 2.15rem; }
+  .poison-grid-card.is-short { font-size: 1.85rem; }
+  .poison-grid-card.is-long { font-size: 1.1rem; }
+  .poison-grid-card.is-xlong { font-size: .9rem; }
+  .poison-grid-card.is-poison-setup,
+  .poison-grid-card.is-antidote-setup { font-size: 1.75rem; }
 }
 
 @media (max-width: 480px) {
