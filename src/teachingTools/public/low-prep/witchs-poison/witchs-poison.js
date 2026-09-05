@@ -177,6 +177,7 @@
         poisonCards: new Set(),
         antidoteCards: new Set(),
         groups: [],
+        groupNames: [],
         phase: 'setup',
         setupGroup: null,
         setupPoisonPicks: 0,
@@ -190,6 +191,14 @@
     }
 
     var state = blankState();
+
+    // A group's display name: the teacher's custom name if set, else "Group N".
+    function groupLabel(groupNumber) {
+      var custom = state.groupNames[groupNumber - 1];
+      return (custom && custom.trim())
+        ? custom.trim()
+        : format(app.dataset.groupTemplate, { group: groupNumber });
+    }
 
     function setSetupStatus(message, isError) {
       setupStatus.textContent = message;
@@ -259,9 +268,14 @@
         avatar.appendChild(status);
         team.appendChild(avatar);
 
-        var name = doc.createElement('p');
+        var name = doc.createElement('input');
+        name.type = 'text';
         name.className = 'poison-team-name';
-        name.textContent = format(app.dataset.groupTemplate, { group: groupNumber });
+        name.maxLength = 16;
+        name.value = groupLabel(groupNumber);
+        name.dataset.group = String(groupNumber);
+        name.setAttribute('aria-label', app.dataset.renameGroupLabel || 'Group name');
+        name.title = app.dataset.renameGroupLabel || 'Group name';
         team.appendChild(name);
 
         var badges = doc.createElement('p');
@@ -412,14 +426,14 @@
     function updatePlacementPrompt() {
       if (!state.setupGroup) return;
       var kind = placingKind();
-      currentGroup.textContent = format(app.dataset.groupTemplate, { group: state.setupGroup });
+      currentGroup.textContent = groupLabel(state.setupGroup);
       if (kind === 'antidote') {
         progress.textContent = format(app.dataset.antidoteSetupProgressTemplate, {
           current: state.setupAntidotePicks,
           total: state.antidotesPerGroup
         });
         boardPrompt.textContent = format(app.dataset.antidoteSetupPromptTemplate, {
-          group: state.setupGroup,
+          group: groupLabel(state.setupGroup),
           total: state.antidotesPerGroup
         });
         boardPrompt.className = 'poison-read-prompt is-antidote-prompt';
@@ -429,7 +443,7 @@
           total: state.poisonsPerGroup
         });
         boardPrompt.textContent = format(app.dataset.poisonSetupPromptTemplate, {
-          group: state.setupGroup,
+          group: groupLabel(state.setupGroup),
           total: state.poisonsPerGroup
         });
         boardPrompt.className = 'poison-read-prompt is-poison-prompt';
@@ -479,7 +493,7 @@
         button.disabled = true;
       });
       boardPrompt.className = 'poison-read-prompt is-hold-prompt';
-      boardPrompt.textContent = format(app.dataset.placementHoldPrompt, { group: state.setupGroup });
+      boardPrompt.textContent = format(app.dataset.placementHoldPrompt, { group: groupLabel(state.setupGroup) });
       if (placementTimer !== null) cancelSchedule(placementTimer);
       placementTimer = schedule(function () {
         placementTimer = null;
@@ -514,7 +528,7 @@
         button.type = 'button';
         button.className = 'poison-chooser-group';
         button.dataset.group = String(groupNumber);
-        button.textContent = format(app.dataset.groupTemplate, { group: groupNumber });
+        button.textContent = groupLabel(groupNumber);
         chooserGroups.appendChild(button);
       });
       boardPrompt.textContent = '';
@@ -579,7 +593,7 @@
     }
 
     function updateTurn() {
-      currentGroup.textContent = format(app.dataset.groupTemplate, { group: state.turnGroup });
+      currentGroup.textContent = groupLabel(state.turnGroup);
       updateProgress();
       updateRoster();
     }
@@ -597,7 +611,7 @@
       updateRoster();
       var result = getWinners(state.groups);
       var groupsText = result.winners.map(function (n) {
-        return format(app.dataset.groupTemplate, { group: n });
+        return groupLabel(n);
       }).join('、');
       var title = app.dataset.gameOverWinTitle;
       var sub = result.minCount === 0
@@ -635,12 +649,12 @@
         cardButton.classList.add('is-antidote-found');
         groupState.antidotes += 1;
         playCast('antidote', cardButton);
-        gameStatus.textContent = format(app.dataset.antidoteFoundTemplate, { group: state.turnGroup });
+        gameStatus.textContent = format(app.dataset.antidoteFoundTemplate, { group: groupLabel(state.turnGroup) });
       } else if (state.poisonCards.has(cardNumber)) {
         cardButton.classList.add('is-poisoned');
         groupState.poisonCount += 1;
         playCast('poison', cardButton);
-        gameStatus.textContent = format(app.dataset.poisonGroupTemplate, { group: state.turnGroup });
+        gameStatus.textContent = format(app.dataset.poisonGroupTemplate, { group: groupLabel(state.turnGroup) });
       } else {
         cardButton.classList.add('is-safe');
         gameStatus.textContent = defaultGameStatus;
@@ -660,8 +674,8 @@
       groupState.poisonCount -= 1;
       playCast('antidote');
       var message = groupState.poisonCount > 0
-        ? format(app.dataset.antidoteUsedTemplate, { group: groupNumber })
-        : format(app.dataset.antidoteClearedTemplate, { group: groupNumber });
+        ? format(app.dataset.antidoteUsedTemplate, { group: groupLabel(groupNumber) })
+        : format(app.dataset.antidoteClearedTemplate, { group: groupLabel(groupNumber) });
       gameStatus.textContent = message;
       updateRoster();
     }
@@ -785,6 +799,44 @@
       var cureButton = event.target.closest('.poison-team-cure');
       if (!cureButton) return;
       useAntidote(Number(cureButton.dataset.group));
+    });
+
+    // Rename a group inline; the new name follows it everywhere.
+    function reflectGroupName(groupNumber) {
+      var activeGroup = state.phase === 'play' ? state.turnGroup : state.setupGroup;
+      if (activeGroup === groupNumber) currentGroup.textContent = groupLabel(groupNumber);
+      // Refresh the placement instruction if it names this group.
+      if (state.phase !== 'play' && state.setupGroup === groupNumber) updatePlacementPrompt();
+      if (chooserGroups) {
+        var chBtn = chooserGroups.querySelector('.poison-chooser-group[data-group="' + groupNumber + '"]');
+        if (chBtn) chBtn.textContent = groupLabel(groupNumber);
+      }
+    }
+    roster.addEventListener('input', function (event) {
+      var nameInput = event.target.closest('.poison-team-name');
+      if (!nameInput) return;
+      var groupNumber = Number(nameInput.dataset.group);
+      state.groupNames[groupNumber - 1] = nameInput.value;
+      reflectGroupName(groupNumber);
+    });
+    roster.addEventListener('keydown', function (event) {
+      var nameInput = event.target.closest('.poison-team-name');
+      if (nameInput && event.key === 'Enter') { event.preventDefault(); nameInput.blur(); }
+    });
+    roster.addEventListener('focusin', function (event) {
+      var nameInput = event.target.closest('.poison-team-name');
+      if (nameInput) nameInput.select();
+    });
+    roster.addEventListener('focusout', function (event) {
+      var nameInput = event.target.closest('.poison-team-name');
+      if (!nameInput) return;
+      var groupNumber = Number(nameInput.dataset.group);
+      // Empty name falls back to the default and is shown as such.
+      if (!nameInput.value.trim()) {
+        state.groupNames[groupNumber - 1] = '';
+        nameInput.value = groupLabel(groupNumber);
+        reflectGroupName(groupNumber);
+      }
     });
     if (chooserGroups) {
       chooserGroups.addEventListener('click', function (event) {
