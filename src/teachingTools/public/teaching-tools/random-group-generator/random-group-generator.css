@@ -61,7 +61,9 @@
 .group-plan { display: flex; align-items: flex-start; gap: 8px; min-height: 54px; margin-top: 13px; padding: 10px 12px; border: 1px dashed #bdd0b2; border-radius: 12px; background: #fffef9; color: var(--group-leaf); }
 .group-plan p { margin: 0; color: var(--muted); font-size: .77rem; line-height: 1.45; }
 .group-primary-button { width: 100%; min-height: 48px; margin-top: 13px; padding: 10px 16px; border: 0; border-radius: 14px; background: var(--group-coral); box-shadow: 0 5px 0 #9d392f; color: white; cursor: pointer; font: inherit; font-size: .9rem; font-weight: 900; transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
-.group-primary-button:hover { transform: translateY(-2px); background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
+@media (hover: hover) and (pointer: fine) {
+  .group-primary-button:hover { transform: translateY(-2px); background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
+}
 .group-primary-button:active { transform: translateY(3px); box-shadow: 0 2px 0 #9d392f; }
 .group-primary-button:focus-visible, .group-secondary-button:focus-visible, .group-text-button:focus-visible { outline: 3px solid rgba(248, 198, 63, .5); outline-offset: 3px; }
 .group-status { min-height: 20px; margin: 10px 2px 0; color: #a14538; font-size: .77rem; font-weight: 800; text-align: center; }
@@ -73,7 +75,9 @@
 .group-results__heading { display: flex; align-items: center; gap: 14px; }
 .group-results__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .group-secondary-button { min-height: 39px; padding: 8px 12px; border: 1px solid #c9d9c0; border-radius: 11px; background: #fffdf7; color: var(--group-deep); cursor: pointer; font: inherit; font-size: .77rem; font-weight: 900; transition: transform .15s ease, background-color .15s ease; }
-.group-secondary-button:hover:not(:disabled) { transform: translateY(-2px); background: var(--group-mist); }
+@media (hover: hover) and (pointer: fine) {
+  .group-secondary-button:hover:not(:disabled) { transform: translateY(-2px); background: var(--group-mist); }
+}
 .group-secondary-button:disabled { cursor: not-allowed; opacity: .42; }
 .group-output { min-height: 200px; padding: 25px 27px 29px; }
 .group-empty-state { display: grid; min-height: 150px; place-items: center; align-content: center; color: var(--muted); text-align: center; }

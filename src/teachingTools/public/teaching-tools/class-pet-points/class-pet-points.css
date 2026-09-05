@@ -373,7 +373,9 @@ button { -webkit-tap-highlight-color: transparent; }
   transition: transform .16s ease, box-shadow .16s ease;
 }
 
-.primary-button:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #9d392f; }
+@media (hover: hover) and (pointer: fine) {
+  .primary-button:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #9d392f; }
+}
 .primary-button:active { transform: translateY(3px); box-shadow: 0 2px 0 #9d392f; }
 
 .growth-guide ol,
@@ -534,7 +536,9 @@ button { -webkit-tap-highlight-color: transparent; }
   transition: transform .17s ease, box-shadow .17s ease;
 }
 
-.student-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(23, 63, 55, .14); }
+@media (hover: hover) and (pointer: fine) {
+  .student-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(23, 63, 55, .14); }
+}
 .student-card.stage-1 { --stage-color: #7ca96c; --stage-soft: #edf6e6; }
 .student-card.stage-2 { --stage-color: #d3a523; --stage-soft: #fff6d6; }
 .student-card.stage-3 { --stage-color: #df7d35; --stage-soft: #fff0e2; }
@@ -813,7 +817,9 @@ button { -webkit-tap-highlight-color: transparent; }
   font-size: .74rem;
   font-weight: 900;
 }
-.point-button:hover { transform: translateY(-1px); }
+@media (hover: hover) and (pointer: fine) {
+  .point-button:hover { transform: translateY(-1px); }
+}
 .point-button.minus { color: #a34a3c; }
 .point-button.plus-one { border-color: #add09d; background: #edf7e7; color: #2e704f; }
 .point-button.plus-five { border-color: #efd07d; background: #fff4cf; color: #855c13; }

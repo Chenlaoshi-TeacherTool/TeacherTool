@@ -123,10 +123,14 @@
 }
 
 .vg-primary { width: 100%; margin-top: 18px; padding: 13px 18px; background: var(--vg-coral); box-shadow: 0 5px 0 #9d392f; color: #fffdf7; font-size: .98rem; }
-.vg-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 0 #9d392f; }
+@media (hover: hover) and (pointer: fine) {
+  .vg-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 7px 0 #9d392f; }
+}
 .vg-primary:active { transform: translateY(3px); box-shadow: 0 2px 0 #9d392f; }
 .vg-secondary { width: auto; margin: 0; padding: 10px 15px; background: var(--vg-sun); box-shadow: 0 4px 0 #c89418; color: var(--vg-deep); font-size: .88rem; }
-.vg-secondary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 0 #c89418; }
+@media (hover: hover) and (pointer: fine) {
+  .vg-secondary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 5px 0 #c89418; }
+}
 .vg-primary:disabled,
 .vg-secondary:disabled { cursor: not-allowed; filter: grayscale(.65); opacity: .5; box-shadow: none; }
 
@@ -168,7 +172,9 @@
 .vg-remove-btn { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 7px; background: #f3ede0; color: var(--vg-coral); font-size: .8rem; font-weight: 900; cursor: pointer; transition: background .12s; }
 .vg-remove-btn:hover { background: #f6dcd6; }
 .vg-add-row { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 9px 16px; border: 1px dashed var(--vg-leaf); border-radius: 999px; background: #f6faf3; color: var(--vg-green); font-family: inherit; font-size: .85rem; font-weight: 900; cursor: pointer; transition: background .12s, transform .12s; }
-.vg-add-row:hover { background: var(--vg-mist); transform: translateY(-1px); }
+@media (hover: hover) and (pointer: fine) {
+  .vg-add-row:hover { background: var(--vg-mist); transform: translateY(-1px); }
+}
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {

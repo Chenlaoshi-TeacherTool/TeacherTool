@@ -107,9 +107,11 @@ textarea:focus-visible {
   transition: background .18s ease, transform .18s ease;
 }
 
-.back-link:hover {
-  background: rgba(255, 255, 255, .24);
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .back-link:hover {
+    background: rgba(255, 255, 255, .24);
+    transform: translateY(-1px);
+  }
 }
 
 .brand {
@@ -583,7 +585,9 @@ h2 {
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
-.btn:hover:not(:disabled) { transform: translateY(-1px); }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled) { transform: translateY(-1px); }
+}
 
 .btn:disabled {
   cursor: not-allowed;

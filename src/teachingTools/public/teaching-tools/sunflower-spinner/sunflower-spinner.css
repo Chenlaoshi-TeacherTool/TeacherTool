@@ -75,7 +75,9 @@ button:focus-visible, textarea:focus-visible { outline: 3px solid rgba(248, 198,
   text-decoration: none;
   transition: transform .18s ease, background .18s ease;
 }
-.back-link:hover { background: rgba(255, 253, 247, .21); transform: translateX(-2px); }
+@media (hover: hover) and (pointer: fine) {
+  .back-link:hover { background: rgba(255, 253, 247, .21); transform: translateX(-2px); }
+}
 
 .brand { display: flex; align-items: center; gap: 16px; }
 .brand-icon {
@@ -126,7 +128,9 @@ h2 { margin: 0; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-siz
 
 .wheel-controls { margin-top: 17px; padding-top: 17px; border-top: 1px dashed #cbdac2; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .btn { min-height: 42px; padding: 9px 13px; border: 1px solid transparent; border-radius: 12px; font-size: 13px; font-weight: 900; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
-.btn:hover:not(:disabled) { transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover:not(:disabled) { transform: translateY(-2px); }
+}
 .btn:disabled { cursor: not-allowed; opacity: .48; }
 .btn-primary { background: var(--coral); box-shadow: 0 5px 0 #9d392f; color: white; }
 .btn-primary:hover:not(:disabled) { background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
@@ -147,7 +151,9 @@ h2 { margin: 0; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-siz
 .wheel-card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .wheel-card h3 { margin: 0; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 20px; font-weight: 400; }
 .spin-button { min-height: 35px; padding: 6px 11px; border: 1px solid #d3dfc1; border-radius: 999px; background: #edf5df; color: var(--chalk); font-size: 12px; font-weight: 900; transition: transform .18s ease, background .18s ease; }
-.spin-button:hover:not(:disabled) { background: #fff2c6; transform: rotate(-3deg) scale(1.04); }
+@media (hover: hover) and (pointer: fine) {
+  .spin-button:hover:not(:disabled) { background: #fff2c6; transform: rotate(-3deg) scale(1.04); }
+}
 .spin-button:disabled { cursor: not-allowed; opacity: .5; }
 
 .sunflower-garden { min-height: 0; flex: 1; display: grid; place-items: center; position: relative; overflow: hidden; }
