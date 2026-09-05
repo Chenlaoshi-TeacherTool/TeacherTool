@@ -75,7 +75,9 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--leaf); 
   cursor: pointer;
   transition: transform .15s ease, background .15s ease;
 }
-.reveal-preset:hover { transform: translateY(-2px); background: #e2f0cc; }
+@media (hover: hover) and (pointer: fine) {
+  .reveal-preset:hover { transform: translateY(-2px); background: #e2f0cc; }
+}
 .reveal-preset.is-active { background: var(--leaf); color: #fffdf7; border-color: var(--leaf); }
 
 .reveal-upload-drop {
@@ -176,7 +178,9 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--leaf); 
   color: #fff;
   box-shadow: 0 5px 0 #9d392f;
 }
-.reveal-primary:hover:not(:disabled) { transform: translateY(-2px); background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
+@media (hover: hover) and (pointer: fine) {
+  .reveal-primary:hover:not(:disabled) { transform: translateY(-2px); background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
+}
 .reveal-primary:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #9d392f; }
 
 .reveal-secondary {
@@ -185,7 +189,9 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--leaf); 
   background: #edf5df;
   color: var(--chalk-deep);
 }
-.reveal-secondary:hover:not(:disabled) { transform: translateY(-2px); background: #e2f0cc; }
+@media (hover: hover) and (pointer: fine) {
+  .reveal-secondary:hover:not(:disabled) { transform: translateY(-2px); background: #e2f0cc; }
+}
 
 .reveal-primary:disabled, .reveal-secondary:disabled { cursor: not-allowed; opacity: .55; transform: none; box-shadow: none; }
 

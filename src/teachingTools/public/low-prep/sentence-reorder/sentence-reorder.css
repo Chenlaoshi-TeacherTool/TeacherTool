@@ -243,7 +243,9 @@ label { display: block; color: var(--chalk); font-size: .85rem; font-weight: 750
   transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease, border-color .12s ease;
   box-shadow: 0 3px 0 rgba(0,0,0,.15);
 }
-.word-chip:hover { transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) {
+  .word-chip:hover { transform: translateY(-2px); }
+}
 .word-chip:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
 .word-chip.is-dragging { cursor: grabbing; opacity: .92; transform: scale(1.06) rotate(-2deg); box-shadow: 0 10px 22px rgba(0,0,0,.4); z-index: 999; pointer-events: none; transition: none; }
 .word-chip.is-correct { background: #e2f0cc; border-color: var(--leaf); color: var(--chalk-deep); }
@@ -278,7 +280,9 @@ label { display: block; color: var(--chalk); font-size: .85rem; font-weight: 750
   color: #fff;
   box-shadow: 0 5px 0 #9d392f;
 }
-.reorder-primary:hover:not(:disabled) { transform: translateY(-2px); background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
+@media (hover: hover) and (pointer: fine) {
+  .reorder-primary:hover:not(:disabled) { transform: translateY(-2px); background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
+}
 .reorder-primary:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #9d392f; }
 
 .reorder-secondary {
@@ -287,7 +291,9 @@ label { display: block; color: var(--chalk); font-size: .85rem; font-weight: 750
   background: #edf5df;
   color: var(--chalk-deep);
 }
-.reorder-secondary:hover:not(:disabled) { transform: translateY(-2px); background: #e2f0cc; }
+@media (hover: hover) and (pointer: fine) {
+  .reorder-secondary:hover:not(:disabled) { transform: translateY(-2px); background: #e2f0cc; }
+}
 
 .reorder-primary:disabled, .reorder-secondary:disabled { cursor: not-allowed; opacity: .55; transform: none; box-shadow: none; }
 

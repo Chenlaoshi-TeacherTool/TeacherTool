@@ -43,7 +43,9 @@
 .maze-secondary, .maze-primary, .maze-key-toggle { border: 1px solid transparent; border-radius: 999px; font: inherit; font-size: .83rem; font-weight: 900; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
 .maze-secondary { padding: 9px 14px; border-color: #cadbc1; background: var(--maze-mist); color: var(--maze-deep); }
 .maze-primary { padding: 12px 16px; background: var(--maze-coral); color: #fffdf7; box-shadow: inset 0 -4px 0 rgba(92, 39, 30, .28); }
-.maze-secondary:hover, .maze-primary:hover, .maze-key-toggle:hover { transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) {
+  .maze-secondary:hover, .maze-primary:hover, .maze-key-toggle:hover { transform: translateY(-2px); }
+}
 .maze-primary:disabled { cursor: wait; opacity: .72; transform: none; }
 
 .maze-pair-editor { margin-top: 18px; padding: 16px; border: 1px solid #dbe7d3; border-radius: 14px; background: #f9fcf6; }

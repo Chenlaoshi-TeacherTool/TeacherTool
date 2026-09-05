@@ -206,7 +206,9 @@ img.twemoji { width: 1em; height: 1em; vertical-align: -.12em; }
 .emoji-picker label { display: block; margin-top: 18px; }
 .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 7px; margin-top: 14px; }
 .emoji-grid button { display: grid; place-items: center; aspect-ratio: 1; border: 1px solid #d5dfd8; border-radius: 11px; background: #fff; font-size: 1.6rem; }
-.emoji-grid button:hover, .emoji-grid button:focus { border-color: var(--tarsia-green); background: #edf5ef; transform: translateY(-1px); }
+@media (hover: hover) and (pointer: fine) {
+  .emoji-grid button:hover, .emoji-grid button:focus { border-color: var(--tarsia-green); background: #edf5ef; transform: translateY(-1px); }
+}
 .emoji-grid img.twemoji { width: 29px; height: 29px; }
 .custom-emoji > span { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
 .twemoji-credit { color: #788a82; font-size: .75rem; }

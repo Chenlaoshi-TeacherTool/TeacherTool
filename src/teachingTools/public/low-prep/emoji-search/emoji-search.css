@@ -130,9 +130,11 @@
   overflow: hidden;
   transition: transform 0.08s ease, box-shadow 0.15s ease;
 }
-.emoji-card:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .emoji-card:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+  }
 }
 
 .emoji-copy-main {
