@@ -53,63 +53,38 @@ test('keeps only the last poison/antidote setting for a card', function () {
   assert.equal(antidote.has(1), false);
 });
 
-test('builds a fresh group roster', function () {
+test('builds a fresh group roster with a poison tally', function () {
   assert.deepEqual(game.makeGroups(2), [
-    { poisoned: false, antidotes: 0 },
-    { poisoned: false, antidotes: 0 }
+    { poisoned: false, antidotes: 0, poisonCount: 0 },
+    { poisoned: false, antidotes: 0, poisonCount: 0 }
   ]);
 });
 
-test('counts un-poisoned groups and pending recoveries', function () {
-  var groups = [
-    { poisoned: false, antidotes: 0 },
-    { poisoned: true, antidotes: 0 },
-    { poisoned: true, antidotes: 1 }
-  ];
-  assert.equal(game.getAliveCount(groups), 1);
-  assert.equal(game.canStillRecover(groups), true);
+test('the game only ends once every card is flipped', function () {
+  var groups = game.makeGroups(3);
+  groups[0].poisoned = true;
+  assert.equal(game.isGameOver(groups, 5, 12), false); // poisoned groups keep playing
+  assert.equal(game.isGameOver(groups, 12, 12), true);
 });
 
-test('ends when only one group survives, unless an antidote can still save someone', function () {
-  var total = 12;
-  // Two groups alive -> keep playing.
-  assert.equal(game.isGameOver([
-    { poisoned: false, antidotes: 0 },
-    { poisoned: false, antidotes: 0 },
-    { poisoned: true, antidotes: 0 }
-  ], 5, total), false);
-  // One group alive, nobody can recover -> game over.
-  assert.equal(game.isGameOver([
-    { poisoned: false, antidotes: 0 },
-    { poisoned: true, antidotes: 0 },
-    { poisoned: true, antidotes: 0 }
-  ], 5, total), true);
-  // One group alive, but a poisoned team still holds an antidote -> wait.
-  assert.equal(game.isGameOver([
-    { poisoned: false, antidotes: 0 },
-    { poisoned: true, antidotes: 1 },
-    { poisoned: true, antidotes: 0 }
-  ], 5, total), false);
-  // All cards flipped always ends the game.
-  assert.equal(game.isGameOver([
-    { poisoned: false, antidotes: 0 },
-    { poisoned: false, antidotes: 0 }
-  ], total, total), true);
+test('turns rotate through every group, poisoned or not', function () {
+  assert.equal(game.nextGroup(1, 3), 2);
+  assert.equal(game.nextGroup(3, 3), 1); // wraps around
+  assert.equal(game.nextGroup(1, 1), 1);
 });
 
-test('skips poisoned groups when choosing the next turn', function () {
-  var groups = [
-    { poisoned: false, antidotes: 0 },
-    { poisoned: true, antidotes: 0 },
-    { poisoned: false, antidotes: 0 }
-  ];
-  assert.equal(game.nextActiveGroup(1, groups), 3);
-  assert.equal(game.nextActiveGroup(3, groups), 1);
-  // Everyone else poisoned -> stay put.
-  assert.equal(game.nextActiveGroup(1, [
-    { poisoned: false, antidotes: 0 },
-    { poisoned: true, antidotes: 0 }
-  ]), 1);
+test('winners are the groups poisoned the fewest times', function () {
+  var fewest = game.getWinners([
+    { poisonCount: 2 }, { poisonCount: 0 }, { poisonCount: 3 }
+  ]);
+  assert.deepEqual(fewest.winners, [2]);
+  assert.equal(fewest.minCount, 0);
+
+  var tie = game.getWinners([
+    { poisonCount: 1 }, { poisonCount: 1 }, { poisonCount: 4 }
+  ]);
+  assert.deepEqual(tie.winners, [1, 2]);
+  assert.equal(tie.minCount, 1);
 });
 
 test('saves named card sets in browser storage', function () {

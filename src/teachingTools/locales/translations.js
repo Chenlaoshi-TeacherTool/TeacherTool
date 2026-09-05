@@ -541,6 +541,7 @@ module.exports = {
       antidoteFoundTemplate: 'Group {group} found an antidote! 💊',
       antidoteUsedTemplate: 'Group {group} used an antidote and recovered! ✨',
       antidoteHeldTemplate: '💊 × {count}',
+      poisonCountTemplate: '☠️ × {count}',
       useAntidoteLabel: '💊 Use antidote',
       poisonCastLabel: 'A poison is cast…',
       antidoteCastLabel: 'An antidote is brewed…',
@@ -552,9 +553,8 @@ module.exports = {
       gameStartSub: 'Poisons are hidden. Let the reading begin!',
       gameOverTitle: 'Game Over',
       gameOverWinTitle: 'We have a winner!',
-      gameOverWinSub: 'Group {group} is the last one standing! 🏆',
-      gameOverSurvivors: 'All cards flipped. Survivors: {groups}.',
-      gameOverAllPoisoned: 'All cards flipped — every group was poisoned!',
+      gameOverWinnersSafe: 'Winners: {groups} — never poisoned! 🏆',
+      gameOverWinnersLeast: 'Winners: {groups} — poisoned the fewest times ({count}×)! 🏆',
       gameOverTemplate: 'Game over — Group {group} found the poison card.'
     },
     nameTentGenerator: {
@@ -1736,6 +1736,7 @@ module.exports = {
       antidoteFoundTemplate: '第 {group} 组翻到了解药！💊',
       antidoteUsedTemplate: '第 {group} 组使用解药，恢复正常！✨',
       antidoteHeldTemplate: '💊 × {count}',
+      poisonCountTemplate: '☠️ × {count}',
       useAntidoteLabel: '💊 使用解药',
       poisonCastLabel: '女巫正在下毒……',
       antidoteCastLabel: '女巫正在熬制解药……',
@@ -1747,9 +1748,8 @@ module.exports = {
       gameStartSub: '毒药已藏好，开始朗读闯关吧！',
       gameOverTitle: '游戏结束',
       gameOverWinTitle: '恭喜获胜！',
-      gameOverWinSub: '第 {group} 组坚持到最后，获得胜利！🏆',
-      gameOverSurvivors: '卡片已全部翻完。存活小组：{groups}。',
-      gameOverAllPoisoned: '卡片已全部翻完——所有小组都中毒啦！',
+      gameOverWinnersSafe: '获胜：{groups} —— 全程没有中毒！🏆',
+      gameOverWinnersLeast: '获胜：{groups} —— 中毒次数最少（{count} 次）！🏆',
       gameOverTemplate: '游戏结束——第 {group} 组抽中了毒药卡。'
     },
     nameTentGenerator: {

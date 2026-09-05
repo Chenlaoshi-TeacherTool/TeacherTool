@@ -62,36 +62,31 @@
   function makeGroups(groupCount) {
     var groups = [];
     for (var i = 0; i < groupCount; i += 1) {
-      groups.push({ poisoned: false, antidotes: 0 });
+      groups.push({ poisoned: false, antidotes: 0, poisonCount: 0 });
     }
     return groups;
   }
 
-  // Groups that are not currently poisoned.
-  function getAliveCount(groups) {
-    return groups.filter(function (g) { return !g.poisoned; }).length;
-  }
-
-  // A poisoned group still holding an antidote can come back, so the "last one
-  // standing" ending must wait for them to decide.
-  function canStillRecover(groups) {
-    return groups.some(function (g) { return g.poisoned && g.antidotes > 0; });
-  }
-
+  // Nobody is eliminated: poisoned groups keep playing (to find an antidote, or
+  // just to tally hits), so the game runs until every card is flipped.
   function isGameOver(groups, flipped, total) {
-    if (flipped >= total) return true;
-    return getAliveCount(groups) <= 1 && !canStillRecover(groups);
+    return flipped >= total;
   }
 
-  // Next group (1-based) that is not poisoned, scanning forward from `current`
-  // and wrapping around. Returns current if nobody else is available.
-  function nextActiveGroup(current, groups) {
-    var count = groups.length;
-    for (var step = 1; step <= count; step += 1) {
-      var candidate = ((current - 1 + step) % count) + 1;
-      if (!groups[candidate - 1].poisoned) return candidate;
-    }
-    return current;
+  // Simple round-robin: every group takes a turn, poisoned or not.
+  function nextGroup(current, groupCount) {
+    return (current % groupCount) + 1;
+  }
+
+  // The winning group(s) are the ones poisoned the fewest times.
+  function getWinners(groups) {
+    var min = Infinity;
+    groups.forEach(function (g) { if (g.poisonCount < min) min = g.poisonCount; });
+    var winners = [];
+    groups.forEach(function (g, index) {
+      if (g.poisonCount === min) winners.push(index + 1);
+    });
+    return { winners: winners, minCount: min === Infinity ? 0 : min };
   }
 
   function getSavedCardSets(storage) {
@@ -298,9 +293,10 @@
         status.textContent = groupState.poisoned ? '☠️' : '';
 
         var badges = team.querySelector('.poison-team-badges');
-        badges.textContent = groupState.antidotes > 0
-          ? format(app.dataset.antidoteHeldTemplate, { count: groupState.antidotes })
-          : '';
+        var parts = [];
+        if (groupState.antidotes > 0) parts.push(format(app.dataset.antidoteHeldTemplate, { count: groupState.antidotes }));
+        if (groupState.poisonCount > 0) parts.push(format(app.dataset.poisonCountTemplate, { count: groupState.poisonCount }));
+        badges.textContent = parts.join('  ');
 
         var cure = team.querySelector('.poison-team-cure');
         var canCure = groupState.poisoned && groupState.antidotes > 0 && !state.ended;
@@ -586,16 +582,8 @@
     }
 
     function advanceTurn() {
-      state.turnGroup = nextActiveGroup(state.turnGroup, state.groups);
+      state.turnGroup = nextGroup(state.turnGroup, state.groupCount);
       updateTurn();
-    }
-
-    function survivorList() {
-      var survivors = [];
-      state.groups.forEach(function (g, index) {
-        if (!g.poisoned) survivors.push(index + 1);
-      });
-      return survivors;
     }
 
     function endGame() {
@@ -604,23 +592,14 @@
         button.disabled = true;
       });
       updateRoster();
-      var survivors = survivorList();
-      var title;
-      var sub;
-      if (survivors.length === 1) {
-        title = app.dataset.gameOverWinTitle;
-        sub = format(app.dataset.gameOverWinSub, { group: survivors[0] });
-      } else if (survivors.length === 0) {
-        title = app.dataset.gameOverTitle;
-        sub = app.dataset.gameOverAllPoisoned;
-      } else {
-        title = app.dataset.gameOverTitle;
-        sub = format(app.dataset.gameOverSurvivors, {
-          groups: survivors.map(function (n) {
-            return format(app.dataset.groupTemplate, { group: n });
-          }).join('、')
-        });
-      }
+      var result = getWinners(state.groups);
+      var groupsText = result.winners.map(function (n) {
+        return format(app.dataset.groupTemplate, { group: n });
+      }).join('、');
+      var title = app.dataset.gameOverWinTitle;
+      var sub = result.minCount === 0
+        ? format(app.dataset.gameOverWinnersSafe, { groups: groupsText })
+        : format(app.dataset.gameOverWinnersLeast, { groups: groupsText, count: result.minCount });
       gameStatus.textContent = sub;
       gameStatus.classList.add('is-ended');
       showBanner('over', title, sub, function () { resetButton.focus(); }, prefersReducedMotion ? 1000 : 2400);
@@ -657,6 +636,7 @@
       } else if (state.poisonCards.has(cardNumber)) {
         cardButton.classList.add('is-poisoned');
         groupState.poisoned = true;
+        groupState.poisonCount += 1;
         playCast('poison', cardButton);
         gameStatus.textContent = format(app.dataset.poisonGroupTemplate, { group: state.turnGroup });
       } else {
@@ -677,12 +657,7 @@
       groupState.poisoned = false;
       playCast('antidote');
       gameStatus.textContent = format(app.dataset.antidoteUsedTemplate, { group: groupNumber });
-      // Make sure the turn pointer rests on an active group again.
-      if (state.groups[state.turnGroup - 1] && state.groups[state.turnGroup - 1].poisoned) {
-        state.turnGroup = nextActiveGroup(state.turnGroup, state.groups);
-      }
-      updateTurn();
-      checkGameOver();
+      updateRoster();
     }
 
     // ----- Board render + reset --------------------------------------------
@@ -862,10 +837,9 @@
     canPlaceCards: canPlaceCards,
     applyCardSetting: applyCardSetting,
     makeGroups: makeGroups,
-    getAliveCount: getAliveCount,
-    canStillRecover: canStillRecover,
     isGameOver: isGameOver,
-    nextActiveGroup: nextActiveGroup,
+    nextGroup: nextGroup,
+    getWinners: getWinners,
     getSavedCardSets: getSavedCardSets,
     saveCardSet: saveCardSet,
     init: init
