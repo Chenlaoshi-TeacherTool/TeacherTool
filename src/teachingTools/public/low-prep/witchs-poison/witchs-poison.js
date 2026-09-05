@@ -164,6 +164,7 @@
 
     var castTimer = null;
     var bannerTimer = null;
+    var placementTimer = null;
 
     function blankState() {
       return {
@@ -467,16 +468,26 @@
         return;
       }
 
-      // This group finished placing. Hide their picks, then let the teacher pick
-      // who goes next (or start the game once every group has placed).
-      state.placedGroups.add(state.setupGroup);
-      state.setupGroup = null;
-      resetPlacementBoard();
-      if (state.placedGroups.size < state.groupCount) {
-        showChooser(false);
-        return;
-      }
-      finishPlacement();
+      // This group finished placing. Keep the ☠️/💊 on screen for a few seconds
+      // so everyone can see which card is poison and which is antidote, then hide
+      // them and let the teacher pick who goes next (or start the game).
+      Array.from(cardGrid.querySelectorAll('button')).forEach(function (button) {
+        button.disabled = true;
+      });
+      boardPrompt.className = 'poison-read-prompt is-hold-prompt';
+      boardPrompt.textContent = format(app.dataset.placementHoldPrompt, { group: state.setupGroup });
+      if (placementTimer !== null) cancelSchedule(placementTimer);
+      placementTimer = schedule(function () {
+        placementTimer = null;
+        state.placedGroups.add(state.setupGroup);
+        state.setupGroup = null;
+        resetPlacementBoard();
+        if (state.placedGroups.size < state.groupCount) {
+          showChooser(false);
+        } else {
+          finishPlacement();
+        }
+      }, prefersReducedMotion ? 1500 : 3000);
     }
 
     // Which groups still need to place their cards.
@@ -689,6 +700,7 @@
       if (state.timer !== null) cancelSchedule(state.timer);
       if (castTimer !== null) { cancelSchedule(castTimer); castTimer = null; }
       if (bannerTimer !== null) { cancelSchedule(bannerTimer); bannerTimer = null; }
+      if (placementTimer !== null) { cancelSchedule(placementTimer); placementTimer = null; }
       state = blankState();
       if (cast) { cast.hidden = true; cast.textContent = ''; }
       if (banner) { banner.hidden = true; banner.textContent = ''; }

@@ -214,6 +214,12 @@
   text-align: center;
 }
 
+.poison-read-prompt.is-hold-prompt {
+  color: var(--chalk);
+  font-size: 1.02rem;
+  font-weight: 900;
+}
+
 .poison-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
