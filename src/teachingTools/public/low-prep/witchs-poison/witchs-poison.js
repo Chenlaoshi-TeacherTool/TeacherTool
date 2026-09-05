@@ -151,6 +151,10 @@
     var resetButton = doc.getElementById('poison-reset-button');
     var cast = doc.getElementById('poison-cast');
     var banner = doc.getElementById('poison-banner');
+    var chooser = doc.getElementById('poison-chooser');
+    var chooserTitle = doc.getElementById('poison-chooser-title');
+    var chooserGroups = doc.getElementById('poison-chooser-groups');
+    var fullscreenButtons = Array.from(doc.querySelectorAll('.poison-fullscreen'));
     var prefersReducedMotion = false;
     try {
       prefersReducedMotion = !!(root().matchMedia && root().matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -171,9 +175,10 @@
         antidoteCards: new Set(),
         groups: [],
         phase: 'setup',
-        setupGroup: 1,
+        setupGroup: null,
         setupPoisonPicks: 0,
         setupAntidotePicks: 0,
+        placedGroups: new Set(),
         turnGroup: 1,
         flipped: 0,
         ended: false,
@@ -400,6 +405,7 @@
     }
 
     function updatePlacementPrompt() {
+      if (!state.setupGroup) return;
       var kind = placingKind();
       currentGroup.textContent = format(app.dataset.groupTemplate, { group: state.setupGroup });
       if (kind === 'antidote') {
@@ -461,18 +467,64 @@
         return;
       }
 
-      if (state.setupGroup < state.groupCount) {
-        state.setupGroup += 1;
-        state.setupPoisonPicks = 0;
-        state.setupAntidotePicks = 0;
-        // Hide this group's picks before the next group takes over.
-        resetPlacementBoard();
-        updatePlacementPrompt();
-        showBanner('handoff', format(app.dataset.handoffTitle, { group: state.setupGroup }), app.dataset.handoffSub);
+      // This group finished placing. Hide their picks, then let the teacher pick
+      // who goes next (or start the game once every group has placed).
+      state.placedGroups.add(state.setupGroup);
+      state.setupGroup = null;
+      resetPlacementBoard();
+      if (state.placedGroups.size < state.groupCount) {
+        showChooser(false);
         return;
       }
-
       finishPlacement();
+    }
+
+    // Which groups still need to place their cards.
+    function remainingSetupGroups() {
+      var remaining = [];
+      for (var g = 1; g <= state.groupCount; g += 1) {
+        if (!state.placedGroups.has(g)) remaining.push(g);
+      }
+      return remaining;
+    }
+
+    // Ask the teacher which group places next.
+    function showChooser(isFirst) {
+      if (!chooser) return;
+      var remaining = remainingSetupGroups();
+      chooserTitle.textContent = isFirst ? app.dataset.chooserFirstTitle : app.dataset.chooserNextTitle;
+      chooserGroups.textContent = '';
+      remaining.forEach(function (groupNumber) {
+        var button = doc.createElement('button');
+        button.type = 'button';
+        button.className = 'poison-chooser-group';
+        button.dataset.group = String(groupNumber);
+        button.textContent = format(app.dataset.groupTemplate, { group: groupNumber });
+        chooserGroups.appendChild(button);
+      });
+      boardPrompt.textContent = '';
+      chooser.hidden = false;
+      chooser.setAttribute('aria-hidden', 'false');
+      var firstButton = chooserGroups.querySelector('button');
+      if (firstButton) firstButton.focus();
+    }
+
+    function hideChooser() {
+      if (!chooser) return;
+      chooser.hidden = true;
+      chooser.setAttribute('aria-hidden', 'true');
+      chooserGroups.textContent = '';
+    }
+
+    function startGroupPlacement(groupNumber) {
+      hideChooser();
+      state.setupGroup = groupNumber;
+      state.setupPoisonPicks = 0;
+      state.setupAntidotePicks = 0;
+      resetPlacementBoard();
+      updatePlacementPrompt();
+      var firstCard = cardGrid.querySelector('button');
+      if (firstCard) firstCard.focus();
     }
 
     function finishPlacement() {
@@ -640,6 +692,7 @@
       state = blankState();
       if (cast) { cast.hidden = true; cast.textContent = ''; }
       if (banner) { banner.hidden = true; banner.textContent = ''; }
+      hideChooser();
       roster.textContent = '';
       game.hidden = true;
       setup.hidden = false;
@@ -715,7 +768,7 @@
       state.antidotesPerGroup = antidotesPerGroup;
       state.groups = makeGroups(groupCount);
       state.phase = 'poison-setup';
-      state.setupGroup = 1;
+      state.setupGroup = null;
       state.setupPoisonPicks = 0;
       state.setupAntidotePicks = 0;
 
@@ -725,8 +778,8 @@
       gameStatus.classList.remove('is-ended');
       renderRoster();
       renderBoard();
-      var firstCard = cardGrid.querySelector('button');
-      if (firstCard) firstCard.focus();
+      // Let the teacher choose which group hides its cards first.
+      showChooser(true);
     });
 
     cardGrid.addEventListener('click', chooseCard);
@@ -735,7 +788,51 @@
       if (!cureButton) return;
       useAntidote(Number(cureButton.dataset.group));
     });
+    if (chooserGroups) {
+      chooserGroups.addEventListener('click', function (event) {
+        var groupButton = event.target.closest('.poison-chooser-group');
+        if (!groupButton) return;
+        startGroupPlacement(Number(groupButton.dataset.group));
+      });
+    }
     resetButton.addEventListener('click', resetGame);
+
+    // ----- Fullscreen -------------------------------------------------------
+    function fullscreenElement() {
+      var d = doc;
+      return d.fullscreenElement || d.webkitFullscreenElement || d.msFullscreenElement || null;
+    }
+    function updateFullscreenButtons() {
+      var active = !!fullscreenElement();
+      fullscreenButtons.forEach(function (button) {
+        button.textContent = active ? button.dataset.exitLabel : button.dataset.enterLabel;
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+    function toggleFullscreen() {
+      var d = doc;
+      var el = d.documentElement;
+      try {
+        var result;
+        if (fullscreenElement()) {
+          result = (d.exitFullscreen || d.webkitExitFullscreen || d.msExitFullscreen || function () {}).call(d);
+        } else {
+          result = (el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || function () {}).call(el);
+        }
+        if (result && typeof result.catch === 'function') result.catch(function () {});
+      } catch (_) { /* fullscreen may be blocked in some contexts */ }
+    }
+    if (fullscreenButtons.length) {
+      var fsSupported = !!(doc.documentElement.requestFullscreen || doc.documentElement.webkitRequestFullscreen || doc.documentElement.msRequestFullscreen);
+      fullscreenButtons.forEach(function (button) {
+        if (!fsSupported) { button.hidden = true; return; }
+        button.addEventListener('click', toggleFullscreen);
+      });
+      doc.addEventListener('fullscreenchange', updateFullscreenButtons);
+      doc.addEventListener('webkitfullscreenchange', updateFullscreenButtons);
+      updateFullscreenButtons();
+    }
+
     renderSavedList();
     updateCardCount();
   }

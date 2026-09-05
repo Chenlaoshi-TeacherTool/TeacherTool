@@ -434,9 +434,7 @@
 .poison-cast-img {
   width: clamp(150px, 34vw, 260px);
   height: auto;
-  /* Drops a white PNG background against the light board. */
-  mix-blend-mode: multiply;
-  filter: drop-shadow(0 14px 30px rgba(30, 8, 60, .25));
+  filter: drop-shadow(0 14px 30px rgba(30, 8, 60, .35));
 }
 .poison-cast-emoji { display: none; font-size: clamp(4rem, 15vw, 8rem); line-height: 1; filter: drop-shadow(0 10px 24px rgba(30, 8, 60, .4)); }
 .poison-cast-emoji.is-visible { display: block; }
@@ -475,6 +473,64 @@
   60% { opacity: 1; transform: scale(1) rotate(-12deg); }
   100% { opacity: 0; transform: scale(1.4) rotate(30deg); }
 }
+
+/* ---- Group chooser (who places next) ---- */
+.poison-chooser {
+  position: fixed;
+  z-index: 1002;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(30, 8, 60, .82);
+  animation: poison-fade-in 220ms ease both;
+}
+.poison-chooser[hidden] { display: none; }
+
+.poison-chooser-card {
+  width: min(560px, 100%);
+  padding: 32px 28px;
+  border: 4px solid #ffd85d;
+  border-radius: 26px;
+  background: linear-gradient(145deg, #6a3bb0, #341a63);
+  box-shadow: 0 30px 80px rgba(14, 2, 34, .55);
+  color: #fff;
+  text-align: center;
+}
+
+.poison-chooser-title {
+  margin: 0 0 20px;
+  font-size: clamp(1.5rem, 4.5vw, 2.3rem);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.poison-chooser-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.poison-chooser-group {
+  min-height: 60px;
+  padding: 14px 16px;
+  border: 2px solid #ffd85d;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 900;
+  transition: transform 140ms ease, background-color 140ms ease;
+}
+.poison-chooser-group:hover { transform: translateY(-2px); background: #ffd85d; color: #341a63; }
+.poison-chooser-group:active { transform: translateY(1px); }
+
+@keyframes poison-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Fullscreen button on the setup screen spans the form width. */
+.poison-fullscreen-setup { display: block; width: 100%; margin-top: 12px; }
 
 /* ---- Big banner (game start / game over) ---- */
 .poison-banner {
