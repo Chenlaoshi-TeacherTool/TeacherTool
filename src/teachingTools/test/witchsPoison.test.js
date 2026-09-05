@@ -53,18 +53,27 @@ test('keeps only the last poison/antidote setting for a card', function () {
   assert.equal(antidote.has(1), false);
 });
 
-test('builds a fresh group roster with a poison tally', function () {
+test('builds a fresh group roster with an antidote and poison tally', function () {
   assert.deepEqual(game.makeGroups(2), [
-    { poisoned: false, antidotes: 0, poisonCount: 0 },
-    { poisoned: false, antidotes: 0, poisonCount: 0 }
+    { antidotes: 0, poisonCount: 0 },
+    { antidotes: 0, poisonCount: 0 }
   ]);
 });
 
 test('the game only ends once every card is flipped', function () {
   var groups = game.makeGroups(3);
-  groups[0].poisoned = true;
+  groups[0].poisonCount = 1;
   assert.equal(game.isGameOver(groups, 5, 12), false); // poisoned groups keep playing
   assert.equal(game.isGameOver(groups, 12, 12), true);
+});
+
+test('a cured group (no active poison) counts as a winner', function () {
+  // Group 1 was poisoned twice but cleared both; Group 2 still has one ☠️.
+  var result = game.getWinners([
+    { poisonCount: 0 }, { poisonCount: 1 }, { poisonCount: 0 }
+  ]);
+  assert.deepEqual(result.winners, [1, 3]);
+  assert.equal(result.minCount, 0);
 });
 
 test('turns rotate through every group, poisoned or not', function () {

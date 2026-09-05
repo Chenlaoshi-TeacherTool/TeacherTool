@@ -62,7 +62,9 @@
   function makeGroups(groupCount) {
     var groups = [];
     for (var i = 0; i < groupCount; i += 1) {
-      groups.push({ poisoned: false, antidotes: 0, poisonCount: 0 });
+      // poisonCount = number of active ☠️ right now (a group is poisoned while
+      // it is > 0). Each antidote clears one ☠️.
+      groups.push({ antidotes: 0, poisonCount: 0 });
     }
     return groups;
   }
@@ -284,13 +286,14 @@
         var groupNumber = Number(team.dataset.group);
         var groupState = state.groups[groupNumber - 1];
         if (!groupState) return;
+        var isPoisoned = groupState.poisonCount > 0;
         var isCurrent = state.phase === 'play' && !state.ended && groupNumber === state.turnGroup;
-        team.classList.toggle('is-poisoned', groupState.poisoned);
+        team.classList.toggle('is-poisoned', isPoisoned);
         team.classList.toggle('is-current', isCurrent);
         team.classList.toggle('has-antidote', groupState.antidotes > 0);
 
         var status = team.querySelector('.poison-team-status');
-        status.textContent = groupState.poisoned ? '☠️' : '';
+        status.textContent = isPoisoned ? '☠️' : '';
 
         var badges = team.querySelector('.poison-team-badges');
         var parts = [];
@@ -299,7 +302,7 @@
         badges.textContent = parts.join('  ');
 
         var cure = team.querySelector('.poison-team-cure');
-        var canCure = groupState.poisoned && groupState.antidotes > 0 && !state.ended;
+        var canCure = isPoisoned && groupState.antidotes > 0 && !state.ended;
         cure.hidden = !canCure;
       });
     }
@@ -635,7 +638,6 @@
         gameStatus.textContent = format(app.dataset.antidoteFoundTemplate, { group: state.turnGroup });
       } else if (state.poisonCards.has(cardNumber)) {
         cardButton.classList.add('is-poisoned');
-        groupState.poisoned = true;
         groupState.poisonCount += 1;
         playCast('poison', cardButton);
         gameStatus.textContent = format(app.dataset.poisonGroupTemplate, { group: state.turnGroup });
@@ -652,11 +654,15 @@
 
     function useAntidote(groupNumber) {
       var groupState = state.groups[groupNumber - 1];
-      if (!groupState || !groupState.poisoned || groupState.antidotes <= 0 || state.ended) return;
+      if (!groupState || groupState.poisonCount <= 0 || groupState.antidotes <= 0 || state.ended) return;
+      // One bottle clears exactly one ☠️.
       groupState.antidotes -= 1;
-      groupState.poisoned = false;
+      groupState.poisonCount -= 1;
       playCast('antidote');
-      gameStatus.textContent = format(app.dataset.antidoteUsedTemplate, { group: groupNumber });
+      var message = groupState.poisonCount > 0
+        ? format(app.dataset.antidoteUsedTemplate, { group: groupNumber })
+        : format(app.dataset.antidoteClearedTemplate, { group: groupNumber });
+      gameStatus.textContent = message;
       updateRoster();
     }
 

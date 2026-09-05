@@ -539,7 +539,8 @@ module.exports = {
       poisonedTitle: "You're poisoned!",
       poisonGroupTemplate: 'Group {group} drank the poison! ☠️',
       antidoteFoundTemplate: 'Group {group} found an antidote! 💊',
-      antidoteUsedTemplate: 'Group {group} used an antidote and recovered! ✨',
+      antidoteUsedTemplate: 'Group {group} cleared one ☠️ with an antidote!',
+      antidoteClearedTemplate: 'Group {group} used an antidote and fully recovered! ✨',
       antidoteHeldTemplate: '💊 × {count}',
       poisonCountTemplate: '☠️ × {count}',
       useAntidoteLabel: '💊 Use antidote',
@@ -553,8 +554,8 @@ module.exports = {
       gameStartSub: 'Poisons are hidden. Let the reading begin!',
       gameOverTitle: 'Game Over',
       gameOverWinTitle: 'We have a winner!',
-      gameOverWinnersSafe: 'Winners: {groups} — never poisoned! 🏆',
-      gameOverWinnersLeast: 'Winners: {groups} — poisoned the fewest times ({count}×)! 🏆',
+      gameOverWinnersSafe: 'Winners: {groups} — no poison left! 🏆',
+      gameOverWinnersLeast: 'Winners: {groups} — the least poison left ({count} ☠️)! 🏆',
       gameOverTemplate: 'Game over — Group {group} found the poison card.'
     },
     nameTentGenerator: {
@@ -1734,7 +1735,8 @@ module.exports = {
       poisonedTitle: '你中毒啦！',
       poisonGroupTemplate: '第 {group} 组喝到了毒药！☠️',
       antidoteFoundTemplate: '第 {group} 组翻到了解药！💊',
-      antidoteUsedTemplate: '第 {group} 组使用解药，恢复正常！✨',
+      antidoteUsedTemplate: '第 {group} 组用解药清除了一个中毒！',
+      antidoteClearedTemplate: '第 {group} 组用解药，完全恢复正常！✨',
       antidoteHeldTemplate: '💊 × {count}',
       poisonCountTemplate: '☠️ × {count}',
       useAntidoteLabel: '💊 使用解药',
@@ -1748,8 +1750,8 @@ module.exports = {
       gameStartSub: '毒药已藏好，开始朗读闯关吧！',
       gameOverTitle: '游戏结束',
       gameOverWinTitle: '恭喜获胜！',
-      gameOverWinnersSafe: '获胜：{groups} —— 全程没有中毒！🏆',
-      gameOverWinnersLeast: '获胜：{groups} —— 中毒次数最少（{count} 次）！🏆',
+      gameOverWinnersSafe: '获胜：{groups} —— 身上已无中毒！🏆',
+      gameOverWinnersLeast: '获胜：{groups} —— 剩余中毒最少（{count} 个 ☠️）！🏆',
       gameOverTemplate: '游戏结束——第 {group} 组抽中了毒药卡。'
     },
     nameTentGenerator: {
