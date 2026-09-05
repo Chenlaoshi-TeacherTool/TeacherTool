@@ -101,7 +101,8 @@
 }
 
 .poison-panel textarea,
-.poison-panel input {
+.poison-panel input,
+.poison-panel select {
   display: block;
   width: 100%;
   padding: 12px 13px;
@@ -118,6 +119,23 @@
   margin: 7px 0 0;
   color: var(--muted);
   font-size: .82rem;
+}
+
+.poison-library {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid #d8e5c7;
+  border-radius: 8px;
+  background: #f8fbf2;
+}
+
+.poison-library label:first-child { margin-top: 0; }
+
+.poison-library-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
 }
 
 .poison-options {
@@ -322,6 +340,7 @@
   .poison-header-badge { display: none; }
   .poison-main { width: min(100%, calc(100% - 32px)); padding-top: 24px; }
   .poison-options { grid-template-columns: 1fr; gap: 2px; }
+  .poison-library-row { grid-template-columns: 1fr; }
   .poison-panel { padding: 23px; }
   .poison-card-grid { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 9px; }
   .poison-grid-card { min-height: 82px; font-size: 1.65rem; }

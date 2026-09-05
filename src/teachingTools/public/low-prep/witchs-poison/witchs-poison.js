@@ -5,10 +5,12 @@
   if (typeof module === 'object' && module.exports) module.exports = game;
   if (root && root.document) {
     root.document.addEventListener('DOMContentLoaded', function () {
-      game.init(root.document, root.setTimeout.bind(root), root.clearTimeout.bind(root));
+      game.init(root.document, root.setTimeout.bind(root), root.clearTimeout.bind(root), root.localStorage);
     });
   }
 })(typeof window !== 'undefined' ? window : null, function () {
+  var STORAGE_KEY = 'teacherTool.witchsPoison.cardSets.v1';
+
   function parseCards(value) {
     return String(value || '').split(/\r?\n|\r/).map(function (line) {
       return line.trim();
@@ -33,13 +35,41 @@
     return cardCount >= groupCount * poisonsPerGroup;
   }
 
+  function getSavedCardSets(storage) {
+    if (!storage) return [];
+    try {
+      return JSON.parse(storage.getItem(STORAGE_KEY) || '[]').filter(function (item) {
+        return item && item.name && item.text;
+      });
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveCardSet(storage, name, text) {
+    var cleanName = String(name || '').trim();
+    var cleanText = String(text || '').trim();
+    if (!storage || !cleanName || !parseCards(cleanText).length) return null;
+    var saved = getSavedCardSets(storage).filter(function (item) {
+      return item.name !== cleanName;
+    });
+    var item = { name: cleanName, text: cleanText };
+    saved.unshift(item);
+    try {
+      storage.setItem(STORAGE_KEY, JSON.stringify(saved.slice(0, 30)));
+      return item;
+    } catch (_) {
+      return null;
+    }
+  }
+
   function format(template, values) {
     return template.replace(/\{(\w+)\}/g, function (_, key) {
       return values[key] === undefined ? '' : values[key];
     });
   }
 
-  function init(doc, schedule, cancelSchedule) {
+  function init(doc, schedule, cancelSchedule, storage) {
     var app = doc.getElementById('poison-app');
     if (!app) return;
 
@@ -48,6 +78,10 @@
     var game = doc.getElementById('poison-game');
     var cardInput = doc.getElementById('poison-card-input');
     var cardCount = doc.getElementById('poison-card-count');
+    var savedList = doc.getElementById('poison-saved-list');
+    var saveName = doc.getElementById('poison-save-name');
+    var saveButton = doc.getElementById('poison-save-cards');
+    var loadButton = doc.getElementById('poison-load-cards');
     var groupInput = doc.getElementById('poison-group-count');
     var poisonInput = doc.getElementById('poison-cards-per-group');
     var setupStatus = doc.getElementById('poison-setup-status');
@@ -77,6 +111,23 @@
     function setSetupStatus(message, isError) {
       setupStatus.textContent = message;
       setupStatus.classList.toggle('is-error', Boolean(isError));
+    }
+
+    function renderSavedList(selectedName) {
+      var saved = getSavedCardSets(storage);
+      savedList.textContent = '';
+      var emptyOption = doc.createElement('option');
+      emptyOption.value = '';
+      emptyOption.textContent = saved.length ? app.dataset.savedCardsPlaceholder : app.dataset.noSavedCards;
+      savedList.appendChild(emptyOption);
+      saved.forEach(function (item) {
+        var option = doc.createElement('option');
+        option.value = item.name;
+        option.textContent = item.name;
+        savedList.appendChild(option);
+      });
+      savedList.value = selectedName || '';
+      loadButton.disabled = !saved.length;
     }
 
     function updateCardCount() {
@@ -227,6 +278,27 @@
     poisonInput.addEventListener('input', updateCardCount);
     groupInput.addEventListener('input', updateCardCount);
 
+    saveButton.addEventListener('click', function () {
+      var saved = saveCardSet(storage, saveName.value, cardInput.value);
+      if (!saved) {
+        setSetupStatus(saveName.value.trim() ? app.dataset.invalidCards : app.dataset.saveMissingName, true);
+        return;
+      }
+      renderSavedList(saved.name);
+      setSetupStatus(format(app.dataset.saveSuccessTemplate, { name: saved.name }), false);
+    });
+
+    loadButton.addEventListener('click', function () {
+      var selected = savedList.value;
+      var item = getSavedCardSets(storage).find(function (saved) { return saved.name === selected; });
+      if (!item) return;
+      cardInput.value = item.text;
+      saveName.value = item.name;
+      updateCardCount();
+      setSetupStatus(format(app.dataset.loadSuccessTemplate, { name: item.name }), false);
+      cardInput.focus();
+    });
+
     form.addEventListener('submit', function (event) {
       event.preventDefault();
       var cards = parseCards(cardInput.value);
@@ -263,6 +335,7 @@
 
     cardGrid.addEventListener('click', chooseCard);
     resetButton.addEventListener('click', resetGame);
+    renderSavedList();
     updateCardCount();
   }
 
@@ -271,6 +344,8 @@
     getTurn: getTurn,
     getTextClass: getTextClass,
     canPlacePoisons: canPlacePoisons,
+    getSavedCardSets: getSavedCardSets,
+    saveCardSet: saveCardSet,
     init: init
   };
 });

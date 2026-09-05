@@ -25,3 +25,20 @@ test('requires enough cards for each group to place poison', function () {
   assert.equal(game.canPlacePoisons(10, 5, 2), true);
   assert.equal(game.canPlacePoisons(9, 5, 2), false);
 });
+
+test('saves named card sets in browser storage', function () {
+  var values = {};
+  var storage = {
+    getItem: function (key) { return values[key] || null; },
+    setItem: function (key, value) { values[key] = value; }
+  };
+
+  assert.equal(game.saveCardSet(storage, '', '苹果'), null);
+  assert.equal(game.saveCardSet(storage, 'Unit 1', '   '), null);
+  assert.deepEqual(game.saveCardSet(storage, 'Unit 1', '苹果\n香蕉'), {
+    name: 'Unit 1',
+    text: '苹果\n香蕉'
+  });
+  game.saveCardSet(storage, 'Unit 1', '山\n水');
+  assert.deepEqual(game.getSavedCardSets(storage), [{ name: 'Unit 1', text: '山\n水' }]);
+});
