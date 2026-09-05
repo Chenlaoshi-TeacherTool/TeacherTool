@@ -7,7 +7,7 @@
   <title><%= t('poisonGame.metaTitle') %></title>
   <%- include('../partials/seo', { pageDescription: t('poisonGame.metaDescription') }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/witchs-poison/witchs-poison.css?v=1">
+  <link rel="stylesheet" href="/low-prep/witchs-poison/witchs-poison.css?v=2">
 </head>
 <body class="poison-page">
   <header class="header poison-header">
@@ -76,13 +76,10 @@
       </div>
 
       <p class="poison-read-prompt"><%= t('poisonGame.readPrompt') %></p>
-      <div id="poison-reading-card" class="poison-reading-card">
-        <p id="poison-card-content" class="poison-card-content"></p>
-      </div>
+      <div id="poison-card-grid" class="poison-card-grid" aria-live="polite"></div>
 
       <p id="poison-game-status" class="poison-status poison-game-status" aria-live="polite"><%= t('poisonGame.gameStatusDefault') %></p>
       <div class="poison-game-actions">
-        <button id="poison-next-button" class="poison-primary" type="button"><%= t('poisonGame.nextButton') %> →</button>
         <button id="poison-reset-button" class="poison-secondary" type="button"><%= t('poisonGame.resetButton') %></button>
       </div>
     </section>
@@ -96,7 +93,7 @@
     </div>
   </main>
 
-  <script src="/low-prep/witchs-poison/witchs-poison.js?v=1" defer></script>
+  <script src="/low-prep/witchs-poison/witchs-poison.js?v=2" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

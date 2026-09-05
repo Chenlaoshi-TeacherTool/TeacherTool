@@ -14,3 +14,9 @@ test('ignores empty lines and rotates cards through the groups', function () {
     return game.getTurn(index, 3).groupNumber;
   }), [1, 2, 3, 1]);
 });
+
+test('sizes short words and long sentences for the card grid', function () {
+  assert.equal(game.getTextClass('风'), 'is-single');
+  assert.equal(game.getTextClass('苹果'), '');
+  assert.equal(game.getTextClass('我喜欢在学校和朋友一起学习中文。'), 'is-long');
+});

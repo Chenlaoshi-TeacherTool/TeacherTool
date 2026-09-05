@@ -22,6 +22,13 @@
     };
   }
 
+  function getTextClass(text) {
+    var length = Array.from(text).length;
+    if (length === 1) return 'is-single';
+    if (length > 12) return 'is-long';
+    return '';
+  }
+
   function format(template, values) {
     return template.replace(/\{(\w+)\}/g, function (_, key) {
       return values[key] === undefined ? '' : values[key];
@@ -43,14 +50,13 @@
     var defaultSetupStatus = setupStatus.textContent;
     var currentGroup = doc.getElementById('poison-current-group');
     var progress = doc.getElementById('poison-progress');
-    var readingCard = doc.getElementById('poison-reading-card');
-    var cardContent = doc.getElementById('poison-card-content');
+    var cardGrid = doc.getElementById('poison-card-grid');
     var gameStatus = doc.getElementById('poison-game-status');
-    var nextButton = doc.getElementById('poison-next-button');
+    var defaultGameStatus = gameStatus.textContent;
     var resetButton = doc.getElementById('poison-reset-button');
     var alert = doc.getElementById('poison-alert');
     var alertGroup = doc.getElementById('poison-alert-group');
-    var state = { cards: [], groupCount: 0, poisonNumber: 0, cardIndex: 0, ended: false, timer: null };
+    var state = { cards: [], groupCount: 0, poisonNumber: 0, picks: 0, ended: false, timer: null };
 
     function setSetupStatus(message, isError) {
       setupStatus.textContent = message;
@@ -69,10 +75,18 @@
         : '');
     }
 
-    function showPoison(turn) {
+    function updateTurn() {
+      var turn = getTurn(state.picks, state.groupCount);
+      currentGroup.textContent = format(app.dataset.groupTemplate, { group: turn.groupNumber });
+      progress.textContent = format(app.dataset.progressTemplate, { current: state.picks, total: state.cards.length });
+    }
+
+    function showPoison(turn, cardButton) {
       state.ended = true;
-      nextButton.disabled = true;
-      readingCard.classList.add('is-poisoned');
+      Array.from(cardGrid.querySelectorAll('button')).forEach(function (button) {
+        button.disabled = true;
+      });
+      cardButton.classList.add('is-poisoned');
       alertGroup.textContent = format(app.dataset.poisonGroupTemplate, { group: turn.groupNumber });
       alert.hidden = false;
       alert.setAttribute('aria-hidden', 'false');
@@ -85,30 +99,46 @@
       }, 1800);
     }
 
-    function showCurrentCard() {
-      var turn = getTurn(state.cardIndex, state.groupCount);
-      var text = state.cards[state.cardIndex];
-      var length = Array.from(text).length;
+    function chooseCard(event) {
+      var cardButton = event.target.closest('button');
+      if (!cardButton || state.ended || cardButton.disabled) return;
 
-      currentGroup.textContent = format(app.dataset.groupTemplate, { group: turn.groupNumber });
-      progress.textContent = format(app.dataset.progressTemplate, { current: turn.cardNumber, total: state.cards.length });
-      cardContent.textContent = text;
-      cardContent.classList.toggle('is-single', length === 1);
-      cardContent.classList.toggle('is-long', length > 12);
-      readingCard.classList.remove('is-poisoned');
+      var cardNumber = Number(cardButton.dataset.cardNumber);
+      var turn = getTurn(state.picks, state.groupCount);
+      if (cardNumber === state.poisonNumber) {
+        showPoison(turn, cardButton);
+        return;
+      }
 
-      if (turn.cardNumber === state.poisonNumber) showPoison(turn);
+      cardButton.disabled = true;
+      cardButton.classList.add('is-safe');
+      state.picks += 1;
+      updateTurn();
+      gameStatus.textContent = defaultGameStatus;
+    }
+
+    function renderBoard() {
+      cardGrid.textContent = '';
+      state.cards.forEach(function (text, index) {
+        var button = doc.createElement('button');
+        var textClass = getTextClass(text);
+        button.type = 'button';
+        button.className = 'poison-grid-card' + (textClass ? ' ' + textClass : '');
+        button.dataset.cardNumber = index + 1;
+        button.textContent = text;
+        cardGrid.appendChild(button);
+      });
+      updateTurn();
     }
 
     function resetGame() {
       if (state.timer !== null) cancelSchedule(state.timer);
-      state = { cards: [], groupCount: 0, poisonNumber: 0, cardIndex: 0, ended: false, timer: null };
+      state = { cards: [], groupCount: 0, poisonNumber: 0, picks: 0, ended: false, timer: null };
       alert.hidden = true;
       alert.setAttribute('aria-hidden', 'true');
       game.hidden = true;
       setup.hidden = false;
-      nextButton.disabled = false;
-      readingCard.classList.remove('is-poisoned');
+      cardGrid.textContent = '';
       gameStatus.classList.remove('is-ended');
       setSetupStatus(defaultSetupStatus, false);
       form.querySelector('button[type="submit"]').focus();
@@ -136,23 +166,17 @@
       state.cards = cards;
       state.groupCount = Number(groupInput.value);
       state.poisonNumber = poisonNumber;
-      state.cardIndex = 0;
+      state.picks = 0;
       state.ended = false;
       setup.hidden = true;
       game.hidden = false;
-      gameStatus.textContent = '';
+      gameStatus.textContent = defaultGameStatus;
       gameStatus.classList.remove('is-ended');
-      nextButton.disabled = false;
-      showCurrentCard();
-      if (!state.ended) nextButton.focus();
+      renderBoard();
+      cardGrid.querySelector('button').focus();
     });
 
-    nextButton.addEventListener('click', function () {
-      if (state.ended) return;
-      state.cardIndex += 1;
-      showCurrentCard();
-    });
-
+    cardGrid.addEventListener('click', chooseCard);
     resetButton.addEventListener('click', resetGame);
     updateCardCount();
   }
@@ -160,6 +184,7 @@
   return {
     parseCards: parseCards,
     getTurn: getTurn,
+    getTextClass: getTextClass,
     init: init
   };
 });
