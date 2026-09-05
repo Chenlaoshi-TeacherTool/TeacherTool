@@ -156,6 +156,9 @@
     var chooser = doc.getElementById('poison-chooser');
     var chooserTitle = doc.getElementById('poison-chooser-title');
     var chooserGroups = doc.getElementById('poison-chooser-groups');
+    var music = doc.getElementById('poison-music');
+    var muteButtons = Array.from(doc.querySelectorAll('.poison-mute'));
+    var MUTE_KEY = 'teacherTool.witchsPoison.muted';
     var fullscreenButtons = Array.from(doc.querySelectorAll('.poison-fullscreen'));
     var prefersReducedMotion = false;
     try {
@@ -415,6 +418,40 @@
       }, hold);
     }
 
+    // ----- Background music -------------------------------------------------
+
+    var musicMuted = false;
+    try { musicMuted = storage && storage.getItem(MUTE_KEY) === '1'; } catch (_) { musicMuted = false; }
+
+    function updateMuteButtons() {
+      muteButtons.forEach(function (button) {
+        button.textContent = musicMuted ? button.dataset.soundOffLabel : button.dataset.soundOnLabel;
+        button.setAttribute('aria-pressed', musicMuted ? 'true' : 'false');
+      });
+    }
+
+    function startMusic() {
+      if (!music) return;
+      music.muted = musicMuted;
+      try {
+        var p = music.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      } catch (_) { /* autoplay may be blocked */ }
+    }
+
+    function stopMusic() {
+      if (!music) return;
+      music.pause();
+      try { music.currentTime = 0; } catch (_) {}
+    }
+
+    function toggleMute() {
+      musicMuted = !musicMuted;
+      if (music) music.muted = musicMuted;
+      try { if (storage) storage.setItem(MUTE_KEY, musicMuted ? '1' : '0'); } catch (_) {}
+      updateMuteButtons();
+    }
+
     // ----- Placement phase --------------------------------------------------
 
     function placingKind() {
@@ -571,6 +608,8 @@
       state.flipped = 0;
       state.turnGroup = 1;
       state.ended = false;
+      // The game has begun — stop the setup music.
+      stopMusic();
       Array.from(cardGrid.querySelectorAll('button')).forEach(function (button) {
         button.disabled = false;
         button.classList.remove('is-poison-setup', 'is-antidote-setup', 'is-poison-flash', 'is-antidote-flash');
@@ -701,6 +740,7 @@
       if (castTimer !== null) { cancelSchedule(castTimer); castTimer = null; }
       if (bannerTimer !== null) { cancelSchedule(bannerTimer); bannerTimer = null; }
       if (placementTimer !== null) { cancelSchedule(placementTimer); placementTimer = null; }
+      stopMusic();
       state = blankState();
       if (cast) { cast.hidden = true; cast.textContent = ''; }
       if (banner) { banner.hidden = true; banner.textContent = ''; }
@@ -790,6 +830,9 @@
       gameStatus.classList.remove('is-ended');
       renderRoster();
       renderBoard();
+      // Witchy background music while teams hide their cards (this click is the
+      // user gesture that lets it autoplay); it stops when the game starts.
+      startMusic();
       // Let the teacher choose which group hides its cards first.
       showChooser(true);
     });
@@ -847,6 +890,12 @@
     }
     resetButton.addEventListener('click', resetGame);
 
+    // ----- Mute -------------------------------------------------------------
+    muteButtons.forEach(function (button) {
+      button.addEventListener('click', toggleMute);
+    });
+    updateMuteButtons();
+
     // ----- Fullscreen -------------------------------------------------------
     function fullscreenElement() {
       var d = doc;
@@ -854,6 +903,8 @@
     }
     function updateFullscreenButtons() {
       var active = !!fullscreenElement();
+      // A witchy purple backdrop while in fullscreen.
+      if (doc.body) doc.body.classList.toggle('poison-fs', active);
       fullscreenButtons.forEach(function (button) {
         button.textContent = active ? button.dataset.exitLabel : button.dataset.enterLabel;
         button.setAttribute('aria-pressed', active ? 'true' : 'false');

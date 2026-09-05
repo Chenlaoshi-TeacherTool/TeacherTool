@@ -564,7 +564,13 @@
 @keyframes poison-fade-in { from { opacity: 0; } to { opacity: 1; } }
 
 /* Fullscreen button on the setup screen spans the form width. */
-.poison-fullscreen-setup { display: block; width: 100%; margin-top: 12px; }
+.poison-setup-toggles { display: flex; gap: 12px; margin-top: 12px; }
+.poison-setup-toggles .poison-secondary { flex: 1; }
+
+/* Witchy purple backdrop while in fullscreen */
+body.poison-fs { background: radial-gradient(circle at 50% -10%, #4a2585, #2a1257 55%, #180a34) fixed; }
+body.poison-fs .poison-header { background: transparent; }
+body.poison-fs .poison-main { color: #f3ecff; }
 
 /* ---- Big banner (game start / game over) ---- */
 .poison-banner {
