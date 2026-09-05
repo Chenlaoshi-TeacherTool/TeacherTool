@@ -16,6 +16,8 @@
   --line: #e5ddc9;
   --shadow: 0 14px 30px rgba(24, 66, 55, 0.12);
   --site-nav-height: 76px;
+  /* Shared motion tokens — strong ease-out beats the built-in curves. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 * { box-sizing: border-box; }
@@ -249,10 +251,12 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
   background: rgba(255, 253, 247, 0.12) !important;
   color: #fffdf7 !important;
   font-weight: 800;
-  transition: transform 160ms ease, background-color 160ms ease;
+  transition: transform 160ms var(--ease-out), background-color 160ms ease;
 }
 
-.back-btn:hover { transform: translateX(-3px); background: rgba(255, 253, 247, 0.24) !important; }
+@media (hover: hover) and (pointer: fine) {
+  .back-btn:hover { transform: translateX(-3px); background: rgba(255, 253, 247, 0.24) !important; }
+}
 
 .btn,
 .activity-btn,
@@ -265,15 +269,17 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
   font-family: inherit;
   font-weight: 800 !important;
   letter-spacing: 0.01em;
-  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), background-color 160ms ease;
 }
 
-.btn:hover,
-.activity-btn:hover,
-.open-btn:hover {
-  transform: translateY(-2px);
-  background: #d75d49 !important;
-  box-shadow: 0 7px 0 #9d392f;
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover,
+  .activity-btn:hover,
+  .open-btn:hover {
+    transform: translateY(-2px);
+    background: #d75d49 !important;
+    box-shadow: 0 7px 0 #9d392f;
+  }
 }
 
 .btn:active,
@@ -301,7 +307,12 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
 
 .tool-card,
 .activity-card,
-.card { position: relative; overflow: hidden; }
+.card {
+  position: relative;
+  overflow: hidden;
+  /* Was missing — the hover lift used to snap instantly. */
+  transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+}
 
 .tool-card::before,
 .activity-card::before,
@@ -315,11 +326,13 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
   background: linear-gradient(90deg, var(--sun), #f5dc7d, var(--leaf-light));
 }
 
-.tool-card:hover,
-.activity-card:not(.coming-soon):hover,
-.card:hover {
-  transform: translateY(-6px) rotate(-0.3deg) !important;
-  box-shadow: 0 20px 35px rgba(24, 66, 55, 0.17) !important;
+@media (hover: hover) and (pointer: fine) {
+  .tool-card:hover,
+  .activity-card:not(.coming-soon):hover,
+  .card:hover {
+    transform: translateY(-6px) rotate(-0.3deg) !important;
+    box-shadow: 0 20px 35px rgba(24, 66, 55, 0.17) !important;
+  }
 }
 
 .tool-card h2,
@@ -378,4 +391,26 @@ footer { background: var(--chalk-deep) !important; color: #fff9e9 !important; }
   .account-coming-soon-status { display: none; }
   .tools-grid,
   .activities-grid { padding: 30px 16px 46px; }
+}
+
+/* Respect reduced-motion for the shared theme: keep color/shadow feedback,
+   drop the position/scale movement. */
+@media (prefers-reduced-motion: reduce) {
+  .back-btn,
+  .btn,
+  .activity-btn,
+  .open-btn,
+  .tool-card,
+  .activity-card,
+  .card { transition: background-color 160ms ease, box-shadow 160ms ease; }
+  .back-btn:hover,
+  .btn:hover,
+  .activity-btn:hover,
+  .open-btn:hover,
+  .btn:active,
+  .activity-btn:active,
+  .open-btn:active,
+  .tool-card:hover,
+  .activity-card:not(.coming-soon):hover,
+  .card:hover { transform: none !important; }
 }
