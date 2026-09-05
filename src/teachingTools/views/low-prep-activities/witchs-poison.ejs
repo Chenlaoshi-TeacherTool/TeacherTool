@@ -7,7 +7,7 @@
   <title><%= t('poisonGame.metaTitle') %></title>
   <%- include('../partials/seo', { pageDescription: t('poisonGame.metaDescription') }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/witchs-poison/witchs-poison.css?v=4">
+  <link rel="stylesheet" href="/low-prep/witchs-poison/witchs-poison.css?v=5">
 </head>
 <body class="poison-page">
   <header class="header poison-header">
@@ -33,8 +33,26 @@
     data-poison-setup-prompt-template="<%= t('poisonGame.poisonSetupPromptTemplate') %>"
     data-play-prompt="<%= t('poisonGame.readPrompt') %>"
     data-poison-group-template="<%= t('poisonGame.poisonGroupTemplate') %>"
+    data-antidote-setup-progress-template="<%= t('poisonGame.antidoteSetupProgressTemplate') %>"
+    data-antidote-setup-prompt-template="<%= t('poisonGame.antidoteSetupPromptTemplate') %>"
+    data-antidote-found-template="<%= t('poisonGame.antidoteFoundTemplate') %>"
+    data-antidote-used-template="<%= t('poisonGame.antidoteUsedTemplate') %>"
+    data-antidote-held-template="<%= t('poisonGame.antidoteHeldTemplate') %>"
+    data-use-antidote-label="<%= t('poisonGame.useAntidoteLabel') %>"
+    data-poison-cast-label="<%= t('poisonGame.poisonCastLabel') %>"
+    data-antidote-cast-label="<%= t('poisonGame.antidoteCastLabel') %>"
+    data-game-start-title="<%= t('poisonGame.gameStartTitle') %>"
+    data-game-start-sub="<%= t('poisonGame.gameStartSub') %>"
+    data-game-over-title="<%= t('poisonGame.gameOverTitle') %>"
+    data-game-over-win-title="<%= t('poisonGame.gameOverWinTitle') %>"
+    data-game-over-win-sub="<%= t('poisonGame.gameOverWinSub') %>"
+    data-game-over-survivors="<%= t('poisonGame.gameOverSurvivors') %>"
+    data-game-over-all-poisoned="<%= t('poisonGame.gameOverAllPoisoned') %>"
+    data-poison-witch-src="/low-prep/witchs-poison/poison-witch.png"
+    data-antidote-witch-src="/low-prep/witchs-poison/antidote-witch.png"
     data-game-over-template="<%= t('poisonGame.gameOverTemplate') %>"
     data-invalid-cards="<%= t('poisonGame.invalidCards') %>"
+    data-invalid-groups="<%= t('poisonGame.invalidGroups') %>"
     data-invalid-poison-count-template="<%= t('poisonGame.invalidPoisonCountTemplate') %>"
     data-save-success-template="<%= t('poisonGame.saveSuccessTemplate') %>"
     data-load-success-template="<%= t('poisonGame.loadSuccessTemplate') %>"
@@ -76,9 +94,21 @@
             <p class="poison-help"><%= t('poisonGame.groupCountHelp') %></p>
           </div>
           <div>
+            <label for="poison-students-per-group"><%= t('poisonGame.studentsPerGroupLabel') %></label>
+            <input id="poison-students-per-group" type="number" min="1" max="8" step="1" value="4" required>
+            <p class="poison-help"><%= t('poisonGame.studentsPerGroupHelp') %></p>
+          </div>
+          <div>
             <label for="poison-cards-per-group"><%= t('poisonGame.poisonCardsPerGroupLabel') %></label>
             <input id="poison-cards-per-group" type="number" min="1" max="10" step="1" value="1" required>
             <p class="poison-help"><%= t('poisonGame.poisonCardsPerGroupHelp') %></p>
+          </div>
+          <div class="poison-toggle-field">
+            <label class="poison-toggle" for="poison-antidote-toggle">
+              <input id="poison-antidote-toggle" type="checkbox">
+              <span><%= t('poisonGame.antidoteToggleLabel') %></span>
+            </label>
+            <p class="poison-help"><%= t('poisonGame.antidoteToggleHelp') %></p>
           </div>
         </div>
 
@@ -96,6 +126,8 @@
         <p id="poison-progress" class="poison-progress"></p>
       </div>
 
+      <div id="poison-roster" class="poison-roster" aria-label="<%= t('poisonGame.rosterLabel') %>"></div>
+
       <p id="poison-board-prompt" class="poison-read-prompt"><%= t('poisonGame.readPrompt') %></p>
       <div id="poison-card-grid" class="poison-card-grid" aria-live="polite"></div>
 
@@ -105,16 +137,11 @@
       </div>
     </section>
 
-    <div id="poison-alert" class="poison-alert" role="alert" aria-hidden="true" hidden>
-      <div class="poison-alert-card">
-        <span class="poison-alert-icon" aria-hidden="true">☠️</span>
-        <p class="poison-alert-title"><%= t('poisonGame.poisonedTitle') %></p>
-        <p id="poison-alert-group" class="poison-alert-group"></p>
-      </div>
-    </div>
+    <div id="poison-cast" class="poison-cast" aria-hidden="true" hidden></div>
+    <div id="poison-banner" class="poison-banner" role="alert" aria-hidden="true" hidden></div>
   </main>
 
-  <script src="/low-prep/witchs-poison/witchs-poison.js?v=4" defer></script>
+  <script src="/low-prep/witchs-poison/witchs-poison.js?v=5" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
