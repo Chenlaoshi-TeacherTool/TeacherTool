@@ -1,4 +1,9 @@
-.poison-page { margin: 0; }
+.poison-page {
+  margin: 0;
+  /* Shared motion tokens (strong curves beat the built-in easings). */
+  --wp-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --wp-pop: cubic-bezier(0.2, 0.8, 0.3, 1);
+}
 
 .poison-header { padding: 57px 24px 45px; }
 
@@ -153,7 +158,7 @@
   cursor: pointer;
   font: inherit;
   font-weight: 900;
-  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+  transition: transform 160ms var(--wp-ease-out), box-shadow 160ms var(--wp-ease-out), background-color 160ms ease;
 }
 
 .poison-primary {
@@ -163,7 +168,10 @@
   color: #fff;
 }
 
-.poison-primary:hover:not(:disabled) { transform: translateY(-2px); background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
+/* Hover lift only where a real pointer exists (touch taps would stick otherwise) */
+@media (hover: hover) and (pointer: fine) {
+  .poison-primary:hover:not(:disabled) { transform: translateY(-2px); background: #d75d49; box-shadow: 0 7px 0 #9d392f; }
+}
 .poison-primary:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #9d392f; }
 .poison-primary:disabled { cursor: not-allowed; opacity: .48; box-shadow: none; }
 .poison-setup .poison-primary,
@@ -224,6 +232,12 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
+  animation: poison-rise 300ms var(--wp-ease-out) both;
+}
+
+@keyframes poison-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .poison-grid-card {
@@ -244,14 +258,19 @@
   text-align: center;
   white-space: pre-wrap;
   box-shadow: 0 5px 0 rgba(44, 30, 90, .18);
-  transition: transform 140ms ease, border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+  transition: transform 140ms var(--wp-ease-out), border-color 140ms ease, background-color 140ms ease, color 140ms ease;
 }
 
-.poison-grid-card:hover:not(:disabled) {
-  transform: translateY(-2px);
-  border-color: #8f74df;
-  background: #fffdf7;
+@media (hover: hover) and (pointer: fine) {
+  .poison-grid-card:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: #8f74df;
+    background: #fffdf7;
+  }
 }
+
+/* Tactile press feedback on the card the student picks */
+.poison-grid-card:active:not(:disabled) { transform: scale(0.97); }
 
 .poison-grid-card:disabled { cursor: not-allowed; }
 
@@ -350,8 +369,18 @@
   border-radius: 14px;
   background: #fbf8ff;
   text-align: center;
-  transition: transform 160ms ease, border-color 160ms ease, background-color 220ms ease, box-shadow 160ms ease;
+  transition: transform 160ms var(--wp-ease-out), border-color 160ms ease, background-color 220ms ease, box-shadow 160ms ease;
+  /* Staggered fade-in at game start (opacity only, so it never fights the
+     is-current lift). */
+  animation: poison-fade-in 300ms ease both;
 }
+
+.poison-team:nth-child(2) { animation-delay: 55ms; }
+.poison-team:nth-child(3) { animation-delay: 110ms; }
+.poison-team:nth-child(4) { animation-delay: 165ms; }
+.poison-team:nth-child(5) { animation-delay: 220ms; }
+.poison-team:nth-child(6) { animation-delay: 275ms; }
+.poison-team:nth-child(n+7) { animation-delay: 320ms; }
 
 .poison-team.is-current {
   border-color: #e4b744;
@@ -556,10 +585,12 @@
   font: inherit;
   font-size: 1.15rem;
   font-weight: 900;
-  transition: transform 140ms ease, background-color 140ms ease;
+  transition: transform 140ms var(--wp-ease-out), background-color 140ms ease, color 140ms ease;
 }
-.poison-chooser-group:hover { transform: translateY(-2px); background: #ffd85d; color: #341a63; }
-.poison-chooser-group:active { transform: translateY(1px); }
+@media (hover: hover) and (pointer: fine) {
+  .poison-chooser-group:hover { transform: translateY(-2px); background: #ffd85d; color: #341a63; }
+}
+.poison-chooser-group:active { transform: scale(0.97); }
 
 @keyframes poison-fade-in { from { opacity: 0; } to { opacity: 1; } }
 
@@ -658,10 +689,14 @@ body.poison-fs .poison-main { color: #f3ecff; }
   .poison-banner-inner { animation-name: poison-fade; }
   .poison-cast-spark,
   .poison-team-cure,
+  .poison-card-grid,
+  .poison-team,
   .poison-grid-card.is-poisoned,
   .poison-grid-card.is-antidote-found,
   .poison-grid-card.is-poison-flash,
   .poison-grid-card.is-antidote-flash { animation: none; }
+  .poison-team { animation-delay: 0ms; }
+  .poison-grid-card:active:not(:disabled) { transform: none; }
 }
 
 @keyframes poison-fade {
