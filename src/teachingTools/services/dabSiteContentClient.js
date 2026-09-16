@@ -74,7 +74,7 @@ function toRecommendationProduct(row) {
 
 async function loadAll() {
   var toolGuideRows = await dabGet('/toolguides');
-  var articleRows = await dabGet('/articles?$orderby=id');
+  var articleRows = await dabGet('/articles?$orderby=created_at');
   var recommendationRows = [];
   try {
     recommendationRows = await dabGet('/recommendationproducts?$filter=is_published eq true&$orderby=sort_order');
