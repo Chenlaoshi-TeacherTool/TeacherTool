@@ -832,4 +832,118 @@ router.post('/articles/:slug/delete', async function (req, res, next) {
   } catch (err) { next(err); }
 });
 
+// ===== Recommendations =====
+
+function parseReasons(body) {
+  var reasons = [];
+  [1, 2, 3].forEach(function (index) {
+    var title = (body['reason' + index + '_title'] || '').trim();
+    var text = (body['reason' + index + '_text'] || '').trim();
+    if (title || text) reasons.push({ title: title, text: text });
+  });
+  return reasons;
+}
+
+function attachReasonFields(product) {
+  var reasons = JSON.parse(product.reasons || '[]');
+  [0, 1, 2].forEach(function (index) {
+    var reason = reasons[index] || {};
+    product['reason' + (index + 1) + '_title'] = reason.title || '';
+    product['reason' + (index + 1) + '_text'] = reason.text || '';
+  });
+  return product;
+}
+
+router.get('/recommendations', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().query('SELECT slug, title, category, sort_order, is_published FROM recommendation_products ORDER BY sort_order, title');
+    res.render('admin/recommendations-index', { title: 'Recommendations', products: result.recordset, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.get('/recommendations/new', function (req, res) {
+  res.render('admin/recommendations-edit', { title: 'New Recommendation', product: null, isNew: true, adminUser: req.adminUser });
+});
+
+router.post('/recommendations/new', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('slug', sql.NVarChar, req.body.slug)
+      .input('title', sql.NVarChar, req.body.title)
+      .input('subtitle', sql.NVarChar, req.body.subtitle || null)
+      .input('category', sql.NVarChar, req.body.category || null)
+      .input('description', sql.NVarChar, req.body.description || null)
+      .input('imageUrl', sql.NVarChar, req.body.image_url || null)
+      .input('imageAlt', sql.NVarChar, req.body.image_alt || null)
+      .input('productUrl', sql.NVarChar, req.body.product_url || null)
+      .input('linkText', sql.NVarChar, req.body.link_text || null)
+      .input('linkNote', sql.NVarChar, req.body.link_note || null)
+      .input('reasons', sql.NVarChar, JSON.stringify(parseReasons(req.body)))
+      .input('teacherTipTitle', sql.NVarChar, req.body.teacher_tip_title || null)
+      .input('teacherTip', sql.NVarChar, req.body.teacher_tip || null)
+      .input('printableLabelUrl', sql.NVarChar, req.body.printable_label_url || null)
+      .input('printableLabelText', sql.NVarChar, req.body.printable_label_text || null)
+      .input('printableLabelNote', sql.NVarChar, req.body.printable_label_note || null)
+      .input('sortOrder', sql.Int, Number(req.body.sort_order) || 0)
+      .input('isPublished', sql.Bit, req.body.is_published === 'on')
+      .query(
+        'INSERT INTO recommendation_products (slug, title, subtitle, category, description, image_url, image_alt, product_url, link_text, link_note, reasons, teacher_tip_title, teacher_tip, printable_label_url, printable_label_text, printable_label_note, sort_order, is_published) ' +
+        'VALUES (@slug, @title, @subtitle, @category, @description, @imageUrl, @imageAlt, @productUrl, @linkText, @linkNote, @reasons, @teacherTipTitle, @teacherTip, @printableLabelUrl, @printableLabelText, @printableLabelNote, @sortOrder, @isPublished)'
+      );
+    await siteContentStore.refresh();
+    res.redirect('/admin/recommendations/' + encodeURIComponent(req.body.slug) + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.get('/recommendations/:slug/edit', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().input('slug', sql.NVarChar, req.params.slug).query('SELECT * FROM recommendation_products WHERE slug = @slug');
+    var product = result.recordset[0];
+    if (!product) return res.status(404).send('Recommendation not found.');
+    res.render('admin/recommendations-edit', { title: 'Edit ' + product.title, product: attachReasonFields(product), isNew: false, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.post('/recommendations/:slug', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('slug', sql.NVarChar, req.params.slug)
+      .input('title', sql.NVarChar, req.body.title)
+      .input('subtitle', sql.NVarChar, req.body.subtitle || null)
+      .input('category', sql.NVarChar, req.body.category || null)
+      .input('description', sql.NVarChar, req.body.description || null)
+      .input('imageUrl', sql.NVarChar, req.body.image_url || null)
+      .input('imageAlt', sql.NVarChar, req.body.image_alt || null)
+      .input('productUrl', sql.NVarChar, req.body.product_url || null)
+      .input('linkText', sql.NVarChar, req.body.link_text || null)
+      .input('linkNote', sql.NVarChar, req.body.link_note || null)
+      .input('reasons', sql.NVarChar, JSON.stringify(parseReasons(req.body)))
+      .input('teacherTipTitle', sql.NVarChar, req.body.teacher_tip_title || null)
+      .input('teacherTip', sql.NVarChar, req.body.teacher_tip || null)
+      .input('printableLabelUrl', sql.NVarChar, req.body.printable_label_url || null)
+      .input('printableLabelText', sql.NVarChar, req.body.printable_label_text || null)
+      .input('printableLabelNote', sql.NVarChar, req.body.printable_label_note || null)
+      .input('sortOrder', sql.Int, Number(req.body.sort_order) || 0)
+      .input('isPublished', sql.Bit, req.body.is_published === 'on')
+      .query(
+        'UPDATE recommendation_products SET title=@title, subtitle=@subtitle, category=@category, description=@description, image_url=@imageUrl, image_alt=@imageAlt, product_url=@productUrl, link_text=@linkText, link_note=@linkNote, reasons=@reasons, teacher_tip_title=@teacherTipTitle, teacher_tip=@teacherTip, printable_label_url=@printableLabelUrl, printable_label_text=@printableLabelText, printable_label_note=@printableLabelNote, sort_order=@sortOrder, is_published=@isPublished, updated_at=SYSUTCDATETIME() WHERE slug=@slug'
+      );
+    await siteContentStore.refresh();
+    res.redirect('/admin/recommendations/' + encodeURIComponent(req.params.slug) + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/recommendations/:slug/delete', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request().input('slug', sql.NVarChar, req.params.slug).query('DELETE FROM recommendation_products WHERE slug = @slug');
+    await siteContentStore.refresh();
+    res.redirect('/admin/recommendations');
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

@@ -95,6 +95,18 @@
         }
       ]
     },
+    "RecommendationProduct": {
+      "source": "dbo.recommendation_products",
+      "rest": {
+        "path": "/recommendationproducts"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
     "LevelLookup": {
       "source": "dbo.level_lookup",
       "rest": {

@@ -1,0 +1,63 @@
+<%- include('layout-head') %>
+<h1><%= product ? 'Edit: ' + product.title : 'New Recommendation' %></h1>
+
+<form method="POST" action="<%= (product && product.slug) ? '/admin/recommendations/' + encodeURIComponent(product.slug) : '/admin/recommendations/new' %>">
+  <label>Slug (used internally, no spaces)</label>
+  <input type="text" name="slug" value="<%= product ? product.slug : '' %>" <%= !isNew ? 'readonly' : 'required' %>>
+  <label>Title</label>
+  <input type="text" name="title" value="<%= product ? product.title : '' %>" required>
+  <label>Subtitle</label>
+  <input type="text" name="subtitle" value="<%= product ? (product.subtitle || '') : '' %>">
+  <label>Category / meta line</label>
+  <input type="text" name="category" value="<%= product ? (product.category || '') : '' %>" placeholder="Find 02 · Classroom Organization">
+  <label>Description</label>
+  <textarea name="description" rows="4"><%= product ? (product.description || '') : '' %></textarea>
+  <label>Image URL</label>
+  <input type="text" name="image_url" value="<%= product ? (product.image_url || '') : '' %>" placeholder="/images/example.png">
+  <label>Image alt text</label>
+  <input type="text" name="image_alt" value="<%= product ? (product.image_alt || '') : '' %>">
+  <label>Product URL</label>
+  <input type="text" name="product_url" value="<%= product ? (product.product_url || '') : '' %>">
+  <label>Button text</label>
+  <input type="text" name="link_text" value="<%= product ? (product.link_text || '') : '' %>" placeholder="View this on Amazon →">
+  <label>Link note / disclosure</label>
+  <textarea name="link_note" rows="2"><%= product ? (product.link_note || '') : '' %></textarea>
+
+  <h2>Why recommend it</h2>
+  <% [1, 2, 3].forEach(function (index) { %>
+    <label>Reason <%= index %> title</label>
+    <input type="text" name="reason<%= index %>_title" value="<%= product ? product['reason' + index + '_title'] : '' %>">
+    <label>Reason <%= index %> text</label>
+    <textarea name="reason<%= index %>_text" rows="2"><%= product ? product['reason' + index + '_text'] : '' %></textarea>
+  <% }) %>
+
+  <h2>Classroom tip</h2>
+  <label>Tip title</label>
+  <input type="text" name="teacher_tip_title" value="<%= product ? (product.teacher_tip_title || '') : '' %>" placeholder="Classroom use tip:">
+  <label>Tip text</label>
+  <textarea name="teacher_tip" rows="3"><%= product ? (product.teacher_tip || '') : '' %></textarea>
+
+  <h2>Printable label</h2>
+  <label>Printable label URL</label>
+  <input type="text" name="printable_label_url" value="<%= product ? (product.printable_label_url || '') : '' %>" placeholder="/pdf/cart-labels.pdf">
+  <label>Printable label link text</label>
+  <input type="text" name="printable_label_text" value="<%= product ? (product.printable_label_text || '') : '' %>" placeholder="Download matching drawer labels">
+  <label>Printable label note</label>
+  <textarea name="printable_label_note" rows="2"><%= product ? (product.printable_label_note || '') : '' %></textarea>
+
+  <label>Sort order</label>
+  <input type="text" name="sort_order" value="<%= product ? product.sort_order : '0' %>">
+  <label><input type="checkbox" name="is_published" <%= !product || product.is_published ? 'checked' : '' %>> Published</label>
+
+  <div class="actions">
+    <button type="submit"><%= !isNew ? 'Save changes' : 'Create recommendation' %></button>
+  </div>
+</form>
+
+<% if (!isNew) { %>
+<form method="POST" action="/admin/recommendations/<%= encodeURIComponent(product.slug) %>/delete" onsubmit="return confirm('Delete this recommendation?');" style="margin-top:24px;">
+  <button type="submit" class="danger">Delete this recommendation</button>
+</form>
+<% } %>
+
+<%- include('layout-foot') %>

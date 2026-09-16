@@ -8,7 +8,7 @@
 
 var dabSiteContent = require('./dabSiteContentClient');
 
-var state = { toolGuides: {}, articles: [] };
+var state = { toolGuides: {}, articles: [], recommendations: [] };
 
 async function refresh() {
   state = await dabSiteContent.loadAll();

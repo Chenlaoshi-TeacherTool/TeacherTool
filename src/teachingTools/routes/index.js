@@ -36,7 +36,7 @@ router.get('/feedback', function(req, res, next) {
 });
 
 router.get('/recommendations', function(req, res, next) {
-  res.render('recommendations', { title: 'Classroom Recommendations' });
+  res.render('recommendations', { title: 'Classroom Recommendations', products: siteContentStore.get().recommendations || [] });
 });
 
 router.get('/resources', function(req, res, next) {
@@ -181,6 +181,10 @@ router.get('/teaching-tools/witchs-poison', function(req, res, next) {
   res.render('low-prep-activities/witchs-poison', { title: "Witch's Poison" });
 });
 
+router.get('/teaching-tools/uno-card-generator', function(req, res, next) {
+  res.render('low-prep-activities/uno-card-generator', { title: 'Chinese UNO Card Generator', toolGuide: siteContentStore.get().toolGuides['uno-card-generator'] });
+});
+
 router.get('/teaching-tools/decode-practice', function(req, res, next) {
   res.render('low-prep-activities/decode-practice', { title: '译码练习生成器 · Decode Practice Generator', toolGuide: siteContentStore.get().toolGuides['decode-practice'] });
 });
@@ -196,7 +200,7 @@ router.get('/low-prep-activities', function(req, res) {
 [
   'word-sudoku', 'word-cloud', 'independent-reading', 'tear-paper-bingo',
   'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle',
-  'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'decode-practice', 'vocab-glossary'
+  'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);

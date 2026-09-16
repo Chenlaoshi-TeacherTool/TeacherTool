@@ -39,6 +39,49 @@
           </aside>
         </div>
 
+        <% if (products && products.length) { %>
+          <% products.forEach(function (product) { %>
+        <article class="recommendation-product" aria-labelledby="product-<%= product.slug %>-title">
+          <% if (product.productUrl || product.imageUrl) { %>
+          <a class="recommendation-product__image" href="<%= product.productUrl || product.imageUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer" aria-label="<%= product.title %>">
+            <% if (product.imageUrl) { %><img src="<%= product.imageUrl %>" alt="<%= product.imageAlt || product.title %>" loading="lazy"><% } %>
+          </a>
+          <% } %>
+
+          <div class="recommendation-product__copy">
+            <% if (product.category) { %><p class="product-number"><%= product.category %></p><% } %>
+            <h2 id="product-<%= product.slug %>-title"><%= product.title %></h2>
+            <% if (product.subtitle) { %><p class="product-subtitle"><%= product.subtitle %></p><% } %>
+            <% if (product.description) { %><p><%= product.description %></p><% } %>
+
+            <% if (product.reasons && product.reasons.length) { %>
+            <h3><%= t('recommendations.product1WhyTitle') %></h3>
+            <div class="product-reasons">
+              <% product.reasons.forEach(function (reason) { %>
+              <section><strong><%= reason.title %></strong><p><%= reason.text %></p></section>
+              <% }) %>
+            </div>
+            <% } %>
+
+            <% if (product.teacherTip || product.teacherTipTitle) { %>
+            <div class="product-teacher-tip"><strong><%= product.teacherTipTitle || t('recommendations.product1TipStrong') %></strong><span> <%= product.teacherTip || '' %></span></div>
+            <% } %>
+
+            <% if (product.printableLabelUrl) { %>
+            <div class="product-printable-label">
+              <a href="<%= product.printableLabelUrl %>"><%= product.printableLabelText || 'Download printable labels' %></a>
+              <% if (product.printableLabelNote) { %><p><%= product.printableLabelNote %></p><% } %>
+            </div>
+            <% } %>
+
+            <% if (product.productUrl) { %>
+            <a class="btn product-link" href="<%= product.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= product.linkText || 'View product →' %></a>
+            <% } %>
+            <% if (product.linkNote) { %><p class="product-link-note"><%= product.linkNote %></p><% } %>
+          </div>
+        </article>
+          <% }) %>
+        <% } else { %>
         <article class="recommendation-product" aria-labelledby="rolling-cart-title">
           <a class="recommendation-product__image" href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer" aria-label="View the 15-drawer classroom rolling cart on Amazon">
             <img src="/images/15-drawer-rolling-cart.png" alt="Classroom rolling cart with fifteen colorful drawers, a top work surface, and wheels" loading="lazy">
@@ -63,6 +106,7 @@
             <p class="product-link-note"><%= t('recommendations.product1LinkNote') %></p>
           </div>
         </article>
+        <% } %>
       </div>
     </section>
 

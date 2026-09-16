@@ -50,16 +50,45 @@ function toArticle(row) {
   };
 }
 
+function toRecommendationProduct(row) {
+  return {
+    slug: row.slug,
+    title: row.title,
+    subtitle: row.subtitle,
+    category: row.category,
+    description: row.description,
+    imageUrl: row.image_url,
+    imageAlt: row.image_alt,
+    productUrl: row.product_url,
+    linkText: row.link_text,
+    linkNote: row.link_note,
+    reasons: JSON.parse(row.reasons || '[]'),
+    teacherTipTitle: row.teacher_tip_title,
+    teacherTip: row.teacher_tip,
+    printableLabelUrl: row.printable_label_url,
+    printableLabelText: row.printable_label_text,
+    printableLabelNote: row.printable_label_note,
+    sortOrder: row.sort_order
+  };
+}
+
 async function loadAll() {
   var toolGuideRows = await dabGet('/toolguides');
   var articleRows = await dabGet('/articles?$orderby=id');
+  var recommendationRows = [];
+  try {
+    recommendationRows = await dabGet('/recommendationproducts?$filter=is_published eq true&$orderby=sort_order');
+  } catch (err) {
+    console.error('Could not load recommendations from DAB:', err.message);
+  }
 
   var toolGuides = {};
   toolGuideRows.forEach(function (row) { toolGuides[row.slug] = toToolGuide(row); });
 
   return {
     toolGuides: toolGuides,
-    articles: articleRows.map(toArticle)
+    articles: articleRows.map(toArticle),
+    recommendations: recommendationRows.map(toRecommendationProduct)
   };
 }
 

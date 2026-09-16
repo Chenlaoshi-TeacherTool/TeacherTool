@@ -87,6 +87,9 @@ body { margin: 0; }
 .product-reasons p { margin: 7px 0 0; font-size: .9rem; }
 .product-teacher-tip { margin: 24px 0; padding: 17px 19px; border-left: 5px solid var(--sun); border-radius: 10px; background: #fff4cf; color: #5b491c; line-height: 1.7; }
 .product-teacher-tip strong { display: block; margin-bottom: 3px; color: var(--chalk); }
+.product-printable-label { margin: 20px 0; padding: 16px 18px; border: 1px solid #d7e3c7; border-radius: 10px; background: #f4f8ec; }
+.product-printable-label a { color: var(--chalk); font-weight: 900; }
+.product-printable-label p { margin: 7px 0 0; color: #49655b; font-size: .9rem; line-height: 1.55; }
 .product-link { display: inline-flex; text-decoration: none; }
 .product-link-note { margin: 13px 0 0 !important; color: var(--muted) !important; font-size: .82rem; }
 .question-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }

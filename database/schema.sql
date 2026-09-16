@@ -118,6 +118,29 @@ CREATE TABLE articles (
     CONSTRAINT CK_articles_sections_json CHECK (sections IS NULL OR ISJSON(sections) = 1)
 );
 
+CREATE TABLE recommendation_products (
+    slug                NVARCHAR(120) NOT NULL PRIMARY KEY,
+    title               NVARCHAR(200) NOT NULL,
+    subtitle            NVARCHAR(250) NULL,
+    category            NVARCHAR(120) NULL,
+    description         NVARCHAR(MAX) NULL,
+    image_url           NVARCHAR(500) NULL,
+    image_alt           NVARCHAR(300) NULL,
+    product_url         NVARCHAR(500) NULL,
+    link_text           NVARCHAR(200) NULL,
+    link_note           NVARCHAR(MAX) NULL,
+    reasons             NVARCHAR(MAX) NULL, -- JSON array of {title, text}
+    teacher_tip_title   NVARCHAR(120) NULL,
+    teacher_tip         NVARCHAR(MAX) NULL,
+    printable_label_url NVARCHAR(500) NULL,
+    printable_label_text NVARCHAR(200) NULL,
+    printable_label_note NVARCHAR(MAX) NULL,
+    sort_order          INT           NOT NULL DEFAULT 0,
+    is_published        BIT           NOT NULL DEFAULT 1,
+    updated_at          DATETIME2     NOT NULL DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT CK_recommendation_products_reasons_json CHECK (reasons IS NULL OR ISJSON(reasons) = 1)
+);
+
 -- ===== Seed the lookup tables =====
 
 INSERT INTO level_lookup (code, label_en) VALUES

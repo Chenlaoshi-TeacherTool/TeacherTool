@@ -1,0 +1,19 @@
+<%- include('layout-head') %>
+<h1>Recommendations</h1>
+<p><a class="button" href="/admin/recommendations/new">+ New recommendation</a></p>
+<table>
+  <thead><tr><th>Title</th><th>Slug</th><th>Category</th><th>Sort</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    <% products.forEach(function (product) { %>
+    <tr>
+      <td><%= product.title %></td>
+      <td><%= product.slug %></td>
+      <td><%= product.category || '' %></td>
+      <td><%= product.sort_order %></td>
+      <td><%= product.is_published ? 'Published' : 'Draft' %></td>
+      <td><a href="/admin/recommendations/<%= encodeURIComponent(product.slug) %>/edit">Edit</a></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('layout-foot') %>
