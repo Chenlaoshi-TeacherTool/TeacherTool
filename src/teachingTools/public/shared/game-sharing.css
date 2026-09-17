@@ -31,6 +31,25 @@
 .game-share-dialog-submit { width: 100%; min-height: 46px; margin-top: 18px; border: 0; border-radius: 11px; background: linear-gradient(135deg, #c9503f, #a83d31); color: #fff; font-weight: 800; }
 .game-share-dialog-submit:disabled { cursor: wait; opacity: .7; }
 .game-share-dialog-success { margin: 0 0 14px; color: #356e57; font-weight: 800; }
+.game-share-dialog-qr {
+  margin: 16px auto 4px;
+  padding: 14px;
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  border: 1px dashed #cbd8c2;
+  border-radius: 14px;
+  background: #fbfdf6;
+}
+.game-share-dialog-qr[hidden] { display: none; }
+.game-share-dialog-qr [data-share-qr] {
+  padding: 8px;
+  border-radius: 10px;
+  background: #fff;
+}
+.game-share-dialog-qr img,
+.game-share-dialog-qr canvas { display: block; }
+.game-share-dialog-qr p { margin: 0; color: #5d7168; font-size: 12px; text-align: center; }
 .game-share-dialog-result-actions { margin-top: 11px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .game-share-dialog-result-actions button,
 .game-share-dialog-result-actions a { min-height: 43px; padding: 10px 12px; display: grid; place-items: center; border: 1px solid #d3dccf; border-radius: 10px; background: #fff; color: #194f45; font-size: 12px; font-weight: 800; text-decoration: none; }

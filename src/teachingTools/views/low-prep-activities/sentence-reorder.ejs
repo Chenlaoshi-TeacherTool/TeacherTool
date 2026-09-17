@@ -8,7 +8,8 @@
   <%- include('../partials/seo', { pageDescription: 'Type in sentences and turn them into drag-and-drop word puzzles. Students drag the scrambled words back into the correct order, right in the browser.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
-  <link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder.css?v=4">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=3">
+  <link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder.css?v=5">
 </head>
 <body class="reorder-page">
   <main class="reorder-wrap">
@@ -57,6 +58,10 @@
         </section>
 
         <button id="generate-button" class="reorder-primary" type="button">🧩 <%= t('sentenceReorder.generateButton') %></button>
+        <div class="reorder-share-controls">
+          <button id="share-button" class="reorder-secondary" type="button" disabled>🔗 <%= t('sentenceReorder.shareButton') %></button>
+          <button id="manage-links-button" class="reorder-secondary" type="button">🗂️ <%= t('sentenceReorder.manageLinksButton') %> <span id="managed-link-count"></span></button>
+        </div>
         <p id="setup-status" class="reorder-setup-status" aria-live="polite"><%= t('sentenceReorder.setupStatusDefault') %></p>
       </section>
 
@@ -106,7 +111,8 @@
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script src="/shared/library-picker.js" defer></script>
-  <script src="/low-prep/sentence-reorder/sentence-reorder.js?v=6" defer></script>
+  <script src="/shared/game-sharing.js?v=3" defer></script>
+  <script src="/low-prep/sentence-reorder/sentence-reorder.js?v=7" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

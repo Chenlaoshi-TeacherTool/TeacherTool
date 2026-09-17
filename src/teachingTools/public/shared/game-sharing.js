@@ -2,6 +2,7 @@
   'use strict';
 
   const STORAGE_KEY = 'teacher-game-shares:v1';
+  let qrCodeLoader = null;
 
   function normalizeStoredShare(item) {
     if (!item || !/^[0-9a-f-]{36}$/i.test(String(item.shareId || '')) || !item.deleteToken) return null;
@@ -138,6 +139,10 @@
           <p class="game-share-dialog-success">✓ Student link created</p>
           <label>Share link<input name="shareUrl" readonly></label>
           <label>Student password<input name="sharePasswordResult" readonly></label>
+          <div class="game-share-dialog-qr" data-share-qr-wrap hidden>
+            <div data-share-qr></div>
+            <p>Students can scan this QR code, then enter the password.</p>
+          </div>
           <div class="game-share-dialog-result-actions">
             <button type="button" data-copy-link>Copy link + password</button>
             <a data-open-link target="_blank" rel="noopener">Open student view</a>
@@ -147,6 +152,33 @@
       </form>`;
     document.body.append(dialog);
     return dialog;
+  }
+
+  function loadQrCode() {
+    if (typeof window.QRCode === 'function') return Promise.resolve();
+    if (qrCodeLoader) return qrCodeLoader;
+    qrCodeLoader = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      script.async = true;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.append(script);
+    });
+    return qrCodeLoader;
+  }
+
+  async function renderQrCode(target, wrapper, url) {
+    target.replaceChildren();
+    wrapper.hidden = false;
+    target.textContent = 'Generating QR code…';
+    try {
+      await loadQrCode();
+      target.replaceChildren();
+      new window.QRCode(target, { text: url, width: 176, height: 176 });
+    } catch (_error) {
+      wrapper.hidden = true;
+    }
   }
 
   function createManagerDialog() {
@@ -270,6 +302,8 @@
     const passwordInput = dialog.querySelector('[name="sharePassword"]');
     const urlInput = dialog.querySelector('[name="shareUrl"]');
     const passwordResultInput = dialog.querySelector('[name="sharePasswordResult"]');
+    const qrWrap = dialog.querySelector('[data-share-qr-wrap]');
+    const qrTarget = dialog.querySelector('[data-share-qr]');
 
     form.hidden = false;
     resultPanel.hidden = true;
@@ -295,6 +329,7 @@
         });
         urlInput.value = published.absoluteUrl;
         passwordResultInput.value = passwordInput.value;
+        renderQrCode(qrTarget, qrWrap, published.absoluteUrl);
         dialog.querySelector('[data-open-link]').href = published.absoluteUrl;
         dialog.querySelector('[data-copy-link]').onclick = async (event) => {
           await copyText(`Game link: ${published.absoluteUrl}\nPassword: ${passwordInput.value}`);

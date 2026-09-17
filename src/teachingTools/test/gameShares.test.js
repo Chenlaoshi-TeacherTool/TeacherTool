@@ -32,6 +32,17 @@ function validGameData() {
   };
 }
 
+function validSentenceReorderData() {
+  return {
+    title: 'Chinese Sentence Practice',
+    relaxed: true,
+    sentences: [
+      { words: ['我', '喜欢', '苹果。'] },
+      { words: ['她', '有', '一只', '小猫。'] }
+    ]
+  };
+}
+
 test.before(async function () {
   tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'teacher-tool-game-share-'));
   delete process.env.AZURE_STORAGE_CONNECTION_STRING;
@@ -105,6 +116,38 @@ test('publishes, password-protects, opens, and deletes a shared game', async fun
   assert.equal(missingResponse.status, 404);
 });
 
+test('publishes and opens a shared Sentence Reorder game', async function () {
+  var publishResponse = await fetch(baseUrl + '/api/game-shares', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      gameType: 'sentence-reorder',
+      version: 1,
+      title: 'Chinese Sentence Practice',
+      password: 'sentences',
+      data: validSentenceReorderData()
+    })
+  });
+  assert.equal(publishResponse.status, 201);
+  var published = await publishResponse.json();
+
+  var unlockResponse = await fetch(baseUrl + published.url + '/unlock', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ password: 'sentences' }),
+    redirect: 'manual'
+  });
+  assert.equal(unlockResponse.status, 302);
+  var cookie = unlockResponse.headers.get('set-cookie').split(';')[0];
+
+  var playerResponse = await fetch(baseUrl + published.url, { headers: { Cookie: cookie } });
+  assert.equal(playerResponse.status, 200);
+  var playerHtml = await playerResponse.text();
+  assert.match(playerHtml, /Put this sentence in order/);
+  assert.match(playerHtml, /Chinese Sentence Practice/);
+  assert.match(playerHtml, /sentence-reorder-player\.js/);
+});
+
 test('rejects unsupported game types and malformed Sudoku data', async function () {
   var unsupported = await fetch(baseUrl + '/api/game-shares', {
     method: 'POST',
@@ -122,4 +165,17 @@ test('rejects unsupported game types and malformed Sudoku data', async function 
   });
   assert.equal(invalid.status, 400);
   assert.match((await invalid.json()).error, /solution is invalid/i);
+
+  var invalidSentence = await fetch(baseUrl + '/api/game-shares', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      gameType: 'sentence-reorder',
+      version: 1,
+      password: 'abcd',
+      data: { sentences: [{ words: ['hello'] }] }
+    })
+  });
+  assert.equal(invalidSentence.status, 400);
+  assert.match((await invalidSentence.json()).error, /at least two words/i);
 });

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title><%= title %> - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Complete a shared Sentence Reorder game online.', noindex: true }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-share.css?v=1">
+  <link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder-player.css?v=1">
+</head>
+<body class="game-share-page reorder-player-page">
+  <header class="reorder-player-header">
+    <div>
+      <p class="game-share-eyebrow">Sentence Reorder · Online game</p>
+      <h1 id="gameTitle"><%= title %></h1>
+      <p>Drag the words into the correct sentence order.</p>
+    </div>
+    <div class="reorder-player-progress" aria-live="polite">
+      <strong id="progressCount">0 / 0</strong>
+      <span>sentences complete</span>
+    </div>
+  </header>
+
+  <main class="reorder-player-main">
+    <section class="reorder-player-card" aria-labelledby="sentenceHeading">
+      <div class="reorder-card-heading">
+        <div>
+          <p class="game-share-eyebrow">Puzzle</p>
+          <h2 id="sentenceHeading">Put this sentence in order</h2>
+        </div>
+        <p id="sentenceProgress" class="reorder-student-meta">Sentence 1 of 1</p>
+      </div>
+
+      <div id="studentSentenceStage" class="reorder-student-stage" aria-label="Sentence words"></div>
+      <p id="gameStatus" class="reorder-student-status" role="status">Your progress is saved on this device.</p>
+
+      <div class="reorder-player-actions">
+        <button id="checkButton" type="button" class="reorder-student-primary">Check answer</button>
+        <button id="shuffleButton" type="button" class="reorder-student-secondary">Shuffle again</button>
+        <button id="revealButton" type="button" class="reorder-student-secondary">Show answer</button>
+      </div>
+      <div class="reorder-player-nav">
+        <button id="prevButton" type="button" class="reorder-student-secondary">Previous</button>
+        <button id="nextButton" type="button" class="reorder-student-primary">Next sentence</button>
+      </div>
+      <button id="resetButton" type="button" class="reorder-student-reset">Reset my progress</button>
+    </section>
+  </main>
+
+  <div id="completionPanel" class="reorder-student-completion" hidden role="dialog" aria-modal="true" aria-labelledby="completionTitle">
+    <div class="reorder-student-completion-card">
+      <div class="reorder-student-completion-icon" aria-hidden="true">🎉</div>
+      <h2 id="completionTitle">Correct!</h2>
+      <p id="completionMessage">Excellent work — the sentence is in the right order.</p>
+      <button id="closeCompletionButton" type="button" class="reorder-student-primary">Keep playing</button>
+    </div>
+  </div>
+
+  <script>window.__SHARED_GAME__ = <%- gameDataJson %>;</script>
+  <script src="/low-prep/sentence-reorder/sentence-reorder-player.js?v=1"></script>
+</body>
+</html>

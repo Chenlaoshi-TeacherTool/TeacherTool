@@ -4,6 +4,9 @@
   var sentenceInput = document.getElementById('sentence-input');
   var relaxedCheckbox = document.getElementById('hide-punctuation-case');
   var generateButton = document.getElementById('generate-button');
+  var shareButton = document.getElementById('share-button');
+  var manageLinksButton = document.getElementById('manage-links-button');
+  var managedLinkCount = document.getElementById('managed-link-count');
   var setupStatus = document.getElementById('setup-status');
 
   var stage = document.getElementById('puzzle-stage');
@@ -30,9 +33,11 @@
   var celebrationTimer = null;
 
   sentenceInput.addEventListener('input', updateSetupStatus);
+  relaxedCheckbox.addEventListener('change', updateSetupStatus);
   updateSetupStatus();
   initLibraryPicker();
   buildCelebrationConfetti();
+  updateManagedLinkCount();
 
   var CHINESE_SENTENCE_TEMPLATES = [
     '我 喜欢 {word}。',
@@ -79,11 +84,30 @@
 
   function updateSetupStatus() {
     var count = parseSentences(sentenceInput.value).length;
+    if (shareButton) shareButton.disabled = !count || !window.TeacherGameShare;
     if (!count) {
       setupStatus.textContent = 'Enter at least one sentence to begin.';
     } else {
       setupStatus.textContent = count + ' sentence' + (count === 1 ? '' : 's') + ' ready to generate.';
     }
+  }
+
+  function updateManagedLinkCount() {
+    if (!managedLinkCount || !window.TeacherGameShare) return;
+    var count = window.TeacherGameShare.listShares().length;
+    managedLinkCount.textContent = count ? '(' + count + ')' : '';
+  }
+
+  function buildSharePayload() {
+    var sentences = parseSentences(sentenceInput.value);
+    if (!sentences.length) throw new Error('Enter at least one sentence to share.');
+    return {
+      title: 'Sentence Reorder',
+      relaxed: relaxedCheckbox.checked,
+      sentences: sentences.map(function (sentence) {
+        return { words: sentence.words.slice() };
+      })
+    };
   }
 
   function parseSentences(raw) {
@@ -124,6 +148,39 @@
     state.currentIndex = 0;
     loadPuzzle(0);
   });
+
+  if (shareButton) {
+    shareButton.addEventListener('click', function () {
+      if (!window.TeacherGameShare) {
+        setupStatus.textContent = 'Sharing is not available yet. Please refresh the page.';
+        return;
+      }
+      if (!parseSentences(sentenceInput.value).length) {
+        updateSetupStatus();
+        return;
+      }
+      window.TeacherGameShare.openPublisher({
+        gameType: 'sentence-reorder',
+        version: 1,
+        title: function () { return 'Sentence Reorder'; },
+        getData: buildSharePayload,
+        onPublished: function () {
+          updateManagedLinkCount();
+          setupStatus.textContent = 'Student link and QR code are ready.';
+        }
+      });
+    });
+  }
+
+  if (manageLinksButton) {
+    manageLinksButton.disabled = !window.TeacherGameShare;
+    manageLinksButton.addEventListener('click', function () {
+      if (!window.TeacherGameShare) return;
+      window.TeacherGameShare.openManager({
+        onChanged: updateManagedLinkCount
+      });
+    });
+  }
 
   function loadPuzzle(index) {
     var entry = state.sentences[index];
