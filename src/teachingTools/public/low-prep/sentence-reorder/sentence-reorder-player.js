@@ -105,6 +105,38 @@
     track.className = 'reorder-student-track';
     state.order.forEach((word) => track.append(makeChip(word)));
     elements.stage.append(track);
+    refreshLockedChips();
+  }
+
+  function isLockedChip(chip) {
+    return chip && chip.classList.contains('is-locked');
+  }
+
+  function unlockedSegment(chip) {
+    let segment = 0;
+    let node = chip && chip.parentElement ? chip.parentElement.firstElementChild : null;
+    while (node && node !== chip) {
+      if (isLockedChip(node)) segment += 1;
+      node = node.nextElementSibling;
+    }
+    return segment;
+  }
+
+  function refreshLockedChips() {
+    const words = sentenceWords();
+    const track = document.getElementById('studentWordTrack');
+    if (!track) return;
+    let wordIndex = 0;
+    Array.from(track.children).forEach((chip) => {
+      if (!chip.classList.contains('reorder-student-chip')) return;
+      const isCorrect = normalize(chip.dataset.word) === normalize(words[wordIndex]);
+      chip.classList.toggle('is-correct', isCorrect);
+      chip.classList.toggle('is-locked', isCorrect);
+      chip.disabled = isCorrect;
+      chip.setAttribute('aria-disabled', isCorrect ? 'true' : 'false');
+      if (isCorrect) chip.classList.remove('is-incorrect');
+      wordIndex += 1;
+    });
   }
 
   function renderProgress() {
@@ -129,6 +161,7 @@
     const track = document.getElementById('studentWordTrack');
     if (!track) return;
     state.order = Array.from(track.children).map((chip) => chip.dataset.word);
+    refreshLockedChips();
   }
 
   function checkAnswers() {
@@ -142,6 +175,7 @@
       chip.classList.add(isCorrect ? 'is-correct' : 'is-incorrect');
       if (isCorrect) correct += 1;
     });
+    refreshLockedChips();
     if (correct === words.length) {
       state.solved[state.currentIndex] = true;
       saveProgress();
@@ -173,14 +207,15 @@
   function onChipKeyDown(event) {
     const track = document.getElementById('studentWordTrack');
     if (!track) return;
+    if (isLockedChip(event.currentTarget)) return;
     const chips = Array.from(track.children);
     const index = chips.indexOf(event.currentTarget);
-    if (event.key === 'ArrowLeft' && index > 0) {
+    if (event.key === 'ArrowLeft' && index > 0 && !isLockedChip(chips[index - 1])) {
       track.insertBefore(chips[index], chips[index - 1]);
       event.currentTarget.focus();
       syncOrderFromDom();
       event.preventDefault();
-    } else if (event.key === 'ArrowRight' && index < chips.length - 1) {
+    } else if (event.key === 'ArrowRight' && index < chips.length - 1 && !isLockedChip(chips[index + 1])) {
       track.insertBefore(chips[index + 1], chips[index]);
       event.currentTarget.focus();
       syncOrderFromDom();
@@ -189,12 +224,14 @@
   }
 
   function onPointerDown(event) {
-    if (drag) return;
+    const chip = event.currentTarget;
+    if (drag || chip.disabled || isLockedChip(chip)) return;
     drag = {
-      chip: event.currentTarget,
+      chip,
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
+      segment: unlockedSegment(chip),
       started: false
     };
     document.addEventListener('pointermove', onPointerMove);
@@ -251,6 +288,8 @@
     let bestDist = Infinity;
     Array.from(track.children).forEach((chip) => {
       if (!chip.classList.contains('reorder-student-chip')) return;
+      if (isLockedChip(chip)) return;
+      if (drag && unlockedSegment(chip) !== drag.segment) return;
       const rect = chip.getBoundingClientRect();
       const dx = x - (rect.left + rect.width / 2);
       const dy = y - (rect.top + rect.height / 2);

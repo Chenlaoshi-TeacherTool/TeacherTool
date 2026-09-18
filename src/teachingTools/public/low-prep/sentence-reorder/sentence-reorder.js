@@ -205,6 +205,7 @@
     });
     stage.appendChild(track);
     attachDragHandlers(track);
+    refreshLockedChips();
   }
 
   function makeChip(word) {
@@ -225,17 +226,54 @@
     });
   }
 
+  function currentWords() {
+    var entry = state.sentences[state.currentIndex];
+    return entry ? entry.words : [];
+  }
+
+  function isLockedChip(chip) {
+    return chip && chip.classList.contains('is-locked');
+  }
+
+  function unlockedSegment(chip) {
+    var segment = 0;
+    var node = chip && chip.parentElement ? chip.parentElement.firstElementChild : null;
+    while (node && node !== chip) {
+      if (isLockedChip(node)) segment++;
+      node = node.nextElementSibling;
+    }
+    return segment;
+  }
+
+  function refreshLockedChips() {
+    var words = currentWords();
+    var track = document.getElementById('word-track');
+    if (!words.length || !track) return;
+    var wordIndex = 0;
+    Array.prototype.forEach.call(track.children, function (chip) {
+      if (!chip.classList.contains('word-chip')) return;
+      var isCorrect = normalize(chip.dataset.word) === normalize(words[wordIndex]);
+      chip.classList.toggle('is-correct', isCorrect);
+      chip.classList.toggle('is-locked', isCorrect);
+      chip.setAttribute('aria-disabled', isCorrect ? 'true' : 'false');
+      chip.setAttribute('tabindex', isCorrect ? '-1' : '0');
+      if (isCorrect) chip.classList.remove('is-incorrect');
+      wordIndex++;
+    });
+  }
+
   function onChipKeyDown(event) {
     var track = document.getElementById('word-track');
     if (!track) return;
+    if (isLockedChip(event.currentTarget)) return;
     var chips = Array.prototype.slice.call(track.children);
     var index = chips.indexOf(event.currentTarget);
-    if (event.key === 'ArrowLeft' && index > 0) {
+    if (event.key === 'ArrowLeft' && index > 0 && !isLockedChip(chips[index - 1])) {
       track.insertBefore(chips[index], chips[index - 1]);
       event.currentTarget.focus();
       syncOrderFromDom();
       event.preventDefault();
-    } else if (event.key === 'ArrowRight' && index < chips.length - 1) {
+    } else if (event.key === 'ArrowRight' && index < chips.length - 1 && !isLockedChip(chips[index + 1])) {
       track.insertBefore(chips[index + 1], chips[index]);
       event.currentTarget.focus();
       syncOrderFromDom();
@@ -247,12 +285,13 @@
 
   function onPointerDown(event) {
     var chip = event.currentTarget;
-    if (drag) return;
+    if (drag || isLockedChip(chip)) return;
     drag = {
       chip: chip,
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
+      segment: unlockedSegment(chip),
       started: false
     };
     // Listen on the document, not the chip itself: once the chip is
@@ -320,6 +359,8 @@
     var bestDist = Infinity;
     Array.prototype.forEach.call(track.children, function (chip) {
       if (!chip.classList.contains('word-chip')) return;
+      if (isLockedChip(chip)) return;
+      if (drag && unlockedSegment(chip) !== drag.segment) return;
       var rect = chip.getBoundingClientRect();
       var cx = rect.left + rect.width / 2;
       var cy = rect.top + rect.height / 2;
@@ -361,6 +402,7 @@
     state.order = Array.prototype.map.call(track.children, function (chip) {
       return chip.dataset.word;
     });
+    refreshLockedChips();
   }
 
   function normalize(word) {
@@ -380,6 +422,7 @@
       chip.classList.add(isCorrect ? 'is-correct' : 'is-incorrect');
       if (isCorrect) correctCount++;
     });
+    refreshLockedChips();
     var total = entry.words.length;
     if (correctCount === total) {
       feedbackText.textContent = '🎉 Correct! All ' + total + ' words are in the right order.';

@@ -224,11 +224,13 @@ label { display: block; color: var(--chalk); font-size: .85rem; font-weight: 750
 .reorder-track {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 24px 10px;
+  padding-top: 18px;
   width: 100%;
 }
 
 .word-chip {
+  position: relative;
   padding: 12px 18px;
   border: 2px solid #fffdf7;
   border-radius: 12px;
@@ -245,10 +247,29 @@ label { display: block; color: var(--chalk); font-size: .85rem; font-weight: 750
 }
 @media (hover: hover) and (pointer: fine) {
   .word-chip:hover { transform: translateY(-2px); }
+  .word-chip.is-locked:hover { transform: none; }
 }
 .word-chip:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
 .word-chip.is-dragging { cursor: grabbing; opacity: .92; transform: scale(1.06) rotate(-2deg); box-shadow: 0 10px 22px rgba(0,0,0,.4); z-index: 999; pointer-events: none; transition: none; }
 .word-chip.is-correct { background: #e2f0cc; border-color: var(--leaf); color: var(--chalk-deep); }
+.word-chip.is-locked { cursor: default; }
+.word-chip.is-locked::before {
+  content: '✓';
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--leaf);
+  color: #fffdf7;
+  font-size: .82rem;
+  line-height: 1;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 6px rgba(0,0,0,.22);
+}
 .word-chip.is-incorrect { background: #fbe4e0; border-color: var(--coral); color: var(--chalk-deep); }
 
 .word-chip-placeholder {

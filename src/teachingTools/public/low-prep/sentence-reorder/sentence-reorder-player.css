@@ -62,10 +62,12 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
+  gap: 24px 12px;
+  padding-top: 18px;
 }
 
 .reorder-student-chip {
+  position: relative;
   padding: 13px 18px;
   border: 2px solid #fffdf7;
   border-radius: 12px;
@@ -81,6 +83,7 @@
   user-select: none;
 }
 .reorder-student-chip:focus-visible { outline: 3px solid var(--game-gold); outline-offset: 3px; }
+.reorder-student-chip:disabled { opacity: 1; }
 .reorder-student-chip.is-dragging {
   position: fixed;
   z-index: 30;
@@ -91,6 +94,24 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, .35);
 }
 .reorder-student-chip.is-correct { background: #e4f2d7; border-color: #8fca78; }
+.reorder-student-chip.is-locked { cursor: default; }
+.reorder-student-chip.is-locked::before {
+  content: '✓';
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #8fca78;
+  color: #fffdf7;
+  font-size: .82rem;
+  line-height: 1;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .22);
+}
 .reorder-student-chip.is-incorrect { background: #ffe4df; border-color: var(--game-coral); }
 
 .reorder-student-placeholder {
