@@ -385,6 +385,11 @@ h2 {
   transition: transform .18s ease, box-shadow .18s ease;
 }
 
+.picture-box.needs-review {
+  border: 2px dashed var(--coral);
+  background: #fff5ef;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .picture-box:hover {
     transform: translateY(-2px) rotate(-2deg);
@@ -444,6 +449,9 @@ h2 {
   color: var(--success);
   font-weight: 800;
 }
+
+.match-status.warning { color: var(--coral); }
+.match-status.warning .check { background: var(--coral); }
 
 .check {
   width: 20px;

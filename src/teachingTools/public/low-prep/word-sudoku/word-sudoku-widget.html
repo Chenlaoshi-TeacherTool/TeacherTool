@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="/shared/game-sharing.css?v=2">
-  <link rel="stylesheet" href="./word-sudoku-widget.css?v=topic-library-2">
+  <link rel="stylesheet" href="./word-sudoku-widget.css?v=emoji-learning-3">
 </head>
 <body>
   <header class="hero">
@@ -64,7 +64,7 @@
         <p class="emoji-help">
           <span aria-hidden="true">💡</span>
           Need a different picture? Click any icon to search the
-          <a href="https://github.com/twitter/twemoji" target="_blank" rel="noopener noreferrer">open-source Twemoji collection</a>,
+          <a href="https://openmoji.org" target="_blank" rel="noopener noreferrer">open-source OpenMoji collection</a>,
           or copy an emoji you find online and paste it below.
         </p>
 
@@ -74,7 +74,7 @@
             <button class="picker-close" id="pickerClose" type="button" aria-label="Close icon picker">×</button>
           </div>
           <label class="emoji-search" for="emojiSearchInput">
-            <span>Search Twemoji</span>
+            <span>Search OpenMoji</span>
             <input id="emojiSearchInput" type="search" placeholder="Try apple, science, weather..." autocomplete="off" aria-describedby="emojiSearchStatus">
           </label>
           <p class="emoji-search-status" id="emojiSearchStatus">Search in English or another supported language to find a classroom-ready emoji.</p>
@@ -87,7 +87,7 @@
         </div>
 
         <div class="auto-match">
-          <span class="match-status"><span class="check">✓</span><span id="matchStatus">Auto-matching complete</span></span>
+          <span class="match-status" id="matchSummary"><span class="check" id="matchCheck">✓</span><span id="matchStatus">Auto-matching complete</span></span>
           <button class="link-button" id="rematchAll" type="button">Re-match All</button>
         </div>
       </section>
@@ -184,12 +184,12 @@
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <!-- Twemoji artwork: Twitter, Inc. and contributors (CC-BY 4.0), loaded as SVGs from the official repository. -->
+  <!-- OpenMoji artwork (CC BY-SA 4.0), loaded from the OpenMoji package. -->
   <script src="/shared/wordlist-core.js"></script>
-  <script src="/shared/emoji-core.js"></script>
+  <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
   <script src="/shared/library-picker.js"></script>
   <script src="/shared/game-sharing.js?v=2"></script>
-  <script src="./word-sudoku-widget.js?v=topic-balance-emoji-1"></script>
+  <script src="./word-sudoku-widget.js?v=emoji-learning-3"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

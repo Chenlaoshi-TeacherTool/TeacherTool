@@ -23,6 +23,7 @@
     "🏃", "🚶", "🧘", "💃", "🎨", "📖", "✍️", "👋", "👏", "💬",
     "⭐", "🎯", "🔔", "🎈", "🎁", "💡", "🧩", "🌱", "☂️", "⏰"
   ];
+  const unmatchedPlaceholders = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
 
   // Prefer clear classroom-friendly pictures for common vocabulary before
   // falling back to the wider OpenMoji search results.
@@ -31,6 +32,10 @@
     "再见": ["👋", "🚪"], goodbye: ["👋", "🚪"], "老师": ["👩‍🏫"], teacher: ["👩‍🏫"],
     "学生": ["🧑‍🎓"], student: ["🧑‍🎓"], "朋友": ["🧑‍🤝‍🧑"], friend: ["🧑‍🤝‍🧑"],
     "人": ["🧑"], person: ["🧑"], "喜欢": ["❤️"], like: ["❤️"],
+    "请": ["🙏", "🥺"], please: ["🙏", "🥺"], "对不起": ["😔", "🙇"], sorry: ["😔", "🙇"],
+    "我": ["🙋"], "i": ["🙋"], me: ["🙋"], "你": ["👉"], you: ["👉"],
+    "他": ["👨"], he: ["👨"], him: ["👨"], "她": ["👩"], she: ["👩"], her: ["👩"],
+    "是": ["✅"], "to be": ["✅"], "有": ["🤲"], "to have": ["🤲"],
     "苹果": ["🍎"], apple: ["🍎"], "香蕉": ["🍌"], banana: ["🍌"],
     "草莓": ["🍓"], strawberry: ["🍓"], "西瓜": ["🍉"], watermelon: ["🍉"],
     "葡萄": ["🍇"], grape: ["🍇"], grapes: ["🍇"], "橘子": ["🍊"], orange: ["🍊"],
@@ -42,10 +47,21 @@
     "铅笔": ["✏️"], pencil: ["✏️"], "橡皮": ["🧽"], eraser: ["🧽"],
     "尺子": ["📏"], ruler: ["📏"], "桌子": ["🪑"], desk: ["🪑"],
     "椅子": ["💺"], chair: ["💺"], "黑板": ["⬛"], blackboard: ["⬛"],
-    "请坐": ["🪑"], "sit down": ["🪑"], "请听": ["👂"], listen: ["👂"],
-    "请说": ["💬"], speak: ["💬"], "请看": ["👀"], look: ["👀"],
-    "请读": ["📖"], read: ["📖"], "请写": ["✍️"], write: ["✍️"],
-    "头": ["👤"], head: ["👤"], "眼睛": ["👀"], eye: ["👀"], eyes: ["👀"],
+    "请坐": ["🧎", "🪑"], "please sit down": ["🧎", "🪑"], "sit down": ["🧎", "🪑"],
+    "请听": ["👂"], "please listen": ["👂"], listen: ["👂"],
+    "请说": ["💬"], "please speak": ["💬"], speak: ["💬"],
+    "请看": ["👀"], "please look": ["👀"], look: ["👀"],
+    "请读": ["📖", "📚"], "please read": ["📖", "📚"], read: ["📖", "📚"],
+    "请写": ["✍️"], "please write": ["✍️"], write: ["✍️"],
+    "学校": ["🏫"], school: ["🏫"], "同学": ["🧑‍🤝‍🧑", "👥"], classmate: ["🧑‍🤝‍🧑", "👥"],
+    "书包": ["🎒"], backpack: ["🎒"], "课本": ["📘", "📖"], textbook: ["📘", "📖"],
+    "教室": ["🏫", "🚪"], classroom: ["🏫", "🚪"],
+    "上课": ["🔔", "🏫"], "to attend class": ["🔔", "🏫"], "class starts": ["🔔", "🏫"],
+    "下课": ["🛎️", "🔔"], "class ends": ["🛎️", "🔔"],
+    "作业": ["📝", "📚"], homework: ["📝", "📚"], "考试": ["🧾", "📝"], exam: ["🧾", "📝"], test: ["🧾", "📝"],
+    "开学": ["📅", "🏫"], "school starts": ["📅", "🏫"], "学习": ["📚", "🧠"], "to study": ["📚", "🧠"], study: ["📚", "🧠"],
+    "准备": ["✅", "🎒"], "to prepare": ["✅", "🎒"], prepare: ["✅", "🎒"], "活动": ["🎯", "🎲"], activity: ["🎯", "🎲"],
+    "头": ["👤"], head: ["👤"], "脸": ["🙂"], face: ["🙂"], "眼睛": ["👀"], eye: ["👀"], eyes: ["👀"],
     "耳朵": ["👂"], ear: ["👂"], ears: ["👂"], "鼻子": ["👃"], nose: ["👃"],
     "嘴": ["👄"], mouth: ["👄"], "牙": ["🦷"], tooth: ["🦷"], teeth: ["🦷"],
     "手": ["✋"], hand: ["✋"], "脚": ["🦶"], foot: ["🦶"], "腿": ["🦵"], leg: ["🦵"],
@@ -97,6 +113,8 @@
     applyCustomIcon: document.getElementById("applyCustomIcon"),
     rematchAll: document.getElementById("rematchAll"),
     matchStatus: document.getElementById("matchStatus"),
+    matchSummary: document.getElementById("matchSummary"),
+    matchCheck: document.getElementById("matchCheck"),
     sudoku: document.getElementById("sudoku"),
     screenLegend: document.getElementById("screenLegend"),
     printLegend: document.getElementById("printLegend"),
@@ -184,7 +202,7 @@
       try {
         emojiIndex = await CE.load();
       } catch (_error) {
-        // The curated fallback palette still keeps the activity usable offline.
+        // Numbered placeholders keep the activity usable offline without inventing a match.
       }
     }
 
@@ -429,6 +447,10 @@
         .filter(Boolean)
     );
 
+    item.needsReview = false;
+    const remembered = CE && typeof CE.recall === "function" ? CE.recall(item) : "";
+    if (remembered && !used.has(remembered)) return remembered;
+
     const preferred = preferredIconCandidates(item).find((icon) => !used.has(icon));
     if (preferred) return preferred;
 
@@ -448,12 +470,10 @@
         if (pick) return pick.emoji;
       }
     }
-    // 兜底（索引未就绪或没搜到）：从精选调色板里轮流取一个没被占用的。
-    const candidates = iconPalette.slice(index).concat(iconPalette.slice(0, index));
-    return (
-      candidates.find((icon) => !used.has(icon)) ||
-      iconPalette[index % iconPalette.length]
-    );
+    // No semantic match: use a visible numbered placeholder instead of an unrelated picture.
+    item.needsReview = true;
+    const placeholders = unmatchedPlaceholders.slice(index).concat(unmatchedPlaceholders.slice(0, index));
+    return placeholders.find((icon) => !used.has(icon));
   }
 
   function autoMatchItems(items) {
@@ -479,8 +499,11 @@
       const iconButton = document.createElement("button");
       iconButton.type = "button";
       iconButton.className = "picture-box";
+      iconButton.classList.toggle("needs-review", Boolean(item.needsReview));
       iconButton.textContent = item.icon;
-      iconButton.title = `Change the icon for "${item.word || `word ${index + 1}`}"`;
+      iconButton.title = item.needsReview
+        ? `Choose a matching icon for "${item.word || `word ${index + 1}`}"`
+        : `Change the icon for "${item.word || `word ${index + 1}`}"`;
       iconButton.setAttribute("aria-label", iconButton.title);
       iconButton.addEventListener("click", () => openPicker(index));
 
@@ -519,7 +542,7 @@
     elements.pickerTitle.textContent =
       `Choose an icon for "${item.word || `word ${index + 1}`}"`;
     elements.customIconInput.value = item.icon;
-    elements.emojiSearchInput.value = "";
+    elements.emojiSearchInput.value = semanticQueries(item)[0] || "";
     elements.iconPicker.hidden = false;
     renderPickerOptions();
     elements.iconPicker.scrollIntoView({
@@ -585,8 +608,11 @@
   function applyIcon(icon) {
     const cleanIcon = icon.trim();
     if (state.pickerIndex === null || !cleanIcon) return;
-    state.items[state.pickerIndex].icon = cleanIcon;
-    state.items[state.pickerIndex].manual = true;
+    const item = state.items[state.pickerIndex];
+    if (CE && typeof CE.remember === "function") CE.remember(item, cleanIcon);
+    item.icon = cleanIcon;
+    item.manual = true;
+    item.needsReview = false;
     renderInputs();
     renderLegends();
     renderPuzzle();
@@ -611,13 +637,18 @@
       normalized(item.word)
     ).length;
     const isValid = validWords();
+    const reviewCount = state.items.filter((item) => item.needsReview).length;
     elements.wordCount.textContent = isValid
       ? "9/9 complete"
       : `${completed}/9 filled in`;
     elements.wordCount.classList.toggle("warning", !isValid);
-    elements.matchStatus.textContent = isValid
-      ? "Auto-matching complete"
-      : "Please enter 9 different words";
+    elements.matchStatus.textContent = !isValid
+      ? "Please enter 9 different words"
+      : reviewCount
+        ? `${reviewCount} icon${reviewCount === 1 ? " needs" : "s need"} review — click to choose`
+        : "Auto-matching complete";
+    elements.matchSummary.classList.toggle("warning", Boolean(isValid && reviewCount));
+    elements.matchCheck.textContent = isValid && reviewCount ? "!" : "✓";
     elements.readyPill.textContent = isValid
       ? "✓ Layout Ready"
       : "Please check your words";

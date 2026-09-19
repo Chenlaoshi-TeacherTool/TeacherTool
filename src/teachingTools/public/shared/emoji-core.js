@@ -36,9 +36,55 @@
 
   // 命中所需的最低分（低于此值视为没匹配上）
   var MATCH_THRESHOLD = 500;
+  var CHOICE_STORAGE_KEY = 'teacherTool.emojiChoices.v1';
 
   var indexPromise = null;
   var pngCache = Object.create(null);
+
+  function choiceKeys(item) {
+    var seen = Object.create(null);
+    return [item && item.zh, item && item.en, item && item.word]
+      .map(function (value) {
+        return String(value || '').normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim();
+      })
+      .filter(function (key) {
+        if (!key || seen[key]) return false;
+        seen[key] = true;
+        return true;
+      });
+  }
+
+  function readChoices() {
+    try {
+      var stored = JSON.parse(global.localStorage.getItem(CHOICE_STORAGE_KEY) || '{}');
+      return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
+    } catch (_error) {
+      return {};
+    }
+  }
+
+  function recall(item) {
+    var choices = readChoices();
+    var keys = choiceKeys(item);
+    for (var i = 0; i < keys.length; i++) {
+      if (typeof choices[keys[i]] === 'string' && choices[keys[i]].trim()) return choices[keys[i]].trim();
+    }
+    return '';
+  }
+
+  function remember(item, emoji) {
+    var cleanEmoji = String(emoji || '').trim();
+    var keys = choiceKeys(item);
+    if (!cleanEmoji || !keys.length) return false;
+    try {
+      var choices = readChoices();
+      keys.forEach(function (key) { choices[key] = cleanEmoji; });
+      global.localStorage.setItem(CHOICE_STORAGE_KEY, JSON.stringify(choices));
+      return true;
+    } catch (_error) {
+      return false;
+    }
+  }
 
   // ---------- 文本归一化 ----------
   function normalizeEmoji(value) {
@@ -258,6 +304,15 @@
       };
     }
 
+    var remembered = recall(item);
+    if (remembered) {
+      return index.byEmoji[normalizeEmoji(remembered)] || {
+        emoji: remembered,
+        hexcode: emojiToHex(remembered),
+        annotation: item.en || item.zh || item.word || 'emoji',
+      };
+    }
+
     var queries = queryVariants(englishFor(item, opts));
     var best = null;
     var bestScore = 0;
@@ -327,6 +382,8 @@
     match: match,
     matchAll: matchAll,
     search: search,
+    recall: recall,
+    remember: remember,
     svgUrl: svgUrl,
     pngUrl: pngUrl,
     fetchPng: fetchPng,
