@@ -291,7 +291,13 @@ function generateWorksheet() {
         card.appendChild(wrapper);
         grid.appendChild(card);
 
-        new QRCode(qr, { text: item.url, width: 170, height: 170 });
+        new QRCode(qr, {
+            text: item.url,
+            width: 170,
+            height: 170,
+            typeNumber: 0,
+            correctLevel: QRCode.CorrectLevel.M
+        });
     });
 
     worksheet.hidden = false;
