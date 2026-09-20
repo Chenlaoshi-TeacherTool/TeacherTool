@@ -122,7 +122,7 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--leaf); 
 
 .reveal-media { position: relative; overflow: hidden; line-height: 0; cursor: grab; touch-action: none; }
 .reveal-media.is-dragging { cursor: grabbing; }
-.reveal-media img { position: absolute; top: 0; left: 0; display: block; will-change: transform; }
+.reveal-media img { position: absolute; top: 0; left: 0; display: block; transform-origin: 0 0; will-change: transform; }
 
 .reveal-focus-marker {
   position: absolute;
