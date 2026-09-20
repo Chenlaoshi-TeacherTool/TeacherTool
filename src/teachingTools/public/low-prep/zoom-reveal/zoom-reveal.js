@@ -228,6 +228,8 @@
     media.className = 'reveal-media';
     var img = document.createElement('img');
     img.alt = 'Picture to reveal';
+    img.draggable = false;
+    img.addEventListener('dragstart', function (event) { event.preventDefault(); });
     var marker = document.createElement('div');
     marker.className = 'reveal-focus-marker is-hidden';
     media.appendChild(img);
@@ -238,11 +240,12 @@
 
     media.addEventListener('pointerdown', function (event) {
       if (state.currentIndex === -1 || state.isPlaying) return;
+      event.preventDefault();
       drag.active = true;
       drag.moved = false;
       drag.lastX = event.clientX;
       drag.lastY = event.clientY;
-      media.setPointerCapture(event.pointerId);
+      try { media.setPointerCapture(event.pointerId); } catch (err) {}
       media.classList.add('is-dragging');
     });
 
