@@ -133,9 +133,99 @@
     return out.join('').replace(/\s+/g, ' ').trim();
   }
 
-  /** 查内置英文释义，查不到返回 '' */
+  // ---------- CC-CEDICT 兜底词典（可选，异步加载）----------
+  // 内置 EN_DICT 只有几百条精挑的常用词；中文词一旦不在里面，toEnglish 就返回 ''，
+  // 于是 emoji 匹配（走英文标注）就配不上。加载 CC-CEDICT（约 12 万条）作为兜底，
+  // 中文词就能自动翻成英文，emoji 自动匹配也随之大幅改善。
+  //   数据形状：{ "菠萝": [{ py:"bō luó", d:["pineapple"] }], ... }
+  //   数据来自 vocab-glossary 工具已有的 cedict.json.gz（CC BY-SA，可商用）。
+  var CEDICT = null;
+  var cedictPromise = null;
+  var DEFAULT_CEDICT_URL = '/low-prep/vocab-glossary/cedict.json.gz';
+
+  // 把一条释义清理成适合匹配 / 展示的干净词：去掉括注、分类词(CL:...)、多余空白。
+  function cleanGloss(def) {
+    return String(def || '')
+      .replace(/\([^)]*\)/g, ' ')                 // (American tech company)、(coll.) 等括注
+      .replace(/\bCL:[^,;，；]*/g, ' ')            // 分类词说明，如 CL:只
+      .replace(/[，；]/g, ';')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // CC-CEDICT 给专有名词读音（人名/地名/公司）标注的拼音首字母大写，
+  // 普通词读音小写：花 有 Huā（姓）和 huā（花朵）两个读音。匹配 emoji 时优先普通词义，
+  // 才不会把 花 配成「姓」、把 苹果 配成公司。
+  function isProperReading(reading) {
+    return !!(reading && typeof reading.py === 'string' && /^[A-Z]/.test(reading.py.trim()));
+  }
+
+  // 取一个读音里第一条可用释义；跳过 CC-CEDICT 的「surname X」姓氏释义。
+  function firstUsableGloss(reading) {
+    var defs = (reading && reading.d) || [];
+    for (var i = 0; i < defs.length; i++) {
+      var gloss = cleanGloss(defs[i]);
+      if (gloss && !/^surname\b/i.test(gloss)) return gloss;
+    }
+    return '';
+  }
+
+  function cedictEnglish(text) {
+    if (!CEDICT) return '';
+    var readings = CEDICT[text];
+    if (!readings || !readings.length) return '';
+    // 优先普通词义（拼音小写开头的读音），如 花→flower、苹果→apple。
+    for (var r = 0; r < readings.length; r++) {
+      if (isProperReading(readings[r])) continue;
+      var gloss = firstUsableGloss(readings[r]);
+      if (gloss) return gloss;
+    }
+    // 兜底：只有专有名词读音时也给出释义，如 中国→China。
+    for (var r2 = 0; r2 < readings.length; r2++) {
+      var fallback = firstUsableGloss(readings[r2]);
+      if (fallback) return fallback;
+    }
+    return '';
+  }
+
+  /** 查英文释义：先查内置精选词典，再兜底查 CC-CEDICT，查不到返回 '' */
   function toEnglish(text) {
-    return EN_DICT[text] || '';
+    return EN_DICT[text] || cedictEnglish(text) || '';
+  }
+
+  /** 是否已经加载好 CC-CEDICT 兜底词典 */
+  function hasCedict() {
+    return !!CEDICT;
+  }
+
+  /**
+   * 异步加载 CC-CEDICT 兜底词典（浏览器内解压 gzip）。只真正拉取一次。
+   * 加载完成后 toEnglish 会自动开始命中更多中文词。
+   * @param {string} [url]
+   * @returns {Promise<object>}
+   */
+  function loadCedict(url) {
+    if (CEDICT) return Promise.resolve(CEDICT);
+    if (cedictPromise) return cedictPromise;
+    if (typeof global.fetch !== 'function') {
+      return Promise.reject(new Error('fetch unavailable'));
+    }
+    cedictPromise = global.fetch(url || DEFAULT_CEDICT_URL).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (typeof global.DecompressionStream === 'undefined' || !res.body) {
+        // 很旧的浏览器：交给浏览器按 Content-Encoding 自行解压。
+        return res.text();
+      }
+      var stream = res.body.pipeThrough(new global.DecompressionStream('gzip'));
+      return new Response(stream).text();
+    }).then(function (text) {
+      CEDICT = JSON.parse(text);
+      return CEDICT;
+    }).catch(function (err) {
+      cedictPromise = null; // 允许下次重试
+      throw err;
+    });
+    return cedictPromise;
   }
 
   /** 内置英文词库有多少条 */
@@ -279,7 +369,7 @@
 
   function writeIndex(idx) {
     if (!HAS_STORE) { MEM_INDEX = idx.slice(); return; }
-    try { global.localStorage.setItem(INDEX_KEY, JSON.stringify(idx)); } catch (e) {}
+    global.localStorage.setItem(INDEX_KEY, JSON.stringify(idx));
   }
 
   function newId() {
@@ -293,15 +383,25 @@
     list.name = list.name || 'Untitled vocabulary list';
     list.updated = Date.now();
     var body = JSON.stringify(list);
-    if (HAS_STORE) {
-      try { global.localStorage.setItem(PREFIX + list.id, body); }
-      catch (e) { throw new Error('Browser storage is full or unavailable. Download a JSON backup instead.'); }
-    } else {
-      MEM[list.id] = body;
-    }
     var idx = readIndex().filter(function (r) { return r.id !== list.id; });
     idx.unshift({ id: list.id, name: list.name, theme: list.theme || '', level: list.level || '', count: list.items.length, updated: list.updated });
-    writeIndex(idx);
+    if (HAS_STORE) {
+      var key = PREFIX + list.id;
+      var previousBody = global.localStorage.getItem(key);
+      try {
+        global.localStorage.setItem(key, body);
+        writeIndex(idx);
+      } catch (e) {
+        try {
+          if (previousBody === null) global.localStorage.removeItem(key);
+          else global.localStorage.setItem(key, previousBody);
+        } catch (rollbackError) {}
+        throw new Error('Browser storage is full or unavailable. Download a JSON backup instead.');
+      }
+    } else {
+      MEM[list.id] = body;
+      writeIndex(idx);
+    }
     return list;
   }
 
@@ -374,6 +474,8 @@
     toneOf: toneOf,
     toEnglish: toEnglish,
     englishSize: englishSize,
+    loadCedict: loadCedict,
+    hasCedict: hasCedict,
     parseLine: parseLine,
     parseText: parseText,
     toCSV: toCSV,

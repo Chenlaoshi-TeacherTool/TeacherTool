@@ -80,6 +80,8 @@
 
   // Emoji 由通用模块 ChenEmoji（/shared/emoji-core.js）提供：搜索、自动匹配、显示都用 OpenMoji。
   const CE = window.ChenEmoji;
+  // 中文→英文翻译由 ChenWordlist（/shared/wordlist-core.js）提供，含 CC-CEDICT 兜底。
+  const CW = window.ChenWordlist;
   let emojiIndex = null;
 
   const difficultyTargets = { easy: 46, medium: 36, hard: 28 };
@@ -853,19 +855,36 @@
   initLibraryPicker();
   updateManagedLinkCount();
 
+  // 重新匹配并重绘（emoji 索引或中文词典就绪后调用）。
+  function refreshAfterAssetLoad() {
+    autoMatchItems(state.items);
+    renderInputs();
+    renderLegends();
+    renderPuzzle();
+    if (!elements.iconPicker.hidden) renderPickerOptions();
+  }
+
   // 异步加载 OpenMoji 索引；就绪后重绘，把原生 emoji 升级成 OpenMoji 图。
   if (CE) {
     CE.load()
       .then((index) => {
         emojiIndex = index;
-        autoMatchItems(state.items);
-        renderInputs();
-        renderLegends();
-        renderPuzzle();
-        if (!elements.iconPicker.hidden) renderPickerOptions();
+        refreshAfterAssetLoad();
       })
       .catch(() => {
         // 加载失败：继续用系统原生 emoji 显示，功能不受影响。
+      });
+  }
+
+  // 异步加载 CC-CEDICT 中文兜底词典；就绪后中文词能自动翻成英文，
+  // emoji 自动匹配随之大幅改善（此前只有约 300 条内置词能配上）。就绪后重新匹配一次。
+  if (CW && typeof CW.loadCedict === "function") {
+    CW.loadCedict()
+      .then(() => {
+        if (emojiIndex) refreshAfterAssetLoad();
+      })
+      .catch(() => {
+        // 词典加载失败：退回内置精选词典，中文词可能需手动挑图，其余功能不受影响。
       });
   }
 })();
