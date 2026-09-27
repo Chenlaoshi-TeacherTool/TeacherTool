@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f56040">
+  <title>Fake Instagram Classroom Profile · Chen Laoshi's Teaching Toolkit</title>
+  <meta name="description" content="Create a private, classroom-safe Instagram-style profile with editable profile details, bio, posts, and local browser saving.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/fake-instagram-profile/fake-instagram-profile.html">
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <script src="/javascripts/clarity.js"></script>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="./fake-instagram-profile.css">
+</head>
+<body class="ig-body">
+  <header class="ig-toolbar account-header-host">
+    <a class="ig-back-link" href="/teaching-tools">Back to Teaching Tools</a>
+    <div class="ig-toolbar-actions">
+      <span class="ig-save-status" id="saveStatus">Saved on this device</span>
+      <button class="ig-secondary-btn" id="resetButton" type="button">Reset sample</button>
+      <button class="ig-secondary-btn" id="printButton" type="button">Print / Save PDF</button>
+    </div>
+  </header>
+
+  <main class="ig-shell">
+    <section class="ig-privacy-note" aria-label="Student privacy reminder">
+      <strong>Private classroom mockup.</strong>
+      <span>This is not connected to Instagram. Everything saves only in this browser, so use fictional or classroom-safe information.</span>
+    </section>
+
+    <section class="ig-profile-card" aria-label="Editable fake Instagram profile">
+      <header class="ig-profile-header">
+        <button class="ig-avatar" id="avatarButton" type="button" aria-label="Change profile image">
+          <span id="avatarInitial">C</span>
+        </button>
+
+        <div class="ig-profile-main">
+          <div class="ig-identity-row">
+            <label class="ig-field-label" for="usernameInput">Username</label>
+            <input id="usernameInput" class="ig-username-input" maxlength="32" autocomplete="off">
+            <button class="ig-primary-btn" id="addPostButton" type="button">Add post</button>
+          </div>
+
+          <div class="ig-stats" aria-label="Profile statistics">
+            <span><strong id="postCount">0</strong> posts</span>
+            <span><strong id="followerCount" contenteditable="true" data-field="followers">418</strong> followers</span>
+            <span><strong id="followingCount" contenteditable="true" data-field="following">36</strong> following</span>
+          </div>
+
+          <label class="ig-field-label" for="displayNameInput">Display name</label>
+          <input id="displayNameInput" class="ig-display-name-input" maxlength="60" autocomplete="off">
+          <label class="ig-field-label" for="bioInput">Bio</label>
+          <textarea id="bioInput" class="ig-bio-input" rows="3" maxlength="220"></textarea>
+        </div>
+      </header>
+
+      <section class="ig-highlight-row" aria-label="Editable story highlights">
+        <button class="ig-highlight" type="button">
+          <span>Unit</span>
+          <input maxlength="18" aria-label="Highlight 1 label">
+        </button>
+        <button class="ig-highlight" type="button">
+          <span>Quotes</span>
+          <input maxlength="18" aria-label="Highlight 2 label">
+        </button>
+        <button class="ig-highlight" type="button">
+          <span>Evidence</span>
+          <input maxlength="18" aria-label="Highlight 3 label">
+        </button>
+      </section>
+    </section>
+
+    <section class="ig-posts-panel" aria-labelledby="postsHeading">
+      <div class="ig-posts-heading">
+        <h1 id="postsHeading">Fake Instagram Posts</h1>
+        <p>Click a post to edit its caption, date, and likes. Images are optional so this works quickly on classroom devices.</p>
+      </div>
+      <div class="ig-grid" id="postsGrid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div class="ig-modal" id="postModal" hidden>
+    <div class="ig-modal-backdrop" data-close-modal></div>
+    <section class="ig-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header class="ig-modal-header">
+        <h2 id="modalTitle">Add post</h2>
+        <button class="ig-icon-btn" type="button" data-close-modal aria-label="Close modal">x</button>
+      </header>
+
+      <form id="postForm" class="ig-post-form">
+        <input id="editingPostId" type="hidden">
+        <label>Image
+          <input id="postImageInput" type="file" accept="image/*">
+        </label>
+        <div class="ig-image-preview" id="imagePreviewWrap" hidden>
+          <img id="imagePreview" alt="Selected post preview">
+          <button class="ig-text-btn" id="removeImageButton" type="button">Remove image</button>
+        </div>
+        <label>Caption
+          <textarea id="captionInput" rows="4" maxlength="500" required></textarea>
+        </label>
+        <div class="ig-form-grid">
+          <label>Date
+            <input id="dateInput" maxlength="40" placeholder="Today">
+          </label>
+          <label>Likes
+            <input id="likesInput" maxlength="20" placeholder="128">
+          </label>
+        </div>
+        <div class="ig-modal-actions">
+          <button class="ig-text-btn ig-danger" id="deletePostButton" type="button" hidden>Delete post</button>
+          <button class="ig-secondary-btn" type="button" data-close-modal>Cancel</button>
+          <button class="ig-primary-btn" type="submit">Save post</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <input id="avatarInput" type="file" accept="image/*" hidden>
+  <div class="ig-toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="ig-noscript">This tool needs JavaScript enabled to edit and save the classroom profile.</p></noscript>
+  <script src="./fake-instagram-profile.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
