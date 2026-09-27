@@ -124,6 +124,10 @@ router.get('/teaching-tools/fake-wechat-single-post', function(req, res) {
   res.redirect(302, '/teaching-tools/fake-wechat-single-post/');
 });
 
+router.get('/teaching-tools/social-media-classroom-tools', function(req, res) {
+  res.redirect(302, '/teaching-tools/social-media-classroom-tools/');
+});
+
 router.get('/classroom-shop', function(req, res, next) {
   res.render('classroom-shop', { title: 'Classroom Shop' });
 });
@@ -242,7 +246,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font',
     '/teaching-tools/sunflower-spinner/sunflower-spinner.html', '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
-    '/teaching-tools/fakebook-profile/fakebook-profile.html', '/teaching-tools/fake-wechat-moments/', '/teaching-tools/fake-wechat-single-post/',
+    '/teaching-tools/fakebook-profile/fakebook-profile.html', '/teaching-tools/fake-wechat-moments/', '/teaching-tools/fake-wechat-single-post/', '/teaching-tools/social-media-classroom-tools/',
     '/low-prep/word-sudoku/word-sudoku-widget.html', '/low-prep/word-cloud/word-cloud-widget.html',
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',
     '/teaching-tools/would-you-rather', '/teaching-tools/jeopardy',
