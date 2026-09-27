@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ededed">
+  <title>Fake WeChat Moments · Chen Laoshi's Teaching Toolkit</title>
+  <meta name="description" content="Create a private WeChat Moments-style feed for a historical or fictional character, with editable posts, photos, likes, comments, and local browser saving.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/fake-wechat-moments/">
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <script src="/javascripts/clarity.js"></script>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="moments-body">
+  <header class="tool-bar account-header-host">
+    <a class="back-link" href="/teaching-tools">Back to Teaching Tools</a>
+    <div class="tool-actions">
+      <span id="saveStatus" class="save-status">Saved on this device</span>
+      <button id="themeToggle" class="secondary-btn" type="button" aria-pressed="false">Dark mode</button>
+      <button id="resetButton" class="secondary-btn" type="button">Reset sample</button>
+      <button id="addMomentButton" class="primary-btn" type="button">Add New Moment</button>
+    </div>
+  </header>
+
+  <main class="phone-shell" aria-label="Fake WeChat Moments editor">
+    <div class="status-bar" aria-hidden="true">
+      <span>9:41</span>
+      <span>Fake Moments</span>
+      <span>100%</span>
+    </div>
+
+    <section class="moments-header">
+      <button id="coverButton" class="cover-photo" type="button" aria-label="Change cover photo">
+        <span>Tap to change cover</span>
+      </button>
+      <div class="profile-row">
+        <div id="profileName" class="profile-name" contenteditable="true" spellcheck="false" aria-label="Profile name"></div>
+        <button id="avatarButton" class="avatar" type="button" aria-label="Change avatar">
+          <span id="avatarInitial">Q</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="feed" class="feed" aria-live="polite"></section>
+  </main>
+
+  <div id="momentModal" class="modal" hidden>
+    <div class="modal-backdrop" data-close-modal></div>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header class="modal-header">
+        <h2 id="modalTitle">Add New Moment</h2>
+        <button class="icon-btn" type="button" data-close-modal aria-label="Close modal">x</button>
+      </header>
+      <form id="momentForm" class="moment-form">
+        <label>Post content
+          <textarea id="postTextInput" rows="5" required></textarea>
+        </label>
+        <label>Images
+          <input id="postImagesInput" type="file" accept="image/*" multiple>
+        </label>
+        <div id="imagePreview" class="image-preview" hidden></div>
+        <label>Timestamp
+          <input id="timestampInput" type="text" placeholder="Today 08:30">
+        </label>
+        <label>Like names
+          <input id="likesInput" type="text" placeholder="Li Bai, Du Fu, Wang Wei">
+        </label>
+        <label>Comments
+          <textarea id="commentsInput" rows="5" placeholder="Username: Comment"></textarea>
+        </label>
+        <footer class="modal-actions">
+          <button class="secondary-btn" type="button" data-close-modal>Cancel</button>
+          <button class="primary-btn" type="submit">Add Moment</button>
+        </footer>
+      </form>
+    </section>
+  </div>
+
+  <input id="coverInput" type="file" accept="image/*" hidden>
+  <input id="avatarInput" type="file" accept="image/*" hidden>
+  <input id="replaceImageInput" type="file" accept="image/*" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript-note">This tool needs JavaScript enabled to edit and save the fake Moments feed.</p></noscript>
+  <script src="./script.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

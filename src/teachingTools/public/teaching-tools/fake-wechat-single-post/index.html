@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ededed">
+  <title>Fake WeChat Moments Single Post Generator · Chen Laoshi's Teaching Toolkit</title>
+  <meta name="description" content="Create one private WeChat Moments-style post for a historical or fictional character, with editable text, photos, likes, comments, and local browser saving.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/fake-wechat-single-post/">
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <script src="/javascripts/clarity.js"></script>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="single-body">
+  <header class="tool-bar account-header-host">
+    <a class="back-link" href="/teaching-tools">Back to Teaching Tools</a>
+    <div class="tool-actions">
+      <span id="saveStatus" class="save-status">Not saved yet</span>
+      <button id="addPhotoButton" class="secondary-btn" type="button">Add Photo</button>
+      <button id="addCommentButton" class="secondary-btn" type="button">Add Comment</button>
+      <button id="saveButton" class="primary-btn" type="button">Save Post</button>
+      <button id="loadButton" class="secondary-btn" type="button">Load Saved Post</button>
+    </div>
+  </header>
+
+  <main class="phone-shell" aria-label="Fake WeChat Moments single post editor">
+    <div class="status-bar" aria-hidden="true">
+      <span>9:41</span>
+      <span>Moments</span>
+      <span>100%</span>
+    </div>
+
+    <section class="profile-strip">
+      <button id="avatarButton" class="avatar" type="button" aria-label="Upload avatar">
+        <span id="avatarInitial">M</span>
+      </button>
+      <div>
+        <div id="profileName" class="profile-name" contenteditable="true" spellcheck="false" aria-label="Profile name"></div>
+        <p>Single post generator</p>
+      </div>
+    </section>
+
+    <article class="moment-card">
+      <div id="postText" class="post-text" contenteditable="true" spellcheck="true" aria-label="Post text"></div>
+      <div id="photoGrid" class="photo-grid" aria-label="Post photo grid"></div>
+      <div class="meta-row">
+        <span id="timestamp" contenteditable="true" spellcheck="false" aria-label="Timestamp"></span>
+        <span aria-hidden="true">·</span>
+        <span id="location" contenteditable="true" spellcheck="false" aria-label="Location"></span>
+      </div>
+      <section class="interaction" aria-label="Likes and comments">
+        <button id="likesButton" class="likes" type="button"></button>
+        <div id="commentsList" class="comments"></div>
+      </section>
+    </article>
+  </main>
+
+  <input id="avatarInput" type="file" accept="image/*" hidden>
+  <input id="photoInput" type="file" accept="image/*" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript-note">This tool needs JavaScript enabled to edit and save the fake Moments post.</p></noscript>
+  <script src="./script.js"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
