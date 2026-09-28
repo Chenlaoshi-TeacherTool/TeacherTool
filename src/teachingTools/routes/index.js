@@ -80,6 +80,10 @@ router.get('/teaching-tools/random-group-generator', function(req, res, next) {
   res.render('teaching-tools/random-group-generator', { title: 'Random Group Generator', toolGuide: siteContentStore.get().toolGuides['random-group-generator'] });
 });
 
+router.get('/teaching-tools/classroom-noise-monitor', function(req, res, next) {
+  res.render('teaching-tools/classroom-noise-monitor', { title: 'Classroom Noise Monitor' });
+});
+
 router.get('/teaching-tools/class-pet-points', function(req, res, next) {
   res.render('teaching-tools/class-pet-points', { title: 'Class Pet Points' });
 });

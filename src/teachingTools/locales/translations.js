@@ -339,6 +339,9 @@ module.exports = {
       qrDesc: 'Generate QR codes from text or links for stations, research, choice boards, and family communication.',
       groupTitle: 'Random Group Generator',
       groupDesc: 'Create partners or groups quickly for discussion, labs, problem solving, reading, and review.',
+      noiseMonitorTitle: 'Classroom Noise Monitor',
+      noiseMonitorScope: 'Projection tool · Microphone stays local',
+      noiseMonitorDesc: 'Show a big quiet/loud meter with a friendly character, threshold slider, and a gentle shh cue.',
       petTitle: 'Class Pet Points',
       petScope: 'Teacher-managed · Saves in this browser',
       petDesc: 'Help 24 original pets hatch, grow, sparkle, and wear teacher-chosen holiday skins.',
@@ -1137,6 +1140,16 @@ module.exports = {
       noGroupsYet: 'No groups yet',
       emptyStateText: 'Your shuffled teams will be easy to scan and copy from here.'
     },
+    noiseMonitor: {
+      backBtn: '← Back to Teaching Tools',
+      eyebrow: 'Classroom volume',
+      title: 'Noise Monitor',
+      subtitle: 'Project a simple room-volume signal. Set the threshold, start listening, and let the character help students notice when the room gets too loud.',
+      quietState: 'Nice and quiet',
+      thresholdLabel: 'Noise threshold',
+      startButton: 'Start Listening',
+      readyStatus: 'Ready. Your browser will ask for microphone permission when you start.'
+    },
     classPetPoints: {
       backAll: '← All teaching tools',
       eyebrow: 'A cheerful classroom motivator',
@@ -1552,6 +1565,9 @@ module.exports = {
       qrDesc: '为学习站、调查活动、选择板和家校沟通生成文字或链接二维码。',
       groupTitle: '随机分组工具',
       groupDesc: '快速为讨论、实验、解题、阅读和复习生成搭档或小组。',
+      noiseMonitorTitle: '课堂音量监测器',
+      noiseMonitorScope: '投影工具 · 麦克风仅在本地使用',
+      noiseMonitorDesc: '显示大号安静/过响提示、友好角色、阈值滑块和轻柔的“嘘”提醒。',
       petTitle: '班级宠物积分',
       petScope: '教师管理 · 保存在本浏览器',
       petDesc: '帮助 24 只原创宠物孵化、成长、闪耀，并穿上老师选择的节日皮肤。',
@@ -2349,6 +2365,16 @@ module.exports = {
       copyGroups: '复制分组',
       noGroupsYet: '尚无分组',
       emptyStateText: '打乱后的分组会以清晰易读的方式显示，方便您从这里复制。'
+    },
+    noiseMonitor: {
+      backBtn: '← 返回教学工具',
+      eyebrow: '课堂音量',
+      title: '音量监测器',
+      subtitle: '投影一个简单的课堂音量信号。设置阈值，开始监听，让角色提醒学生什么时候声音太大。',
+      quietState: '很好，教室很安静',
+      thresholdLabel: '音量阈值',
+      startButton: '开始监听',
+      readyStatus: '准备好了。开始时浏览器会请求麦克风权限。'
     },
     classPetPoints: {
       backAll: '← 所有教学工具',
