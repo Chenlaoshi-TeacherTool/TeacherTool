@@ -7,7 +7,6 @@
   var thresholdReadout = document.getElementById('thresholdReadout');
   var volumeReadout = document.getElementById('volumeReadout');
   var indicator = document.getElementById('noiseIndicator');
-  var character = document.getElementById('noiseCharacter');
   var stateNode = document.getElementById('noiseState');
   var statusNode = document.getElementById('monitorStatus');
   var shhAudio = document.getElementById('shhAudio');
@@ -17,15 +16,16 @@
   var mediaStream = null;
   var frameId = 0;
   var isRunning = false;
-  var lastShhAt = 0;
+  var currentState = 'green';
 
   function text(key) {
     var isZh = document.documentElement.lang === 'zh';
     var labels = {
       start: isZh ? '开始监听' : 'Start Listening',
       stop: isZh ? '停止' : 'Stop',
-      quiet: isZh ? '很好，教室很安静' : 'Nice and quiet',
-      loud: isZh ? '声音太大啦' : 'Too loud',
+      green: isZh ? '安静' : 'Quiet',
+      yellow: isZh ? '注意音量' : 'Careful',
+      red: isZh ? '太大声' : 'Too loud',
       listening: isZh ? '正在监听。本工具只在本浏览器中处理麦克风声音。' : 'Listening. Microphone audio is processed only in this browser.',
       stopped: isZh ? '已停止监听。' : 'Stopped.',
       unsupported: isZh ? '此浏览器不支持麦克风监听。' : 'This browser does not support microphone monitoring.',
@@ -74,19 +74,17 @@
   }
 
   function setLoudness(volume, threshold) {
-    var isLoud = volume > threshold;
-    indicator.classList.toggle('is-loud', isLoud);
-    indicator.classList.toggle('is-quiet', !isLoud);
-    character.classList.toggle('is-stressed', isLoud);
-    character.classList.toggle('is-happy', !isLoud);
-    stateNode.textContent = isLoud ? text('loud') : text('quiet');
+    var state = volume > threshold ? 'red' : (volume < threshold * .6 ? 'green' : 'yellow');
+    indicator.dataset.state = state;
+    stateNode.textContent = text(state);
     volumeReadout.textContent = String(volume);
 
-    if (isLoud && Date.now() - lastShhAt > 2500) {
+    if (state === 'red' && currentState !== 'red') {
       shhAudio.currentTime = 0;
       shhAudio.play().catch(function () {});
-      lastShhAt = Date.now();
     }
+
+    currentState = state;
   }
 
   function updateMeter() {

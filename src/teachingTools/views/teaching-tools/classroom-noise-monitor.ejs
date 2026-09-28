@@ -7,7 +7,7 @@
   <title>Classroom Noise Monitor - Teacher Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'A large classroom projection noise monitor that listens locally in the browser and reacts when the room gets too loud.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/teaching-tools/classroom-noise-monitor/classroom-noise-monitor.css?v=noise-monitor-1">
+  <link rel="stylesheet" href="/teaching-tools/classroom-noise-monitor/classroom-noise-monitor.css?v=noise-monitor-2">
 </head>
 <body class="noise-page">
   <main class="noise-shell">
@@ -20,16 +20,10 @@
         <p><%= t('noiseMonitor.subtitle') %></p>
       </div>
 
-      <div id="noiseIndicator" class="noise-indicator is-quiet" aria-live="polite">
-        <div id="noiseCharacter" class="noise-character is-happy" aria-hidden="true">
-          <div class="character-hair"></div>
-          <div class="character-face">
-            <span class="eye eye-left"></span>
-            <span class="eye eye-right"></span>
-            <span class="mouth"></span>
-          </div>
-          <div class="character-body"></div>
-        </div>
+      <div id="noiseIndicator" class="traffic-light" data-state="green" aria-live="polite">
+        <div class="traffic-light__lamp traffic-light__lamp--green" data-light="green" aria-hidden="true"></div>
+        <div class="traffic-light__lamp traffic-light__lamp--yellow" data-light="yellow" aria-hidden="true"></div>
+        <div class="traffic-light__lamp traffic-light__lamp--red" data-light="red" aria-hidden="true"></div>
         <p id="noiseState" class="noise-state"><%= t('noiseMonitor.quietState') %></p>
         <strong id="volumeReadout">0</strong>
       </div>
@@ -48,7 +42,7 @@
     <audio id="shhAudio" preload="auto"></audio>
   </main>
 
-  <script src="/teaching-tools/classroom-noise-monitor/classroom-noise-monitor.js?v=noise-monitor-1"></script>
+  <script src="/teaching-tools/classroom-noise-monitor/classroom-noise-monitor.js?v=noise-monitor-2"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>
