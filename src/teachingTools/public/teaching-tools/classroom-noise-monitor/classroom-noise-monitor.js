@@ -9,7 +9,7 @@
   var indicator = document.getElementById('noiseIndicator');
   var stateNode = document.getElementById('noiseState');
   var statusNode = document.getElementById('monitorStatus');
-  var shhAudio = document.getElementById('shhAudio');
+  var shhSound = document.getElementById('shhSound');
   var audioContext = null;
   var analyser = null;
   var microphoneSource = null;
@@ -34,45 +34,6 @@
     return labels[key];
   }
 
-  function createShhDataUrl() {
-    var sampleRate = 22050;
-    var duration = .72;
-    var length = Math.floor(sampleRate * duration);
-    var headerSize = 44;
-    var buffer = new ArrayBuffer(headerSize + length * 2);
-    var view = new DataView(buffer);
-    var previous = 0;
-
-    function writeString(offset, value) {
-      for (var index = 0; index < value.length; index += 1) view.setUint8(offset + index, value.charCodeAt(index));
-    }
-
-    writeString(0, 'RIFF');
-    view.setUint32(4, 36 + length * 2, true);
-    writeString(8, 'WAVEfmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, 1, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2, true);
-    view.setUint16(32, 2, true);
-    view.setUint16(34, 16, true);
-    writeString(36, 'data');
-    view.setUint32(40, length * 2, true);
-
-    for (var i = 0; i < length; i += 1) {
-      var fade = Math.sin(Math.PI * i / length);
-      var noise = (Math.random() * 2 - 1) * .42;
-      previous = previous * .78 + noise * .22;
-      view.setInt16(headerSize + i * 2, previous * fade * 32767, true);
-    }
-
-    var bytes = new Uint8Array(buffer);
-    var binary = '';
-    for (var j = 0; j < bytes.length; j += 1) binary += String.fromCharCode(bytes[j]);
-    return 'data:audio/wav;base64,' + window.btoa(binary);
-  }
-
   function setLoudness(volume, threshold) {
     var state = volume > threshold ? 'red' : (volume < threshold * .6 ? 'green' : 'yellow');
     indicator.dataset.state = state;
@@ -80,8 +41,8 @@
     volumeReadout.textContent = String(volume);
 
     if (state === 'red' && currentState !== 'red') {
-      shhAudio.currentTime = 0;
-      shhAudio.play().catch(function () {});
+      shhSound.currentTime = 0;
+      shhSound.play().catch(function () {});
     }
 
     currentState = state;
@@ -148,6 +109,5 @@
     else startMonitor();
   });
 
-  shhAudio.src = createShhDataUrl();
   thresholdReadout.textContent = thresholdInput.value;
 }());
