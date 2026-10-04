@@ -84,6 +84,10 @@ router.get('/teaching-tools/classroom-noise-monitor', function(req, res, next) {
   res.render('teaching-tools/classroom-noise-monitor', { title: 'Classroom Noise Monitor' });
 });
 
+router.get('/teaching-tools/time-machine', function(req, res, next) {
+  res.render('teaching-tools/time-machine', { title: '时间机器 · Time Machine' });
+});
+
 router.get('/teaching-tools/class-pet-points', function(req, res, next) {
   res.render('teaching-tools/class-pet-points', { title: 'Class Pet Points' });
 });
@@ -247,7 +251,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/', '/teaching-tools', '/theme-activities', '/theme-activities/weather', '/theme-activities/weather/songs',
     '/classroom-shop',
     '/resources', '/recommendations', '/about', '/contact', '/feedback', '/privacy',
-    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font',
+    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine',
     '/teaching-tools/sunflower-spinner/sunflower-spinner.html', '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
     '/teaching-tools/fakebook-profile/fakebook-profile.html', '/teaching-tools/fake-wechat-moments/', '/teaching-tools/fake-wechat-single-post/', '/teaching-tools/social-media-classroom-tools/',
