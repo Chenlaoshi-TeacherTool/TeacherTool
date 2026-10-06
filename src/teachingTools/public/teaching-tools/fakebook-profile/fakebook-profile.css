@@ -558,7 +558,7 @@
 @media print {
   .fb-tools-bar, .fb-privacy-note, .fb-composer, .fb-reply-form, .fb-post-delete,
   .fb-reply-delete, .fb-remove-line, .fb-friend-remove, .fb-cover-edit,
-  .fb-toast, .site-main-nav, .milk-tea-site-footer, .account-coming-soon { display: none !important; }
+  .fb-about, .fb-toast, .site-main-nav, .milk-tea-site-footer, .account-coming-soon { display: none !important; }
   .fb-app { padding: 0; max-width: 100%; }
   body { background: #fff; }
 }
