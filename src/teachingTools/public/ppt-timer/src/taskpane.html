@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timer</title>
+  <link rel="stylesheet" href="taskpane.css">
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+</head>
+<body>
+  <main class="timer-shell">
+    <section class="timer-card">
+      <div class="timer-header">
+        <p class="eyebrow">PowerPoint Timer</p>
+        <h1>Timer</h1>
+      </div>
+
+      <div id="timeDisplay" class="time-display" aria-live="polite">01:00</div>
+
+      <div class="preset-row" aria-label="Preset countdown lengths">
+        <button class="preset-button" data-minutes="1">1 min</button>
+        <button class="preset-button" data-minutes="3">3 min</button>
+        <button class="preset-button" data-minutes="5">5 min</button>
+        <button class="preset-button" data-minutes="10">10 min</button>
+      </div>
+
+      <label class="custom-time">
+        Custom minutes
+        <input id="customMinutes" type="number" min="1" max="999" step="1" value="1">
+      </label>
+
+      <div class="control-row">
+        <button id="startButton" class="primary-button">Start</button>
+        <button id="pauseButton" class="secondary-button">Pause</button>
+        <button id="resetButton" class="secondary-button">Reset</button>
+      </div>
+
+      <button id="fullscreenButton" class="fullscreen-button">Fullscreen</button>
+    </section>
+  </main>
+
+  <div id="fullscreenTimer" class="fullscreen-timer" role="dialog" aria-modal="true" aria-label="Fullscreen timer">
+    <button id="exitFullscreenButton" class="exit-fullscreen" aria-label="Exit fullscreen">Exit</button>
+    <div id="fullscreenDisplay" class="fullscreen-display">01:00</div>
+  </div>
+
+  <audio id="beepAudio" preload="auto" src="../assets/beep.mp3"></audio>
+  <script src="taskpane.js"></script>
+</body>
+</html>
