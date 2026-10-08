@@ -13,12 +13,13 @@ const presetButtons = [...document.querySelectorAll(".preset-button")];
 let selectedSeconds = 60;
 let remainingSeconds = selectedSeconds;
 let intervalId = null;
-let endAt = null;
 let hasAlarmed = false;
 
-Office.onReady(() => {
+if (window.Office?.onReady) {
+  Office.onReady(render);
+} else {
   render();
-});
+}
 
 function selectMinutes(minutes) {
   selectedSeconds = Math.max(1, Math.floor(minutes)) * 60;
@@ -30,13 +31,13 @@ function selectMinutes(minutes) {
 
 function startTimer() {
   if (remainingSeconds <= 0) {
-    selectMinutes(Number(customMinutes.value) || 1);
+    remainingSeconds = selectedSeconds;
   }
 
-  endAt = Date.now() + remainingSeconds * 1000;
+  hasAlarmed = false;
   clearTimer();
   intervalId = window.setInterval(tick, 1000);
-  tick();
+  render();
 }
 
 function pauseTimer() {
@@ -44,7 +45,6 @@ function pauseTimer() {
     return;
   }
 
-  remainingSeconds = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
   clearTimer();
   render();
 }
@@ -57,7 +57,7 @@ function resetTimer() {
 }
 
 function tick() {
-  remainingSeconds = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+  remainingSeconds = Math.max(0, remainingSeconds - 1);
   render();
 
   if (remainingSeconds === 0) {
@@ -69,7 +69,6 @@ function tick() {
 function clearTimer() {
   window.clearInterval(intervalId);
   intervalId = null;
-  endAt = null;
 }
 
 function alarm() {
