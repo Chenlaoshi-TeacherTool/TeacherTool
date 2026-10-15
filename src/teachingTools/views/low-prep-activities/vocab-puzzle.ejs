@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>生词拼图生成器 · PDF Puzzle Maker - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Upload an A4 PDF or type Chinese words and cut the whole page into a printable jigsaw puzzle. Characters are split across pieces, so students rebuild the words as they put the page back together. Download PNG or PDF.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/vocab-puzzle/vocab-puzzle.css?v=3">
+</head>
+<body class="vp-page">
+  <main class="vp-wrap">
+    <header class="vp-header">
+      <div class="vp-header-content">
+        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+        <p class="vp-eyebrow">Vocabulary review · 生词复习</p>
+        <h1>🧩 生词拼图生成器 · PDF Puzzle Maker</h1>
+        <p>Upload an A4 PDF (a vocabulary page, a text, a worksheet) or type your words. The whole page is cut into jigsaw pieces — characters get split across pieces, so students have to rebuild the words to put the page back together.</p>
+        <div class="vp-hero-points" aria-label="Tool highlights">
+          <span>Whole page → jigsaw</span>
+          <span>2–24 pieces</span>
+          <span>Scrambled pieces · Board · Answer key</span>
+          <span>PNG · PDF · Print</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="vp-layout">
+      <section class="vp-builder" aria-label="Build your puzzle">
+
+        <section class="vp-panel">
+          <div class="vp-panel-heading">
+            <span class="vp-step">1</span>
+            <p class="vp-kicker">拼图内容 · Puzzle picture</p>
+            <h2>Choose the page</h2>
+          </div>
+
+          <div class="vp-tabs" role="tablist">
+            <button type="button" class="vp-tab is-active" role="tab" aria-selected="true" data-tab="pdf">📄 上传 PDF · Upload PDF</button>
+            <button type="button" class="vp-tab" role="tab" aria-selected="false" data-tab="type">⌨️ 输入词汇 · Type words</button>
+          </div>
+
+          <div class="vp-tab-panel" data-panel="pdf">
+            <label class="vp-drop" id="vp-drop" for="vp-file-input">
+              <input type="file" id="vp-file-input" accept="application/pdf,.pdf,image/png,image/jpeg" hidden>
+              <span class="vp-drop-icon" aria-hidden="true">📄</span>
+              <strong>Drop a PDF here or click to choose</strong>
+              <small>拖入 PDF 或点击选择 · A4 works best · PNG / JPG also OK</small>
+            </label>
+            <p id="vp-file-status" class="vp-note" aria-live="polite"></p>
+
+            <div id="vp-thumbs-wrap" class="vp-thumbs-wrap" hidden>
+              <div class="vp-thumbs-toolbar">
+                <span>Pages to turn into puzzles · 选择页面 (<strong id="vp-thumb-selected">0</strong> selected)</span>
+                <span class="vp-thumb-actions">
+                  <button type="button" class="vp-link" id="vp-thumb-all">All</button>
+                  <button type="button" class="vp-link" id="vp-thumb-none">None</button>
+                </span>
+              </div>
+              <div id="vp-thumbs" class="vp-thumbs"></div>
+            </div>
+          </div>
+
+          <div class="vp-tab-panel" data-panel="type" hidden>
+            <label for="vp-words">Words or sentences · 词语或句子 <small>(one per line, or separated by commas / 、)</small></label>
+            <textarea id="vp-words" rows="8" placeholder="苹果&#10;学校、朋友、老师&#10;我喜欢去图书馆看书。"></textarea>
+            <div class="vp-two">
+              <div>
+                <label for="vp-font">Font · 字体</label>
+                <select id="vp-font">
+                  <option value="kai">楷体 Kai</option>
+                  <option value="sans">黑体 Sans</option>
+                </select>
+              </div>
+              <div>
+                <label for="vp-text-style">Style · 样式</label>
+                <select id="vp-text-style">
+                  <option value="grid">Word boxes · 田字格风格</option>
+                  <option value="plain">Plain · 纯文字</option>
+                </select>
+              </div>
+            </div>
+            <div class="vp-options vp-options-spaced">
+              <label class="vp-check"><input type="checkbox" id="vp-show-pinyin"><span>Add pinyin above the words · 加拼音 <small>Filled in from the CC-CEDICT dictionary.</small></span></label>
+            </div>
+          </div>
+        </section>
+
+        <section class="vp-panel">
+          <div class="vp-panel-heading">
+            <span class="vp-step">2</span>
+            <p class="vp-kicker">拼图设置 · Puzzle settings</p>
+            <h2>Cut the puzzle</h2>
+          </div>
+
+          <label for="vp-title">Title on the sheet · 标题 <small>(optional)</small></label>
+          <input type="text" id="vp-title" placeholder="e.g. 第三课 · 我的学校" maxlength="60">
+
+          <label>Number of pieces · 拼图块数</label>
+          <div class="vp-pieces" id="vp-pieces" role="radiogroup" aria-label="Number of pieces">
+            <button type="button" data-n="2">2</button>
+            <button type="button" data-n="4">4</button>
+            <button type="button" data-n="6">6</button>
+            <button type="button" data-n="8">8</button>
+            <button type="button" data-n="12" class="is-active">12</button>
+            <button type="button" data-n="16">16</button>
+            <button type="button" data-n="20">20</button>
+            <button type="button" data-n="24">24</button>
+          </div>
+          <label for="vp-size">Puzzle size · 拼图大小</label>
+          <select id="vp-size">
+            <option value="1">100% — full page · 整页大小</option>
+            <option value="0.85">85% — fewer piece sheets · 少用纸</option>
+            <option value="0.7">70% — fewest piece sheets · 最省纸</option>
+          </select>
+          <p class="vp-note">More pieces = more characters cut apart = harder. 块数越多，被切开的字越多，难度越高。</p>
+
+          <label>Pages to print · 打印页面</label>
+          <div class="vp-options">
+            <label class="vp-check"><input type="checkbox" id="vp-out-scrambled" checked><span>打乱的拼图块 · Scrambled pieces <small>Pieces spread out in random order — students cut them out and rebuild the page.</small></span></label>
+            <label class="vp-check"><input type="checkbox" id="vp-out-board" checked><span>拼图底板 · Assembly board <small>Outline of every piece, same size, to build on.</small></span></label>
+            <label class="vp-check"><input type="checkbox" id="vp-out-cut" checked><span>整页 + 剪裁线 · Whole page with cut lines <small>Answer key — or cut it yourself and hand out the pieces.</small></span></label>
+          </div>
+
+          <label>Options · 选项</label>
+          <div class="vp-options">
+            <label class="vp-check"><input type="checkbox" id="vp-dashed"><span>Dashed cut lines · 虚线剪裁线</span></label>
+            <label class="vp-check"><input type="checkbox" id="vp-straight"><span>Straight cuts (no knobs) · 直线切割 <small>Easier for younger students — no jigsaw shape hints.</small></span></label>
+          </div>
+
+          <button id="vp-generate" class="vp-btn vp-btn-primary" type="button">🧩 Make puzzle · 生成拼图</button>
+        </section>
+      </section>
+
+      <section class="vp-preview-panel" aria-label="Puzzle preview">
+        <div class="vp-preview-toolbar">
+          <div class="vp-count-box">
+            <span class="vp-count-label">Pages</span>
+            <span id="vp-page-count">0</span>
+          </div>
+          <div class="vp-actions">
+            <button id="vp-reshape" class="vp-btn vp-btn-outline" type="button" disabled title="Same page, new piece shapes">🔀 New cut</button>
+            <button id="vp-png" class="vp-btn vp-btn-outline" type="button" disabled>⬇️ PNG</button>
+            <button id="vp-pdf" class="vp-btn vp-btn-primary" type="button" disabled>⬇️ PDF</button>
+            <button id="vp-print" class="vp-btn vp-btn-outline" type="button" disabled>🖨️ Print</button>
+          </div>
+        </div>
+        <p id="vp-status" class="vp-status" aria-live="polite">Upload a PDF or type words, then click “Make puzzle”.</p>
+
+        <div id="vp-empty" class="vp-empty">
+          <div class="vp-empty-icon" aria-hidden="true">🧩</div>
+          <h2>No puzzle yet · 还没有拼图</h2>
+          <p>Your A4 page will be cut into jigsaw pieces here. Pages print on A4.</p>
+        </div>
+
+        <div id="vp-pages" class="vp-pages"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="vp-print-area" aria-hidden="true"></div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/low-prep/vocab-puzzle/pdfjs/pdf.min.js"></script>
+  <script src="/low-prep/vocab-puzzle/vocab-puzzle.js?v=4" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
