@@ -1,0 +1,47 @@
+/* 汉字笔顺练习纸 · Stroke Order Worksheet — app chrome (worksheet styles live inline in #ws-css) */
+.so-page{
+  --navy:#1F3A5F; --navy-2:#2E4D75;
+  --sage:#7E9F7A; --sage-light:#E6EEE3;
+  --gold:#F2B935; --gold-light:#FFF3D3;
+  --ink:#1E2635; --muted:#5F6B7A; --line:#D7DDE4; --bg:#F4F6F1;
+}
+.so-app *{box-sizing:border-box}
+.so-app{max-width:900px;margin:0 auto;padding:20px 16px 40px;color:var(--ink);
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif}
+.so-app .back-btn{display:inline-block;margin-bottom:12px;color:var(--navy);background:#fff;border:1px solid var(--line);
+  border-radius:8px;padding:6px 12px;text-decoration:none;font-size:14px}
+.so-app .back-btn:hover{border-color:var(--navy)}
+.so-app .app-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.so-app .app-head h1{margin:0;font-size:22px;color:var(--navy)}
+.so-app .app-head p{margin:0;color:var(--muted);font-size:14px}
+.so-app .controls{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;
+  display:grid;gap:14px;border-top:5px solid var(--sage)}
+.so-app .row,.so-modal .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.so-app .field{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--muted)}
+.so-app .field input[type=text],.so-app .field input[type=number],.so-app .field select{
+  font:inherit;font-size:15px;color:var(--ink);padding:8px 10px;border:1px solid var(--line);
+  border-radius:8px;background:#fff;min-height:40px}
+.so-app .field input[type=number]{width:80px}
+.so-app #chars{font-size:24px;width:260px;max-width:100%;letter-spacing:4px}
+.so-app .check{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--ink);min-height:40px}
+.so-app button,.so-modal button{font:inherit;font-size:14px;border-radius:8px;padding:9px 14px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--navy);min-height:40px}
+.so-app button:hover,.so-modal button:hover{border-color:var(--navy)}
+.so-app button.primary,.so-modal button.primary{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600}
+.so-app button.primary:hover,.so-modal button.primary:hover{background:var(--navy-2)}
+.so-app button:focus-visible,.so-app input:focus-visible,.so-app select:focus-visible,.so-modal button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.so-app .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.so-app .status{font-size:14px;color:var(--muted);min-height:20px}
+.so-app .status.err{color:#B4232A}
+.so-app .hint,.so-modal .hint{font-size:12.5px;color:var(--muted);margin:0}
+.so-app .preview-wrap{overflow-x:auto}
+.so-modal{position:fixed;inset:0;background:rgba(20,30,45,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
+.so-modal.open{display:flex}
+.so-modal .modal-box{background:#fff;border-radius:14px;padding:18px;width:min(760px,100%);max-height:90vh;display:flex;flex-direction:column;gap:10px}
+.so-modal .modal-box h2{margin:0;font-size:17px;color:var(--navy)}
+.so-modal textarea{width:100%;flex:1;min-height:300px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:8px;padding:10px}
+@media print{
+  .so-page{background:#fff}
+  .no-print,.tool-learning-guide,.milk-tea-footer,#milkTeaFooter{display:none !important}
+  .so-app{padding:0;max-width:none}
+}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>汉字笔顺练习纸 · Stroke Order Worksheet - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Type Chinese characters and instantly get a printable stroke-order worksheet: colour-coded stroke-by-stroke breakdown, pinyin, English meaning, and 田字格 / 米字格 tracing practice boxes.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/stroke-order-worksheet/stroke-order-worksheet.css?v=1">
+<style id="ws-css">
+/* ---------- Worksheet (this block is copied into the embed code) ---------- */
+.cls-ws{--ws-navy:#1F3A5F;--ws-sage:#7E9F7A;--ws-gold:#E0A21B;--ws-muted:#5F6B7A;--ws-line:#D7DDE4;
+  background:#fff;color:#1E2635;max-width:816px;margin:0 auto;padding:32px 36px;border-radius:6px;
+  box-shadow:0 1px 3px rgba(31,58,95,.12);
+  font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif}
+.cls-ws svg{display:block;width:100%;height:auto}
+.cls-ws .ws-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;
+  border-bottom:2px solid var(--ws-navy);padding-bottom:10px;margin-bottom:6px}
+.cls-ws .ws-title{font-size:22px;font-weight:700;color:var(--ws-navy);margin:0}
+.cls-ws .ws-title small{font-size:14px;font-weight:400;color:var(--ws-muted);margin-left:8px}
+.cls-ws .ws-name{font-size:13px;color:var(--ws-muted);white-space:nowrap}
+.cls-ws .ws-name span{display:inline-block;width:110px;border-bottom:1px solid #9AA4B1;margin:0 14px 0 4px}
+.cls-ws .ws-char{padding:18px 0 20px;border-bottom:1px dashed var(--ws-line);break-inside:avoid;page-break-inside:avoid}
+.cls-ws .ws-head{display:flex;gap:22px;align-items:center}
+.cls-ws .ws-big{width:150px;flex:none}
+.cls-ws .ws-pinyin{font-size:34px;font-weight:600;color:var(--ws-navy);line-height:1.1;outline:none}
+.cls-ws .ws-meaning{font-size:16px;margin-top:6px;outline:none}
+.cls-ws .ws-facts{font-size:13px;color:var(--ws-muted);margin-top:8px;display:flex;gap:18px;flex-wrap:wrap}
+.cls-ws .ws-facts b{color:#1E2635;font-weight:600}
+.cls-ws .ws-label{font-size:12.5px;color:var(--ws-muted);margin:14px 0 6px}
+.cls-ws .ws-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px}
+.cls-ws .ws-step{position:relative}
+.cls-ws .ws-step b{position:absolute;top:2px;left:4px;font-size:11px;color:var(--ws-muted);font-weight:600}
+.cls-ws .ws-practice{display:grid;grid-template-columns:repeat(var(--cols,8),1fr);border-left:1.5px solid var(--ws-sage);border-top:1.5px solid var(--ws-sage)}
+.cls-ws .ws-practice svg{border-right:1.5px solid var(--ws-sage);border-bottom:1.5px solid var(--ws-sage)}
+.cls-ws .ws-foot{font-size:11px;color:#8A94A1;margin-top:12px;text-align:right}
+.cls-ws [contenteditable]:hover{background:#FFF3D3}
+@media (max-width:560px){
+  .cls-ws{padding:18px 14px}
+  .cls-ws .ws-big{width:96px}
+  .cls-ws .ws-pinyin{font-size:26px}
+  .cls-ws .ws-name{white-space:normal}
+  .cls-ws .ws-name span{width:80px}
+}
+@media print{
+  .cls-ws{box-shadow:none;padding:0;max-width:none}
+  .cls-ws [contenteditable]:hover{background:none}
+}
+</style>
+</head>
+<body class="so-page">
+<main class="so-app">
+  <a href="/teaching-tools#low-prep-activities" class="back-btn no-print">← Back to Teaching Tools</a>
+  <header class="app-head no-print">
+    <h1>✍️ 汉字笔顺练习纸</h1>
+    <p>输入汉字，自动生成笔顺分解与练习格 · Stroke order worksheet generator</p>
+  </header>
+
+  <section class="controls no-print" aria-label="设置">
+    <div class="row">
+      <label class="field">汉字 Characters（最多 12 个）
+        <input id="chars" type="text" value="大小人" maxlength="40" autocomplete="off">
+      </label>
+      <button class="primary" id="go">生成练习纸</button>
+    </div>
+    <div class="row">
+      <label class="field">格子 Grid
+        <select id="grid">
+          <option value="tian">田字格</option>
+          <option value="mi">米字格</option>
+          <option value="fang">方格</option>
+        </select>
+      </label>
+      <label class="field">每行格数 Columns
+        <input id="cols" type="number" min="5" max="12" value="8">
+      </label>
+      <label class="field">练习行数 Rows
+        <input id="rows" type="number" min="1" max="10" value="3">
+      </label>
+      <label class="field">第一行描红 Traces
+        <input id="trace" type="number" min="0" max="11" value="4">
+      </label>
+      <label class="check"><input id="rowTrace" type="checkbox" checked>每行首格描红</label>
+      <label class="check"><input id="nameLine" type="checkbox" checked>姓名/日期栏</label>
+    </div>
+    <p class="hint">提示：生成后可直接点击拼音和英文释义进行修改（多音字可删去不需要的读音）。</p>
+  </section>
+
+  <div class="toolbar no-print">
+    <button id="dlPng">下载 PNG</button>
+    <button id="dlSvg">下载 SVG</button>
+    <button id="embed">复制 HTML 嵌入代码</button>
+    <button id="print">打印 / 存为 PDF</button>
+    <button id="share">复制分享链接</button>
+  </div>
+  <div class="status no-print" id="status" role="status"></div>
+
+  <div class="preview-wrap"><div class="cls-ws" id="worksheet"></div></div>
+</main>
+
+<div class="so-modal no-print" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <h2 id="modalTitle">HTML + CSS 嵌入代码</h2>
+    <p class="hint">整段粘贴到网页中即可显示当前练习纸；样式都限定在 .cls-ws 内，不会影响网站其它部分。</p>
+    <textarea id="code" readonly></textarea>
+    <div class="row">
+      <button class="primary" id="copyCode">复制代码</button>
+      <button id="dlHtml">下载 .html 文件</button>
+      <button id="closeModal">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="no-print">
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+</div>
+
+<script src="/low-prep/stroke-order-worksheet/stroke-dict.js?v=1"></script>
+<script src="/low-prep/stroke-order-worksheet/stroke-order-worksheet.js?v=1"></script>
+<script src="/javascripts/account-coming-soon.js"></script>
+<script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

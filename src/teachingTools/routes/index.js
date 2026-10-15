@@ -213,6 +213,10 @@ router.get('/teaching-tools/vocab-glossary', function(req, res, next) {
   res.render('low-prep-activities/vocab-glossary', { title: '生词表生成器 · Article Vocabulary Builder', toolGuide: siteContentStore.get().toolGuides['vocab-glossary'] });
 });
 
+router.get('/teaching-tools/stroke-order-worksheet', function(req, res, next) {
+  res.render('low-prep-activities/stroke-order-worksheet', { title: '汉字笔顺练习纸 · Stroke Order Worksheet', toolGuide: siteContentStore.get().toolGuides['stroke-order-worksheet'] });
+});
+
 router.get('/low-prep-activities', function(req, res) {
   res.redirect(301, '/teaching-tools#low-prep-activities');
 });
@@ -220,7 +224,8 @@ router.get('/low-prep-activities', function(req, res) {
 [
   'word-sudoku', 'word-cloud', 'independent-reading', 'tear-paper-bingo',
   'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle',
-  'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary'
+  'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary',
+  'stroke-order-worksheet'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -261,7 +266,8 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle',
     '/teaching-tools/bingo-generator', '/teaching-tools/emoji-search', '/teaching-tools/image-revealer', '/teaching-tools/zoom-reveal',
     '/teaching-tools/name-tent-generator', '/teaching-tools/flash-card-generator', '/teaching-tools/sentence-reorder', '/teaching-tools/witchs-poison',
-    '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary'
+    '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary',
+    '/teaching-tools/stroke-order-worksheet'
   ].concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var urls = paths.map(function(path) {
     return '  <url><loc>' + baseUrl + path + '</loc></url>';
