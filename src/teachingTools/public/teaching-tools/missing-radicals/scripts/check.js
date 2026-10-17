@@ -1,0 +1,19 @@
+'use strict';
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path');
+const source=fs.readFileSync(path.join(__dirname,'../app.js'),'utf8');
+const settings={count:{value:'2'},selection:{value:'random'}};
+const context=vm.createContext({document:{getElementById:id=>settings[id]},console});
+vm.runInContext(source.slice(0,source.indexOf('async function loadChar')),context);
+vm.runInContext(`
+cache.set('请',{strokes:Array(10).fill(''),radStrokes:[0,1]});
+components={'请':[0,0,1,1,1,1,1,1,1,1]};
+if(JSON.stringify(chooseHidden('请','radical',rng('x')).hidden)!=='[0,1]')throw Error('radical');
+if(JSON.stringify(chooseHidden('请','component',rng('x')).hidden)!=='[2,3,4,5,6,7,8,9]')throw Error('component');
+if(JSON.stringify(chooseHidden('请','strokes',rng('x')))!==JSON.stringify(chooseHidden('请','strokes',rng('x'))))throw Error('seed');
+`,context);
+const geometry=source.slice(source.indexOf('function resample('),source.indexOf('let teams='));vm.runInContext(geometry,context);
+assert.equal(vm.runInContext('matchesStroke([[100,100],[500,100]],[[100,800],[500,800]])',context),true);
+assert.equal(vm.runInContext('matchesStroke([[500,100],[100,100]],[[100,800],[500,800]])',context),false);
+assert.equal(vm.runInContext('matchesStroke([[100,700],[500,700]],[[100,800],[500,800]])',context),false);
+const data=JSON.parse(fs.readFileSync(path.join(__dirname,'../data/components.json'),'utf8'));assert(Object.keys(data).length>2600);for(const char of '请问宿舍语言学生餐厅美国汉语空姐学院进来加拿大星空知道记者空地可以朋友')assert(Array.isArray(data[char]),char);
+console.log('PASS: radical/component mapping, seeded strokes, directed median checks, sample coverage');
