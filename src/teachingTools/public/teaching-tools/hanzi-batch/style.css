@@ -1,0 +1,116 @@
+/* App styles stay scoped so the shared navigation and footer retain their own layout. */
+.hanzi-page {
+  margin: 0;
+  color: var(--ink, #193d38);
+  background-color: var(--cream, #fff9e9);
+  background-image: radial-gradient(rgba(34,91,70,.075) .8px, transparent .8px);
+  background-size: 16px 16px;
+  font-family: 'Nunito', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  line-height: 1.65;
+}
+.hanzi-hero { position: relative; padding: 58px 24px 35px; text-align: center; background: #194f45; color: #fffdf7; }
+.hanzi-hero .back-btn { position: absolute; top: 15px; left: 24px; padding: 6px 13px; font-size: 12px; text-decoration: none; }
+.hanzi-hero .hanzi-kicker { margin: 0 0 8px; color: #ffe18a; font-size: 12px; font-weight: 800; letter-spacing: .12em; }
+.hanzi-hero h1 { margin: 0 0 10px; font-size: clamp(25px, 3vw, 38px); line-height: 1.4; }
+.hanzi-hero > p:not(.hanzi-kicker) { margin: 0; font-size: 14px; }
+.hanzi-hero-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
+.hanzi-hero-tags span { border: 1px solid #ffffff3d; border-radius: 999px; padding: 4px 12px; color: #fff2c5; font-size: 12px; }
+#hanziApp { max-width: 1440px; margin: 28px auto 0; padding: 0 24px; display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 24px; align-items: start; font-size: 15px; }
+#hanziApp * { box-sizing: border-box; }
+#hanziApp .panel { min-width: 0; background: var(--paper, #fffdf7); border: 1px solid var(--line, #e5ddc9); border-radius: 20px; padding: 25px; box-shadow: var(--shadow, 0 14px 30px #1842371f); }
+#hanziApp .inputpanel { position: sticky; top: 20px; border-top: 5px solid var(--sun, #f8c63f); }
+#hanziApp .eyebrow { font-size: 12px; color: var(--leaf, #356e57); font-weight: 800; }
+#hanziApp h2 { color: var(--chalk, #194f45); font-size: 18px; margin: 13px 0; line-height: 1.5; }
+#hanziApp .inputtitle { font-size: 23px; margin: 7px 0 5px; }
+#hanziApp small, #hanziApp .muted, #hanziApp .hint { color: var(--muted, #5d7168); font-weight: 400; }
+#hanziApp .muted { margin: 0 0 20px; font-size: 13px; }
+#hanziApp .hint { font-size: 12px; line-height: 1.8; }
+#hanziApp label { display: block; font-size: 13px; font-weight: 700; margin: 12px 0 7px; }
+#hanziApp textarea, #hanziApp select { width: 100%; border: 1px solid #cfd8c5; border-radius: 12px; padding: 11px; background: #fffef9; font: inherit; color: inherit; }
+#hanziApp textarea { resize: vertical; line-height: 1.6; }
+#hanziApp button { min-height: 42px; font: inherit; font-weight: 800; border: 1px solid var(--line, #e5ddc9); background: #fffdf7; color: var(--chalk, #194f45); border-radius: 999px; padding: 9px 15px; cursor: pointer; }
+#hanziApp button:disabled { opacity: .4; cursor: default; }
+#hanziApp button:focus-visible, #hanziApp input:focus-visible, #hanziApp select:focus-visible, #hanziApp textarea:focus-visible { outline: 3px solid var(--sun, #f8c63f); outline-offset: 3px; }
+#hanziApp .primary { background: var(--coral, #c9503f); border-color: transparent; color: #fff; box-shadow: 0 4px 0 #9d392f; }
+#hanziApp .secondary { background: #edf5df; color: var(--chalk, #194f45); border-color: #d8e5c7; }
+#hanziApp .wide { width: 100%; margin-top: 10px; }
+#hanziApp .text { min-height: 32px; border: 0; background: none; padding: 4px; font-size: 12px; }
+#hanziApp .sectionhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#hanziApp .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+#hanziApp .chip { display: flex; border: 1px solid var(--line, #e5ddc9); border-radius: 12px; padding: 4px; align-items: center; background: #fffef9; }
+#hanziApp .chip.active { border-color: var(--chalk, #194f45); background: #edf5df; }
+#hanziApp .chip button { font-size: 25px; padding: 0 7px; background: none; border: 0; }
+#hanziApp .chip.missing { opacity: .4; }
+#hanziApp .chip input { margin: 0 3px; }
+#hanziApp input { accent-color: var(--leaf, #356e57); }
+#hanziApp hr { border: 0; border-top: 1px solid var(--line, #e5ddc9); margin: 24px 0; }
+#hanziApp .workspace { display: grid; min-width: 0; gap: 22px; }
+#hanziApp .playerhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+#hanziApp .chartitle { display: flex; align-items: center; gap: 15px; margin-top: 5px; }
+#hanziApp .chartitle strong { font-size: 40px; color: var(--chalk, #194f45); line-height: 1.5; }
+#hanziApp .chartitle .muted { margin: 0; }
+#hanziApp .tag { background: #edf5df; border-radius: 999px; padding: 5px 11px; color: var(--leaf, #356e57); font-size: 13px; }
+#hanziApp #stage { position: relative; width: min(100%, 380px); aspect-ratio: 1; margin: 8px auto 18px; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 4px 20px #4b4d2910; }
+#hanziApp .grid, #hanziApp .writer { position: absolute; inset: 0; width: 100%; height: 100%; }
+#hanziApp .writer svg { width: 100%; height: 100%; }
+#hanziApp .meterlabel { display: flex; justify-content: space-between; max-width: 380px; margin: auto; font-size: 13px; color: var(--muted, #5d7168); }
+#hanziApp progress { display: block; width: 100%; height: 9px; border: 0; border-radius: 8px; overflow: hidden; accent-color: var(--leaf, #356e57); }
+#hanziApp progress::-webkit-progress-bar { background: #e9efdf; }
+#hanziApp progress::-webkit-progress-value { background: var(--leaf, #356e57); }
+#hanziApp #strokeProgress { max-width: 380px; margin: 10px auto 18px; }
+#hanziApp .controls { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; padding: 17px 0; border-block: 1px solid var(--line, #e5ddc9); }
+#hanziApp .inline { display: inline-flex; align-items: center; gap: 7px; margin: 0; font-weight: 400; }
+#hanziApp .speed { margin: 0 0 0 auto; font-size: 12px; }
+#hanziApp .speed input { display: block; max-width: 145px; }
+#hanziApp .legend { display: flex; flex-wrap: wrap; gap: 7px; padding: 16px 0; }
+#hanziApp .legend button { min-height: 34px; color: white; border: 0; border-radius: 10px; padding: 6px 10px; font-size: 12px; }
+#hanziApp .settings { display: flex; gap: 14px; border-top: 1px solid var(--line, #e5ddc9); }
+#hanziApp .settings label { flex: 1; min-width: 0; }
+#hanziApp .settings select { padding: 8px; margin-top: 6px; }
+#hanziApp input[type=color] { display: block; width: 100%; height: 42px; margin-top: 6px; padding: 3px; border: 1px solid var(--line, #e5ddc9); border-radius: 10px; }
+#hanziApp .single { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 16px; font-size: 13px; }
+#hanziApp .single b { margin-right: 5px; }
+#hanziApp .single button { padding: 8px 12px; }
+#hanziApp .exportpanel { border-top: 5px solid var(--sun, #f8c63f); }
+#hanziApp .exportoptions { display: flex; gap: 20px; align-items: center; }
+#hanziApp fieldset { flex: 1; border: 0; padding: 0; margin: 0; }
+#hanziApp legend { font-size: 12px; color: var(--muted, #5d7168); }
+#hanziApp fieldset label { display: inline-flex; gap: 5px; margin: 10px 15px 10px 0; font-weight: 400; }
+#hanziApp .exportoptions > label { min-width: 110px; }
+#hanziApp .exportoptions select { margin-top: 5px; }
+#hanziApp .exportbottom { display: flex; align-items: center; gap: 12px; margin-top: 15px; }
+#hanziApp .exportbottom .hint { flex: 1; }
+#hanziApp #status { min-height: 20px; font-size: 12px; color: var(--leaf, #356e57); margin-bottom: 0; }
+#hanziApp [hidden] { display: none !important; }
+.hanzi-related { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 24px; margin: 30px 20px 0; color: var(--muted, #5d7168); font-size: 13px; }
+.hanzi-related a { color: var(--chalk, #194f45); font-weight: 800; text-underline-offset: 4px; }
+.hanzi-attribution { text-align: center; color: var(--muted, #5d7168); font-size: 11px; padding: 18px 20px 28px; margin: 0; }
+#hanziApp #playerPanel:fullscreen { overflow: auto; border-radius: 0; background: var(--paper, #fffdf7); display: flex; flex-direction: column; justify-content: center; }
+#hanziApp #playerPanel:fullscreen #stage { width: min(55vh, 650px); flex-shrink: 0; }
+@media (hover: hover) and (pointer: fine) {
+  #hanziApp button:enabled:hover { border-color: var(--leaf, #356e57); background-color: #edf5df; }
+  #hanziApp .primary:enabled:hover { background-color: #d75d49; border-color: transparent; }
+  #hanziApp .legend button:enabled:hover { filter: brightness(.92); }
+}
+@media (max-width: 1050px) {
+  #hanziApp { grid-template-columns: 270px minmax(0, 1fr); padding: 0 16px; gap: 16px; }
+  #hanziApp .panel { padding: 20px; }
+  #hanziApp .controls .speed { margin-left: 0; }
+  #hanziApp .exportbottom, #hanziApp .exportoptions { flex-wrap: wrap; }
+}
+@media (max-width: 720px) {
+  .hanzi-hero { padding: 65px 18px 28px; }
+  .hanzi-hero .back-btn { left: 16px; }
+  .hanzi-hero-tags { gap: 6px; }
+  .hanzi-hero-tags span { padding: 3px 9px; font-size: 11px; }
+  #hanziApp { display: block; margin-top: 18px; }
+  #hanziApp .inputpanel { position: static; margin-bottom: 16px; }
+  #hanziApp .panel { border-radius: 16px; }
+  #hanziApp .workspace { gap: 16px; }
+  #hanziApp .settings { gap: 8px; }
+  #hanziApp .settings select { font-size: 12px; }
+  #hanziApp .exportbottom .hint { flex-basis: 100%; }
+  #hanziApp .chartitle { gap: 9px; }
+  #hanziApp .chartitle strong { font-size: 34px; }
+  #hanziApp .playerhead > button { padding: 8px 12px; white-space: nowrap; }
+}

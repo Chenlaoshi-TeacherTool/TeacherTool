@@ -124,6 +124,10 @@ router.get('/teaching-tools/fakebook-profile', function(req, res) {
   res.redirect(302, '/teaching-tools/fakebook-profile/fakebook-profile.html');
 });
 
+router.get('/teaching-tools/hanzi-batch', function(req, res) {
+  res.redirect(302, '/teaching-tools/hanzi-batch/index.html');
+});
+
 router.get('/teaching-tools/fake-wechat-moments', function(req, res) {
   res.redirect(302, '/teaching-tools/fake-wechat-moments/');
 });
@@ -271,7 +275,8 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/bingo-generator', '/teaching-tools/emoji-search', '/teaching-tools/image-revealer', '/teaching-tools/zoom-reveal',
     '/teaching-tools/name-tent-generator', '/teaching-tools/flash-card-generator', '/teaching-tools/sentence-reorder', '/teaching-tools/witchs-poison',
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary',
-    '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle'
+    '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle',
+    '/teaching-tools/hanzi-batch/index.html'
   ].concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var urls = paths.map(function(path) {
     return '  <url><loc>' + baseUrl + path + '</loc></url>';
