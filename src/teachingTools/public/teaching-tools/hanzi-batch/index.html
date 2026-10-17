@@ -5,7 +5,7 @@
 <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/hanzi-batch/index.html">
 <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/stylesheets/site-theme.css">
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 <script src="/javascripts/clarity.js"></script></head>
 <body class="hanzi-page">
 <header class="header hanzi-hero">
@@ -15,10 +15,14 @@
   <p>从一个字，到一整堂课。看笔顺、做课件、印练习，一次备好。</p>
   <div class="hanzi-hero-tags"><span>动态笔顺预览</span><span>批量打包下载</span><span>文件在本机生成</span></div>
 </header>
-<main id="hanziApp"><aside class="panel inputpanel"><div class="eyebrow">第一步 · 添加汉字</div><h2 class="inputtitle">准备本课汉字</h2><p class="muted">粘贴文字，或从课程库加入。</p>
+<main id="hanziApp"><aside class="panel inputpanel"><div class="eyebrow">第一步 · 添加汉字</div><h2 class="inputtitle">准备本课汉字</h2><p class="muted">粘贴文字，或从 Word Bank 加入。</p>
 <label for="input">输入或粘贴汉字</label><textarea id="input" rows="3" placeholder="例如：你好，大家好！">你好大家</textarea><button id="add" class="primary wide">生成汉字列表</button><p class="hint">只保留汉字，自动去重，按首次出现排序。</p>
 <div class="sectionhead"><h2>待生成汉字 <small id="count">0</small></h2><button id="clear" class="text">清空</button></div><div id="chips" class="chips"></div><p class="hint">点汉字预览 · 勾选后批量导出</p>
-<hr><h2>字库点选 <small>示例课程</small></h2><label for="book">教材</label><select id="book"></select><label for="lesson">课次</label><select id="lesson"></select><button id="lessonAdd" class="secondary wide">＋ 加入本课</button><p class="hint">课程库目前为示例，可按教学需要补充。</p>
+<hr><div class="sectionhead"><h2>Word Bank 词库</h2><button id="wordBankReload" class="text" type="button">刷新</button></div>
+<label for="wordBank">选择词表</label><select id="wordBank" disabled><option value="">正在加载词库…</option></select>
+<button id="wordBankAdd" class="secondary wide" type="button" disabled>＋ 提取汉字并加入</button>
+<p id="wordBankStatus" class="hint" role="status" aria-live="polite">正在加载网站 Word Bank…</p>
+<p class="hint">仅提取中文词条中的汉字，自动去重。<a href="/teaching-tools/word-list-library">打开 Word Bank →</a></p>
 </aside><section class="workspace"><section class="panel playerpanel" id="playerPanel"><div class="playerhead"><div><span class="eyebrow">第二步 · 预览笔顺</span><div class="chartitle"><strong id="char">—</strong><span class="tag" id="strokes">0 画</span><span class="muted" id="position">第 0 / 0 字</span></div></div><button id="fullscreen" class="secondary">⛶ 全屏</button></div>
 <div id="stage" aria-label="汉字笔顺播放器"></div><div class="meterlabel"><span>笔顺进度</span><span id="step">0 / 0 画</span></div><progress id="strokeProgress" value="0" max="1"></progress>
 <div class="controls"><button id="prev" aria-label="上一个字">◀</button><button id="play" class="primary">▶ 播放</button><button id="next" aria-label="下一个字">▶</button><button id="reset">重置</button><label class="inline"><input id="loop" type="checkbox">循环播放</label><label class="speed">每笔 <output id="speedLabel">700 ms</output><input id="speed" type="range" min="200" max="1600" step="50" value="700"></label></div>
@@ -28,4 +32,4 @@
 <div class="hanzi-related"><span>还需要纸上练习？</span><a href="/teaching-tools/stroke-order-worksheet">汉字笔顺练习纸 →</a><a href="/teaching-tools/word-list-library">词表库 →</a></div>
 <p class="hanzi-attribution">Stroke data from Make Me a Hanzi (Arphic Public License) via Hanzi Writer.</p>
 <footer></footer>
-<script src="vendor/hanzi-writer.min.js"></script><script src="vendor/gif.js"></script><script src="vendor/jszip.min.js"></script><script src="vendor/jspdf.umd.min.js"></script><script type="module" src="app.js?v=2"></script><script src="/javascripts/milk-tea-footer.js"></script></body></html>
+<script src="vendor/hanzi-writer.min.js"></script><script src="vendor/gif.js"></script><script src="vendor/jszip.min.js"></script><script src="vendor/jspdf.umd.min.js"></script><script type="module" src="app.js?v=3"></script><script src="/javascripts/milk-tea-footer.js"></script></body></html>

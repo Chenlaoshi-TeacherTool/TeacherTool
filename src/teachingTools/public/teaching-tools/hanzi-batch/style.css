@@ -25,6 +25,7 @@
 #hanziApp small, #hanziApp .muted, #hanziApp .hint { color: var(--muted, #5d7168); font-weight: 400; }
 #hanziApp .muted { margin: 0 0 20px; font-size: 13px; }
 #hanziApp .hint { font-size: 12px; line-height: 1.8; }
+#hanziApp .hint a { color: var(--chalk, #194f45); font-weight: 700; text-underline-offset: 3px; }
 #hanziApp label { display: block; font-size: 13px; font-weight: 700; margin: 12px 0 7px; }
 #hanziApp textarea, #hanziApp select { width: 100%; border: 1px solid #cfd8c5; border-radius: 12px; padding: 11px; background: #fffef9; font: inherit; color: inherit; }
 #hanziApp textarea { resize: vertical; line-height: 1.6; }

@@ -6,7 +6,7 @@ import {svg} from './exporters/svg.js';
 import {png} from './exporters/png.js';
 import {breakdown} from './exporters/breakdown.js';
 const $=id=>document.getElementById(id);
-let items=[],current=-1,lessons=[],controller=null,viewToken=0;
+let items=[],current=-1,controller=null,viewToken=0;
 const options=()=>({grid:$('grid').value,scheme:$('scheme').value,color:$('color').value,speed:Number($('speed').value),size:Number($('size').value),pdf:$('pdf').checked});
 const status=text=>$('status').textContent=text;
 const player=new Player($('stage'),n=>{const total=items[current]?.data?.strokes.length||0;$('step').textContent=`${n} / ${total} 画`;$('strokeProgress').max=total||1;$('strokeProgress').value=n;});
@@ -44,9 +44,9 @@ $('prev').onclick=()=>{for(let i=current-1;i>=0;i--)if(items[i].data){show(i);br
 $('next').onclick=()=>{for(let i=current+1;i<items.length;i++)if(items[i].data){show(i);break;}};
 $('play').onclick=()=>player.play(()=>$('loop').checked).catch(e=>status(e.message));$('reset').onclick=()=>player.step(0);
 $('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('playerPanel').requestFullscreen();}catch(e){status('此浏览器不支持全屏显示');}};
-function busy(value){$('hanziApp').querySelectorAll('button,input,select,textarea').forEach(el=>{if(el.id!=='cancel')el.disabled=value;});if(!value)render();$('cancel').hidden=!value;$('exportProgress').hidden=!value;}
+function busy(value){$('hanziApp').querySelectorAll('button,input,select,textarea').forEach(el=>{if(el.id!=='cancel')el.disabled=value;});if(!value){render();updateWordBankControls();}$('cancel').hidden=!value;$('exportProgress').hidden=!value;}
 async function run(job){
-  if(controller)return;controller=new AbortController();const signal=controller.signal;player.stop();busy(true);$('exportProgress').value=0;
+  if(controller)return;if(wordBankImporting)return status('正在提取词库汉字，请稍候。');controller=new AbortController();const signal=controller.signal;player.stop();busy(true);$('exportProgress').value=0;
   try{await job(signal,(p,label)=>{$('exportProgress').value=p;status(`${label} · ${Math.round(p*100)}%`);});status('生成完成，文件已下载。');}
   catch(e){status(e.name==='AbortError'?'已取消生成，未下载未完成文件。':`生成失败：${e.message}`);}
   finally{controller=null;busy(false);}
@@ -58,10 +58,44 @@ $('export').onclick=()=>{
   run(async(signal,progress)=>{const result=await batch(selected,formats,o,signal,progress);check(signal);download(result,'汉字笔顺_批量导出.zip');});
 };
 document.querySelectorAll('[data-single]').forEach(b=>b.onclick=()=>{const item=items[current],format=b.dataset.single,o=options();if(!item?.data)return;run(async(signal,progress)=>{const result=await ({gif,svg,png,breakdown}[format])(item.data,o,signal,p=>progress(p,item.char));check(signal);download(result,`${item.char}${format==='breakdown'?'_分解图.png':'.'+format}`);});});
-function fillLessons(){const book=lessons[Number($('book').value)];$('lesson').replaceChildren(...book.lessons.map((l,i)=>new Option(l.title,i)));}
-$('book').onchange=fillLessons;$('lessonAdd').onclick=()=>add(lessons[Number($('book').value)].lessons[Number($('lesson').value)].chars);
-async function init(){
-  try{const response=await fetch(new URL('./data/lessons.json',import.meta.url));if(!response.ok)throw new Error();lessons=await response.json();$('book').replaceChildren(...lessons.map((b,i)=>new Option(b.book,i)));fillLessons();}catch{status('课程库加载失败，请用 HTTP 静态服务器打开并检查 lessons.json。');$('lessonAdd').disabled=true;}
-  await add($('input').value);
+let wordLists=[],wordBankLoading=false,wordBankImporting=false;
+function updateWordBankControls(){
+  const blocked=!!controller||wordBankLoading||wordBankImporting;
+  $('wordBank').disabled=blocked||!wordLists.length;
+  $('wordBankAdd').disabled=blocked||!$('wordBank').value;
+  $('wordBankReload').disabled=blocked;
 }
-init();
+async function loadWordBank(){
+  wordBankLoading=true;updateWordBankControls();$('wordBankStatus').textContent='正在加载网站 Word Bank…';
+  const selected=$('wordBank').value;
+  try{
+    const response=await fetch('/api/wordlists/presets');if(!response.ok)throw new Error();
+    const payload=await response.json();wordLists=payload.lists||[];
+    $('wordBank').replaceChildren(new Option(wordLists.length?'请选择词表':'暂无已发布词表',''),...wordLists.map(list=>new Option([list.name,list.level,list.count!=null?`${list.count} 个词`:null].filter(Boolean).join(' · '),list.id)));
+    if(wordLists.some(list=>list.id===selected))$('wordBank').value=selected;
+    $('wordBankStatus').textContent=wordLists.length?`已载入 ${wordLists.length} 个网站词表。`:'Word Bank 暂无已发布词表，可继续手动输入汉字。';
+  }catch{
+    wordLists=[];$('wordBank').replaceChildren(new Option('词库暂时不可用',''));
+    $('wordBankStatus').textContent='Word Bank 加载失败，请点击刷新重试。也可继续手动输入汉字。';
+  }finally{wordBankLoading=false;updateWordBankControls();}
+}
+$('wordBankReload').onclick=loadWordBank;
+$('wordBank').onchange=()=>{
+  const list=wordLists.find(list=>list.id===$('wordBank').value);
+  $('wordBankStatus').textContent=list?[list.description,'点击下方按钮提取汉字。'].filter(Boolean).join(' '):'请选择一个词表。';
+  updateWordBankControls();
+};
+$('wordBankAdd').onclick=async()=>{
+  const id=$('wordBank').value;if(!id||controller||wordBankImporting)return;
+  wordBankImporting=true;updateWordBankControls();$('wordBankStatus').textContent='正在提取汉字…';
+  try{
+    const response=await fetch('/api/wordlists/presets/'+encodeURIComponent(id));if(!response.ok)throw new Error();
+    const list=await response.json();const chars=extract((list.items||[]).map(item=>item.zh||'').join(''));
+    const added=chars.filter(char=>!items.some(item=>item.char===char)).length;
+    await add(chars.join(''));
+    $('wordBankStatus').textContent=chars.length?`已从“${list.name}”提取 ${chars.length} 个不重复汉字，新加入 ${added} 个。`:'这个词表没有可提取的汉字。';
+  }catch{$('wordBankStatus').textContent='词表读取失败，请重试。已有汉字保留不变。';}
+  finally{wordBankImporting=false;updateWordBankControls();}
+};
+loadWordBank();
+add($('input').value);

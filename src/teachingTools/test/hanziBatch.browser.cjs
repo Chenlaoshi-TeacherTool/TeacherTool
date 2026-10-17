@@ -10,6 +10,10 @@ const server=http.createServer(require('../app'));
   await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({headless:true,channel:'msedge'});
   try{
     const page=await browser.newPage({viewport:{width:1450,height:1100},acceptDownloads:true});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+    const bank={id:'class-words',name:'课堂词汇',level:'A',count:3,items:[{zh:'你好',en:'错',py:'误'},{zh:'好家'},{zh:'ABC123'}]};
+    let bankFails=false;
+    await page.route('**/api/wordlists/presets',route=>route.fulfill({status:bankFails?502:200,json:bankFails?{}:{lists:[bank]}}));
+    await page.route('**/api/wordlists/presets/class-words',route=>route.fulfill({json:bank}));
     const base=`http://127.0.0.1:${server.address().port}`;
     await page.context().addCookies([{name:'lang',value:'zh',url:base}]);
     const redirect=await page.request.get(base+'/teaching-tools/hanzi-batch',{maxRedirects:0});assert.equal(redirect.status(),302);assert.equal(redirect.headers().location,'/teaching-tools/hanzi-batch/index.html');
@@ -27,6 +31,12 @@ const server=http.createServer(require('../app'));
     await page.locator('#speed').fill('200');await page.locator('#speed').dispatchEvent('change');await page.locator('#play').click();
     await page.waitForFunction(()=>document.querySelector('#strokeProgress').value===7,{},{timeout:6000});
     const strokes=await page.locator('.writer path[clip-path]').evaluateAll(paths=>paths.slice(7,14).map(p=>p.style.stroke));assert.ok(new Set(strokes).size>1);
+    await page.locator('#clear').click();await page.locator('#input').fill('你');await page.locator('#add').click();await page.waitForFunction(()=>document.querySelectorAll('.chip input:enabled').length===1);
+    await page.locator('#wordBank').selectOption('class-words');await page.locator('#wordBankAdd').click();await page.waitForFunction(()=>document.querySelector('#wordBankStatus').textContent.includes('新加入 2 个'));
+    assert.deepEqual(await page.locator('.chip button').allTextContents(),['你','好','家']);
+    await page.locator('#wordBankAdd').click();await page.waitForFunction(()=>document.querySelector('#wordBankStatus').textContent.includes('新加入 0 个'));assert.equal(await page.locator('.chip').count(),3);
+    bankFails=true;await page.locator('#wordBankReload').click();await page.waitForFunction(()=>document.querySelector('#wordBankStatus').textContent.includes('加载失败'));assert.equal(await page.locator('#wordBankAdd').isDisabled(),true);assert.equal(await page.locator('.chip').count(),3);
+    bankFails=false;await page.locator('#wordBankReload').click();await page.waitForFunction(()=>document.querySelector('#wordBankStatus').textContent.includes('已载入'));
     // Export a real all-format ZIP, including a multi-stroke GIF encoded by the worker.
     await page.locator('#clear').click();await page.locator('#input').fill('一家');await page.locator('#add').click();await page.waitForFunction(()=>document.querySelectorAll('.chip input:enabled').length===2);
     await page.locator('#size').selectOption('300');for(const f of ['svg','png','breakdown'])await page.locator(`[name=format][value=${f}]`).check();await page.locator('#pdf').check();
@@ -42,6 +52,6 @@ const server=http.createServer(require('../app'));
     // Deterministic 404 vs temporary network failure behavior.
     await page.route('**/hanzi-writer-data@2.0.1/**',route=>route.fulfill({status:404,body:'missing'}));
     await page.locator('#input').fill('龘');await page.locator('#add').click();await page.waitForSelector('.chip.missing');assert.equal(await page.locator('.chip.missing').getAttribute('title'),'暂无笔顺数据');
-    assert.deepEqual(errors,[]);console.log('PASS: extraction, cumulative steps, playback, colors, actual ZIP download, worker GIF, SVG, PNG, PDF, cancellation, missing data, mobile layout, site navigation/theme/directory/sitemap');
+    assert.deepEqual(errors,[]);console.log('PASS: Word Bank import/Chinese-field filtering/deduplication/refresh failure and retry; extraction, playback, exports, cancellation, responsive site integration');
   }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
