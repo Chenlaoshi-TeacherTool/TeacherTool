@@ -60,29 +60,22 @@ function startDot(data, i){
        + `<polygon points="${x2},${y2} ${p1.join(',')} ${p2.join(',')}" fill="#fff" stroke="${c}" stroke-width="8" stroke-linejoin="round"/>`
        + `<circle cx="${pts[0][0]}" cy="${pts[0][1]}" r="42" fill="#fff" stroke="${c}" stroke-width="16"/>`;
 }
-function numbers(data){
-  return data.medians.map((m, i) => {
-    const [x,y] = toScreen(m[0]); const c = PALETTE[i % PALETTE.length];
-    return `<circle cx="${x}" cy="${y}" r="44" fill="#fff" stroke="${c}" stroke-width="9"/>`
-         + `<text x="${x}" y="${y+22}" font-size="62" font-weight="700" text-anchor="middle" fill="${c}" font-family="Arial,sans-serif">${i+1}</text>`;
-  }).join('');
-}
 function cell(inner, grid, attrs = '', border = true){
   const frame = border ? `<rect x="3" y="3" width="1018" height="1018" fill="none" stroke="#7E9F7A" stroke-width="10"/>` : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" ${attrs}><rect width="1024" height="1024" fill="#fff"/>${gridLines(grid)}${inner}${frame}</svg>`;
 }
-const bigChar  = (d, g, a) => cell(charPaths(d,'color') + numbers(d), g, a);
 const stepCell = (d, i, g, a) => cell(charPaths(d,'step',i) + startDot(d,i), g, a);
 
-function practiceKinds(o){
-  const kinds = [];
-  for (let r = 0; r < o.rows; r++) for (let c = 0; c < o.cols; c++){
-    if (r === 0) kinds.push(c === 0 ? 'model' : (c <= o.trace ? 'trace' : 'blank'));
-    else kinds.push(c === 0 && o.rowTrace ? 'trace' : 'blank');
-  }
+function worksheetKinds(d, o){
+  const kinds = ['model', ...d.strokes.map((_, i) => i), ...Array(o.trace).fill('trace')];
+  const count = Math.max(o.rows, Math.ceil(kinds.length / o.cols)) * o.cols;
+  while (kinds.length < count) kinds.push(o.rowTrace && kinds.length % o.cols === 0 ? 'trace' : 'blank');
   return kinds;
 }
-function practiceInner(d, k){ return k === 'model' ? charPaths(d,'ink') : k === 'trace' ? charPaths(d,'trace') : ''; }
+function worksheetCell(d, k, o, attrs = ''){
+  if (typeof k === 'number') return stepCell(d, k, o.grid, attrs);
+  return cell(k === 'model' ? charPaths(d,'ink') : k === 'trace' ? charPaths(d,'trace') : '', o.grid, attrs);
+}
 
 /* ---------- HTML / CSS worksheet ---------- */
 function render(){
@@ -93,16 +86,11 @@ function render(){
   for (const ch of state.chars){
     const d = cache[ch], info = state.info[ch];
     h += `<section class="ws-char"><div class="ws-head">`
-      +  `<div class="ws-big">${bigChar(d, o.grid, `role="img" aria-label="${ch}"`)}</div><div>`
-      +  `<div class="ws-pinyin" contenteditable="true" data-ch="${ch}" data-k="pinyin">${esc(info.pinyin)}</div>`
-      +  `<div class="ws-meaning" contenteditable="true" data-ch="${ch}" data-k="meaning">${esc(info.meaning)}</div>`
-      +  `<div class="ws-facts"><span>笔画 Strokes <b>${d.strokes.length}</b></span>`
-      +  (info.radical ? `<span>部首 Radical <b>${esc(info.radical)}</b></span>` : '') + `</div></div></div>`
-      +  `<div class="ws-label">笔顺 Stroke order</div><div class="ws-steps">`
-      +  d.strokes.map((_, i) => `<div class="ws-step">${stepCell(d, i, o.grid)}<b>${i+1}</b></div>`).join('')
-      +  `</div><div class="ws-label">练习 Practice</div><div class="ws-practice" style="--cols:${o.cols}">`
-      +  practiceKinds(o).map(k => cell(practiceInner(d,k), o.grid, '', false)).join('')
-      +  `</div></section>`;
+      + `<div class="ws-pinyin" contenteditable="true" data-ch="${ch}" data-k="pinyin">${esc(info.pinyin)}</div>`
+      + `<div class="ws-meaning" contenteditable="true" data-ch="${ch}" data-k="meaning">${esc(info.meaning)}</div>`
+      + `</div><div class="ws-practice" style="--cols:${o.cols}">`
+      + worksheetKinds(d, o).map(k => worksheetCell(d, k, o)).join('')
+      + `</div></section>`;
   }
   h += `<div class="ws-foot">clsteachingtools.com · 笔顺数据 Make Me a Hanzi</div>`;
   ws.innerHTML = h;
@@ -142,25 +130,16 @@ function buildSVG(){
   if (o.nameLine) p.push(t(W-M-200, y+24, 13, '姓名 Name ______________', 'fill="#5F6B7A" text-anchor="end"') + t(W-M, y+24, 13, '日期 Date ______________', 'fill="#5F6B7A" text-anchor="end"'));
   y += 38; p.push(`<rect x="${M}" y="${y}" width="${CW}" height="2" fill="#1F3A5F"/>`); y += 6;
   for (const ch of state.chars){
-    const d = cache[ch], info = state.info[ch]; y += 18;
-    p.push(bigChar(d, o.grid, `x="${M}" y="${y}" width="146" height="146"`));
-    p.push(t(M+170, y+46, 34, info.pinyin, 'font-weight="600" fill="#1F3A5F"'));
-    wrap(info.meaning || '', 62).forEach((ln, i) => p.push(t(M+170, y+80+i*20, 16, ln, 'fill="#1E2635"')));
-    p.push(t(M+170, y+128, 13, `笔画 Strokes ${d.strokes.length}`, 'fill="#5F6B7A"'));
-    if (info.radical) p.push(t(M+290, y+128, 13, `部首 Radical ${info.radical}`, 'fill="#5F6B7A"'));
-    y += 146 + 26; p.push(t(M, y, 12.5, '笔顺 Stroke order', 'fill="#5F6B7A"')); y += 8;
-    const S = 66, G = 8, per = Math.floor((CW + G) / (S + G));
-    d.strokes.forEach((_, i) => {
-      const x = M + (i % per) * (S + G), yy = y + Math.floor(i / per) * (S + G);
-      p.push(stepCell(d, i, o.grid, `x="${x}" y="${yy}" width="${S}" height="${S}"`) + t(x+4, yy+12, 10, i+1, 'fill="#5F6B7A" font-weight="600"'));
-    });
-    y += Math.ceil(d.strokes.length / per) * (S + G) + 14;
-    p.push(t(M, y, 12.5, '练习 Practice', 'fill="#5F6B7A"')); y += 8;
-    const cs = CW / o.cols;
-    practiceKinds(o).forEach((k, i) => p.push(cell(practiceInner(d,k), o.grid,
+    const d = cache[ch], info = state.info[ch];
+    y += 20;
+    p.push(t(M, y, 14, info.pinyin, 'font-weight="600" fill="#1F3A5F"'));
+    const meaning = wrap(info.meaning || '', 64);
+    meaning.forEach((ln, i) => p.push(t(M+130, y+i*16, 12, ln, 'fill="#1E2635"')));
+    y += 7 + Math.max(0, meaning.length-1)*16;
+    const cs = CW / o.cols, kinds = worksheetKinds(d, o);
+    kinds.forEach((k, i) => p.push(worksheetCell(d, k, o,
       `x="${M + (i % o.cols)*cs}" y="${y + Math.floor(i / o.cols)*cs}" width="${cs}" height="${cs}"`)));
-    y += o.rows * cs + 20;
-    p.push(`<line x1="${M}" y1="${y}" x2="${W-M}" y2="${y}" stroke="#D7DDE4" stroke-dasharray="4 4"/>`);
+    y += kinds.length / o.cols * cs + 10;
   }
   y += 18; p.push(t(W-M, y, 11, 'clsteachingtools.com · 笔顺数据 Make Me a Hanzi', 'fill="#8A94A1" text-anchor="end"'));
   const H = Math.ceil(y + M/2);

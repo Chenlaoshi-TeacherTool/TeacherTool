@@ -7,7 +7,7 @@
   <title>汉字笔顺练习纸 · Stroke Order Worksheet - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Type Chinese characters and instantly get a printable stroke-order worksheet: colour-coded stroke-by-stroke breakdown, pinyin, English meaning, and 田字格 / 米字格 tracing practice boxes.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/stroke-order-worksheet/stroke-order-worksheet.css?v=1">
+  <link rel="stylesheet" href="/low-prep/stroke-order-worksheet/stroke-order-worksheet.css?v=2">
 <style id="ws-css">
 /* ---------- Worksheet (this block is copied into the embed code) ---------- */
 .cls-ws{--ws-navy:#1F3A5F;--ws-sage:#7E9F7A;--ws-gold:#E0A21B;--ws-muted:#5F6B7A;--ws-line:#D7DDE4;
@@ -21,30 +21,23 @@
 .cls-ws .ws-title small{font-size:14px;font-weight:400;color:var(--ws-muted);margin-left:8px}
 .cls-ws .ws-name{font-size:13px;color:var(--ws-muted);white-space:nowrap}
 .cls-ws .ws-name span{display:inline-block;width:110px;border-bottom:1px solid #9AA4B1;margin:0 14px 0 4px}
-.cls-ws .ws-char{padding:18px 0 20px;border-bottom:1px dashed var(--ws-line);break-inside:avoid;page-break-inside:avoid}
-.cls-ws .ws-head{display:flex;gap:22px;align-items:center}
-.cls-ws .ws-big{width:150px;flex:none}
-.cls-ws .ws-pinyin{font-size:34px;font-weight:600;color:var(--ws-navy);line-height:1.1;outline:none}
-.cls-ws .ws-meaning{font-size:16px;margin-top:6px;outline:none}
-.cls-ws .ws-facts{font-size:13px;color:var(--ws-muted);margin-top:8px;display:flex;gap:18px;flex-wrap:wrap}
-.cls-ws .ws-facts b{color:#1E2635;font-weight:600}
-.cls-ws .ws-label{font-size:12.5px;color:var(--ws-muted);margin:14px 0 6px}
-.cls-ws .ws-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px}
-.cls-ws .ws-step{position:relative}
-.cls-ws .ws-step b{position:absolute;top:2px;left:4px;font-size:11px;color:var(--ws-muted);font-weight:600}
-.cls-ws .ws-practice{display:grid;grid-template-columns:repeat(var(--cols,8),1fr);border-left:1.5px solid var(--ws-sage);border-top:1.5px solid var(--ws-sage)}
-.cls-ws .ws-practice svg{border-right:1.5px solid var(--ws-sage);border-bottom:1.5px solid var(--ws-sage)}
+.cls-ws .ws-char{padding:8px 0;break-inside:avoid;page-break-inside:avoid}
+.cls-ws .ws-head{display:flex;gap:14px;align-items:baseline;margin-bottom:4px}
+.cls-ws .ws-pinyin{font-size:15px;font-weight:600;color:var(--ws-navy);min-width:90px;outline:none}
+.cls-ws .ws-meaning{font-size:12px;outline:none;overflow-wrap:anywhere}
+.cls-ws .ws-practice{display:grid;grid-template-columns:repeat(var(--cols,9),minmax(0,1fr));border-left:1px solid var(--ws-sage);border-top:1px solid var(--ws-sage)}
+.cls-ws .ws-practice svg{border-right:1px solid var(--ws-sage);border-bottom:1px solid var(--ws-sage)}
 .cls-ws .ws-foot{font-size:11px;color:#8A94A1;margin-top:12px;text-align:right}
 .cls-ws [contenteditable]:hover{background:#FFF3D3}
 @media (max-width:560px){
   .cls-ws{padding:18px 14px}
-  .cls-ws .ws-big{width:96px}
-  .cls-ws .ws-pinyin{font-size:26px}
   .cls-ws .ws-name{white-space:normal}
   .cls-ws .ws-name span{width:80px}
 }
 @media print{
-  .cls-ws{box-shadow:none;padding:0;max-width:none}
+  .cls-ws{box-shadow:none;padding:0;max-width:170mm}
+  .cls-ws .ws-char{padding:5px 0}
+  .cls-ws .ws-foot{margin-top:4px}
   .cls-ws [contenteditable]:hover{background:none}
 }
 </style>
@@ -73,18 +66,18 @@
         </select>
       </label>
       <label class="field">每行格数 Columns
-        <input id="cols" type="number" min="5" max="12" value="8">
+        <input id="cols" type="number" min="5" max="12" value="9">
       </label>
-      <label class="field">练习行数 Rows
-        <input id="rows" type="number" min="1" max="10" value="3">
+      <label class="field">每字最少行数 Rows
+        <input id="rows" type="number" min="1" max="10" value="2">
       </label>
-      <label class="field">第一行描红 Traces
-        <input id="trace" type="number" min="0" max="11" value="4">
+      <label class="field">笔顺后描红 Traces
+        <input id="trace" type="number" min="0" max="11" value="2">
       </label>
       <label class="check"><input id="rowTrace" type="checkbox" checked>每行首格描红</label>
       <label class="check"><input id="nameLine" type="checkbox" checked>姓名/日期栏</label>
     </div>
-    <p class="hint">提示：生成后可直接点击拼音和英文释义进行修改（多音字可删去不需要的读音）。</p>
+    <p class="hint">提示：示范字、笔顺、描红和空白格依次排列；笔画多时自动增加行数。生成后可直接点击拼音和英文释义进行修改（多音字可删去不需要的读音）。</p>
   </section>
 
   <div class="toolbar no-print">
@@ -117,7 +110,7 @@
 </div>
 
 <script src="/low-prep/stroke-order-worksheet/stroke-dict.js?v=1"></script>
-<script src="/low-prep/stroke-order-worksheet/stroke-order-worksheet.js?v=1"></script>
+<script src="/low-prep/stroke-order-worksheet/stroke-order-worksheet.js?v=2"></script>
 <script src="/javascripts/account-coming-soon.js"></script>
 <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

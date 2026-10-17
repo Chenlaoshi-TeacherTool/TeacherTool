@@ -41,7 +41,7 @@
 .so-modal .modal-box h2{margin:0;font-size:17px;color:var(--navy)}
 .so-modal textarea{width:100%;flex:1;min-height:300px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;border:1px solid var(--line);border-radius:8px;padding:10px}
 @media print{
-  .so-page{background:#fff}
+  html body.so-page{background:#fff;margin:0;min-height:0;padding-top:0 !important}
   .no-print,.tool-learning-guide,.milk-tea-footer,#milkTeaFooter{display:none !important}
   .so-app{padding:0;max-width:none}
 }
