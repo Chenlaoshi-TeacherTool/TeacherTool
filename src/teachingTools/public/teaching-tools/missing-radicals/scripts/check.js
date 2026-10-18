@@ -11,6 +11,8 @@ if(JSON.stringify(chooseHidden('请','radical',rng('x')).hidden)!=='[0,1]')throw
 if(JSON.stringify(chooseHidden('请','component',rng('x')).hidden)!=='[2,3,4,5,6,7,8,9]')throw Error('component');
 if(JSON.stringify(chooseHidden('请','strokes',rng('x')))!==JSON.stringify(chooseHidden('请','strokes',rng('x'))))throw Error('seed');
 `,context);
+assert.equal(vm.runInContext("JSON.stringify(shuffled(parse(SAMPLE),rng('123:order')))",context),vm.runInContext("JSON.stringify(shuffled(parse(SAMPLE),rng('123:order')))",context));
+assert.notEqual(vm.runInContext("JSON.stringify(shuffled(parse(SAMPLE),rng('123:order')))",context),vm.runInContext("JSON.stringify(shuffled(parse(SAMPLE),rng('456:order')))",context));
 const geometry=source.slice(source.indexOf('function resample('),source.indexOf('let teams='));vm.runInContext(geometry,context);
 assert.equal(vm.runInContext('matchesStroke([[100,100],[500,100]],[[100,800],[500,800]])',context),true);
 assert.equal(vm.runInContext('matchesStroke([[500,100],[100,100]],[[100,800],[500,800]])',context),false);

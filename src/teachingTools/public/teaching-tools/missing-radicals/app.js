@@ -37,7 +37,7 @@ async function generate() {
   try {
     if (!window.pinyinPro) throw Error('Pinyin library unavailable. Check your connection and reload. 拼音库未加载，请联网重试。');
     try { components = await (await fetch('data/components.json')).json(); } catch { components = {}; }
-    const entries = parse($('words').value), chars = [...new Set(entries.flatMap(e=>[...e.word]))];
+    const entries = shuffled(parse($('words').value), rng($('seed').value + ':order')), chars = [...new Set(entries.flatMap(e=>[...e.word]))];
     const failures = [];
     // Limit concurrent CDN requests for large classroom lists.
     for (let i=0;i<chars.length;i+=12) await Promise.all(chars.slice(i,i+12).map(c=>loadChar(c).catch(()=>failures.push(c))));
@@ -94,7 +94,7 @@ function pageShell(version,key,index) {
   page.append(el('h2','',$('title').value));
   const meta=el('div','meta'); meta.append(el('span','',`Version ${version}${key?' · Answer key 答案':''} · ${index}`),el('span','','Name 姓名: __________   Date 日期: __________')); page.append(meta,el('p','instruction',$('instructions').value));
   if($('bank').checked){const bank=el('div','word-bank'); versions[version].forEach(w=>{const span=el('span','',w.word); if(w.meaning) span.append(el('small','',' · '+w.meaning)); bank.append(span);});page.append(bank);}
-  page.append(el('div','word-grid'),el('footer','',$('footer').value)); return page;
+  page.append(el('div','word-grid'),el('footer','','CLS Teaching Tools · clsteachingtools.com')); return page;
 }
 function render() {
   const host=$('pages');host.replaceChildren();
@@ -124,7 +124,7 @@ $('save').onclick=()=>{try{localStorage.setItem('cls.missingParts.list',$('words
 $('load').onclick=()=>{try{const value=localStorage.getItem('cls.missingParts.list');if(value!==null)$('words').value=value;else $('status').textContent='No saved list 暂无保存词表';}catch{$('status').textContent='Browser storage unavailable 无法读取';}};
 $('generate').onclick=generate;$('regenerate').onclick=()=>{$('seed').value=String(crypto.getRandomValues(new Uint32Array(1))[0]);generate();};
 $('theme').onclick=()=>document.body.classList.toggle('dark');
-for(const id of ['title','instructions','paper','grid','bank','outline','footer']) $(id).addEventListener('change',render);
+for(const id of ['title','instructions','paper','grid','bank','outline']) $(id).addEventListener('change',render);
 for(const id of ['keys','printChoice']) $(id).addEventListener('change',updatePrint);
 $('print').onclick=()=>{updatePrint();window.print();};
 document.querySelectorAll('[data-view]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>{$('pages').dataset.view=b.dataset.view;document.querySelectorAll('.tabs button').forEach(tab=>tab.setAttribute('aria-selected',String(tab===b)));};});
