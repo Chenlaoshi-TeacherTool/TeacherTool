@@ -128,7 +128,7 @@ label.tm-field {
   color: var(--tm-muted);
 }
 
-.tm-page select, .tm-page textarea {
+.tm-page select {
   font: inherit;
   color: var(--tm-text);
   background: #fff;
@@ -136,18 +136,12 @@ label.tm-field {
   border-radius: 8px;
   padding: 8px 12px;
 }
-.tm-page select:focus, .tm-page textarea:focus {
+.tm-page select:focus {
   outline: none;
   border-color: var(--tm-green);
   box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.18);
 }
 
-.tm-page textarea {
-  width: 100%;
-  min-height: 64px;
-  resize: vertical;
-  font-size: 16px;
-}
 
 .tm-btn {
   font: inherit;

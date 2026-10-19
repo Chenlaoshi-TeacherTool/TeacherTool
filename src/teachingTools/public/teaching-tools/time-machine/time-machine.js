@@ -52,7 +52,7 @@
   const hourHand = $('hourHand'), minuteHand = $('minuteHand');
   const startBtn = $('startBtn'), questionBtn = $('questionBtn'), answerBtn = $('answerBtn');
   const modeSelect = $('modeSelect'), questionSelect = $('questionSelect');
-  const customQuestion = $('customQuestion'), muteBtn = $('muteBtn');
+  const muteBtn = $('muteBtn');
   const qaPlaceholder = $('qaPlaceholder'), qaQuestion = $('qaQuestion'), qaAnswer = $('qaAnswer');
 
   QUESTIONS.forEach((q, i) => {
@@ -400,7 +400,7 @@
   }
 
   /* ================= 问题与答案 ================= */
-  let currentQuestion = null;   // { text, index }  index = -1 表示自定义问题
+  let currentQuestion = null;   // { text, index }
 
   function resetQA() {
     currentQuestion = null;
@@ -437,19 +437,14 @@
   }
 
   questionBtn.addEventListener('click', () => {
-    const custom = customQuestion.value.trim();
     let index;
-    if (custom) {
-      currentQuestion = { text: custom, index: -1 };
+    if (questionSelect.value === 'random') {
+      do { index = rand(0, QUESTIONS.length - 1); }
+      while (currentQuestion && QUESTIONS.length > 1 && index === currentQuestion.index);
     } else {
-      if (questionSelect.value === 'random') {
-        do { index = rand(0, QUESTIONS.length - 1); }
-        while (currentQuestion && QUESTIONS.length > 1 && index === currentQuestion.index);
-      } else {
-        index = Number(questionSelect.value);
-      }
-      currentQuestion = { text: QUESTIONS[index], index };
+      index = Number(questionSelect.value);
     }
+    currentQuestion = { text: QUESTIONS[index], index };
     qaPlaceholder.hidden = true;
     qaAnswer.hidden = true;
     showPop(qaQuestion, currentQuestion.text);
