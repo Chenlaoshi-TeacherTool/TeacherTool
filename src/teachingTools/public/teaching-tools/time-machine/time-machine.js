@@ -50,7 +50,7 @@
   const cards = {};
   document.querySelectorAll('.tm-card[data-part]').forEach(c => { cards[c.dataset.part] = c; });
   const hourHand = $('hourHand'), minuteHand = $('minuteHand');
-  const startBtn = $('startBtn'), questionBtn = $('questionBtn'), answerBtn = $('answerBtn');
+  const startBtn = $('startBtn'), answerBtn = $('answerBtn');
   const modeSelect = $('modeSelect'), questionSelect = $('questionSelect');
   const muteBtn = $('muteBtn');
   const qaPlaceholder = $('qaPlaceholder'), qaQuestion = $('qaQuestion'), qaAnswer = $('qaAnswer');
@@ -387,6 +387,7 @@
       } else {
         running = false;
         setButtons(false);
+        showQuestion();
       }
     }
     requestAnimationFrame(frame);
@@ -394,9 +395,9 @@
 
   function setButtons(disabled) {
     startBtn.disabled = disabled;
-    questionBtn.disabled = disabled;
     answerBtn.disabled = disabled;
     modeSelect.disabled = disabled;
+    questionSelect.disabled = disabled;
   }
 
   /* ================= 问题与答案 ================= */
@@ -436,7 +437,7 @@
     }
   }
 
-  questionBtn.addEventListener('click', () => {
+  function showQuestion() {
     let index;
     if (questionSelect.value === 'random') {
       do { index = rand(0, QUESTIONS.length - 1); }
@@ -448,7 +449,10 @@
     qaPlaceholder.hidden = true;
     qaAnswer.hidden = true;
     showPop(qaQuestion, currentQuestion.text);
-  });
+    answerBtn.disabled = false;
+  }
+
+  questionSelect.addEventListener('change', showQuestion);
 
   answerBtn.addEventListener('click', () => {
     const index = currentQuestion ? currentQuestion.index : 1;

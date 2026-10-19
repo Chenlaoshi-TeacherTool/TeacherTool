@@ -39,9 +39,8 @@ body.tm-page {
 
 /* ---------- Cards ---------- */
 .tm-machine {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: stretch;
   gap: 16px;
   width: 100%;
@@ -70,7 +69,7 @@ body.tm-page {
   letter-spacing: 0.08em;
 }
 
-.tm-date-card { min-width: 150px; }
+.tm-date-card { min-width: 0; }
 
 .tm-flip { perspective: 500px; }
 .tm-flip-face {
@@ -101,8 +100,8 @@ body.tm-page {
   to   { transform: rotateX(0deg);   filter: brightness(1); }
 }
 
-.tm-clock-card { min-width: 220px; }
-.tm-clock { width: 200px; height: 200px; }
+.tm-clock-card { min-width: 0; }
+.tm-clock { width: 100%; max-width: 200px; height: auto; aspect-ratio: 1; }
 .tm-clock .tm-hand { transform-origin: 100px 100px; }
 
 /* ---------- Controls ---------- */
@@ -174,7 +173,7 @@ label.tm-field {
 .tm-btn-ghost:hover { border-color: var(--tm-green); color: var(--tm-green-dark); }
 
 /* ---------- Q & A ---------- */
-.tm-qa { width: 100%; max-width: 760px; min-height: 150px; }
+.tm-qa { grid-column: 2 / -1; min-width: 0; min-height: 250px; }
 .tm-qa-question {
   font-size: clamp(26px, 4.5vw, 40px);
   font-weight: 700;
@@ -197,6 +196,16 @@ label.tm-field {
 [hidden] { display: none !important; }
 
 .tm-hint { color: var(--tm-muted); font-size: 13px; margin: 0; }
+
+@media (max-width: 600px) {
+  .tm-machine { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .tm-machine .tm-card { padding: 12px 8px; }
+  .tm-flip-face { padding: 10px 8px; }
+  .tm-qa { grid-column: 2; min-height: 200px; }
+  .tm-qa-question { font-size: 24px; }
+  .tm-qa-answer { font-size: 20px; padding: 8px; }
+  .tm-qa .tm-btn { padding: 10px 12px; font-size: 14px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .tm-flip-face.tm-flip-anim, .tm-pop { animation: none; }
