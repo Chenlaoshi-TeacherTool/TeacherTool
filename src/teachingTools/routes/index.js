@@ -112,10 +112,6 @@ router.get('/teaching-tools/vocabulary-booklet', function(req, res) {
   res.redirect(302, '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html');
 });
 
-router.get('/teaching-tools/sunflower-spinner', function(req, res) {
-  res.redirect(302, '/teaching-tools/sunflower-spinner/sunflower-spinner.html');
-});
-
 router.get('/teaching-tools/word-list-library', function(req, res) {
   res.redirect(302, '/teaching-tools/word-list-library/word-list-library.html');
 });
@@ -269,7 +265,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/classroom-shop',
     '/resources', '/recommendations', '/about', '/contact', '/feedback', '/privacy',
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine',
-    '/teaching-tools/sunflower-spinner/sunflower-spinner.html', '/teaching-tools/word-list-library/word-list-library.html',
+    '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
     '/teaching-tools/missing-radicals',
     '/teaching-tools/fakebook-profile/fakebook-profile.html', '/teaching-tools/fake-wechat-moments/', '/teaching-tools/fake-wechat-single-post/', '/teaching-tools/social-media-classroom-tools/',

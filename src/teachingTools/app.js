@@ -50,6 +50,11 @@ app.get('/fonts/Yu_DuoYinZi_Collection.ttc', function(req, res) {
   res.redirect(302, fontDownloadUrl);
 });
 
+// Keep the withdrawn tool unavailable, including direct static-file links.
+app.use('/teaching-tools/sunflower-spinner', function(req, res, next) {
+  next(createError(410, 'Sunflower Spinner 已下架 / has been removed.'));
+});
+
 app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));
 
 app.use('/', indexRouter);
