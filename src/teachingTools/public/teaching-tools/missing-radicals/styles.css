@@ -30,3 +30,5 @@ body.dark .sheet button{color:#283e30}
 @media screen and (max-width:900px){.workspace{display:block}.workspace>.preview{margin-top:24px}.workspace>aside{max-width:none}.tabs{flex-wrap:wrap}.tabs button{white-space:nowrap}}
 
 .team-heading{flex-wrap:wrap}.team-heading>input:not([type=color]){flex:1;min-width:100px;width:0}.score-controls{display:flex;align-items:center;gap:6px;flex-shrink:0}.score-controls button{min-width:44px;min-height:44px;padding:6px}.score-controls output{text-align:center}.team.inactive .team-heading{pointer-events:auto}
+
+.next-question{align-self:flex-end;min-height:44px;margin-top:8px;border-color:var(--team-color);color:var(--team-color)}.next-question:disabled{opacity:.45;cursor:default}
