@@ -872,6 +872,7 @@ module.exports = {
       revealAllButton: 'Reveal all',
       restartButton: 'Restart image',
       fullscreenButton: 'Fullscreen',
+      exitFullscreenButton: 'Exit',
       previousButton: 'Previous',
       nextImageButton: 'Next image'
     },
@@ -2113,6 +2114,7 @@ module.exports = {
       revealAllButton: '全部揭示',
       restartButton: '重新开始本图',
       fullscreenButton: '全屏',
+      exitFullscreenButton: '退出',
       previousButton: '上一张',
       nextImageButton: '下一张图片'
     },

@@ -136,17 +136,66 @@ input[type="range"] { width: 100%; margin-top: 10px; accent-color: var(--leaf); 
   justify-content: center;
   overflow: hidden;
 }
-.reveal-stage:fullscreen,
-.reveal-stage.is-pseudo-fullscreen {
-  border-radius: 0;
+.reveal-stage-wrap { position: relative; }
+.reveal-fs-bar { display: none; }
+
+.reveal-stage-wrap:fullscreen,
+.reveal-stage-wrap.is-pseudo-fullscreen {
+  background: var(--chalk-deep);
 }
-.reveal-stage.is-pseudo-fullscreen {
+body.reveal-pseudo-fs .reveal-preview-panel { position: static; }
+body.reveal-pseudo-fs { overflow: hidden; }
+.reveal-stage-wrap.is-pseudo-fullscreen {
   position: fixed;
   inset: 0;
   z-index: 999;
   width: 100vw;
   height: 100vh;
 }
+.reveal-stage-wrap:fullscreen .reveal-stage,
+.reveal-stage-wrap.is-pseudo-fullscreen .reveal-stage {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  padding-bottom: 84px;
+}
+.reveal-stage-wrap:fullscreen .reveal-fs-bar,
+.reveal-stage-wrap.is-pseudo-fullscreen .reveal-fs-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 249, 233, .25);
+  border-radius: 999px;
+  background: rgba(16, 62, 55, .88);
+  transform: translateX(-50%);
+  transition: opacity .3s ease;
+}
+.reveal-stage-wrap.is-idle .reveal-fs-bar { opacity: 0; pointer-events: none; }
+.reveal-stage-wrap.is-idle { cursor: none; }
+
+.reveal-fs-btn {
+  border: 1px solid rgba(255, 249, 233, .35);
+  border-radius: 999px;
+  background: rgba(255, 253, 247, .12);
+  color: #fffdf7;
+  padding: 9px 16px;
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.reveal-fs-btn:hover:not(:disabled) { background: rgba(255, 253, 247, .26); }
+.reveal-fs-btn:disabled { cursor: not-allowed; opacity: .45; }
+.reveal-fs-primary { border-color: transparent; background: var(--coral); }
+.reveal-fs-primary:hover:not(:disabled) { background: #d75d49; }
 .reveal-stage-empty { color: #cfe3da; font-size: .95rem; padding: 60px 20px; text-align: center; }
 
 .reveal-media { position: relative; line-height: 0; }

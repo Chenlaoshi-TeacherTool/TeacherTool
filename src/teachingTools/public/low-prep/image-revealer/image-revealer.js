@@ -12,6 +12,12 @@
   var speedValue = document.getElementById('speed-value');
 
   var stage = document.getElementById('reveal-stage');
+  var stageWrap = document.getElementById('reveal-stage-wrap');
+  var fsBar = stageWrap.querySelector('.reveal-fs-bar');
+  var fsToggleButton = document.getElementById('fs-toggle-button');
+  var FS_BAR_RESERVED = 84;
+  var IDLE_HIDE_MS = 3000;
+  var idleTimer = null;
   var progressText = document.getElementById('progress-text');
 
   var startButton = document.getElementById('start-button');
@@ -21,6 +27,8 @@
   var fullscreenButton = document.getElementById('fullscreen-button');
   var prevButton = document.getElementById('prev-button');
   var nextButton = document.getElementById('next-button');
+  var startLabel = startButton.textContent;
+  var pauseLabel = pauseButton.textContent;
 
   var state = {
     images: [],       // { file, url }
@@ -158,11 +166,16 @@
     updateControlsAvailability();
   }
 
+  function isFullscreenActive() {
+    return document.fullscreenElement === stageWrap || stageWrap.classList.contains('is-pseudo-fullscreen');
+  }
+
   function sizeMedia(media, img) {
     if (!img.naturalWidth || !img.naturalHeight) return;
-    var isFull = document.fullscreenElement === stage || stage.classList.contains('is-pseudo-fullscreen');
     var maxWidth = stage.clientWidth || window.innerWidth;
-    var maxHeight = isFull ? window.innerHeight : Math.max(320, window.innerHeight * 0.68);
+    var maxHeight = isFullscreenActive()
+      ? Math.max(200, stage.clientHeight - FS_BAR_RESERVED)
+      : Math.max(320, window.innerHeight * 0.68);
     var scale = Math.min(maxWidth / img.naturalWidth, maxHeight / img.naturalHeight);
     media.style.width = Math.round(img.naturalWidth * scale) + 'px';
     media.style.height = Math.round(img.naturalHeight * scale) + 'px';
@@ -176,8 +189,27 @@
 
   window.addEventListener('resize', resizeCurrentMedia);
   document.addEventListener('fullscreenchange', function () {
-    if (!document.fullscreenElement) stage.classList.remove('is-pseudo-fullscreen');
+    if (!document.fullscreenElement) stageWrap.classList.remove('is-pseudo-fullscreen');
+    onFullscreenToggled();
+  });
+
+  function onFullscreenToggled() {
+    document.body.classList.toggle('reveal-pseudo-fs', stageWrap.classList.contains('is-pseudo-fullscreen'));
+    stageWrap.classList.remove('is-idle');
+    window.clearTimeout(idleTimer);
+    if (isFullscreenActive()) wakeFullscreenBar();
     resizeCurrentMedia();
+  }
+
+  function wakeFullscreenBar() {
+    stageWrap.classList.remove('is-idle');
+    window.clearTimeout(idleTimer);
+    if (!isFullscreenActive()) return;
+    idleTimer = window.setTimeout(function () { stageWrap.classList.add('is-idle'); }, IDLE_HIDE_MS);
+  }
+
+  ['mousemove', 'mousedown', 'touchstart'].forEach(function (name) {
+    stageWrap.addEventListener(name, wakeFullscreenBar);
   });
 
   function buildOverlay(rows, cols) {
@@ -311,7 +343,14 @@
     prevButton.disabled = !hasCurrent || state.currentIndex === 0;
     nextButton.disabled = !hasCurrent || state.currentIndex >= state.images.length - 1;
 
-    startButton.textContent = fullyRevealed ? '✓ Fully revealed' : '▶ Start';
+    startButton.textContent = fullyRevealed ? '✓' : startLabel;
+
+    fsToggleButton.textContent = state.isRunning ? pauseLabel : startLabel;
+    fsToggleButton.disabled = !hasCurrent || (fullyRevealed && !state.isRunning);
+    fsBar.querySelector('[data-fs-action="prev"]').disabled = prevButton.disabled;
+    fsBar.querySelector('[data-fs-action="next"]').disabled = nextButton.disabled;
+    fsBar.querySelector('[data-fs-action="reveal-all"]').disabled = revealAllButton.disabled;
+    fsBar.querySelector('[data-fs-action="restart"]').disabled = restartButton.disabled;
   }
 
   startButton.addEventListener('click', startReveal);
@@ -326,40 +365,49 @@
     goToImage(state.currentIndex + 1, true);
   });
 
-  fullscreenButton.addEventListener('click', function () {
-    var isActive = document.fullscreenElement === stage || stage.classList.contains('is-pseudo-fullscreen');
-    if (isActive) {
-      if (document.fullscreenElement) document.exitFullscreen();
-      stage.classList.remove('is-pseudo-fullscreen');
-      resizeCurrentMedia();
-      return;
-    }
+  function exitFullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    stageWrap.classList.remove('is-pseudo-fullscreen');
+    onFullscreenToggled();
+  }
+
+  function enterFullscreen() {
     var fallback = function () {
-      stage.classList.add('is-pseudo-fullscreen');
-      resizeCurrentMedia();
+      stageWrap.classList.add('is-pseudo-fullscreen');
+      onFullscreenToggled();
     };
-    if (stage.requestFullscreen) {
-      try {
-        var result = stage.requestFullscreen();
-        if (result && result.catch) {
-          result.then(resizeCurrentMedia).catch(fallback);
-          return;
-        }
-        resizeCurrentMedia();
-        return;
-      } catch (err) {
-        fallback();
-        return;
-      }
+    if (!stageWrap.requestFullscreen) { fallback(); return; }
+    try {
+      var result = stageWrap.requestFullscreen();
+      if (result && result.catch) result.then(onFullscreenToggled).catch(fallback);
+      else onFullscreenToggled();
+    } catch (err) {
+      fallback();
     }
-    fallback();
+  }
+
+  fullscreenButton.addEventListener('click', function () {
+    if (isFullscreenActive()) exitFullscreen(); else enterFullscreen();
+  });
+
+  var fsActions = {
+    prev: function () { prevButton.click(); },
+    toggle: function () { if (state.isRunning) pauseReveal(); else startReveal(); },
+    'reveal-all': revealAll,
+    restart: restartCurrentImage,
+    next: function () { nextButton.click(); },
+    exit: exitFullscreen
+  };
+  fsBar.addEventListener('click', function (event) {
+    var btn = event.target.closest('[data-fs-action]');
+    if (!btn || btn.disabled) return;
+    fsActions[btn.dataset.fsAction]();
+    wakeFullscreenBar();
   });
 
   document.addEventListener('keydown', function (event) {
-    if (event.code === 'Escape' && stage.classList.contains('is-pseudo-fullscreen')) {
-      stage.classList.remove('is-pseudo-fullscreen');
-      resizeCurrentMedia();
-    }
+    if (isFullscreenActive()) wakeFullscreenBar();
+    if (event.code === 'Escape' && stageWrap.classList.contains('is-pseudo-fullscreen')) exitFullscreen();
   });
 
   document.addEventListener('keydown', function (event) {

@@ -7,7 +7,7 @@
   <title>Image Revealer - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Upload photos, cover them in a grid, and reveal one tile at a time as a guessing warm-up. Images stay in your browser and never touch a server.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/image-revealer/image-revealer.css?v=fullscreen-fallback-1">
+  <link rel="stylesheet" href="/low-prep/image-revealer/image-revealer.css?v=fullscreen-bar-3">
 </head>
 <body class="reveal-page">
   <main class="reveal-wrap">
@@ -94,8 +94,18 @@
           <p id="progress-text" class="reveal-progress-text"><%= t('imageRevealer.progressEmpty') %></p>
         </div>
 
-        <div id="reveal-stage" class="reveal-stage">
-          <p class="reveal-stage-empty"><%= t('imageRevealer.stageEmpty') %></p>
+        <div id="reveal-stage-wrap" class="reveal-stage-wrap">
+          <div id="reveal-stage" class="reveal-stage">
+            <p class="reveal-stage-empty"><%= t('imageRevealer.stageEmpty') %></p>
+          </div>
+          <div class="reveal-fs-bar" aria-label="<%= t('imageRevealer.fullscreenButton') %>">
+            <button type="button" class="reveal-fs-btn" data-fs-action="prev">← <%= t('imageRevealer.previousButton') %></button>
+            <button type="button" class="reveal-fs-btn reveal-fs-primary" data-fs-action="toggle" id="fs-toggle-button">▶ <%= t('imageRevealer.startButton') %></button>
+            <button type="button" class="reveal-fs-btn" data-fs-action="reveal-all">⏭ <%= t('imageRevealer.revealAllButton') %></button>
+            <button type="button" class="reveal-fs-btn" data-fs-action="restart">↺ <%= t('imageRevealer.restartButton') %></button>
+            <button type="button" class="reveal-fs-btn reveal-fs-primary" data-fs-action="next"><%= t('imageRevealer.nextImageButton') %> →</button>
+            <button type="button" class="reveal-fs-btn" data-fs-action="exit">✕ <%= t('imageRevealer.exitFullscreenButton') %></button>
+          </div>
         </div>
 
         <div class="reveal-stage-controls">
@@ -115,7 +125,7 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
-  <script src="/low-prep/image-revealer/image-revealer.js?v=fullscreen-fallback-1" defer></script>
+  <script src="/low-prep/image-revealer/image-revealer.js?v=fullscreen-bar-3" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
