@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>练习单生成器 · Chinese Worksheet Generator - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Type Chinese vocabulary and example sentences to get a print-ready worksheet with up to 12 question types: matching, multiple choice, fill in the blanks, sentence order, word search, 田字格 tracing and more, with an answer key.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/worksheet-generator/worksheet-generator.css?v=2">
+  <style id="wg-page-size">@page { size: A4; margin: 12mm; }</style>
+</head>
+<body class="wg-page">
+  <main class="wg-wrap">
+    <header class="wg-header wg-no-print">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+      <p class="wg-eyebrow">Printable practice · 可打印练习单</p>
+      <h1>📝 练习单生成器 · Chinese Worksheet Generator</h1>
+      <p>输入生词和例句，选好题型，马上打印。Type your words, pick the question types, and print. Pinyin and English fill in automatically; everything stays in your browser.</p>
+    </header>
+
+    <div class="wg-layout">
+      <section class="wg-controls wg-no-print" aria-label="Worksheet settings">
+
+        <section class="wg-panel">
+          <div class="wg-panel-heading">
+            <span class="wg-step">1</span>
+            <h2>生词 · Vocabulary</h2>
+          </div>
+          <p class="wg-hint">一行一个词。格式：<code>汉字 | 拼音 | English</code>。拼音和英文可以不填，会自动补全。<br>One word per line. Pinyin and English are optional.</p>
+          <textarea id="wg-words" rows="9" spellcheck="false" placeholder="爸爸 | bà ba | dad&#10;妈妈&#10;哥哥"></textarea>
+          <div class="wg-row">
+            <button id="wg-autofill" type="button" class="wg-secondary">✨ 补全拼音和英文 Fill in pinyin &amp; English</button>
+          </div>
+          <p id="wg-dict-status" class="wg-hint" aria-live="polite">Loading the dictionary…</p>
+
+          <label for="wg-sentences" class="wg-label">例句（可选）· Example sentences <small>for 填空 / 句子排序</small></label>
+          <p class="wg-hint">一行一句，句子里要包含上面的生词。One sentence per line, using the words above.</p>
+          <textarea id="wg-sentences" rows="5" spellcheck="false" placeholder="这是我的爸爸。"></textarea>
+        </section>
+
+        <section class="wg-panel">
+          <div class="wg-panel-heading">
+            <span class="wg-step">2</span>
+            <h2>题型 · Question types</h2>
+          </div>
+          <div class="wg-row wg-row-tight">
+            <button type="button" class="wg-link-btn" id="wg-all">全选 All</button>
+            <button type="button" class="wg-link-btn" id="wg-none">全不选 None</button>
+          </div>
+          <div id="wg-types" class="wg-types"></div>
+        </section>
+
+        <section class="wg-panel">
+          <div class="wg-panel-heading">
+            <span class="wg-step">3</span>
+            <h2>版面 · Layout</h2>
+          </div>
+          <label for="wg-title" class="wg-label">标题 Title</label>
+          <input type="text" id="wg-title" placeholder="我的家人">
+          <label for="wg-subtitle" class="wg-label">副标题 Subtitle</label>
+          <input type="text" id="wg-subtitle" placeholder="My Family · Unit 3">
+
+          <div class="wg-grid2">
+            <div>
+              <label for="wg-paper" class="wg-label">纸张 Paper</label>
+              <select id="wg-paper">
+                <option value="A4">A4</option>
+                <option value="letter">Letter</option>
+              </select>
+            </div>
+            <div>
+              <label for="wg-font" class="wg-label">汉字字体 Font</label>
+              <select id="wg-font">
+                <option value="kai">楷体 Kai</option>
+                <option value="song">宋体 Song</option>
+                <option value="hei">黑体 Hei</option>
+              </select>
+            </div>
+            <div>
+              <label for="wg-versions" class="wg-label">版本数 Versions</label>
+              <select id="wg-versions">
+                <option value="1">1</option>
+                <option value="2">2 (A, B)</option>
+                <option value="3">3 (A–C)</option>
+                <option value="4">4 (A–D)</option>
+              </select>
+            </div>
+            <div>
+              <label for="wg-size" class="wg-label">字号 Text size</label>
+              <select id="wg-size">
+                <option value="s">小 Small</option>
+                <option value="m" selected>中 Medium</option>
+                <option value="l">大 Large</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="wg-checks">
+            <label class="wg-check"><input type="checkbox" id="wg-pinyin" checked> <span>显示拼音 Show pinyin</span></label>
+            <label class="wg-check"><input type="checkbox" id="wg-info" checked> <span>学生信息栏 Name / class / date line</span></label>
+            <label class="wg-check"><input type="checkbox" id="wg-answers" checked> <span>附答案页 Add answer key</span></label>
+          </div>
+        </section>
+      </section>
+
+      <section class="wg-preview" aria-label="Worksheet preview">
+        <div class="wg-toolbar wg-no-print">
+          <button id="wg-shuffle" type="button" class="wg-secondary">🎲 重新打乱 Shuffle</button>
+          <button id="wg-print" type="button" class="wg-primary">🖨️ 打印 / PDF Print</button>
+          <span id="wg-status" class="wg-status" aria-live="polite"></span>
+        </div>
+        <div class="wg-paper-scroll">
+          <div id="wg-output" class="wg-output"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="wg-no-print">
+    <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+  </div>
+
+  <script src="/vendor/pinyin-pro.js"></script>
+  <script src="/low-prep/worksheet-generator/worksheet-generator.js?v=2" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
