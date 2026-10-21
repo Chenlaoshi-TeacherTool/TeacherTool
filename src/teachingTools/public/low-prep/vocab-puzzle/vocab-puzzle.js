@@ -274,9 +274,11 @@
     return out.join(' ');
   }
 
-  // Lay the words out ON the cut lines so the cut always splits characters:
-  // rows sitting on a horizontal cut get every word sliced top/bottom; rows in
-  // the middle of a band put words across the vertical cuts (sliced left/right).
+  // Lay the words out centred on the page, with rows placed symmetrically
+  // around the middle on a half-band lattice: a row on a horizontal cut gets
+  // every word sliced top/bottom, and the centre of the page always sits on a
+  // cut line (horizontal if the row count is even, vertical if columns are even).
+  // Characters grow as large as the row count and word lengths allow.
   function makeTextPage(items, opts) {
     var W = A4_SHORT;
     var H = A4_LONG;
@@ -291,58 +293,83 @@
     ctx.fillRect(0, 0, W, H);
 
     var withPinyin = opts.showPinyin && !!dict;
-    var longest = items.reduce(function (n, w) { return Math.max(n, Array.from(w).length); }, 1);
-    var bandH = H / R;
-    var cellW = W / C;
+    var boxed = opts.textStyle === 'grid';
+    var half = H / R / 2;           // lattice step: half a band
+    var GAP = 0.7;                  // space between words, in character widths
+    var lens = items.map(function (w) { return Array.from(w).length; });
 
-    var candidates = [];
-    var k;
-    for (k = 1; k < R; k++) candidates.push({ y: k * bandH, cut: 'h' });
-    for (k = 0; k < R; k++) candidates.push({ y: (k + 0.5) * bandH, cut: 'v' });
-    if (!candidates.length) candidates.push({ y: H / 2, cut: 'v' });
-
-    // Try using the first t candidate rows; keep whichever gives the biggest text.
-    var best = null;
-    for (var t = 1; t <= candidates.length; t++) {
-      var used = candidates.slice(0, t).sort(function (a, b) { return a.y - b.y; });
-      var perRow = Math.ceil(items.length / t);
-      var gaps = [used[0].y, H - used[used.length - 1].y];
-      for (var g = 1; g < used.length; g++) gaps.push((used[g].y - used[g - 1].y) / 2);
-      var room = Math.min.apply(null, gaps) * 2; // vertical space each row can use
-      var size = Math.min(
-        (W * 0.92) / (perRow * longest + (perRow - 1) * 0.8),
-        room * (withPinyin ? 0.5 : 0.66),
-        320
-      );
-      if (!best || size > best.size + 0.5) best = { rows: used, perRow: perRow, size: size };
+    function dealRows(t) {
+      var rows = [];
+      var start = 0;
+      for (var i = 0; i < t; i++) {
+        var take = Math.ceil((items.length - start) / (t - i));
+        rows.push({ start: start, end: start + take });
+        start += take;
+      }
+      return rows;
     }
 
-    // Deal words into rows (evenly), then position them along each row.
-    var size = best.size;
-    var rowCount = best.rows.length;
-    var queue = items.slice();
-    best.rows.forEach(function (row, ri) {
-      var take = Math.ceil(queue.length / (rowCount - ri));
-      var words = queue.splice(0, take);
-      if (!words.length) return;
-      var xs;
-      if (row.cut === 'v' && C > 1 && words.length <= C - 1) {
-        // Centre words on vertical cut lines, spread across the available lines.
-        xs = words.map(function (_, i) {
-          var line = Math.round((i + 1) * C / (words.length + 1));
-          return Math.min(C - 1, Math.max(1, line)) * cellW;
-        });
-      } else if (row.cut === 'h' && C > 1 && words.length <= C) {
-        // Centre words in each column (vertical cuts stay between them).
-        xs = words.map(function (_, i) {
-          var col = Math.floor((i + 0.5) * C / words.length);
-          return (col + 0.5) * cellW;
-        });
-      } else {
-        xs = words.map(function (_, i) { return W * (i + 0.5) / words.length; });
+    var best = null;
+    for (var t = 1; t <= Math.min(items.length, 2 * R - 1); t++) {
+      for (var step = 2 * R; step >= 1; step--) {
+        if (t % 2 === 0 && step % 2 === 1) continue; // keep rows on the lattice
+        var first = R - (t - 1) * step / 2;
+        if (first < 1 || first + (t - 1) * step > 2 * R - 1) continue;
+        var rows = dealRows(t);
+        var units = Math.max.apply(null, rows.map(function (r) {
+          var n = 0;
+          for (var i = r.start; i < r.end; i++) n += lens[i];
+          return n + (r.end - r.start - 1) * GAP;
+        }));
+        var room = t === 1 ? H : step * half;
+        room = Math.min(room, 2 * first * half);
+        var size = Math.min(
+          (W * 0.86) / (units * (boxed ? 1.12 : 1)),
+          room * (withPinyin ? 0.46 : 0.6) / (boxed ? 1.12 : 1),
+          560
+        );
+        // Share of words a cut actually passes through: every word on a
+        // horizontal cut, otherwise only words that straddle a vertical cut.
+        var cutWords = 0;
+        for (var r = 0; r < t; r++) {
+          var row = rows[r];
+          if ((first + r * step) % 2 === 0) { cutWords += row.end - row.start; continue; }
+          var unit = size * (boxed ? 1.12 : 1);
+          var rowW = 0;
+          for (var q = row.start; q < row.end; q++) rowW += lens[q] * unit;
+          rowW += (row.end - row.start - 1) * GAP * unit;
+          var x0 = (W - rowW) / 2;
+          for (var q2 = row.start; q2 < row.end; q2++) {
+            var x1 = x0 + lens[q2] * unit;
+            for (var line = 1; line < C; line++) {
+              var lx = line * W / C;
+              if (lx > x0 + unit * 0.2 && lx < x1 - unit * 0.2) { cutWords++; break; }
+            }
+            x0 = x1 + GAP * unit;
+          }
+        }
+        var score = size * (0.65 + 0.35 * cutWords / items.length);
+        if (!best || score > best.score) {
+          best = { score: score, size: size, rows: rows, ys: rows.map(function (_, i) { return (first + i * step) * half; }) };
+        }
+        break; // the widest step that fits is best for this t
       }
+    }
+
+    var size = best.size;
+    var gap = size * GAP * (boxed ? 1.12 : 1);
+    best.rows.forEach(function (row, ri) {
+      var words = items.slice(row.start, row.end);
+      ctx.font = '700 ' + size + 'px ' + opts.font;
+      var widths = words.map(function (w) {
+        var tw = ctx.measureText(w).width;
+        return boxed ? Math.max(tw + size * 0.2, Array.from(w).length * size * 1.12) : tw;
+      });
+      var total = widths.reduce(function (a, b) { return a + b; }, 0) + gap * (words.length - 1);
+      var x = (W - total) / 2;
       words.forEach(function (word, i) {
-        drawWord(ctx, word, xs[i], row.y, size, W / words.length, opts, withPinyin);
+        drawWord(ctx, word, x + widths[i] / 2, best.ys[ri], size, W, opts, withPinyin);
+        x += widths[i] + gap;
       });
     });
     return canvas;
@@ -486,10 +513,11 @@
     var bw = Math.min(usable.w, usable.h * aspect) * opts.size;
     var bh = bw / aspect;
 
-    // Shrink if a single piece (with its knobs) would not fit on a pieces sheet.
+    // Shrink if a single piece (with its knobs) would not fit on a pieces sheet
+    // (only matters when that sheet is printed).
     var reach = opts.straight ? 0 : KNOB_REACH;
     var m = Math.min(bw / cols, bh / rows);
-    var fit = Math.min(1, usable.w / (bw / cols + 2 * reach * m + 4), usable.h / (bh / rows + 2 * reach * m + 4));
+    var fit = !opts.scrambled ? 1 : Math.min(1, usable.w / (bw / cols + 2 * reach * m + 4), usable.h / (bh / rows + 2 * reach * m + 4));
     bw *= fit;
     bh *= fit;
 
