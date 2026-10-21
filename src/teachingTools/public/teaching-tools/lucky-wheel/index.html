@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>幸运转盘 · 陈老师教学工具</title>
+<style>
+  :root { color-scheme: light; font-family: 'Segoe UI','Microsoft YaHei',sans-serif; color:#194f45; background:#faf8ef; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:28px 24px 48px; }
+  main { max-width:1120px; margin:auto; }
+  a { color:#356e57; text-underline-offset:4px; }
+  header { margin:32px 0; }
+  .eyebrow { font-size:12px; letter-spacing:3px; font-weight:800; color:#6c806c; }
+  h1 { font-size:clamp(32px,5vw,48px); letter-spacing:-1px; margin:10px 0; }
+  p { line-height:1.7; color:#65766b; }
+  .layout { display:grid; grid-template-columns:340px minmax(0,1fr); gap:24px; align-items:start; }
+  .panel { padding:28px; background:#fffef9; border:1px solid #e4e8d9; border-radius:24px; box-shadow:0 8px 32px #194f4508; }
+  label { display:block; font-size:20px; font-weight:750; }
+  .hint { font-size:14px; margin:8px 0 18px; }
+  textarea { display:block; width:100%; min-height:330px; resize:vertical; border:1px solid #ccd8c5; border-radius:14px; padding:16px; background:#fafbf5; color:#194f45; font:inherit; line-height:1.85; }
+  textarea:focus-visible,button:focus-visible,a:focus-visible { outline:3px solid #d7ab40; outline-offset:4px; }
+  .input-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:16px; }
+  #count { font-size:14px; color:#65766b; }
+  button { font:inherit; cursor:pointer; border:0; font-weight:750; }
+  #reset { padding:10px 16px; color:#356e57; background:#edf3e6; border-radius:12px; }
+  button:disabled { cursor:wait; opacity:.65; }
+  .stage { text-align:center; padding:24px; }
+  .wheel-wrap { position:relative; max-width:560px; margin:12px auto 0; }
+  canvas { display:block; width:100%; height:auto; }
+  .pointer { position:absolute; z-index:2; top:0; left:50%; transform:translateX(-50%); width:30px; height:38px; background:#194f45; clip-path:polygon(0 0,100% 0,50% 100%); }
+  #spin { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:19%; aspect-ratio:1; border:6px solid #fffef9; border-radius:50%; background:#194f45; color:#fffef9; box-shadow:0 4px 16px #194f4526; font-size:clamp(12px,2vw,18px); }
+  #result { min-height:65px; margin:20px 0 0; padding:16px; background:#f1f5e9; border-radius:16px; color:#194f45; font-size:20px; font-weight:750; overflow-wrap:anywhere; }
+  .keyboard { font-size:13px; margin:12px 0 0; }
+  kbd { font:inherit; padding:2px 7px; border:1px solid #dce3d3; border-radius:5px; background:white; }
+  @media(max-width:760px) { body { padding:20px 16px 32px; } header { margin:24px 0; } .layout { grid-template-columns:1fr; } .stage { grid-row:1; padding:16px; } .panel { border-radius:20px; } textarea { min-height:220px; } }
+</style>
+</head>
+<body>
+<main>
+  <a href="/teaching-tools">← 教学工具</a>
+  <header><div class="eyebrow">CHEN LAOSHI · CLASSROOM TOOLS</div><h1>幸运转盘</h1><p>把选择交给一点运气，让每一次课堂互动都有惊喜。</p></header>
+  <div class="layout">
+    <section class="panel" aria-label="转盘内容">
+      <label for="entries">今天，转点什么？</label>
+      <p class="hint" id="input-help">每行一个词语或句子，空行自动忽略。修改后，转盘会自动更新。</p>
+      <textarea id="entries" aria-describedby="input-help" spellcheck="false">分享一个好消息
+请左边的同学回答
+用三个词形容今天
+全班一起伸个懒腰
+问老师一个问题
+给同学一句鼓励
+再转一次</textarea>
+      <div class="input-footer"><span id="count"></span><button id="reset" type="button">重置转盘</button></div>
+      <p class="hint">重置会清除抽取结果，并重新读取上方内容；不会清空你的词句。</p>
+    </section>
+    <section class="panel stage" aria-label="幸运转盘">
+      <div class="wheel-wrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" width="1000" height="1000" role="img" aria-label="幸运转盘"></canvas><button id="spin" type="button">开始</button></div>
+      <p id="result" role="status" aria-live="polite">准备好了，转一转！</p>
+      <p class="keyboard">点击中心按钮，或按 <kbd>SPACE</kbd> 开始</p>
+    </section>
+  </div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const input = document.getElementById('entries');
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const spin = document.getElementById('spin');
+  const reset = document.getElementById('reset');
+  const result = document.getElementById('result');
+  const count = document.getElementById('count');
+  const colors = ['#f3d879','#c5d9b0','#f2c9b6','#dce7c6','#e9deb5','#bcd7cb','#f5e4ac'];
+  const TAU = Math.PI * 2;
+  let items = [], rotation = 0, selected = -1, running = false, frame = 0;
+
+  // Measure each character so Chinese text and unbroken English words both wrap.
+  function wrap(text, width) {
+    const lines = [];
+    let line = '';
+    for (const character of Array.from(text)) {
+      if (line && ctx.measureText(line + character).width > width) {
+        lines.push(line);
+        line = '';
+      }
+      line += character;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, 1000, 1000);
+    const radius = 464, step = TAU / (items.length || 1);
+    ctx.save();
+    ctx.translate(500, 500);
+    if (!items.length) {
+      ctx.beginPath(); ctx.arc(0, 0, radius, 0, TAU);
+      ctx.fillStyle = '#edf3e6'; ctx.fill();
+    }
+    items.forEach((text, index) => {
+      const middle = rotation - Math.PI / 2 + index * step;
+      const start = middle - step / 2, end = middle + step / 2;
+      ctx.save();
+      ctx.beginPath();
+      if (items.length === 1) ctx.arc(0, 0, radius, 0, TAU);
+      else { ctx.moveTo(0, 0); ctx.arc(0, 0, radius, start, end); ctx.closePath(); }
+      ctx.fillStyle = index === selected ? '#f7bf3c' : colors[index % colors.length];
+      ctx.fill();
+      ctx.strokeStyle = index === selected ? '#194f45' : '#fffef9';
+      ctx.lineWidth = index === selected ? 9 : 3;
+      ctx.stroke();
+      // Clip as a final guard; the text box itself fits inside the sector.
+      ctx.clip();
+      ctx.rotate(middle);
+      ctx.translate(radius * .61, 0);
+      if (Math.cos(middle) < 0) ctx.rotate(Math.PI);
+      const width = radius * .48;
+      const height = items.length <= 2 ? radius * .48 : Math.min(radius * .48, 2 * radius * .35 * Math.tan(step / 2)) * .84;
+      let size = 30, lines;
+      // Fit all lines without truncating the original entry.
+      do {
+        ctx.font = '700 ' + size + 'px "Segoe UI","Microsoft YaHei",sans-serif';
+        lines = wrap(text, width);
+        if (lines.length * size * 1.25 <= height && lines.every(line => ctx.measureText(line).width <= width)) break;
+        size *= .9;
+      } while (size > .1);
+      ctx.fillStyle = '#194f45'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      lines.forEach((line, row) => ctx.fillText(line, 0, (row - (lines.length - 1) / 2) * size * 1.25));
+      ctx.restore();
+    });
+    ctx.beginPath(); ctx.arc(0, 0, radius + 3, 0, TAU);
+    ctx.strokeStyle = '#194f45'; ctx.lineWidth = 7; ctx.stroke();
+    ctx.restore();
+  }
+
+  function reload() {
+    cancelAnimationFrame(frame);
+    running = false; rotation = 0; selected = -1;
+    items = input.value.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    count.textContent = items.length + ' 个扇形';
+    canvas.setAttribute('aria-label', '幸运转盘，共 ' + items.length + ' 个扇形');
+    input.disabled = false; spin.disabled = !items.length; spin.textContent = '开始';
+    result.textContent = items.length ? '准备好了，转一转！' : '请先输入至少一个词语或句子';
+    draw();
+  }
+
+  function start() {
+    if (running || !items.length) return;
+    running = true; selected = -1; spin.disabled = true; input.disabled = true;
+    spin.textContent = '旋转中'; result.textContent = '好运转动中…';
+    // Rejection sampling gives every sector the same chance, even with duplicates.
+    const random = new Uint32Array(1), limit = 4294967296 - (4294967296 % items.length);
+    do { crypto.getRandomValues(random); } while (random[0] >= limit);
+    const winner = random[0] % items.length;
+    const from = rotation, target = (TAU - winner * TAU / items.length) % TAU;
+    const distance = TAU * 5 + ((target - from % TAU + TAU) % TAU);
+    const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 150 : 4200;
+    const began = performance.now();
+    function tick(now) {
+      const progress = Math.min(1, (now - began) / duration);
+      rotation = from + distance * (1 - Math.pow(1 - progress, 4));
+      if (progress === 1) {
+        rotation = target; selected = winner; running = false;
+        input.disabled = false; spin.disabled = false; spin.textContent = '再转';
+        result.textContent = '本次抽中：' + items[winner];
+      }
+      draw();
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    }
+    frame = requestAnimationFrame(tick);
+  }
+  spin.addEventListener('click', start);
+  reset.addEventListener('click', reload);
+  input.addEventListener('input', reload);
+  document.addEventListener('keydown', event => {
+    // Preserve normal typing and native Space activation on focused buttons.
+    if (event.code !== 'Space' || event.repeat || event.ctrlKey || event.altKey || event.metaKey || event.target.closest('textarea,input,button,a,[contenteditable]')) return;
+    event.preventDefault(); start();
+  });
+  reload();
+})();
+</script>
+</body>
+</html>
