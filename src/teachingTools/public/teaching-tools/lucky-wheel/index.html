@@ -4,11 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>幸运转盘 · 陈老师教学工具</title>
+<link rel="stylesheet" href="/stylesheets/site-theme.css">
 <style>
   :root { color-scheme: light; font-family: 'Segoe UI','Microsoft YaHei',sans-serif; color:#194f45; background:#faf8ef; }
   * { box-sizing:border-box; }
-  body { margin:0; padding:28px 24px 48px; }
-  main { max-width:1120px; margin:auto; }
+  body { margin:0; }
+  main { max-width:1168px; margin:auto; padding:28px 24px 48px; }
   a { color:#356e57; text-underline-offset:4px; }
   header { margin:32px 0; }
   .eyebrow { font-size:12px; letter-spacing:3px; font-weight:800; color:#6c806c; }
@@ -33,7 +34,15 @@
   #result { min-height:65px; margin:20px 0 0; padding:16px; background:#f1f5e9; border-radius:16px; color:#194f45; font-size:20px; font-weight:750; overflow-wrap:anywhere; }
   .keyboard { font-size:13px; margin:12px 0 0; }
   kbd { font:inherit; padding:2px 7px; border:1px solid #dce3d3; border-radius:5px; background:white; }
-  @media(max-width:760px) { body { padding:20px 16px 32px; } header { margin:24px 0; } .layout { grid-template-columns:1fr; } .stage { grid-row:1; padding:16px; } .panel { border-radius:20px; } textarea { min-height:220px; } }
+  dialog { width:min(620px,calc(100% - 32px)); max-height:calc(100dvh - 48px); overflow:auto; padding:32px; border:1px solid #e4e8d9; border-radius:24px; background:#fffef9; color:#194f45; box-shadow:0 24px 80px #194f4533; text-align:center; }
+  dialog::backdrop { background:#143b3573; }
+  dialog h2 { margin:0; font-size:18px; }
+  #modal-text { margin:24px 0 32px; font-size:clamp(28px,5vw,46px); font-weight:800; line-height:1.5; color:#194f45; overflow-wrap:anywhere; }
+  .modal-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
+  .modal-actions button { flex:1 1 180px; padding:14px 20px; border-radius:12px; }
+  #keep { background:#194f45; color:#fffef9; }
+  #remove { background:#f5e4ac; color:#194f45; }
+  @media(max-width:760px) { main { padding:20px 16px 32px; } header { margin:24px 0; } .layout { grid-template-columns:1fr; } .stage { grid-row:1; padding:16px; } .panel { border-radius:20px; } textarea { min-height:220px; } }
 </style>
 </head>
 <body>
@@ -61,6 +70,15 @@
     </section>
   </div>
 </main>
+<!-- Native dialog provides modal focus trapping and Escape-to-close support. -->
+<dialog id="result-modal" aria-labelledby="modal-heading" aria-describedby="modal-text">
+  <h2 id="modal-heading">本次抽中</h2>
+  <p id="modal-text"></p>
+  <div class="modal-actions">
+    <button id="keep" type="button" autofocus>保留此问题</button>
+    <button id="remove" type="button">移除此问题</button>
+  </div>
+</dialog>
 <script>
 (() => {
   'use strict';
@@ -71,6 +89,8 @@
   const reset = document.getElementById('reset');
   const result = document.getElementById('result');
   const count = document.getElementById('count');
+  const modal = document.getElementById('result-modal');
+  const modalText = document.getElementById('modal-text');
   const colors = ['#f3d879','#c5d9b0','#f2c9b6','#dce7c6','#e9deb5','#bcd7cb','#f5e4ac'];
   const TAU = Math.PI * 2;
   let items = [], rotation = 0, selected = -1, running = false, frame = 0;
@@ -136,6 +156,7 @@
   }
 
   function reload() {
+    if (modal.open) modal.close();
     cancelAnimationFrame(frame);
     running = false; rotation = 0; selected = -1;
     items = input.value.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
@@ -147,7 +168,7 @@
   }
 
   function start() {
-    if (running || !items.length) return;
+    if (running || modal.open || !items.length) return;
     running = true; selected = -1; spin.disabled = true; input.disabled = true;
     spin.textContent = '旋转中'; result.textContent = '好运转动中…';
     // Rejection sampling gives every sector the same chance, even with duplicates.
@@ -167,6 +188,10 @@
         result.textContent = '本次抽中：' + items[winner];
       }
       draw();
+      if (progress === 1) {
+        modalText.textContent = items[winner];
+        modal.showModal();
+      }
       if (progress < 1) frame = requestAnimationFrame(tick);
     }
     frame = requestAnimationFrame(tick);
@@ -174,6 +199,13 @@
   spin.addEventListener('click', start);
   reset.addEventListener('click', reload);
   input.addEventListener('input', reload);
+  document.getElementById('keep').addEventListener('click', () => modal.close());
+  document.getElementById('remove').addEventListener('click', () => {
+    // Remove by index so identical entries remain separate choices.
+    items.splice(selected, 1);
+    input.value = items.join('\n');
+    reload();
+  });
   document.addEventListener('keydown', event => {
     // Preserve normal typing and native Space activation on focused buttons.
     if (event.code !== 'Space' || event.repeat || event.ctrlKey || event.altKey || event.metaKey || event.target.closest('textarea,input,button,a,[contenteditable]')) return;
@@ -182,5 +214,7 @@
   reload();
 })();
 </script>
+<!-- Use the same shared navigation and footer as the other teaching tools. -->
+<script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>
