@@ -389,12 +389,12 @@
       var bw = Math.max(tw + size * 0.2, n * cell);
       var bh = cell;
       ctx.save();
-      ctx.strokeStyle = '#93c5fd';
+      ctx.strokeStyle = '#9fc29a';
       ctx.lineWidth = 4;
       ctx.strokeRect(cx - bw / 2, cy - bh / 2, bw, bh);
       ctx.setLineDash([10, 10]);
       ctx.lineWidth = 2;
-      ctx.strokeStyle = '#bfdbfe';
+      ctx.strokeStyle = '#d3e3cd';
       var startX = cx - (n * cell) / 2;
       ctx.beginPath();
       for (var k = 0; k < n; k++) {
@@ -407,7 +407,7 @@
       ctx.restore();
     }
 
-    ctx.fillStyle = '#111827';
+    ctx.fillStyle = '#103e37';
     ctx.font = '700 ' + size + 'px ' + opts.font;
     ctx.fillText(item, cx, cy + size * 0.04);
 
@@ -418,7 +418,7 @@
         ctx.font = '600 ' + ps + 'px ' + LATIN;
         var pw = ctx.measureText(py).width;
         if (pw > maxW * 0.92) { ps *= maxW * 0.92 / pw; ctx.font = '600 ' + ps + 'px ' + LATIN; }
-        ctx.fillStyle = '#1d4ed8';
+        ctx.fillStyle = '#356e57';
         ctx.fillText(py, cx, cy - size * 0.62 - ps * 0.55);
       }
     }
@@ -566,10 +566,10 @@
       cut: opts.scrambled ? '答案 · Answer key' : '沿线剪开，打乱后再拼起来 · Cut along the lines, mix, then rebuild.'
     }[kind];
     var nameW = 560;
-    fitText(ctx, title, MARGIN, MARGIN + 48, p.pageW - MARGIN * 2 - nameW, 54, '800', LATIN + ', ' + FONTS.sans, '#1e3a8a');
-    fitText(ctx, sub, MARGIN, MARGIN + 96, p.pageW - MARGIN * 2 - nameW, 28, '500', LATIN + ', ' + FONTS.sans, '#4b5563');
+    fitText(ctx, title, MARGIN, MARGIN + 48, p.pageW - MARGIN * 2 - nameW, 54, '800', LATIN + ', ' + FONTS.sans, '#194f45');
+    fitText(ctx, sub, MARGIN, MARGIN + 96, p.pageW - MARGIN * 2 - nameW, 28, '500', LATIN + ', ' + FONTS.sans, '#5d7168');
     ctx.textAlign = 'right';
-    ctx.fillStyle = '#374151';
+    ctx.fillStyle = '#193d38';
     ctx.font = '700 30px ' + LATIN + ', ' + FONTS.sans;
     ctx.fillText(kind === 'cut' && opts.scrambled ? 'Teacher copy · 教师用' : '姓名 Name: _______________', p.pageW - MARGIN, MARGIN + 48);
     ctx.textAlign = 'left';
@@ -585,7 +585,7 @@
 
     ctx.save();
     ctx.translate(b.x, b.y);
-    ctx.strokeStyle = kind === 'board' ? '#9ca3af' : '#1e3a8a';
+    ctx.strokeStyle = kind === 'board' ? '#9ca3af' : '#194f45';
     ctx.lineWidth = kind === 'board' ? 4 : 5;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
@@ -678,7 +678,7 @@
     ctx.clip();
     ctx.drawImage(p.src, 0, 0, p.box.w, p.box.h);
     ctx.restore();
-    ctx.strokeStyle = '#1e3a8a';
+    ctx.strokeStyle = '#194f45';
     ctx.lineWidth = 5;
     ctx.lineJoin = 'round';
     if (opts.dashed) ctx.setLineDash([22, 14]);
