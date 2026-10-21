@@ -11,7 +11,7 @@
 <body>
   <header class="reward-grid-header">
     <a href="/teaching-tools">← 教学工具</a>
-    <div class="heading"><div><p class="eyebrow">CHOOSE · ANSWER · REVEAL</p><h1>课堂抽奖格子</h1><p>选一个格子，答对题目，揭晓惊喜。</p></div><span class="gift" aria-hidden="true">🎁</span></div>
+    <div class="heading"><div><p class="eyebrow">READ · CHOOSE · REVEAL</p><h1>课堂抽奖格子</h1><p>先看题，再选择，点击题目揭晓惊喜。</p></div><span class="gift" aria-hidden="true">🎁</span></div>
   </header>
   <main>
     <p id="status" role="status" aria-live="polite"></p>
@@ -25,7 +25,7 @@
       <div class="panel toolbar"><div><h2>准备你的惊喜墙</h2><p>先设置大小，再为每格填写题目与奖励。修改后自动保存。</p></div>
         <div class="controls"><label>行数 <input id="rows" type="number" min="1" max="8" value="3"></label><span>×</span><label>列数 <input id="cols" type="number" min="1" max="8" value="4"></label><button id="resize" class="secondary">应用大小</button></div>
       </div>
-      <p class="hint">支持 1–8 行、1–8 列。缩小网格会移除末尾格子；答错可重试，答对后锁定。</p>
+      <p class="hint">支持 1–8 行、1–8 列。缩小网格会移除末尾格子；游戏中直接显示题目，点击后揭晓奖励并锁定。</p>
       <div id="editors"></div>
       <div class="bottom-bar"><p>🔒 题目、图片和进度仅保存在此浏览器</p><button id="start">进入课堂模式 →</button></div>
     </section>
@@ -34,9 +34,10 @@
       <div class="board-scroll"><div id="board" aria-label="奖励格子"></div></div>
     </section>
   </main>
-  <dialog id="question-dialog" aria-labelledby="question-title">
-    <p class="eyebrow" id="question-number"></p><h2 id="question-title">请回答</h2><p id="question-text"></p>
-    <div class="dialog-actions"><button id="cancel" class="secondary">暂不作答</button><button id="wrong" class="secondary">答错了，再试试</button><button id="correct">答对了！揭晓奖励</button></div>
+  <dialog id="reward-dialog" aria-labelledby="reward-title">
+    <p class="eyebrow" id="reward-number"></p><h2 id="reward-title">奖励揭晓！</h2><p id="reward-question"></p>
+    <div id="reward-content"></div>
+    <div class="dialog-actions"><button id="close-reward">继续选题</button></div>
   </dialog>
   <script src="../../javascripts/milk-tea-footer.js"></script>
 </body>

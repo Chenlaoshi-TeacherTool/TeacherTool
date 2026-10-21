@@ -3,7 +3,6 @@ const STORAGE_KEY = 'teacher-tool-reward-grid-v1';
 const $ = (id) => document.getElementById(id);
 const newCell = () => ({ question: '', type: 'points', reward: '10', revealed: false });
 let state = { rows: 3, cols: 4, cells: Array.from({ length: 12 }, newCell), mode: 'setup' };
-let selected = null;
 let pendingImages = 0;
 
 function message(text, error = false) {
@@ -111,38 +110,47 @@ function renderRewardField(card, cell) {
   }
 }
 
+function createReward(cell, index) {
+  const reward = document.createElement(cell.type === 'image' ? 'img' : 'span');
+  reward.className = 'reward-value';
+  if (cell.type === 'image') {
+    reward.src = cell.reward;
+    reward.alt = `格子 ${index + 1} 的奖励图片`;
+  } else {
+    reward.textContent = cell.type === 'points' ? `${cell.reward} 分` : cell.reward;
+  }
+  return reward;
+}
+
 function renderBoard() {
   $('board').style.setProperty('--cols', state.cols);
   $('board').replaceChildren();
   const opened = state.cells.filter(cell => cell.revealed).length;
-  $('progress').textContent = opened === state.cells.length ? '全部揭晓！本轮挑战完成 🎉' : `已揭晓 ${opened} / ${state.cells.length} · 请选择一个号码`;
+  $('progress').textContent = opened === state.cells.length ? '全部揭晓！本轮挑战完成 🎉' : `已揭晓 ${opened} / ${state.cells.length} · 看题选格，点击揭晓奖励`;
   state.cells.forEach((cell, index) => {
     const tile = document.createElement('button');
     tile.className = `tile${cell.revealed ? ' revealed' : ''}`;
     tile.disabled = cell.revealed;
+    const number = document.createElement('small');
+    number.textContent = `格子 ${index + 1}`;
+    const question = document.createElement('span');
+    question.className = 'tile-question';
+    question.textContent = cell.question;
+    tile.append(number, question);
     if (cell.revealed) {
-      if (cell.type === 'image' && cell.reward.startsWith('data:image/')) {
-        const image = document.createElement('img');
-        image.src = cell.reward;
-        image.alt = `格子 ${index + 1} 的奖励图片`;
-        tile.append(image);
-      } else {
-        const reward = document.createElement('span');
-        reward.textContent = cell.type === 'points' ? `${cell.reward} 分` : cell.reward;
-        if (cell.type === 'emoji') reward.className = 'emoji';
-        tile.append(reward);
-      }
+      tile.append(createReward(cell, index));
       const caption = document.createElement('small');
       caption.textContent = `格子 ${index + 1} · 已揭晓`;
       tile.append(caption);
     } else {
-      tile.textContent = index + 1;
-      tile.setAttribute('aria-label', `选择格子 ${index + 1}`);
       tile.onclick = () => {
-        selected = index;
-        $('question-number').textContent = `格子 ${index + 1}`;
-        $('question-text').textContent = cell.question;
-        $('question-dialog').showModal();
+        cell.revealed = true;
+        save();
+        renderBoard();
+        $('reward-number').textContent = `格子 ${index + 1}`;
+        $('reward-question').textContent = cell.question;
+        $('reward-content').replaceChildren(createReward(cell, index));
+        $('reward-dialog').showModal();
       };
     }
     $('board').append(tile);
@@ -206,15 +214,11 @@ $('reset').onclick = () => {
   state.cells.forEach(cell => { cell.revealed = false; });
   save(); renderBoard();
 };
-$('cancel').onclick = $('wrong').onclick = () => $('question-dialog').close();
-$('correct').onclick = () => {
-  if (selected === null || state.cells[selected].revealed) return;
-  state.cells[selected].revealed = true;
-  $('question-dialog').close(); save(); renderBoard();
+$('close-reward').onclick = () => $('reward-dialog').close();
+$('reward-dialog').addEventListener('close', () => {
   const next = $('board').querySelector('button:not(:disabled)');
   if (next) next.focus();
-};
-$('question-dialog').addEventListener('close', () => { selected = null; });
+});
 $('fullscreen').onclick = async () => {
   try {
     if (document.fullscreenElement) await document.exitFullscreen();
