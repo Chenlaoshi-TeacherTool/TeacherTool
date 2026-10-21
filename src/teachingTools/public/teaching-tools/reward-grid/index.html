@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>课堂抽奖格子 · Teacher Toolkit</title>
+  <link rel="stylesheet" href="../../stylesheets/site-theme.css">
+  <link rel="stylesheet" href="reward-grid.css">
+  <script src="reward-grid.js" defer></script>
+</head>
+<body>
+  <header class="reward-grid-header">
+    <a href="/teaching-tools">← 教学工具</a>
+    <div class="heading"><div><p class="eyebrow">CHOOSE · ANSWER · REVEAL</p><h1>课堂抽奖格子</h1><p>选一个格子，答对题目，揭晓惊喜。</p></div><span class="gift" aria-hidden="true">🎁</span></div>
+  </header>
+  <main>
+    <p id="status" role="status" aria-live="polite"></p>
+    <section id="setup">
+      <section class="panel bulk-questions" aria-labelledby="bulk-title">
+        <h2 id="bulk-title">一次放入所有题目</h2>
+        <label for="bulk-questions">每行一道题，空行会自动跳过。生成后仍可在各格中单独修改。</label>
+        <textarea id="bulk-questions" rows="7" placeholder="例如：&#10;请用“因为”说一句话。&#10;你最喜欢哪个季节？为什么？&#10;说出三个带有木字旁的汉字。"></textarea>
+        <div class="controls"><button id="generate-questions">生成到格子 ↓</button><p>按格子编号依次填入，保留各格奖励设置。</p></div>
+      </section>
+      <div class="panel toolbar"><div><h2>准备你的惊喜墙</h2><p>先设置大小，再为每格填写题目与奖励。修改后自动保存。</p></div>
+        <div class="controls"><label>行数 <input id="rows" type="number" min="1" max="8" value="3"></label><span>×</span><label>列数 <input id="cols" type="number" min="1" max="8" value="4"></label><button id="resize" class="secondary">应用大小</button></div>
+      </div>
+      <p class="hint">支持 1–8 行、1–8 列。缩小网格会移除末尾格子；答错可重试，答对后锁定。</p>
+      <div id="editors"></div>
+      <div class="bottom-bar"><p>🔒 题目、图片和进度仅保存在此浏览器</p><button id="start">进入课堂模式 →</button></div>
+    </section>
+    <section id="classroom" hidden>
+      <div class="toolbar classroom-toolbar"><div><h2>今天的幸运格</h2><p id="progress" aria-live="polite"></p></div><div class="controls"><button id="edit" class="secondary">返回设置</button><button id="reset" class="secondary">重新开始</button><button id="fullscreen" class="secondary">全屏投影</button></div></div>
+      <div class="board-scroll"><div id="board" aria-label="奖励格子"></div></div>
+    </section>
+  </main>
+  <dialog id="question-dialog" aria-labelledby="question-title">
+    <p class="eyebrow" id="question-number"></p><h2 id="question-title">请回答</h2><p id="question-text"></p>
+    <div class="dialog-actions"><button id="cancel" class="secondary">暂不作答</button><button id="wrong" class="secondary">答错了，再试试</button><button id="correct">答对了！揭晓奖励</button></div>
+  </dialog>
+  <script src="../../javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
