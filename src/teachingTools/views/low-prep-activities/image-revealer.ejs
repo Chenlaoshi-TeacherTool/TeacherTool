@@ -7,7 +7,7 @@
   <title>Image Revealer - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Upload photos, cover them in a grid, and reveal one tile at a time as a guessing warm-up. Images stay in your browser and never touch a server.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/image-revealer/image-revealer.css?v=fullscreen-bar-3">
+  <link rel="stylesheet" href="/low-prep/image-revealer/image-revealer.css?v=sources-1">
 </head>
 <body class="reveal-page">
   <main class="reveal-wrap">
@@ -35,13 +35,40 @@
               <h2><%= t('imageRevealer.uploadHeading') %></h2>
             </div>
           </div>
-          <label class="reveal-upload-drop" for="image-input">
-            <input id="image-input" type="file" accept="image/*" multiple hidden>
-            <span class="reveal-upload-icon" aria-hidden="true">＋</span>
-            <span class="reveal-upload-text"><%= t('imageRevealer.uploadText') %></span>
-          </label>
+          <div class="reveal-preset-row reveal-tabs" role="tablist" aria-label="<%= t('imageRevealer.uploadHeading') %>">
+            <button type="button" class="reveal-tab is-active" role="tab" aria-selected="true" data-source-tab="image">🖼️ <%= t('imageRevealer.tabImage') %></button>
+            <button type="button" class="reveal-tab" role="tab" aria-selected="false" data-source-tab="pdf">📄 <%= t('imageRevealer.tabPdf') %></button>
+            <button type="button" class="reveal-tab" role="tab" aria-selected="false" data-source-tab="text">✏️ <%= t('imageRevealer.tabText') %></button>
+          </div>
+
+          <div class="reveal-source-pane" data-source-pane="image">
+            <label class="reveal-upload-drop" for="image-input">
+              <input id="image-input" type="file" accept="image/*" multiple hidden>
+              <span class="reveal-upload-icon" aria-hidden="true">＋</span>
+              <span class="reveal-upload-text"><%= t('imageRevealer.uploadText') %></span>
+            </label>
+          </div>
+
+          <div class="reveal-source-pane" data-source-pane="pdf" hidden>
+            <label class="reveal-upload-drop" for="pdf-input">
+              <input id="pdf-input" type="file" accept="application/pdf,.pdf" hidden>
+              <span class="reveal-upload-icon" aria-hidden="true">＋</span>
+              <span class="reveal-upload-text"><%= t('imageRevealer.pdfText') %></span>
+            </label>
+            <p class="reveal-help"><%= t('imageRevealer.pdfHelp') %></p>
+          </div>
+
+          <div class="reveal-source-pane" data-source-pane="text" hidden>
+            <label for="text-input"><%= t('imageRevealer.textLabel') %>
+              <textarea id="text-input" class="reveal-text-input" rows="5" placeholder="<%= t('imageRevealer.textPlaceholder') %>"></textarea>
+            </label>
+            <p class="reveal-help"><%= t('imageRevealer.textHelp') %></p>
+            <button id="text-add-button" type="button" class="reveal-secondary"><%= t('imageRevealer.textAddButton') %></button>
+          </div>
+
+          <p id="source-status" class="reveal-help" aria-live="polite"></p>
           <p class="reveal-help"><%= t('imageRevealer.uploadHelp') %></p>
-          <ul id="image-list" class="reveal-image-list" aria-label="Uploaded images"></ul>
+          <ul id="image-list" class="reveal-image-list" aria-label="<%= t('imageRevealer.uploadHeading') %>"></ul>
         </section>
 
         <section class="reveal-panel">
@@ -125,7 +152,21 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
-  <script src="/low-prep/image-revealer/image-revealer.js?v=fullscreen-bar-3" defer></script>
+  <script src="/low-prep/vocab-puzzle/pdfjs/pdf.min.js"></script>
+  <script
+    id="reveal-i18n"
+    type="application/json"><%- JSON.stringify({
+      pdfReading: t('imageRevealer.pdfReading'),
+      pdfDone: t('imageRevealer.pdfDone'),
+      pdfError: t('imageRevealer.pdfError'),
+      pdfNoReader: t('imageRevealer.pdfNoReader'),
+      textAdded: t('imageRevealer.textAdded'),
+      textEmpty: t('imageRevealer.textEmpty'),
+      imagesReady: t('imageRevealer.imagesReady'),
+      slideAlt: t('imageRevealer.slideAlt'),
+      removeAlt: t('imageRevealer.removeAlt')
+    }).replace(/</g, '\\u003c') %></script>
+  <script src="/low-prep/image-revealer/image-revealer.js?v=sources-1" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
