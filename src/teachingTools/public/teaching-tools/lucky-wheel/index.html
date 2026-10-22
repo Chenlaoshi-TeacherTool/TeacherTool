@@ -91,6 +91,49 @@
   const count = document.getElementById('count');
   const modal = document.getElementById('result-modal');
   const modalText = document.getElementById('modal-text');
+  // Match the language cookie used by the shared site navigation (English by default).
+  const isChinese = /(?:^|;\s*)lang=zh(?:;|$)/.test(document.cookie);
+  const text = isChinese ? {
+    wheel: '幸运转盘', start: '开始', again: '再转', spinning: '旋转中',
+    ready: '准备好了，转一转！', empty: '请先输入至少一个词语或句子',
+    progress: '好运转动中…', chosen: '本次抽中：',
+    sectors: n => n + ' 个扇形', wheelLabel: n => '幸运转盘，共 ' + n + ' 个扇形'
+  } : {
+    wheel: 'Lucky Wheel', start: 'Spin', again: 'Again', spinning: 'Spinning',
+    ready: 'Ready? Give it a spin!', empty: 'Enter at least one word or sentence to begin.',
+    progress: 'Spinning…', chosen: 'Selected: ',
+    sectors: n => n + (n === 1 ? ' sector' : ' sectors'),
+    wheelLabel: n => 'Lucky wheel with ' + n + (n === 1 ? ' sector' : ' sectors')
+  };
+  document.documentElement.lang = isChinese ? 'zh-CN' : 'en';
+  if (!isChinese) {
+    document.title = "Lucky Wheel · Chen Laoshi's Teaching Tools";
+    const labels = {
+      'main > a': '← Teaching Tools',
+      'h1': 'Lucky Wheel',
+      'header > p': 'Add a little luck to your classroom. Every spin brings a new surprise.',
+      'label[for="entries"]': 'What will you spin today?',
+      '#input-help': 'Enter one word or sentence per line. Blank lines are ignored. The wheel updates as you type.',
+      '#reset': 'Reset wheel',
+      '.input-footer + .hint': 'Reset clears the result and reloads your entries without deleting them.',
+      '#modal-heading': 'Selected',
+      '#keep': 'Keep this question',
+      '#remove': 'Remove this question'
+    };
+    Object.entries(labels).forEach(([selector, value]) => {
+      document.querySelector(selector).textContent = value;
+    });
+    document.querySelector('section.panel').setAttribute('aria-label', 'Wheel entries');
+    document.querySelector('.stage').setAttribute('aria-label', text.wheel);
+    const keyboard = document.querySelector('.keyboard');
+    keyboard.firstChild.textContent = 'Click the center button or press ';
+    keyboard.lastChild.textContent = ' to spin';
+    input.value = [
+      'Share some good news', 'Ask the classmate on your left',
+      'Describe today in three words', 'Everyone take a stretch break',
+      'Ask your teacher a question', 'Encourage a classmate', 'Spin again'
+    ].join('\n');
+  }
   const colors = ['#f3d879','#c5d9b0','#f2c9b6','#dce7c6','#e9deb5','#bcd7cb','#f5e4ac'];
   const TAU = Math.PI * 2;
   let items = [], rotation = 0, selected = -1, running = false, frame = 0;
@@ -160,17 +203,17 @@
     cancelAnimationFrame(frame);
     running = false; rotation = 0; selected = -1;
     items = input.value.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-    count.textContent = items.length + ' 个扇形';
-    canvas.setAttribute('aria-label', '幸运转盘，共 ' + items.length + ' 个扇形');
-    input.disabled = false; spin.disabled = !items.length; spin.textContent = '开始';
-    result.textContent = items.length ? '准备好了，转一转！' : '请先输入至少一个词语或句子';
+    count.textContent = text.sectors(items.length);
+    canvas.setAttribute('aria-label', text.wheelLabel(items.length));
+    input.disabled = false; spin.disabled = !items.length; spin.textContent = text.start;
+    result.textContent = items.length ? text.ready : text.empty;
     draw();
   }
 
   function start() {
     if (running || modal.open || !items.length) return;
     running = true; selected = -1; spin.disabled = true; input.disabled = true;
-    spin.textContent = '旋转中'; result.textContent = '好运转动中…';
+    spin.textContent = text.spinning; result.textContent = text.progress;
     // Rejection sampling gives every sector the same chance, even with duplicates.
     const random = new Uint32Array(1), limit = 4294967296 - (4294967296 % items.length);
     do { crypto.getRandomValues(random); } while (random[0] >= limit);
@@ -184,8 +227,8 @@
       rotation = from + distance * (1 - Math.pow(1 - progress, 4));
       if (progress === 1) {
         rotation = target; selected = winner; running = false;
-        input.disabled = false; spin.disabled = false; spin.textContent = '再转';
-        result.textContent = '本次抽中：' + items[winner];
+        input.disabled = false; spin.disabled = false; spin.textContent = text.again;
+        result.textContent = text.chosen + items[winner];
       }
       draw();
       if (progress === 1) {
