@@ -22,7 +22,7 @@
   textarea { display:block; width:100%; min-height:330px; resize:vertical; border:1px solid #ccd8c5; border-radius:14px; padding:16px; background:#fafbf5; color:#194f45; font:inherit; line-height:1.85; }
   textarea:focus-visible,button:focus-visible,a:focus-visible { outline:3px solid #d7ab40; outline-offset:4px; }
   .input-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:16px; }
-  #count { font-size:14px; color:#65766b; }
+  #count { margin:8px 0 0; font-size:14px; color:#65766b; text-align:right; }
   button { font:inherit; cursor:pointer; border:0; font-weight:750; }
   #reset { padding:10px 16px; color:#356e57; background:#edf3e6; border-radius:12px; }
   button:disabled { cursor:wait; opacity:.65; }
@@ -42,6 +42,7 @@
   .modal-actions button { flex:1 1 180px; padding:14px 20px; border-radius:12px; }
   #keep { background:#194f45; color:#fffef9; }
   #remove { background:#f5e4ac; color:#194f45; }
+  #play-again { padding:10px 16px; color:#fffef9; background:#194f45; border-radius:12px; }
   @media(max-width:760px) { main { padding:20px 16px 32px; } header { margin:24px 0; } .layout { grid-template-columns:1fr; } .stage { grid-row:1; padding:16px; } .panel { border-radius:20px; } textarea { min-height:220px; } }
 </style>
 </head>
@@ -60,7 +61,8 @@
 问老师一个问题
 给同学一句鼓励
 再转一次</textarea>
-      <div class="input-footer"><span id="count"></span><button id="reset" type="button">重置转盘</button></div>
+      <p id="count"></p>
+      <div class="input-footer"><button id="reset" type="button">重置转盘</button><button id="play-again" type="button">再玩一次</button></div>
       <p class="hint">重置会清除抽取结果，并重新读取上方内容；不会清空你的词句。</p>
     </section>
     <section class="panel stage" aria-label="幸运转盘">
@@ -87,6 +89,7 @@
   const ctx = canvas.getContext('2d');
   const spin = document.getElementById('spin');
   const reset = document.getElementById('reset');
+  const playAgain = document.getElementById('play-again');
   const result = document.getElementById('result');
   const count = document.getElementById('count');
   const modal = document.getElementById('result-modal');
@@ -118,7 +121,8 @@
       '.input-footer + .hint': 'Reset clears the result and reloads your entries without deleting them.',
       '#modal-heading': 'Selected',
       '#keep': 'Keep this question',
-      '#remove': 'Remove this question'
+      '#remove': 'Remove this question',
+      '#play-again': 'Play again'
     };
     Object.entries(labels).forEach(([selector, value]) => {
       document.querySelector(selector).textContent = value;
@@ -205,14 +209,14 @@
     items = input.value.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
     count.textContent = text.sectors(items.length);
     canvas.setAttribute('aria-label', text.wheelLabel(items.length));
-    input.disabled = false; spin.disabled = !items.length; spin.textContent = text.start;
+    input.disabled = false; spin.disabled = playAgain.disabled = !items.length; spin.textContent = text.start;
     result.textContent = items.length ? text.ready : text.empty;
     draw();
   }
 
   function start() {
     if (running || modal.open || !items.length) return;
-    running = true; selected = -1; spin.disabled = true; input.disabled = true;
+    running = true; selected = -1; spin.disabled = playAgain.disabled = true; input.disabled = true;
     spin.textContent = text.spinning; result.textContent = text.progress;
     // Rejection sampling gives every sector the same chance, even with duplicates.
     const random = new Uint32Array(1), limit = 4294967296 - (4294967296 % items.length);
@@ -227,7 +231,7 @@
       rotation = from + distance * (1 - Math.pow(1 - progress, 4));
       if (progress === 1) {
         rotation = target; selected = winner; running = false;
-        input.disabled = false; spin.disabled = false; spin.textContent = text.again;
+        input.disabled = false; spin.disabled = playAgain.disabled = false; spin.textContent = text.again;
         result.textContent = text.chosen + items[winner];
       }
       draw();
@@ -243,6 +247,7 @@
   reset.addEventListener('click', reload);
   input.addEventListener('input', reload);
   document.getElementById('keep').addEventListener('click', () => modal.close());
+  playAgain.addEventListener('click', start);
   document.getElementById('remove').addEventListener('click', () => {
     // Remove by index so identical entries remain separate choices.
     items.splice(selected, 1);
