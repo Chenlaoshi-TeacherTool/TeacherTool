@@ -10,34 +10,34 @@
 </head>
 <body>
   <header class="reward-grid-header">
-    <a href="/teaching-tools">← 教学工具</a>
-    <div class="heading"><div><p class="eyebrow">READ · CHOOSE · REVEAL</p><h1>课堂抽奖格子</h1><p>先看题，再选择，点击题目揭晓惊喜。</p></div><span class="gift" aria-hidden="true">🎁</span></div>
+    <a href="/teaching-tools" data-en="← Teaching Tools">← 教学工具</a>
+    <div class="heading"><div><p class="eyebrow">READ · CHOOSE · REVEAL</p><h1 data-en="Classroom Reward Grid">课堂抽奖格子</h1><p data-en="Read the questions, make your choice, and click to reveal a surprise.">先看题，再选择，点击题目揭晓惊喜。</p></div><span class="gift" aria-hidden="true">🎁</span></div>
   </header>
   <main>
     <p id="status" role="status" aria-live="polite"></p>
     <section id="setup">
       <section class="panel bulk-questions" aria-labelledby="bulk-title">
-        <h2 id="bulk-title">一次放入所有题目</h2>
-        <label for="bulk-questions">每行一道题，空行会自动跳过。生成后仍可在各格中单独修改。</label>
-        <textarea id="bulk-questions" rows="7" placeholder="例如：&#10;请用“因为”说一句话。&#10;你最喜欢哪个季节？为什么？&#10;说出三个带有木字旁的汉字。"></textarea>
-        <div class="controls"><button id="generate-questions">生成到格子 ↓</button><p>按格子编号依次填入，保留各格奖励设置。</p></div>
+        <h2 id="bulk-title" data-en="Add all your questions">一次放入所有题目</h2>
+        <label for="bulk-questions" data-en="One question per line. Blank lines are skipped. You can edit each tile after generating.">每行一道题，空行会自动跳过。生成后仍可在各格中单独修改。</label>
+        <textarea id="bulk-questions" data-en-placeholder="Examples:&#10;Make a sentence using because.&#10;Which season do you like best? Why?&#10;Name three words that describe a person." rows="7" placeholder="例如：&#10;请用“因为”说一句话。&#10;你最喜欢哪个季节？为什么？&#10;说出三个带有木字旁的汉字。"></textarea>
+        <div class="controls"><button id="generate-questions" data-en="Generate questions ↓">生成到格子 ↓</button><p data-en="Fill tiles in order and keep their reward settings.">按格子编号依次填入，保留各格奖励设置。</p></div>
       </section>
-      <div class="panel toolbar"><div><h2>准备你的惊喜墙</h2><p>先设置大小，再为每格填写题目与奖励。修改后自动保存。</p></div>
-        <div class="controls"><label>行数 <input id="rows" type="number" min="1" max="8" value="3"></label><span>×</span><label>列数 <input id="cols" type="number" min="1" max="8" value="4"></label><button id="resize" class="secondary">应用大小</button></div>
+      <div class="panel toolbar"><div><h2 data-en="Set up your reward grid">准备你的惊喜墙</h2><p data-en="Choose a grid size, then add a question and reward to each tile. Changes save automatically.">先设置大小，再为每格填写题目与奖励。修改后自动保存。</p></div>
+        <div class="controls"><label><span data-en="Rows">行数</span> <input id="rows" type="number" min="1" max="8" value="3"></label><span>×</span><label><span data-en="Columns">列数</span> <input id="cols" type="number" min="1" max="8" value="4"></label><button id="resize" class="secondary" data-en="Apply size">应用大小</button></div>
       </div>
-      <p class="hint">支持 1–8 行、1–8 列。缩小网格会移除末尾格子；游戏中直接显示题目，点击后揭晓奖励并锁定。</p>
+      <p class="hint" data-en="Use 1–8 rows and 1–8 columns. Shrinking removes tiles from the end. Questions are visible during play; click to reveal a reward and lock the tile.">支持 1–8 行、1–8 列。缩小网格会移除末尾格子；游戏中直接显示题目，点击后揭晓奖励并锁定。</p>
       <div id="editors"></div>
-      <div class="bottom-bar"><p>🔒 题目、图片和进度仅保存在此浏览器</p><button id="start">进入课堂模式 →</button></div>
+      <div class="bottom-bar"><p data-en="🔒 Questions, images, and progress stay in this browser">🔒 题目、图片和进度仅保存在此浏览器</p><button id="start" data-en="Start classroom mode →">进入课堂模式 →</button></div>
     </section>
     <section id="classroom" hidden>
-      <div class="toolbar classroom-toolbar"><div><h2>今天的幸运格</h2><p id="progress" aria-live="polite"></p></div><div class="controls"><button id="edit" class="secondary">返回设置</button><button id="reset" class="secondary">重新开始</button><button id="fullscreen" class="secondary">全屏投影</button></div></div>
-      <div class="board-scroll"><div id="board" aria-label="奖励格子"></div></div>
+      <div class="toolbar classroom-toolbar"><div><h2 data-en="Today's reward grid">今天的幸运格</h2><p id="progress" aria-live="polite"></p></div><div class="controls"><button id="edit" class="secondary" data-en="Back to setup">返回设置</button><button id="reset" class="secondary" data-en="Restart">重新开始</button><button id="fullscreen" class="secondary" data-en="Full screen">全屏投影</button></div></div>
+      <div class="board-scroll"><div id="board" data-en-aria-label="Reward grid" aria-label="奖励格子"></div></div>
     </section>
   </main>
   <dialog id="reward-dialog" aria-labelledby="reward-title">
-    <p class="eyebrow" id="reward-number"></p><h2 id="reward-title">奖励揭晓！</h2><p id="reward-question"></p>
+    <p class="eyebrow" id="reward-number"></p><h2 id="reward-title" data-en="Reward revealed!">奖励揭晓！</h2><p id="reward-question"></p>
     <div id="reward-content"></div>
-    <div class="dialog-actions"><button id="close-reward">继续选题</button></div>
+    <div class="dialog-actions"><button id="close-reward" data-en="Choose another question">继续选题</button></div>
   </dialog>
   <script src="../../javascripts/milk-tea-footer.js"></script>
 </body>
