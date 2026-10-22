@@ -1,0 +1,47 @@
+.race-wrap { max-width:1120px; margin:auto; padding:28px 20px 48px; color:#194f45; font-family:'Segoe UI','Microsoft YaHei',sans-serif; }
+.race-wrap * { box-sizing:border-box; }
+.race-wrap header { margin:24px 0; }
+.race-wrap h1 { font-size:clamp(28px,4vw,44px); margin:8px 0; }
+.race-wrap p { line-height:1.65; }
+.race-wrap a { color:#356e57; }
+.race-wrap .eyebrow { font-size:12px; font-weight:800; letter-spacing:2px; }
+.race-wrap .panel { background:#fffef9; border:1px solid #dde7d8; border-radius:22px; padding:24px; margin:20px 0; box-shadow:0 6px 22px #194f4508; }
+.race-wrap label { font-size:21px; font-weight:800; }
+.race-wrap textarea { width:100%; resize:vertical; min-height:110px; padding:14px; border:1px solid #b6cbb6; border-radius:12px; font:inherit; line-height:1.7; }
+.race-wrap button { padding:13px 24px; border:0; border-radius:14px; background:#356e57; color:white; font:inherit; font-weight:800; cursor:pointer; min-height:48px; }
+.race-wrap button:disabled { opacity:.45; cursor:not-allowed; }
+.race-wrap button:focus-visible,.race-wrap textarea:focus-visible { outline:3px solid #d59f22; outline-offset:3px; }
+.race-wrap .secondary { background:#e8efdf; color:#194f45; }
+.race-wrap .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:14px; }
+#status { margin-bottom:0; min-height:1.65em; }
+.race-wrap .question { text-align:center; background:#f5f4dc; }
+#current-question { font-size:clamp(23px,3.5vw,36px); margin:10px 0; overflow-wrap:anywhere; white-space:pre-wrap; }
+.team + .team { margin-top:30px; }
+.team-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.team-heading h2 { font-size:20px; margin:0 0 10px; }
+.team-heading output { font-weight:800; white-space:nowrap; }
+.track { border-radius:20px; padding:0 9% 0 12%; background:url('assets/bottom-track.png') center / 100% 100% no-repeat; height:clamp(140px,24vw,260px); }
+.bottom .track { background-image:url('assets/top-track.png'); }
+.course { position:relative; height:100%; }
+.cells { position:absolute; top:48%; width:100%; display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); height:35%; }
+.cells span { border-right:2px dashed #ffffff70; display:flex; align-items:flex-end; justify-content:flex-end; padding:0 3px 2px 0; color:#163f4f; text-shadow:0 1px white; font-size:13px; font-weight:800; }
+.runner { position:absolute; left:0; bottom:21%; width:0; transition:left .55s cubic-bezier(.2,.7,.25,1); z-index:2; }
+.runner span { display:block; width:clamp(58px,9vw,104px); transform:translateX(-50%); filter:drop-shadow(0 5px 2px #40633625); }
+.runner img { display:block; width:100%; height:auto; }
+.runner.moving span { animation:race-hop .28s ease-in-out 2; }
+.finish { position:absolute; right:-5%; top:12%; width:clamp(30px,5vw,56px); height:auto; }
+.race-wrap .correct { margin-top:12px; background:#f5cc53; color:#513b0c; }
+.race-wrap .bottom .correct { background:#b8ddf1; color:#184a67; }
+#winner { text-align:center; margin-top:24px; padding:22px; border-radius:18px; background:#fff0b5; font-size:clamp(24px,4vw,38px); font-weight:800; }
+#winner img { display:block; width:84px; margin:0 auto 12px; }
+.race-wrap button.art-button { padding:0; background:transparent; width:260px; max-width:100%; border-radius:16px; line-height:0; }
+.art-button img { display:block; width:100%; height:auto; }
+.race-wrap .team button.art-button { background:transparent; }
+.team-controls { display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+.team-progress { display:flex; align-items:center; gap:8px; flex:1; min-width:100px; max-width:260px; }
+.team-progress img { width:36px; height:36px; object-fit:contain; }
+.team-progress progress { width:100%; height:20px; accent-color:#12a7ed; }
+.bottom progress { accent-color:#efa722; }
+@keyframes race-hop { 50% { translate:0 -12px; } }
+@media(max-width:600px) { .race-wrap { padding:20px 12px; } .race-wrap .panel { padding:16px; } .team-heading h2 { font-size:17px; } .race-wrap button.art-button { width:220px; } .team-controls { gap:8px; } .team-progress { max-width:220px; } }
+@media(prefers-reduced-motion:reduce) { .runner { transition:none; } .runner.moving span { animation:none; } }

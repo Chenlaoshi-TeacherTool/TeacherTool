@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= lang === 'zh' ? '两队答题竞速' : 'Team Quiz Race' %> · CLS Teaching Tools</title>
+  <%- include('../partials/seo', { pageDescription: 'A two-team classroom quiz race. Add questions, award correct answers and race ten steps to the finish.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/teaching-tools/team-race/team-race.css">
+  <script src="/teaching-tools/team-race/team-race.js" defer></script>
+</head>
+<body>
+<main class="race-wrap">
+  <a href="/teaching-tools"><%= lang === 'zh' ? '← 返回教学工具' : '← Back to Teaching Tools' %></a>
+  <header><p class="eyebrow">CLS · CLASSROOM PLAY</p><h1><%= lang === 'zh' ? '两队答题竞速' : 'Team Quiz Race' %> 🏁</h1><p><%= lang === 'zh' ? '答对一题，前进一格。小鸡队和兔子队，谁先抵达终点？' : 'One correct answer, one step forward. Who will reach the finish first?' %></p></header>
+  <section class="setup panel">
+    <label for="questions"><%= lang === 'zh' ? '今天的题目' : "Today's questions" %></label>
+    <p id="question-help"><%= lang === 'zh' ? '每行一道题，空行自动跳过。两队共用题目，答对后切换下一题；题目用完会循环。修改后点击开始游戏生效。' : 'One question per line; blank lines are skipped. Teams share questions. Each correct answer advances to the next question; the list repeats. Press Start to apply edits.' %></p>
+    <textarea id="questions" rows="4" aria-describedby="question-help" placeholder="<%= lang === 'zh' ? '请用“喜欢”说一句话。\n说出三种水果。\n你今天感觉怎么样？' : 'Make a sentence with like.\nName three fruits.\nHow do you feel today?' %>"></textarea>
+    <div class="actions"><button id="start" class="<%= lang === 'zh' ? 'art-button' : '' %>" type="button"><% if (lang === 'zh') { %><img src="/teaching-tools/team-race/assets/start-button.png" alt="开始游戏"><% } else { %>Start game<% } %></button><button id="restart" class="secondary" type="button" disabled><%= lang === 'zh' ? '重新开始' : 'Restart' %></button></div>
+    <p id="status" role="status" aria-live="polite"><%= lang === 'zh' ? '输入题目，准备出发！' : 'Add questions to get ready!' %></p>
+  </section>
+  <section class="question panel" aria-label="<%= lang === 'zh' ? '当前题目' : 'Current question' %>"><p id="question-number" class="eyebrow"><%= lang === 'zh' ? '准备好了吗？' : 'READY TO RACE?' %></p><h2 id="current-question" aria-live="polite"><%= lang === 'zh' ? '先输入题目，再开始游戏' : 'Add questions, then start the game' %></h2></section>
+  <section class="race-board panel" aria-label="<%= lang === 'zh' ? '双队赛道' : 'Two-team race track' %>">
+    <% ['top', 'bottom'].forEach(function(team, index) { %>
+    <div class="team <%= team %>">
+      <div class="team-heading"><h2><%= lang === 'zh' ? (index === 0 ? '上队 · 兔子队' : '下队 · 小鸡队') : (index === 0 ? 'Top · Team Rabbit' : 'Bottom · Team Chick') %></h2><output id="<%= team %>-score">0 / 10</output></div>
+      <div class="track"><div class="course">
+        <div class="cells" aria-hidden="true"><% for (var step = 1; step <= 10; step++) { %><span><%= step %></span><% } %></div>
+        <div id="<%= team %>-runner" class="runner" role="img" aria-label="<%= lang === 'zh' ? (index === 0 ? '向右跑的兔子' : '向右跑的小鸡') : (index === 0 ? 'Rabbit running right' : 'Chick running right') %>"><span><img src="/teaching-tools/team-race/assets/<%= index === 0 ? 'rabbit' : 'chick' %>.png" alt=""></span></div>
+        <img class="finish" src="/teaching-tools/team-race/assets/flag.png" alt="" aria-hidden="true">
+      </div></div>
+      <div class="team-controls"><button id="<%= team %>-correct" class="correct <%= lang === 'zh' ? 'art-button' : '' %>" type="button" disabled><% if (lang === 'zh') { %><img src="/teaching-tools/team-race/assets/<%= team %>-button.png" alt="<%= index === 0 ? '上队答对，前进一格' : '下队答对，前进一格' %>"><% } else { %><%= index === 0 ? 'Top team correct +1 ★' : 'Bottom team correct +1 ★' %><% } %></button><div class="team-progress"><img src="/teaching-tools/team-race/assets/star.png" alt=""><progress id="<%= team %>-progress" max="10" value="0" aria-label="<%= lang === 'zh' ? (index === 0 ? '上队进度' : '下队进度') : (index === 0 ? 'Top team progress' : 'Bottom team progress') %>"></progress></div></div>
+    </div>
+    <% }); %>
+    <div id="winner" role="status" aria-live="assertive" hidden></div>
+  </section>
+</main>
+<script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

@@ -68,6 +68,10 @@ router.get('/resources/:slug', function(req, res, next) {
 });
 
 // Teaching Tools Routes
+router.get('/teaching-tools/team-race', function(req, res) {
+  res.render('teaching-tools/team-race', { title: 'Team Quiz Race' });
+});
+
 router.get('/teaching-tools/lucky-wheel', function(req, res) {
   res.redirect(302, '/teaching-tools/lucky-wheel/');
 });
@@ -272,7 +276,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/', '/teaching-tools', '/theme-activities', '/theme-activities/weather', '/theme-activities/weather/songs',
     '/classroom-shop',
     '/resources', '/recommendations', '/about', '/contact', '/feedback', '/privacy',
-    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine', '/teaching-tools/lucky-wheel/',
+    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine', '/teaching-tools/lucky-wheel/', '/teaching-tools/team-race',
     '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
     '/teaching-tools/missing-radicals',
