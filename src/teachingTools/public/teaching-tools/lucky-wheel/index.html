@@ -99,12 +99,12 @@
   const text = isChinese ? {
     wheel: '幸运转盘', start: '开始', again: '再转', spinning: '旋转中',
     ready: '准备好了，转一转！', empty: '请先输入至少一个词语或句子',
-    progress: '好运转动中…', chosen: '本次抽中：',
+    progress: '好运转动中…', chosen: '本次抽中：', finished: '全部抽完啦！点“再玩一次”从头开始',
     sectors: n => n + ' 个扇形', wheelLabel: n => '幸运转盘，共 ' + n + ' 个扇形'
   } : {
     wheel: 'Lucky Wheel', start: 'Spin', again: 'Again', spinning: 'Spinning',
     ready: 'Ready? Give it a spin!', empty: 'Enter at least one word or sentence to begin.',
-    progress: 'Spinning…', chosen: 'Selected: ',
+    progress: 'Spinning…', chosen: 'Selected: ', finished: 'All picked! Click “Play again” to start over.',
     sectors: n => n + (n === 1 ? ' sector' : ' sectors'),
     wheelLabel: n => 'Lucky wheel with ' + n + (n === 1 ? ' sector' : ' sectors')
   };
@@ -247,12 +247,22 @@
   reset.addEventListener('click', reload);
   input.addEventListener('input', reload);
   document.getElementById('keep').addEventListener('click', () => modal.close());
-  playAgain.addEventListener('click', start);
+  // Bring back every entry from the text box, then spin from the start.
+  playAgain.addEventListener('click', () => {
+    reload();
+    start();
+  });
   document.getElementById('remove').addEventListener('click', () => {
     // Remove by index so identical entries remain separate choices.
+    // Only the wheel changes; the text box keeps every entry for the next round.
     items.splice(selected, 1);
-    input.value = items.join('\n');
-    reload();
+    selected = -1;
+    modal.close();
+    count.textContent = text.sectors(items.length);
+    canvas.setAttribute('aria-label', text.wheelLabel(items.length));
+    spin.disabled = !items.length;
+    if (!items.length) result.textContent = text.finished;
+    draw();
   });
   document.addEventListener('keydown', event => {
     // Preserve normal typing and native Space activation on focused buttons.
