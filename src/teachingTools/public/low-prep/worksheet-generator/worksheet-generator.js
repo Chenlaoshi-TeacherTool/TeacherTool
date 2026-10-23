@@ -6,6 +6,23 @@
   var END_PUNCT = /[。？！?!.，,；;：:]+$/;
   var LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
+  // Meaning languages. English comes from CC-CEDICT in the browser; the rest are
+  // translated on the server (Azure Translator) when the teacher clicks 补全.
+  var LANGS = [
+    { code: 'en', zh: '英文', name: 'English' },
+    { code: 'th', zh: '泰语', name: 'ภาษาไทย' },
+    { code: 'vi', zh: '越南语', name: 'Tiếng Việt' },
+    { code: 'ru', zh: '俄语', name: 'Русский' },
+    { code: 'es', zh: '西班牙语', name: 'Español' },
+    { code: 'fr', zh: '法语', name: 'Français' }
+  ];
+  var MAX_LANGS = 4;
+  var TRANSLATE_BATCH = 60;
+  // Extra languages are stored in the word line as "th=พ่อ | vi=bố".
+  var LANG_TAG = /^(th|vi|ru|es|fr)\s*[=:：]\s*(.*)$/i;
+  var LANG_BY_CODE = {};
+  LANGS.forEach(function (l) { LANG_BY_CODE[l.code] = l; });
+
   // Shared with vocab-glossary / vocab-puzzle so the dictionary is cached once.
   var CEDICT_URL = '/low-prep/vocab-glossary/cedict.json.gz';
 
@@ -18,7 +35,7 @@
     { key: 'vocab', zh: '词汇表', en: 'Vocabulary List', on: true, count: 0,
       instr: '读一读，记住这些词语。Read each word aloud.' },
     { key: 'match', zh: '连线题', en: 'Matching', on: true, count: 6, max: 8,
-      instr: '把中文和英文连起来。Draw a line to match each word to its meaning.' },
+      instr: '把词语和意思连起来。Draw a line to match each word to its meaning.' },
     { key: 'mc', zh: '选择题', en: 'Multiple Choice', on: true, count: 5, max: 12,
       instr: '选出正确的词语，圈出字母。Circle the letter of the correct Chinese word.' },
     { key: 'tf', zh: '判断题', en: 'True or False', on: false, count: 5, max: 12,
@@ -30,7 +47,7 @@
     { key: 'reorder', zh: '句子排序', en: 'Sentence Order', on: false, count: 4, max: 10, needs: 'sentences',
       instr: '把词语排成正确的句子，写在线上。Put the words in order and write the sentence on the line.' },
     { key: 'translate', zh: '翻译题', en: 'Translation', on: false, count: 5, max: 12,
-      instr: '写出英文的中文意思。Write the Chinese for each English word.' },
+      instr: '写出下面意思的中文词语。Write the Chinese word for each meaning.' },
     { key: 'makeSentence', zh: '造句题', en: 'Make a Sentence', on: false, count: 3, max: 8,
       instr: '用下面的词语造句。Write a sentence using each word.' },
     { key: 'dictation', zh: '听写题', en: 'Dictation', on: false, count: 8, max: 15,
@@ -70,12 +87,13 @@
   document.addEventListener('DOMContentLoaded', function () {
     ['words', 'sentences', 'autofill', 'dict-status', 'types', 'all', 'none', 'title', 'subtitle',
       'paper', 'font', 'versions', 'size', 'pinyin', 'info', 'answers', 'shuffle', 'print',
-      'status', 'output', 'page-size'].forEach(function (id) {
+      'status', 'output', 'page-size', 'langs', 'qlang'].forEach(function (id) {
       el[id.replace(/-(\w)/g, function (m, c) { return c.toUpperCase(); })] = document.getElementById('wg-' + id);
     });
 
     buildTypeControls();
     restore();
+    el.langs.addEventListener('change', onLangChange);
 
     el.autofill.addEventListener('click', autofillWords);
     el.all.addEventListener('click', function () { setAllTypes(true); });
@@ -163,6 +181,8 @@
       pinyin: el.pinyin.checked,
       info: el.info.checked,
       answers: el.answers.checked,
+      langs: selectedLangs(),
+      qlang: el.qlang.value || 'en',
       types: types,
       seed: seed
     };
@@ -180,6 +200,7 @@
       el.sentences.value = SAMPLE_SENTENCES;
       el.title.value = '我的家人';
       el.subtitle.value = 'My Family';
+      updateQlangOptions('en');
       return;
     }
     el.words.value = saved.words || '';
@@ -194,6 +215,10 @@
     el.info.checked = saved.info !== false;
     el.answers.checked = saved.answers !== false;
     if (saved.seed) seed = saved.seed;
+    if (Array.isArray(saved.langs) && saved.langs.length) {
+      langBoxes().forEach(function (box) { box.checked = saved.langs.indexOf(box.value) !== -1; });
+    }
+    updateQlangOptions(saved.qlang);
     if (saved.types) {
       TYPES.forEach(function (type) {
         var t = saved.types[type.key];
@@ -202,6 +227,51 @@
         if (typeInputs[type.key].count && t.count) typeInputs[type.key].count.value = String(t.count);
       });
     }
+  }
+
+  // ---- Meaning languages -----------------------------------------------------
+
+  function langBoxes() {
+    return Array.prototype.slice.call(el.langs.querySelectorAll('input[type=checkbox]'));
+  }
+
+  function selectedLangs() {
+    var codes = langBoxes().filter(function (b) { return b.checked; }).map(function (b) { return b.value; });
+    return codes.length ? codes : ['en'];
+  }
+
+  function onLangChange(event) {
+    var picked = langBoxes().filter(function (b) { return b.checked; });
+    if (picked.length > MAX_LANGS && event.target.checked) {
+      event.target.checked = false;
+      el.dictStatus.textContent = '最多选 4 种语言。Choose up to 4 languages.';
+    }
+    if (!picked.length) event.target.checked = true;
+    updateQlangOptions(el.qlang.value);
+  }
+
+  function updateQlangOptions(preferred) {
+    var langs = selectedLangs();
+    langBoxes().forEach(function (b) {
+      b.disabled = !b.checked && langs.length >= MAX_LANGS;
+    });
+    el.qlang.innerHTML = langs.map(function (code) {
+      var l = LANG_BY_CODE[code];
+      return '<option value="' + code + '">' + esc(l.zh + ' ' + l.name) + '</option>';
+    }).join('');
+    el.qlang.value = langs.indexOf(preferred) !== -1 ? preferred : langs[0];
+  }
+
+  function meaning(it, code) {
+    return code === 'en' ? it.en : (it.tr[code] || '');
+  }
+
+  function formatLine(it) {
+    var parts = [it.hz, it.py, it.en];
+    LANGS.forEach(function (l) {
+      if (l.code !== 'en' && it.tr[l.code]) parts.push(l.code + '=' + it.tr[l.code]);
+    });
+    return parts.join(' | ');
   }
 
   // ---- Dictionary + pinyin ----------------------------------------------------
@@ -276,23 +346,72 @@
       if (!hz || !CJK.test(hz) || seen[hz]) return;
       seen[hz] = true;
       var py = (parts[1] || '').trim();
-      var en = (parts[2] || '').trim();
-      items.push({ hz: hz, py: py || lookupPinyin(hz), en: en || lookupEnglish(hz), pyGiven: !!py, enGiven: !!en });
+      var en = '';
+      var tr = {};
+      parts.slice(2).forEach(function (part) {
+        part = part.trim();
+        var tag = part.match(LANG_TAG);
+        if (tag) tr[tag[1].toLowerCase()] = tag[2].trim();
+        else if (part && !en) en = part;
+      });
+      items.push({ hz: hz, py: py || lookupPinyin(hz), en: en || lookupEnglish(hz), tr: tr });
     });
     return items;
   }
 
   function autofillWords() {
+    var langs = selectedLangs();
+    var extra = langs.filter(function (c) { return c !== 'en'; });
+    el.autofill.disabled = true;
+    el.dictStatus.textContent = '正在补全… Filling in…';
+
+    var items;
+    var translateError = '';
     loadDictionary().catch(function () {}).then(function () {
-      var items = parseWords(el.words.value);
-      el.words.value = items.map(function (it) {
-        return it.hz + ' | ' + it.py + ' | ' + it.en;
-      }).join('\n');
-      var missing = items.filter(function (it) { return !it.en; }).length;
-      el.dictStatus.textContent = missing
-        ? '已补全。' + missing + ' 个词没找到英文，请自己填写。Filled in — ' + missing + ' word(s) need English typed by hand.'
+      items = parseWords(el.words.value);
+      var need = items.filter(function (it) {
+        return extra.some(function (c) { return !it.tr[c]; });
+      }).map(function (it) { return it.hz; });
+      if (!extra.length || !need.length) return null;
+
+      // Translate in batches so long lists stay under the server's limit.
+      var chain = Promise.resolve();
+      for (var i = 0; i < need.length; i += TRANSLATE_BATCH) {
+        chain = chain.then(translateBatch.bind(null, need.slice(i, i + TRANSLATE_BATCH), extra, items));
+      }
+      return chain.catch(function (err) { translateError = err.message; });
+    }).then(function () {
+      el.words.value = items.map(formatLine).join('\n');
+      var missing = items.filter(function (it) {
+        return langs.some(function (c) { return !meaning(it, c); });
+      }).length;
+      var msg = missing
+        ? '已补全。' + missing + ' 个词还缺翻译，请自己填写。Filled in — ' + missing + ' word(s) still need a translation typed by hand.'
         : '已补全，请检查一下。Filled in — please check them.';
+      if (translateError) msg = '翻译服务出错：' + translateError + ' ' + msg;
+      el.dictStatus.textContent = msg;
+      el.dictStatus.classList.toggle('is-error', !!translateError);
       render();
+    }).then(function () { el.autofill.disabled = false; }, function () { el.autofill.disabled = false; });
+  }
+
+  function translateBatch(words, langs, items) {
+    return fetch('/api/translate-words', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ words: words, to: langs })
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+        return data;
+      });
+    }).then(function (data) {
+      var map = data.translations || {};
+      items.forEach(function (it) {
+        var t = map[it.hz];
+        if (!t) return;
+        langs.forEach(function (c) { if (!it.tr[c] && t[c]) it.tr[c] = t[c]; });
+      });
     });
   }
 
@@ -415,10 +534,16 @@
     vocab: function (ctx) {
       var rows = ctx.items.map(function (it, i) {
         return '<tr><td class="wg-num">' + (i + 1) + '</td><td class="wg-cell-hz">' + esc(it.hz) +
-          '</td><td>' + esc(it.py) + '</td><td>' + esc(it.en) + '</td></tr>';
+          '</td><td>' + esc(it.py) + '</td>' + ctx.langs.map(function (c) {
+            return '<td lang="' + c + '">' + esc(meaning(it, c)) + '</td>';
+          }).join('') + '</tr>';
       }).join('');
-      return '<table class="wg-vocab"><thead><tr><th></th><th>汉字 Hanzi</th><th>拼音 Pinyin</th><th>英文 English</th></tr></thead><tbody>' +
-        rows + '</tbody></table>';
+      var heads = ctx.langs.map(function (c) {
+        var l = LANG_BY_CODE[c];
+        return '<th>' + esc(l.zh + ' ' + l.name) + '</th>';
+      }).join('');
+      return '<table class="wg-vocab wg-vocab-' + ctx.langs.length + '"><thead><tr><th></th><th>汉字 Hanzi</th><th>拼音 Pinyin</th>' + heads +
+        '</tr></thead><tbody>' + rows + '</tbody></table>';
     },
 
     match: function (ctx) {
@@ -432,7 +557,7 @@
           '<span class="wg-match-left"><span class="wg-num">' + (i + 1) + '.</span> ' + rubyWord(it.hz, it.py, ctx.pinyin) +
           (ctx.answers ? ' <span class="wg-answer">→ ' + ansLetter + '</span>' : '') + '</span>' +
           '<span class="wg-dot"></span><span class="wg-match-gap"></span><span class="wg-dot"></span>' +
-          '<span class="wg-match-right"><span class="wg-num">' + LETTERS[i] + '.</span> ' + esc(target.en || target.py) + '</span>' +
+          '<span class="wg-match-right"><span class="wg-num">' + LETTERS[i] + '.</span> ' + esc(target.mean || target.py) + '</span>' +
           '</div>';
       });
       return html + '</div>';
@@ -443,7 +568,7 @@
       return '<ol class="wg-list">' + qs.map(function (it) {
         var others = shuffle(ctx.items.filter(function (o) { return o !== it; }), ctx.rng).slice(0, 3);
         var options = shuffle(others.concat([it]), ctx.rng);
-        return '<li class="wg-item"><div class="wg-q">' + esc(it.en || it.py) + '</div><div class="wg-options">' +
+        return '<li class="wg-item"><div class="wg-q">' + esc(it.mean || it.py) + '</div><div class="wg-options">' +
           options.map(function (o, i) {
             var correct = ctx.answers && o === it;
             return '<span class="wg-option' + (correct ? ' is-correct' : '') + '"><b>' + LETTERS[i] + '.</b> ' +
@@ -455,9 +580,9 @@
     tf: function (ctx) {
       var qs = pick(ctx.items, ctx.count, ctx.rng);
       return '<ol class="wg-list wg-cols-2">' + qs.map(function (it) {
-        var others = ctx.items.filter(function (o) { return o !== it && o.en && o.en !== it.en; });
+        var others = ctx.items.filter(function (o) { return o !== it && o.mean && o.mean !== it.mean; });
         var isTrue = !others.length || ctx.rng() < 0.5;
-        var shown = isTrue ? it.en : others[Math.floor(ctx.rng() * others.length)].en;
+        var shown = isTrue ? it.mean : others[Math.floor(ctx.rng() * others.length)].mean;
         return '<li class="wg-item wg-tf">' + rubyWord(it.hz, it.py, ctx.pinyin) + ' <span class="wg-eq">=</span> ' + esc(shown) +
           ' <span class="wg-paren">（' + (ctx.answers ? '<span class="wg-answer">' + (isTrue ? '✓' : '✗') + '</span>' : '&emsp;') + '）</span></li>';
       }).join('') + '</ol>';
@@ -522,10 +647,10 @@
     },
 
     translate: function (ctx) {
-      var qs = pick(ctx.items.filter(function (it) { return it.en; }), ctx.count, ctx.rng);
-      if (!qs.length) return ctx.note('翻译题需要英文释义。Add English meanings to your words.');
+      var qs = pick(ctx.items.filter(function (it) { return it.mean; }), ctx.count, ctx.rng);
+      if (!qs.length) return ctx.note('翻译题需要释义。Add meanings in the question language to your words.');
       return '<ol class="wg-list wg-cols-2">' + qs.map(function (it) {
-        return '<li class="wg-item wg-translate"><span class="wg-en">' + esc(it.en) + '</span><span class="wg-line">' +
+        return '<li class="wg-item wg-translate"><span class="wg-en">' + esc(it.mean) + '</span><span class="wg-line">' +
           (ctx.answers ? '<span class="wg-answer">' + esc(it.hz) + '</span>' : '') + '</span></li>';
       }).join('') + '</ol>';
     },
@@ -534,7 +659,7 @@
       var qs = pick(ctx.items, ctx.count, ctx.rng);
       return '<ol class="wg-list">' + qs.map(function (it) {
         return '<li class="wg-item wg-make"><div class="wg-make-word">' + rubyWord(it.hz, it.py, ctx.pinyin) +
-          (it.en ? ' <small>' + esc(it.en) + '</small>' : '') + '</div>' +
+          (it.mean ? ' <small>' + esc(it.mean) + '</small>' : '') + '</div>' +
           (ctx.answers ? '<div class="wg-line"><span class="wg-answer">答案不唯一 Answers will vary</span></div>'
             : '<div class="wg-line"></div><div class="wg-line"></div>') + '</li>';
       }).join('') + '</ol>';
@@ -564,8 +689,8 @@
         }).join('') + '</tr>';
       });
       html += '</tbody></table><ul class="wg-ws-words">' + puzzle.placed.map(function (it) {
-        return '<li><span class="wg-ws-box"></span>' + esc(ctx.pinyin ? it.py : '') + (ctx.pinyin && it.en ? ' · ' : '') + esc(it.en) +
-          (ctx.answers || (!it.en && !ctx.pinyin) ? ' <span class="wg-answer">' + esc(it.hz) + '</span>' : '') + '</li>';
+        return '<li><span class="wg-ws-box"></span>' + esc(ctx.pinyin ? it.py : '') + (ctx.pinyin && it.mean ? ' · ' : '') + esc(it.mean) +
+          (ctx.answers || (!it.mean && !ctx.pinyin) ? ' <span class="wg-answer">' + esc(it.hz) + '</span>' : '') + '</li>';
       }).join('') + '</ul></div>';
       return html;
     },
@@ -647,6 +772,7 @@
     el.output.className = 'wg-output wg-paper-' + s.paper + ' wg-font-' + s.font + ' wg-size-' + s.size;
 
     var items = parseWords(s.words);
+    items.forEach(function (it) { it.mean = meaning(it, s.qlang); });
     var sentences = s.sentences.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
 
     if (!items.length) {
@@ -704,6 +830,7 @@
         pinyin: s.pinyin,
         answers: answers,
         paper: s.paper,
+        langs: s.langs,
         // Same seed for the student sheet and its answer key so they line up.
         rng: mulberry32(s.seed * 7919 + version * 104729 + typeIndex * 131),
         cache: cache,

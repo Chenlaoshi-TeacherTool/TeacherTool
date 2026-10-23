@@ -239,3 +239,11 @@
   .wg-sheet, .wg-paper-letter .wg-sheet { width: auto; min-height: 0; padding: 0; box-shadow: none; border-radius: 0; }
   .wg-sheet + .wg-sheet { break-before: page; page-break-before: always; }
 }
+
+/* ---- Meaning languages ---- */
+.wg-langs { border: 0; padding: 0; margin: 10px 0 0; min-width: 0; }
+.wg-langs legend { padding: 0; margin-top: 0; }
+.wg-lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+.wg-lang-grid .wg-check input:disabled + span { opacity: .45; }
+.wg-vocab-3 td:not(.wg-cell-hz), .wg-vocab-4 td:not(.wg-cell-hz) { font-size: .92em; }
+.wg-vocab-4 .wg-cell-hz { white-space: nowrap; }

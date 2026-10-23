@@ -7,7 +7,7 @@
   <title>练习单生成器 · Chinese Worksheet Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Type Chinese vocabulary and example sentences to get a print-ready worksheet with up to 12 question types: matching, multiple choice, fill in the blanks, sentence order, word search, 田字格 tracing and more, with an answer key.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/worksheet-generator/worksheet-generator.css?v=2">
+  <link rel="stylesheet" href="/low-prep/worksheet-generator/worksheet-generator.css?v=3">
   <style id="wg-page-size">@page { size: A4; margin: 12mm; }</style>
 </head>
 <body class="wg-page">
@@ -27,10 +27,26 @@
             <span class="wg-step">1</span>
             <h2>生词 · Vocabulary</h2>
           </div>
-          <p class="wg-hint">一行一个词。格式：<code>汉字 | 拼音 | English</code>。拼音和英文可以不填，会自动补全。<br>One word per line. Pinyin and English are optional.</p>
+          <p class="wg-hint">一行一个词。格式：<code>汉字 | 拼音 | English</code>。其他语言写在后面，如 <code>th=พ่อ</code>。拼音和翻译可以不填，会自动补全。<br>One word per line; extra languages go after English, e.g. <code>vi=bố</code>. Pinyin and translations are optional.</p>
           <textarea id="wg-words" rows="9" spellcheck="false" placeholder="爸爸 | bà ba | dad&#10;妈妈&#10;哥哥"></textarea>
+
+          <fieldset class="wg-langs">
+            <legend class="wg-label">释义语言 Meaning languages <small>最多 4 种 · up to 4</small></legend>
+            <div class="wg-lang-grid" id="wg-langs">
+              <label class="wg-check"><input type="checkbox" value="en" checked> <span>英语 English</span></label>
+              <label class="wg-check"><input type="checkbox" value="th"> <span>泰语 ภาษาไทย</span></label>
+              <label class="wg-check"><input type="checkbox" value="vi"> <span>越南语 Tiếng Việt</span></label>
+              <label class="wg-check"><input type="checkbox" value="ru"> <span>俄语 Русский</span></label>
+              <label class="wg-check"><input type="checkbox" value="es"> <span>西班牙语 Español</span></label>
+              <label class="wg-check"><input type="checkbox" value="fr"> <span>法语 Français</span></label>
+            </div>
+            <label for="wg-qlang" class="wg-label">题目里用哪种语言 Language used in questions</label>
+            <select id="wg-qlang"></select>
+            <p class="wg-hint">词汇表会显示所有勾选的语言；连线、选择等题目只用这一种。<br>The vocabulary list shows every language; matching, multiple choice and the rest use this one.</p>
+          </fieldset>
+
           <div class="wg-row">
-            <button id="wg-autofill" type="button" class="wg-secondary">✨ 补全拼音和英文 Fill in pinyin &amp; English</button>
+            <button id="wg-autofill" type="button" class="wg-secondary">✨ 补全拼音和翻译 Fill in pinyin &amp; translations</button>
           </div>
           <p id="wg-dict-status" class="wg-hint" aria-live="polite">Loading the dictionary…</p>
 
@@ -122,7 +138,7 @@
   </div>
 
   <script src="/vendor/pinyin-pro.js"></script>
-  <script src="/low-prep/worksheet-generator/worksheet-generator.js?v=2" defer></script>
+  <script src="/low-prep/worksheet-generator/worksheet-generator.js?v=3" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

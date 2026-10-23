@@ -4,6 +4,7 @@ var express = require('express');
 var dabWordLists = require('../services/dabWordListsClient');
 var dabQuestionBanks = require('../services/dabQuestionBanksClient');
 var authUser = require('../services/authUser');
+var wordTranslator = require('../services/wordTranslator');
 var router = express.Router();
 
 var azureAuthEnabled = authUser.azureAuthEnabled;
@@ -63,6 +64,42 @@ router.get('/wordlists/mine', function (req, res) {
     error: 'Cloud word-list storage is not configured yet.',
     next: 'Provision the Azure storage resource described in docs/vocabulary-cloud-sync.md.'
   });
+});
+
+
+// Worksheet generator: translate vocabulary into up to 4 extra languages.
+// Small per-IP budget so the free Translator tier can't be drained by one visitor.
+var TRANSLATE_WINDOW_MS = 10 * 60 * 1000;
+var TRANSLATE_MAX_REQUESTS = 30;
+var translateHits = new Map();
+
+function translateAllowed(ip) {
+  var now = Date.now();
+  var hits = (translateHits.get(ip) || []).filter(function (t) { return now - t < TRANSLATE_WINDOW_MS; });
+  if (hits.length >= TRANSLATE_MAX_REQUESTS) {
+    translateHits.set(ip, hits);
+    return false;
+  }
+  hits.push(now);
+  translateHits.set(ip, hits);
+  if (translateHits.size > 10000) translateHits.delete(translateHits.keys().next().value);
+  return true;
+}
+
+router.post('/translate-words', function (req, res) {
+  if (!wordTranslator.isConfigured()) {
+    return res.status(503).json({ error: 'Translation is not set up on this server yet.' });
+  }
+  var clean = wordTranslator.cleanRequest(req.body);
+  if (clean.error) return res.status(400).json({ error: clean.error });
+  if (!translateAllowed(req.ip)) {
+    return res.status(429).json({ error: 'Too many translation requests. Please wait a few minutes.' });
+  }
+  wordTranslator.translateWords(clean.words, clean.to)
+    .then(function (result) { res.json(result); })
+    .catch(function (err) {
+      res.status(502).json({ error: 'The translation service is unavailable right now.', detail: err.message });
+    });
 });
 
 module.exports = router;
