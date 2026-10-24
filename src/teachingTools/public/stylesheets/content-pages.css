@@ -70,6 +70,15 @@ body { margin: 0; }
 .recommendation-feature { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 40px; align-items: start; }
 .recommendation-feature p, .recommendation-feature li { color: #405b52; line-height: 1.8; }
 .affiliate-note { padding: 26px; border: 1px solid #eed78e; border-radius: 20px; background: #fff4cf; }
+.content-hero.classroom-finds-hero { padding: 48px 0; }
+.classroom-finds-hero__layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 36px; align-items: center; }
+.classroom-finds-hero h1 { font-size: clamp(2.65rem, 4.5vw, 4rem); }
+.classroom-finds-hero .affiliate-note { padding: 20px; border-radius: 16px; }
+.classroom-finds-hero .affiliate-note h2 { margin: 0 0 10px; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.25rem; font-weight: 400; }
+.classroom-finds-hero .affiliate-note p { max-width: none; color: #405b52; font-size: .85rem; line-height: 1.6; }
+.classroom-finds-hero .affiliate-note p + p { margin-top: 10px; }
+@media (max-width: 860px) { .classroom-finds-hero__layout { grid-template-columns: 1fr; gap: 24px; } }
+
 .recommendation-product { display: grid; grid-template-columns: minmax(280px, .82fr) minmax(0, 1.18fr); gap: clamp(30px, 5vw, 62px); align-items: center; margin-top: 54px; padding: clamp(24px, 4vw, 44px); border: 1px solid var(--line); border-radius: 26px; background: var(--paper); box-shadow: var(--shadow); }
 .recommendation-product__image { display: grid; place-items: center; overflow: hidden; min-height: 420px; border-radius: 22px; background: #fff; }
 .recommendation-product__image img { display: block; width: 100%; height: auto; max-height: 680px; object-fit: contain; transition: transform .22s ease; }

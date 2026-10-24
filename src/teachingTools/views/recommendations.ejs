@@ -11,55 +11,44 @@
 </head>
 <body>
   <% var isDetail = typeof productDetail !== 'undefined' && productDetail; %>
-  <header class="content-hero">
-    <div class="content-shell">
+  <header class="content-hero classroom-finds-hero">
+    <div class="content-shell classroom-finds-hero__layout">
+      <div>
       <p class="content-kicker"><%= t('recommendations.kicker') %></p>
       <% if (isDetail) { %><a class="text-link" href="/classroom-finds">← <%= t('recommendations.title') %></a><% } %>
       <h1><%= isDetail ? title : t('recommendations.title') %></h1>
       <p><%= t('recommendations.intro') %></p>
+      </div>
+      <aside class="affiliate-note">
+        <h2><%= t('recommendations.affiliateTitle') %></h2>
+        <p><%= t('recommendations.affiliateP1') %></p>
+        <p><%= t('recommendations.affiliateP2') %></p>
+      </aside>
     </div>
   </header>
 
   <main>
     <section class="content-section">
       <div class="content-shell">
-        <div class="recommendation-feature">
-          <div>
-            <p class="content-kicker"><%= t('recommendations.listKicker') %></p>
-            <h2><%= t('recommendations.listTitle') %></h2>
-            <p><%= t('recommendations.listIntro') %></p>
-            <ul>
-              <li><strong><%= t('recommendations.item1Strong') %></strong> <%= t('recommendations.item1Text') %></li>
-              <li><strong><%= t('recommendations.item2Strong') %></strong> <%= t('recommendations.item2Text') %></li>
-              <li><strong><%= t('recommendations.item3Strong') %></strong> <%= t('recommendations.item3Text') %></li>
-            </ul>
-          </div>
-          <aside class="affiliate-note">
-            <h2><%= t('recommendations.affiliateTitle') %></h2>
-            <p><%= t('recommendations.affiliateP1') %></p>
-            <p><%= t('recommendations.affiliateP2') %></p>
-          </aside>
-        </div>
-
         <% if (!isDetail && typeof amazonPicks !== 'undefined' && amazonPicks.length) { %>
         <section class="amazon-chart" aria-labelledby="amazon-chart-title">
           <header class="amazon-chart__head">
-            <p class="amazon-chart__eyebrow"><%= lang === 'zh' ? '老师好物推荐' : 'Teacher favorites' %></p>
-            <h2 id="amazon-chart-title"><%= lang === 'zh' ? '亚马逊老师好物榜' : 'Amazon Classroom Charts' %></h2>
-            <p><%= lang === 'zh' ? '老师们最常回购的 ' + amazonPicks.length + ' 件课堂好物' : 'The top ' + amazonPicks.length + ' supplies teachers keep reordering' %></p>
+            <p class="amazon-chart__eyebrow"><%= lang === 'zh' ? '语言课堂精选' : 'For language teachers' %></p>
+            <h2 id="amazon-chart-title"><%= lang === 'zh' ? '语言老师的亚马逊好物清单' : 'Amazon Finds for Language Teachers' %></h2>
+            <p><%= lang === 'zh' ? amazonPicks.length + ' 类材料，支持听说读写与课堂互动。按教学用途整理，非销量排名；图片展示商品示例。链接打开 Amazon 选购结果，方便比较规格。' : amazonPicks.length + ' supply ideas for listening, speaking, reading, and writing. Curated by classroom use, not sales rank. Photos show example products; links open Amazon search results to compare options.' %></p>
           </header>
           <ol class="amazon-chart__list">
             <% amazonPicks.forEach(function (pick) { var copy = lang === 'zh' ? pick.zh : pick.en; %>
             <li class="amazon-chart__item<%= pick.rank <= 3 ? ' amazon-chart__item--top' : '' %>">
               <span class="amazon-chart__rank" aria-hidden="true"><%= pick.rank %></span>
               <a class="amazon-chart__image" href="<%= pick.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer" tabindex="-1" aria-hidden="true">
-                <img src="<%= pick.imageUrl %>" alt="" loading="lazy">
+                <img src="<%= pick.imageUrl %>" alt="<%= copy.title %>" loading="lazy">
               </a>
               <div class="amazon-chart__copy">
                 <h3><span class="visually-hidden">#<%= pick.rank %> </span><%= copy.title %></h3>
                 <p><%= copy.blurb %></p>
               </div>
-              <a class="amazon-chart__cta" href="<%= pick.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= lang === 'zh' ? '去亚马逊看看' : 'View on Amazon' %> →</a>
+              <a class="amazon-chart__cta" href="<%= pick.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= lang === 'zh' ? '在亚马逊选购' : 'Browse on Amazon' %> →</a>
             </li>
             <% }) %>
           </ol>
