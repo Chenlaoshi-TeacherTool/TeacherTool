@@ -32,7 +32,10 @@ var SECTIONS = [
   {
     key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: [],
     children: [
-      { key: 'halloween', href: '/theme-activities/halloween', en: 'Halloween', zh: '万圣节', template: 'theme' },
+      {
+        key: 'halloween', href: '/theme-activities/halloween', en: 'Halloween', zh: '万圣节', template: 'theme',
+        children: [{ key: 'halloween-printables', href: '/theme-activities/halloween/printables', en: 'Halloween printables', zh: '万圣节可打印材料' }]
+      },
       { key: 'chinese-new-year', href: '/theme-activities/chinese-new-year', en: 'Chinese New Year', zh: '春节', template: 'theme' },
       {
         key: 'weather', href: '/theme-activities/weather', en: 'Weather', zh: '天气',

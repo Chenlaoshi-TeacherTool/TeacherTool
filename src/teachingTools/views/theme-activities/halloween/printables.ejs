@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../../partials/seo', { pageDescription: 'Free Halloween Chinese printables in PDF and Word, ready to print for class.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+</head>
+<body>
+  <header class="content-hero">
+    <div class="content-shell">
+      <a class="text-link" href="<%= parent.href %>">← <%= parent.label %></a>
+      <h1><%= title %></h1>
+      <p><%= lang === 'zh' ? '可直接打印的万圣节中文课堂材料。选择 PDF 直接打印，或下载 Word 版自行修改。' : 'Ready-to-print Halloween Chinese class materials. Print the PDF as is, or download the Word file to edit it.' %></p>
+    </div>
+  </header>
+  <main class="content-section">
+    <div class="content-shell resource-grid">
+      <% printables.forEach(function(item, index) { %>
+      <button type="button" class="resource-card printable-card" data-dialog="printable-<%= index %>">
+        <span class="resource-card__meta">🎃 <%= item.pages %> <%= lang === 'zh' ? '页 · PDF / Word' : 'pages · PDF / Word' %></span>
+        <h2><%= item.title %></h2>
+        <p><%= lang === 'zh' ? item.zh : item.en %></p>
+        <span class="resource-card__link"><%= lang === 'zh' ? '下载' : 'Download' %> →</span>
+      </button>
+
+      <dialog class="printable-dialog" id="printable-<%= index %>" aria-labelledby="printable-<%= index %>-title">
+        <form method="dialog" class="printable-dialog__close"><button aria-label="<%= lang === 'zh' ? '关闭' : 'Close' %>">×</button></form>
+        <h2 id="printable-<%= index %>-title"><%= item.title %></h2>
+        <p><%= lang === 'zh' ? '选择要下载的版本：' : 'Choose a version to download:' %></p>
+        <div class="printable-dialog__options">
+          <a class="printable-option" href="<%= item.pdf %>" target="_blank" rel="noopener">
+            <strong>PDF</strong>
+            <span><%= lang === 'zh' ? '直接打印' : 'Ready to print' %></span>
+          </a>
+          <a class="printable-option" href="<%= item.docx %>" download>
+            <strong>Word</strong>
+            <span><%= lang === 'zh' ? '可编辑修改' : 'Editable' %></span>
+          </a>
+        </div>
+      </dialog>
+      <% }) %>
+    </div>
+  </main>
+  <script>
+    document.querySelectorAll('[data-dialog]').forEach(function (card) {
+      var dialog = document.getElementById(card.dataset.dialog);
+      card.addEventListener('click', function () { dialog.showModal(); });
+      // Clicking the backdrop (outside the dialog box) closes it.
+      dialog.addEventListener('click', function (event) { if (event.target === dialog) dialog.close(); });
+    });
+  </script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

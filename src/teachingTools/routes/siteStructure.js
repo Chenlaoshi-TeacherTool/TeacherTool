@@ -36,8 +36,32 @@ router.get('/theme-activities/:theme', function(req, res, next) {
     cards: [
       { heading: text(req, 'Vocabulary', '词汇'), description: text(req, 'Theme vocabulary has not been added yet.', '此主题的词汇尚未添加。') },
       { heading: text(req, 'Games', '游戏'), description: text(req, 'Use your own theme words with the existing classroom games.', '把自己的主题词汇用于现有课堂游戏。'), href: theme.key === 'halloween' ? '/teaching-tools/witchs-poison' : '/teaching-tools/bingo-generator', label: text(req, 'Open game', '打开游戏') },
-      { heading: text(req, 'Printables', '可打印材料'), description: text(req, 'Theme packs have not been added yet. Create a worksheet with your own words.', '主题材料包尚未添加，可用自己的词汇制作练习单。'), href: '/teaching-tools/worksheet-generator', label: text(req, 'Create a worksheet', '制作练习单') }
+      theme.key === 'halloween'
+        ? { heading: text(req, 'Printables', '可打印材料'), description: text(req, 'Ready-to-print Halloween worksheets in PDF and Word.', '可直接打印的万圣节练习单，提供 PDF 和 Word 版。'), href: '/theme-activities/halloween/printables', label: text(req, 'Browse printables', '查看材料') }
+        : { heading: text(req, 'Printables', '可打印材料'), description: text(req, 'Theme packs have not been added yet. Create a worksheet with your own words.', '主题材料包尚未添加，可用自己的词汇制作练习单。'), href: '/teaching-tools/worksheet-generator', label: text(req, 'Create a worksheet', '制作练习单') }
     ]
+  });
+});
+
+// Files live in the public "printables" blob container.
+var PRINTABLES_BASE = 'https://chenlaoshitteaching.blob.core.windows.net/printables/';
+var halloweenPrintables = [
+  {
+    title: '万圣节方位词_Gallery_Walk',
+    en: 'Read each position-word sentence, find the matching picture around the room, and write its letter. Includes 10 picture cards and an answer key.',
+    zh: '读方位词句子，在教室里找到对应的图片并写下字母。含 10 张图片卡和答案。',
+    pages: 12,
+    pdf: PRINTABLES_BASE + 'halloween/halloween-position-words-gallery-walk.pdf',
+    docx: PRINTABLES_BASE + 'halloween/halloween-position-words-gallery-walk.docx'
+  }
+];
+
+router.get('/theme-activities/halloween/printables', function(req, res) {
+  var halloween = child('activities', 'halloween');
+  res.render('theme-activities/halloween/printables', {
+    title: text(req, 'Halloween printables', '万圣节可打印材料'),
+    parent: { href: halloween.href, label: text(req, halloween.en, halloween.zh) },
+    printables: halloweenPrintables
   });
 });
 
