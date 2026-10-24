@@ -100,3 +100,43 @@ body { margin: 0; }
 @media (max-width: 860px) { .article-layout { grid-template-columns: 1fr; gap: 30px; } .article-sidebar { position: static; } .about-hero-grid { grid-template-columns: 1fr; } .about-hero-grid img { width: min(260px, 70vw); } .recommendation-feature, .home-resource-grid { grid-template-columns: 1fr; } }
 @media (max-width: 680px) { .content-shell, .article-shell { width: min(1120px, calc(100% - 32px)); } .content-hero, .article-hero { padding: 76px 0 50px; } .resource-grid, .tool-learning-guide__grid, .prose-grid, .contact-grid, .question-grid { grid-template-columns: 1fr; } .contact-card--wide { grid-column: auto; } .content-cta, .article-tool-cta { align-items: flex-start; flex-direction: column; } .article-layout { padding-top: 38px; } }
 @media (max-width: 620px) { .recommendation-product { margin-top: 36px; padding: 18px; border-radius: 20px; } .product-reasons { grid-template-columns: 1fr; } }
+
+/* Amazon teacher favorites chart on /classroom-finds */
+.amazon-chart { margin-top: 54px; padding: clamp(22px, 4vw, 40px); border: 1px solid var(--line); border-radius: 26px; background: var(--paper); box-shadow: var(--shadow); }
+.amazon-chart__head { margin-bottom: 26px; padding-bottom: 20px; border-bottom: 1px solid var(--line); text-align: center; }
+.amazon-chart__eyebrow { margin: 0; color: var(--coral); font-size: .78rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.amazon-chart__head h2 { margin: 4px 0 6px; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight: 400; line-height: 1.05; }
+.amazon-chart__head p:last-child { margin: 0; color: var(--muted); }
+.amazon-chart__list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.amazon-chart__item { position: relative; display: grid; grid-template-columns: 52px 120px minmax(0, 1fr) 150px; grid-column: 1 / -1; align-items: stretch; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+.amazon-chart__rank { align-self: start; padding: 14px 0 0 16px; color: var(--chalk); font-family: 'DM Serif Display', serif; font-size: 2.4rem; line-height: 1; }
+.amazon-chart__image { display: grid; place-items: center; padding: 12px; }
+.amazon-chart__image img { display: block; width: 100%; height: 110px; object-fit: contain; transition: transform .22s var(--ease-out); }
+.amazon-chart__copy { align-self: center; padding: 14px 18px; }
+.amazon-chart__copy h3 { margin: 0 0 4px; color: var(--ink); font-size: 1.12rem; font-weight: 800; line-height: 1.3; }
+.amazon-chart__copy p { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.55; }
+.amazon-chart__cta { display: grid; place-items: center; padding: 12px; background: var(--chalk); color: #fff; font-weight: 800; text-align: center; text-decoration: none; transition: background-color .18s ease; }
+.amazon-chart__cta:focus-visible { outline: 3px solid var(--sun); outline-offset: -3px; }
+/* Top three sit side by side as tall cards, like the chart's podium row */
+.amazon-chart__item--top { grid-column: auto; grid-template-columns: 1fr; grid-template-rows: auto 210px 1fr auto; }
+.amazon-chart__item--top .amazon-chart__rank { font-size: 3.2rem; padding: 14px 18px 0; }
+.amazon-chart__item--top .amazon-chart__image { padding: 6px 22px 10px; }
+.amazon-chart__item--top .amazon-chart__image img { height: 190px; }
+.amazon-chart__item--top .amazon-chart__copy { align-self: start; padding: 4px 18px 16px; }
+.amazon-chart__item--top .amazon-chart__cta { padding: 13px; }
+.amazon-chart .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (hover: hover) and (pointer: fine) {
+  .amazon-chart__item:hover .amazon-chart__image img { transform: scale(1.04); }
+  .amazon-chart__cta:hover { background: var(--chalk-deep); }
+}
+@media (max-width: 860px) { .amazon-chart__list { grid-template-columns: 1fr; } .amazon-chart__item--top { grid-column: 1 / -1; } }
+@media (max-width: 620px) {
+  .amazon-chart { margin-top: 36px; padding: 18px; border-radius: 20px; }
+  .amazon-chart__item, .amazon-chart__item--top { grid-template-columns: 40px 88px minmax(0, 1fr); grid-template-rows: auto; }
+  .amazon-chart__rank, .amazon-chart__item--top .amazon-chart__rank { padding: 12px 0 0 12px; font-size: 1.9rem; }
+  .amazon-chart__image, .amazon-chart__item--top .amazon-chart__image { padding: 8px; }
+  .amazon-chart__image img, .amazon-chart__item--top .amazon-chart__image img { height: 80px; }
+  .amazon-chart__copy, .amazon-chart__item--top .amazon-chart__copy { align-self: center; padding: 10px 12px 10px 4px; }
+  .amazon-chart__cta { grid-column: 1 / -1; padding: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .amazon-chart__image img { transition: none; } }

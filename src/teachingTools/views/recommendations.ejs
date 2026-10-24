@@ -41,6 +41,31 @@
           </aside>
         </div>
 
+        <% if (!isDetail && typeof amazonPicks !== 'undefined' && amazonPicks.length) { %>
+        <section class="amazon-chart" aria-labelledby="amazon-chart-title">
+          <header class="amazon-chart__head">
+            <p class="amazon-chart__eyebrow"><%= lang === 'zh' ? '老师好物推荐' : 'Teacher favorites' %></p>
+            <h2 id="amazon-chart-title"><%= lang === 'zh' ? '亚马逊老师好物榜' : 'Amazon Classroom Charts' %></h2>
+            <p><%= lang === 'zh' ? '老师们最常回购的 ' + amazonPicks.length + ' 件课堂好物' : 'The top ' + amazonPicks.length + ' supplies teachers keep reordering' %></p>
+          </header>
+          <ol class="amazon-chart__list">
+            <% amazonPicks.forEach(function (pick) { var copy = lang === 'zh' ? pick.zh : pick.en; %>
+            <li class="amazon-chart__item<%= pick.rank <= 3 ? ' amazon-chart__item--top' : '' %>">
+              <span class="amazon-chart__rank" aria-hidden="true"><%= pick.rank %></span>
+              <a class="amazon-chart__image" href="<%= pick.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer" tabindex="-1" aria-hidden="true">
+                <img src="<%= pick.imageUrl %>" alt="" loading="lazy">
+              </a>
+              <div class="amazon-chart__copy">
+                <h3><span class="visually-hidden">#<%= pick.rank %> </span><%= copy.title %></h3>
+                <p><%= copy.blurb %></p>
+              </div>
+              <a class="amazon-chart__cta" href="<%= pick.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= lang === 'zh' ? '去亚马逊看看' : 'View on Amazon' %> →</a>
+            </li>
+            <% }) %>
+          </ol>
+        </section>
+        <% } %>
+
         <% if (products && products.length) { %>
           <% products.forEach(function (product) { %>
         <article class="recommendation-product" aria-labelledby="product-<%= product.slug %>-title">

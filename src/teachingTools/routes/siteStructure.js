@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var siteContentStore = require('../services/siteContentStore');
+var amazonPicks = require('../config/amazonPicks');
 var siteMap = require('../config/siteMap');
 
 function text(req, en, zh) {
@@ -100,7 +101,7 @@ router.get('/shop/physical-products', function(req, res) {
 });
 
 router.get('/classroom-finds', function(req, res) {
-  res.render('recommendations', { title: 'Classroom Finds', products: siteContentStore.get().recommendations || [] });
+  res.render('recommendations', { title: 'Classroom Finds', products: siteContentStore.get().recommendations || [], amazonPicks: amazonPicks });
 });
 
 router.get('/classroom-finds/:slug', function(req, res, next) {
