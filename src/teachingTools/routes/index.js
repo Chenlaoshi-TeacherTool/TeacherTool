@@ -16,8 +16,10 @@ router.get('/set-language', function(req, res) {
 });
 
 /* GET home page. */
+var ebayStoreUrl = siteMap.children('shop').find(function(item) { return item.key === 'physical-products'; }).redirect;
+
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Home' });
+  res.render('index', { title: 'Home', ebayStoreUrl: ebayStoreUrl });
 });
 
 router.get('/privacy', function(req, res, next) {
@@ -138,8 +140,7 @@ router.get('/teaching-tools/social-media-classroom-tools', function(req, res) {
 });
 
 router.get('/classroom-shop', function(req, res, next) {
-  var physicalProducts = siteMap.children('shop').find(function(item) { return item.key === 'physical-products'; });
-  res.redirect(302, physicalProducts.redirect);
+  res.redirect(302, ebayStoreUrl);
 });
 
 // Low-prep activities now live within Teaching Tools.

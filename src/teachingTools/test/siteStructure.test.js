@@ -60,6 +60,8 @@ test('physical products go to the eBay store', async function() {
   }
   var shop = await (await fetch(base + '/shop')).text();
   assert.ok(shop.includes('href="' + ebay + '"'));
+  var home = await (await fetch(base + '/', { headers: { Cookie: 'lang=zh' } })).text();
+  assert.ok(home.includes('href="' + ebay + '" class="btn">陈老师的商店 →'));
   var sitemap = await (await fetch(base + '/sitemap.xml')).text();
   assert.ok(!sitemap.includes('/shop/physical-products'));
 });
