@@ -1,0 +1,73 @@
+'use strict';
+
+var assert = require('node:assert/strict');
+var test = require('node:test');
+var store = require('../services/siteContentStore');
+var products = [];
+store.refresh = async function() {};
+store.get = function() { return { articles: [], toolGuides: {}, recommendations: products }; };
+var app = require('../app');
+var server;
+var base;
+
+test.before(async function() {
+  server = app.listen(0, '127.0.0.1');
+  await new Promise(function(resolve) { server.once('listening', resolve); });
+  base = 'http://127.0.0.1:' + server.address().port;
+});
+test.after(function() { server.close(); });
+
+test('new section pages render in both languages with the required categories', async function() {
+  var pages = {
+    '/shop': ['Printable packs', 'Physical products'],
+    '/shop/printable-packs': ['No printable packs are listed for sale yet.'],
+    '/shop/physical-products': ['magnetic-people-set.png', 'paypal.me'],
+    '/textbook-companion': ['Level 1', 'Level 2', 'Level 3'],
+    '/textbook-companion/level-1': ['Homework packets', 'Projects', 'Vocabulary cards', 'Lesson agendas'],
+    '/textbook-companion/level-2': ['Level 2'],
+    '/textbook-companion/level-3': ['Level 3'],
+    '/theme-activities/halloween': ['Vocabulary', 'Games', 'Printables'],
+    '/theme-activities/chinese-new-year': ['Vocabulary', 'Games', 'Printables'],
+    '/theme-activities/animals': ['Vocabulary', 'Games', 'Printables'],
+    '/theme-activities/weather': ['Printables', '/theme-activities/weather/songs'],
+    '/theme-activities/weather/songs': ['<html lang="en">'],
+    '/theme-activities': ['/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals'],
+    '/teaching-tools': ['/teaching-tools/random-group-generator'],
+    '/resources': ['Teaching Resources']
+  };
+  for (var path of Object.keys(pages)) {
+    var response = await fetch(base + path);
+    assert.equal(response.status, 200, path);
+    var html = await response.text();
+    for (var expected of pages[path]) assert.ok(html.includes(expected), path + ': ' + expected);
+    var zh = await fetch(base + path, { headers: { Cookie: 'lang=zh' } });
+    assert.equal(zh.status, 200, path + ' zh');
+    assert.ok((await zh.text()).includes('<html lang="zh">'), path + ' language');
+  }
+});
+
+test('legacy URLs redirect to the reorganized content', async function() {
+  for (var pair of [['/recommendations', '/classroom-finds'], ['/classroom-shop', '/shop/physical-products']]) {
+    var response = await fetch(base + pair[0], { redirect: 'manual' });
+    assert.equal(response.status, 301);
+    assert.equal(response.headers.get('location'), pair[1]);
+  }
+});
+
+test('product detail pages preserve published content and fallback; unknown pages return 404', async function() {
+  var fallback = await fetch(base + '/classroom-finds/15-drawer-rolling-cart');
+  assert.equal(fallback.status, 200);
+  assert.ok((await fallback.text()).includes('https://amzn.to/4qpPByl'));
+  products = [{ slug: 'test-cart', title: 'Test cart', imageUrl: '/images/15-drawer-rolling-cart.png', description: 'Published description', productUrl: 'https://amzn.to/example', reasons: [{ title: 'Storage', text: 'Published reason' }], printableLabelUrl: '/labels.pdf' }];
+  try {
+    var listing = await (await fetch(base + '/classroom-finds')).text();
+    assert.ok(listing.includes('/classroom-finds/test-cart'));
+    var detail = await (await fetch(base + '/classroom-finds/test-cart')).text();
+    for (var expected of ['Published description', 'Published reason', '/labels.pdf', 'https://amzn.to/example', 'sponsored nofollow']) assert.ok(detail.includes(expected));
+    for (var path of ['/classroom-finds/missing', '/classroom-finds/15-drawer-rolling-cart', '/textbook-companion/level-4', '/theme-activities/missing', '/shop/missing']) {
+      assert.equal((await fetch(base + path)).status, 404, path);
+    }
+    var sitemap = await (await fetch(base + '/sitemap.xml')).text();
+    for (var path of ['/shop', '/textbook-companion/level-3', '/theme-activities/animals', '/classroom-finds/test-cart']) assert.ok(sitemap.includes(base + path));
+  } finally { products = []; }
+});

@@ -4,16 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#194f45">
-  <title>Classroom Finds - Chen Laoshi's Teaching Toolkit</title>
+  <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
   <%- include('partials/seo', { pageDescription: 'Classroom supplies recommended by Chen Laoshi with practical use cases, honest selection reasons, and clear affiliate disclosures.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/stylesheets/content-pages.css">
 </head>
 <body>
+  <% var isDetail = typeof productDetail !== 'undefined' && productDetail; %>
   <header class="content-hero">
     <div class="content-shell">
       <p class="content-kicker"><%= t('recommendations.kicker') %></p>
-      <h1><%= t('recommendations.title') %></h1>
+      <% if (isDetail) { %><a class="text-link" href="/classroom-finds">← <%= t('recommendations.title') %></a><% } %>
+      <h1><%= isDetail ? title : t('recommendations.title') %></h1>
       <p><%= t('recommendations.intro') %></p>
     </div>
   </header>
@@ -51,6 +53,7 @@
           <div class="recommendation-product__copy">
             <% if (product.category) { %><p class="product-number"><%= product.category %></p><% } %>
             <h2 id="product-<%= product.slug %>-title"><%= product.title %></h2>
+            <% if (!isDetail) { %><a class="resource-card__link" href="/classroom-finds/<%= encodeURIComponent(product.slug) %>"><%= lang === 'zh' ? '查看产品详情' : 'View product details' %> →</a><% } %>
             <% if (product.subtitle) { %><p class="product-subtitle"><%= product.subtitle %></p><% } %>
             <% if (product.description) { %><p><%= product.description %></p><% } %>
 
@@ -90,6 +93,7 @@
           <div class="recommendation-product__copy">
             <p class="product-number"><%= t('recommendations.product1Meta') %></p>
             <h2 id="rolling-cart-title"><%= t('recommendations.product1Title') %></h2>
+            <% if (!isDetail) { %><a class="resource-card__link" href="/classroom-finds/15-drawer-rolling-cart"><%= lang === 'zh' ? '查看产品详情' : 'View product details' %> →</a><% } %>
             <p class="product-subtitle"><%= t('recommendations.product1Subtitle') %></p>
             <p><%= t('recommendations.product1Desc') %></p>
 

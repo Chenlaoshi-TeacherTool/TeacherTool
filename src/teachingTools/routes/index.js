@@ -36,7 +36,7 @@ router.get('/feedback', function(req, res, next) {
 });
 
 router.get('/recommendations', function(req, res, next) {
-  res.render('recommendations', { title: 'Classroom Recommendations', products: siteContentStore.get().recommendations || [] });
+  res.redirect(301, '/classroom-finds');
 });
 
 router.get('/resources', function(req, res, next) {
@@ -149,7 +149,7 @@ router.get('/teaching-tools/social-media-classroom-tools', function(req, res) {
 });
 
 router.get('/classroom-shop', function(req, res, next) {
-  res.render('classroom-shop', { title: 'Classroom Shop' });
+  res.redirect(301, '/shop/physical-products');
 });
 
 // Low-prep activities now live within Teaching Tools.
@@ -274,8 +274,10 @@ router.get('/sitemap.xml', function(req, res) {
   var baseUrl = res.locals.siteUrl.replace(/\/$/, '');
   var paths = [
     '/', '/teaching-tools', '/theme-activities', '/theme-activities/weather', '/theme-activities/weather/songs',
-    '/classroom-shop',
-    '/resources', '/recommendations', '/about', '/contact', '/feedback', '/privacy',
+    '/shop', '/shop/printable-packs', '/shop/physical-products',
+    '/textbook-companion', '/textbook-companion/level-1', '/textbook-companion/level-2', '/textbook-companion/level-3',
+    '/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals',
+    '/resources', '/classroom-finds', '/about', '/contact', '/feedback', '/privacy',
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine', '/teaching-tools/lucky-wheel/', '/teaching-tools/team-race',
     '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
@@ -291,6 +293,8 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator',
     '/teaching-tools/hanzi-batch/index.html'
   ].concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
+  var products = siteContentStore.get().recommendations || [];
+  paths = paths.concat(products.length ? products.map(function(product) { return '/classroom-finds/' + product.slug; }) : ['/classroom-finds/15-drawer-rolling-cart']);
   var urls = paths.map(function(path) {
     return '  <url><loc>' + baseUrl + path + '</loc></url>';
   }).join('\n');

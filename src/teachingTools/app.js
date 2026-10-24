@@ -6,6 +6,7 @@ var logger = require('morgan');
 var i18n = require('./services/i18n');
 
 var indexRouter = require('./routes/index');
+var siteStructureRouter = require('./routes/siteStructure');
 var apiRouter = require('./routes/api');
 var adminRouter = require('./routes/admin');
 var bookGeneratorRouter = require('./routes/bookGenerator');
@@ -57,6 +58,7 @@ app.use('/teaching-tools/sunflower-spinner', function(req, res, next) {
 
 app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));
 
+app.use('/', siteStructureRouter);
 app.use('/', indexRouter);
 app.use('/', bookGeneratorRouter);
 app.use('/', gameSharesRouter);

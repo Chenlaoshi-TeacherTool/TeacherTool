@@ -62,7 +62,7 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(1160px, calc(100% - 16px));
+  width: min(1600px, calc(100% - 16px));
   height: 100%;
   margin: 0 auto;
   gap: 22px;
@@ -145,7 +145,7 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
 .site-lang-switch a:hover { color: #194f45; background: transparent; }
 .site-lang-switch a.is-active { background: #194f45; color: #fffdf7; }
 
-@media (max-width: 1040px) {
+@media (max-width: 1600px) {
   :root { --site-nav-height: 106px; }
 
   .site-main-nav { padding: 8px 12px; }

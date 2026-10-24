@@ -198,6 +198,11 @@
         <p><%= t('themeActivitiesWeather.craftsDesc') %></p>
         <p><strong><%= t('themeActivitiesWeather.craftsMaterialsStrong') %></strong> <%= t('themeActivitiesWeather.craftsMaterialsText') %></p>
     </div>
+    <div class="tool-card">
+        <h3><%= lang === 'zh' ? '可打印材料' : 'Printables' %></h3>
+        <p><%= lang === 'zh' ? '用天气词汇制作课堂练习单。' : 'Create a classroom worksheet with your weather vocabulary.' %></p>
+        <a class="btn" href="/teaching-tools/worksheet-generator"><%= lang === 'zh' ? '制作练习单' : 'Create a worksheet' %></a>
+    </div>
 </div>
 <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
