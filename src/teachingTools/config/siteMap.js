@@ -18,6 +18,7 @@
  *   en / zh   labels
  *   nav       shown in the main navigation (FOOTER lists the footer links)
  *   admin     keys of ADMIN_EDITORS that manage this section's content
+ *   redirect  external URL the page forwards to (left out of the sitemap)
  *   children  sub-pages (same shape, may nest); `template: 'theme'` children
  *             are rendered by routes/siteStructure.js from this list
  */
@@ -51,7 +52,7 @@ var SECTIONS = [
     key: 'shop', href: '/shop', en: 'Chen Laoshi’s Shop', zh: '陈老师的商店', navEn: 'Shop', navZh: '商店', nav: true, admin: [],
     children: [
       { key: 'printable-packs', href: '/shop/printable-packs', en: 'Printable packs', zh: '可打印材料包' },
-      { key: 'physical-products', href: '/shop/physical-products', en: 'Physical products', zh: '实体产品' }
+      { key: 'physical-products', href: '/shop/physical-products', en: 'Physical products', zh: '实体产品', redirect: 'https://www.ebay.com/usr/clsteachingtools' }
     ]
   },
   { key: 'about', href: '/about', en: 'About', zh: '关于', nav: true, admin: [] },
@@ -103,9 +104,9 @@ function flatten(items) {
   }, []);
 }
 
-// Every structural URL, for the sitemap and tests.
+// Every structural URL that serves its own page, for the sitemap and tests.
 function allPaths() {
-  return flatten(SECTIONS).map(function(item) { return item.href; });
+  return flatten(SECTIONS).filter(function(item) { return !item.redirect; }).map(function(item) { return item.href; });
 }
 
 // Compact data for the client-side nav/footer in milk-tea-footer.js.

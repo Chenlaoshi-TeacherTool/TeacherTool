@@ -30,6 +30,11 @@ test.after(function() { server.close(); });
 
 test('every page in the site map renders in English and Chinese', async function() {
   for (var item of flatten(siteMap.SECTIONS)) {
+    if (item.redirect) {
+      var response = await fetch(base + item.href, { redirect: 'manual' });
+      assert.equal(response.headers.get('location'), item.redirect, item.href + ' should redirect');
+      continue;
+    }
     assert.equal((await fetch(base + item.href)).status, 200, item.href);
     assert.equal((await fetch(base + item.href, { headers: { Cookie: 'lang=zh' } })).status, 200, item.href + ' zh');
   }
@@ -38,7 +43,10 @@ test('every page in the site map renders in English and Chinese', async function
 test('each section page links to all of its sub-pages', async function() {
   for (var item of flatten(siteMap.SECTIONS).filter(function(entry) { return entry.children; })) {
     var html = await (await fetch(base + item.href)).text();
-    for (var sub of item.children) assert.ok(html.includes('href="' + sub.href + '"'), item.href + ' should link to ' + sub.href);
+    for (var sub of item.children) {
+      var target = sub.redirect || sub.href;
+      assert.ok(html.includes('href="' + target + '"'), item.href + ' should link to ' + target);
+    }
   }
 });
 

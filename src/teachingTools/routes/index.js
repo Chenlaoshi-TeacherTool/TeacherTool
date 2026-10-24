@@ -138,7 +138,8 @@ router.get('/teaching-tools/social-media-classroom-tools', function(req, res) {
 });
 
 router.get('/classroom-shop', function(req, res, next) {
-  res.redirect(301, '/shop/physical-products');
+  var physicalProducts = siteMap.children('shop').find(function(item) { return item.key === 'physical-products'; });
+  res.redirect(302, physicalProducts.redirect);
 });
 
 // Low-prep activities now live within Teaching Tools.

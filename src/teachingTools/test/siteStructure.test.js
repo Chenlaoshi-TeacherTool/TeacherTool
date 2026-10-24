@@ -22,7 +22,6 @@ test('new section pages render in both languages with the required categories', 
   var pages = {
     '/shop': ['Printable packs', 'Physical products'],
     '/shop/printable-packs': ['No printable packs are listed for sale yet.'],
-    '/shop/physical-products': ['magnetic-people-set.png', 'paypal.me'],
     '/textbook-companion': ['Level 1', 'Level 2', 'Level 3'],
     '/textbook-companion/level-1': ['Homework packets', 'Projects', 'Vocabulary cards', 'Lesson agendas'],
     '/textbook-companion/level-2': ['Level 2'],
@@ -47,11 +46,22 @@ test('new section pages render in both languages with the required categories', 
 });
 
 test('legacy URLs redirect to the reorganized content', async function() {
-  for (var pair of [['/recommendations', '/classroom-finds'], ['/classroom-shop', '/shop/physical-products']]) {
-    var response = await fetch(base + pair[0], { redirect: 'manual' });
-    assert.equal(response.status, 301);
-    assert.equal(response.headers.get('location'), pair[1]);
+  var response = await fetch(base + '/recommendations', { redirect: 'manual' });
+  assert.equal(response.status, 301);
+  assert.equal(response.headers.get('location'), '/classroom-finds');
+});
+
+test('physical products go to the eBay store', async function() {
+  var ebay = 'https://www.ebay.com/usr/clsteachingtools';
+  for (var path of ['/shop/physical-products', '/classroom-shop']) {
+    var response = await fetch(base + path, { redirect: 'manual' });
+    assert.equal(response.status, 302, path);
+    assert.equal(response.headers.get('location'), ebay, path);
   }
+  var shop = await (await fetch(base + '/shop')).text();
+  assert.ok(shop.includes('href="' + ebay + '"'));
+  var sitemap = await (await fetch(base + '/sitemap.xml')).text();
+  assert.ok(!sitemap.includes('/shop/physical-products'));
 });
 
 test('product detail pages preserve published content and fallback; unknown pages return 404', async function() {

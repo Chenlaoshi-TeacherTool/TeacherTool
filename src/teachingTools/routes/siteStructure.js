@@ -69,7 +69,7 @@ router.get('/textbook-companion/:level', function(req, res, next) {
 
 var shopCardCopy = {
   'printable-packs': { en: ['Browse printable teaching packs.', 'Browse printables'], zh: ['浏览可打印的教学材料包。', '查看材料包'] },
-  'physical-products': { en: ['Hands-on materials for your classroom.', 'Browse products'], zh: ['适合课堂动手活动的教具。', '查看产品'] }
+  'physical-products': { en: ['Hands-on materials for your classroom, sold in Chen Laoshi’s eBay store.', 'Visit the eBay store'], zh: ['适合课堂动手活动的教具，在陈老师的 eBay 店铺出售。', '前往 eBay 店铺'] }
 };
 
 router.get('/shop', function(req, res) {
@@ -79,7 +79,7 @@ router.get('/shop', function(req, res) {
     intro: text(req, 'Explore Chen Laoshi’s printable packs and physical classroom products.', '浏览陈老师的可打印材料包与实体教具。'),
     cards: shop.children.map(function(item) {
       var copy = shopCardCopy[item.key] || { en: ['', 'Open'], zh: ['', '打开'] };
-      return { heading: text(req, item.en, item.zh), description: text(req, copy.en[0], copy.zh[0]), href: item.href, label: text(req, copy.en[1], copy.zh[1]) };
+      return { heading: text(req, item.en, item.zh), description: text(req, copy.en[0], copy.zh[0]), href: item.redirect || item.href, label: text(req, copy.en[1], copy.zh[1]) };
     })
   });
 });
@@ -94,8 +94,9 @@ router.get('/shop/printable-packs', function(req, res) {
   });
 });
 
+// Physical products are sold on eBay; 302 so the destination can change later.
 router.get('/shop/physical-products', function(req, res) {
-  res.render('classroom-shop', { title: 'Physical Products · Chen Laoshi’s Shop' });
+  res.redirect(302, child('shop', 'physical-products').redirect);
 });
 
 router.get('/classroom-finds', function(req, res) {
