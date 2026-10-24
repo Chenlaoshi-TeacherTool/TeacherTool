@@ -19,6 +19,7 @@
     <div class="content-shell resource-grid">
       <% printables.forEach(function(item, index) { %>
       <button type="button" class="resource-card printable-card" data-dialog="printable-<%= index %>">
+        <% if (item.limitedFree) { %><span class="printable-badge"><%= lang === 'zh' ? '限时免费' : 'Free for a limited time' %></span><% } %>
         <span class="resource-card__meta">🎃 <%= item.pages %> <%= lang === 'zh' ? '页 · PDF / Word' : 'pages · PDF / Word' %></span>
         <h2><%= item.title %></h2>
         <p><%= lang === 'zh' ? item.zh : item.en %></p>
@@ -27,6 +28,7 @@
 
       <dialog class="printable-dialog" id="printable-<%= index %>" aria-labelledby="printable-<%= index %>-title">
         <form method="dialog" class="printable-dialog__close"><button aria-label="<%= lang === 'zh' ? '关闭' : 'Close' %>">×</button></form>
+        <% if (item.limitedFree) { %><span class="printable-badge printable-badge--inline"><%= lang === 'zh' ? '限时免费' : 'Free for a limited time' %></span><% } %>
         <h2 id="printable-<%= index %>-title"><%= item.title %></h2>
         <p><%= lang === 'zh' ? '选择要下载的版本：' : 'Choose a version to download:' %></p>
         <div class="printable-dialog__options">

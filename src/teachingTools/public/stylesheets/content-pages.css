@@ -142,7 +142,7 @@ body { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .amazon-chart__image img { transition: none; } }
 
 /* Downloadable printables: card opens a PDF / Word chooser */
-.printable-card { display: block; width: 100%; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: transform .18s var(--ease-out), box-shadow .18s ease; }
+.printable-card { position: relative; display: block; width: 100%; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: transform .18s var(--ease-out), box-shadow .18s ease; }
 .printable-card h2 { color: var(--chalk); }
 .printable-card:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
 .printable-card:active { transform: scale(.98); }
@@ -165,3 +165,5 @@ body { margin: 0; }
 .printable-option:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) { .printable-option:hover { background: var(--chalk-deep); } .printable-option + .printable-option:hover { background: #1f437a; } }
 @media (prefers-reduced-motion: reduce) { .printable-dialog[open] { animation: none; } .printable-card, .printable-option { transition: none; } }
+.printable-badge { position: absolute; top: -12px; right: 20px; padding: 5px 14px; border-radius: 999px; background: var(--coral); color: #fff; font-size: .85rem; font-weight: 900; letter-spacing: .04em; box-shadow: 0 6px 14px rgba(201, 80, 63, .35); transform: rotate(3deg); }
+.printable-badge--inline { position: static; display: inline-block; margin-bottom: 10px; box-shadow: none; transform: none; }

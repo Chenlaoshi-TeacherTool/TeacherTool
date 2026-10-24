@@ -51,6 +51,7 @@ var halloweenPrintables = [
     en: 'Read each position-word sentence, find the matching picture around the room, and write its letter. Includes 10 picture cards and an answer key.',
     zh: '读方位词句子，在教室里找到对应的图片并写下字母。含 10 张图片卡和答案。',
     pages: 12,
+    limitedFree: true,
     pdf: PRINTABLES_BASE + 'halloween/halloween-position-words-gallery-walk.pdf',
     docx: PRINTABLES_BASE + 'halloween/halloween-position-words-gallery-walk.docx'
   }
