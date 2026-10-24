@@ -3,7 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var fs = require('fs');
 var i18n = require('./services/i18n');
+var siteMap = require('./config/siteMap');
 
 var indexRouter = require('./routes/index');
 var siteStructureRouter = require('./routes/siteStructure');
@@ -54,6 +56,14 @@ app.get('/fonts/Yu_DuoYinZi_Collection.ttc', function(req, res) {
 // Keep the withdrawn tool unavailable, including direct static-file links.
 app.use('/teaching-tools/sunflower-spinner', function(req, res, next) {
   next(createError(410, 'Sunflower Spinner 已下架 / has been removed.'));
+});
+
+// The shared nav script gets its links from config/siteMap.js, so the menu,
+// footer, sitemap, and admin dashboard all follow the same structure.
+var navScript = fs.readFileSync(path.join(__dirname, 'public/javascripts/milk-tea-footer.js'), 'utf8')
+  .replace('/*SITE_NAV*/{ nav: [], footer: [] }', JSON.stringify(siteMap.clientNav()));
+app.get('/javascripts/milk-tea-footer.js', function(req, res) {
+  res.type('application/javascript').send(navScript);
 });
 
 app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));

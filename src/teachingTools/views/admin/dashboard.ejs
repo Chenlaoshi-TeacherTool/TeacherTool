@@ -1,11 +1,27 @@
 <%- include('layout-head') %>
 <h1>Admin</h1>
-<p>Content editing for the teaching tools site. Currently supported:</p>
-<ul>
-  <li><a href="/admin/wordlists">Word Lists</a> — full editing (create, edit, delete lists and terms)</li>
-  <li><a href="/admin/questionbanks">Question Banks</a> — full editing (create, edit, delete banks and questions), plus Excel bulk import</li>
-  <li><a href="/admin/toolguides">Tool Guides</a> — full editing (create, edit, delete)</li>
-  <li><a href="/admin/articles">Articles</a> — full editing (create, edit, delete)</li>
-  <li><a href="/admin/recommendations">Recommendations</a> — classroom finds, affiliate links, and printable label links</li>
-</ul>
+<p>Content editing, organized by site section. Sections come from <code>config/siteMap.js</code>, the same file that drives the public navigation and sitemap.</p>
+<table>
+  <thead><tr><th>Site section</th><th>Editors</th></tr></thead>
+  <tbody>
+  <% groups.forEach(function (group) { %>
+    <tr>
+      <td>
+        <strong><%= group.label %></strong>
+        <% if (group.href) { %><br><a href="<%= group.href %>" target="_blank" rel="noopener"><%= group.href %></a><% } %>
+        <% if (group.note) { %><br><span style="font-size:0.8rem;color:#666;"><%= group.note %></span><% } %>
+      </td>
+      <td>
+        <% if (group.editors.length) { %>
+          <% group.editors.forEach(function (editor) { %>
+            <div><a href="<%= editor.href %>"><%= editor.label %></a> — <%= editor.description %></div>
+          <% }) %>
+        <% } else { %>
+          <span style="color:#999;">No editor yet (content is in code)</span>
+        <% } %>
+      </td>
+    </tr>
+  <% }) %>
+  </tbody>
+</table>
 <%- include('layout-foot') %>

@@ -1,20 +1,15 @@
 (function () {
   'use strict';
 
+  // Nav and footer links are injected from config/siteMap.js when app.js
+  // serves this file. Edit sections there, not here.
+  var SITE_NAV = /*SITE_NAV*/{ nav: [], footer: [] };
+
   var LABELS = {
     en: {
       brand: "Chen Laoshi's Teaching Toolkit",
       tagline: 'Practical tools for every classroom',
-      home: 'Home',
-      activities: 'Theme Activities',
-      tools: 'Teaching Tools',
-      textbook: 'Textbook Companion',
-      shop: 'Shop',
-      finds: 'Classroom Finds',
-      about: 'About',
-      contact: 'Contact',
-      privacy: 'Privacy Policy',
-      legalFooter: '&copy; 2026 Chen Laoshi\'s Teaching Toolkit &middot; <a href="/about">About</a> &middot; <a href="/classroom-finds">Classroom Finds</a> &middot; <a href="/contact">Contact</a> &middot; <a href="/privacy">Privacy Policy</a>',
+      copyright: '&copy; 2026 Chen Laoshi\'s Teaching Toolkit',
       milkTeaKicker: 'Optional support',
       milkTeaTitle: 'Enjoying the toolkit? Buy Chen Laoshi a milk tea.',
       milkTeaToggle: 'Buy me a milk tea 🧋',
@@ -26,16 +21,7 @@
     zh: {
       brand: '陈老师教学工具包',
       tagline: '为每一个教室提供实用支持',
-      home: '首页',
-      activities: '主题活动',
-      tools: '教学工具',
-      textbook: '教材配套',
-      shop: '商店',
-      finds: '教室好物',
-      about: '关于',
-      contact: '联系',
-      privacy: '隐私政策',
-      legalFooter: '&copy; 2026 陈老师教学工具包 &middot; <a href="/about">关于</a> &middot; <a href="/classroom-finds">教室好物</a> &middot; <a href="/contact">联系</a> &middot; <a href="/privacy">隐私政策</a>',
+      copyright: '&copy; 2026 陈老师教学工具包',
       milkTeaKicker: '可选支持',
       milkTeaTitle: '喜欢这个工具包吗？请陈老师喝一杯奶茶。',
       milkTeaToggle: '请我喝奶茶 🧋',
@@ -49,6 +35,10 @@
   function getLang() {
     var match = document.cookie.match(/(?:^|; )lang=([^;]+)/);
     return match && decodeURIComponent(match[1]) === 'zh' ? 'zh' : 'en';
+  }
+
+  function linkHtml(item, lang) {
+    return '<a href="' + item.href + '">' + item[lang] + '</a>';
   }
 
   function buildLangSwitchHtml(lang) {
@@ -108,14 +98,7 @@
         '<div class="site-main-nav-inner">',
         '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" width="42" height="42" alt=""><span>' + t.brand + '<small>' + t.tagline + '</small></span></a>',
         '  <ul class="site-main-nav-links">',
-        '    <li><a href="/">' + t.home + '</a></li>',
-        '    <li><a href="/teaching-tools">' + t.tools + '</a></li>',
-        '    <li><a href="/theme-activities">' + t.activities + '</a></li>',
-        '    <li><a href="/textbook-companion">' + t.textbook + '</a></li>',
-        '    <li><a href="/classroom-finds">' + t.finds + '</a></li>',
-        '    <li><a href="/shop">' + t.shop + '</a></li>',
-        '    <li><a href="/about">' + t.about + '</a></li>',
-        '    <li><a href="/contact">' + t.contact + '</a></li>',
+        SITE_NAV.nav.map(function(item) { return '    <li>' + linkHtml(item, lang) + '</li>'; }).join(''),
         '  </ul>',
         '  ' + buildLangSwitchHtml(lang),
         '</div>'
@@ -136,7 +119,7 @@
     legalFooter.setAttribute('aria-label', 'Site information');
     legalFooter.innerHTML = [
       '<div class="site-legal-footer-inner">',
-      '  <p>' + t.legalFooter + '</p>',
+      '  <p>' + [t.copyright].concat(SITE_NAV.footer.map(function(item) { return linkHtml(item, lang); })).join(' &middot; ') + '</p>',
       '</div>'
     ].join('');
     if (legalFooter.parentElement !== document.body) document.body.appendChild(legalFooter);

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var siteContentStore = require('../services/siteContentStore');
+var siteMap = require('../config/siteMap');
 
 siteContentStore.refresh().catch(function (err) {
   console.error('Could not load site content from DAB at startup:', err.message);
@@ -260,12 +261,9 @@ router.get('/robots.txt', function(req, res) {
 
 router.get('/sitemap.xml', function(req, res) {
   var baseUrl = res.locals.siteUrl.replace(/\/$/, '');
-  var paths = [
-    '/', '/teaching-tools', '/theme-activities', '/theme-activities/weather', '/theme-activities/weather/songs',
-    '/shop', '/shop/printable-packs', '/shop/physical-products',
-    '/textbook-companion', '/textbook-companion/level-1', '/textbook-companion/level-2', '/textbook-companion/level-3',
-    '/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals',
-    '/classroom-finds', '/about', '/contact', '/feedback', '/privacy',
+  // Section pages come from config/siteMap.js; individual tool pages are listed here.
+  var paths = siteMap.allPaths().concat([
+    '/feedback',
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine', '/teaching-tools/lucky-wheel/', '/teaching-tools/team-race',
     '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
@@ -280,7 +278,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary',
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator',
     '/teaching-tools/hanzi-batch/index.html'
-  ].concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
+  ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
   paths = paths.concat(products.length ? products.map(function(product) { return '/classroom-finds/' + product.slug; }) : ['/classroom-finds/15-drawer-rolling-cart']);
   var urls = paths.map(function(path) {

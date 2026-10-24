@@ -2,6 +2,10 @@
 
 Implemented locally; not published. The site uses Express routes and EJS (HTML templates), so individual URLs can reuse one template without duplicating HTML files.
 
+## Where the structure lives
+
+`src/teachingTools/config/siteMap.js` is the single source of truth. The main navigation and footer (`milk-tea-footer.js`, injected by `app.js`), the theme/textbook/shop routes (`routes/siteStructure.js`), `/sitemap.xml`, and the admin nav and dashboard all read from it. To add, rename, or remove a section, edit that file; `test/siteMap.test.js` fails if a page, sub-page link, sitemap entry, or admin editor is out of sync.
+
 ## Page hierarchy
 
 ```text

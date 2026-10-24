@@ -8,14 +8,21 @@ var requireAdmin = require('../middleware/requireAdmin');
 var sqlClient = require('../services/sqlClient');
 var siteContentStore = require('../services/siteContentStore');
 var blobStorage = require('../services/blobStorage');
+var siteMap = require('../config/siteMap');
 var sql = sqlClient.sql;
 
 var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 router.use(requireAdmin);
 
+// Admin nav and dashboard follow the public site structure in config/siteMap.js.
+router.use(function (req, res, next) {
+  res.locals.adminNav = siteMap.adminNav();
+  next();
+});
+
 router.get('/', function (req, res) {
-  res.render('admin/dashboard', { title: 'Admin', adminUser: req.adminUser });
+  res.render('admin/dashboard', { title: 'Admin', adminUser: req.adminUser, groups: siteMap.adminGroups() });
 });
 
 router.get('/wordlists', async function (req, res, next) {
