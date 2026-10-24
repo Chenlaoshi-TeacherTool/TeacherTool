@@ -40,19 +40,7 @@ router.get('/recommendations', function(req, res, next) {
 });
 
 router.get('/resources', function(req, res, next) {
-  var articles = siteContentStore.get().articles;
-  var categories = Array.from(new Set(articles.map(function(article) { return article.category; })));
-  var activeCategory = typeof req.query.category === 'string' ? req.query.category : '';
-  var visibleArticles = activeCategory
-    ? articles.filter(function(article) { return article.category === activeCategory; })
-    : articles;
-
-  res.render('resources/index', {
-    title: 'Teaching Resources',
-    articles: visibleArticles,
-    categories: categories,
-    activeCategory: activeCategory
-  });
+  next(require('http-errors')(410, 'Teaching Resources 已下架 / has been removed.'));
 });
 
 router.get('/resources/:slug', function(req, res, next) {
@@ -277,7 +265,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/shop', '/shop/printable-packs', '/shop/physical-products',
     '/textbook-companion', '/textbook-companion/level-1', '/textbook-companion/level-2', '/textbook-companion/level-3',
     '/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals',
-    '/resources', '/classroom-finds', '/about', '/contact', '/feedback', '/privacy',
+    '/classroom-finds', '/about', '/contact', '/feedback', '/privacy',
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine', '/teaching-tools/lucky-wheel/', '/teaching-tools/team-race',
     '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',

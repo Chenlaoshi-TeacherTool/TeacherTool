@@ -4,8 +4,9 @@ var assert = require('node:assert/strict');
 var test = require('node:test');
 var store = require('../services/siteContentStore');
 var products = [];
+var articles = [];
 store.refresh = async function() {};
-store.get = function() { return { articles: [], toolGuides: {}, recommendations: products }; };
+store.get = function() { return { articles: articles, toolGuides: {}, recommendations: products }; };
 var app = require('../app');
 var server;
 var base;
@@ -32,8 +33,7 @@ test('new section pages render in both languages with the required categories', 
     '/theme-activities/weather': ['Printables', '/theme-activities/weather/songs'],
     '/theme-activities/weather/songs': ['<html lang="en">'],
     '/theme-activities': ['/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals'],
-    '/teaching-tools': ['/teaching-tools/random-group-generator'],
-    '/resources': ['Teaching Resources']
+    '/teaching-tools': ['/teaching-tools/random-group-generator']
   };
   for (var path of Object.keys(pages)) {
     var response = await fetch(base + path);
@@ -70,4 +70,27 @@ test('product detail pages preserve published content and fallback; unknown page
     var sitemap = await (await fetch(base + '/sitemap.xml')).text();
     for (var path of ['/shop', '/textbook-companion/level-3', '/theme-activities/animals', '/classroom-finds/test-cart']) assert.ok(sitemap.includes(base + path));
   } finally { products = []; }
+});
+
+
+test('retired resources listing returns 410 and is excluded from sitemap and navigation', async function() {
+  for (var path of ['/resources', '/resources/', '/resources?category=games']) {
+    assert.equal((await fetch(base + path)).status, 410, path);
+  }
+  var sitemap = await (await fetch(base + '/sitemap.xml')).text();
+  assert.ok(!sitemap.includes('<loc>' + base + '/resources</loc>'));
+  var nav = await (await fetch(base + '/javascripts/milk-tea-footer.js')).text();
+  assert.ok(!nav.includes('href="/resources"'));
+});
+
+
+test('existing article pages remain available after retiring the list', async function() {
+  articles = [{ slug: 'retained-article', title: 'Retained article', category: 'Classroom', intro: ['Existing content'], sections: [], relatedTool: { href: '/teaching-tools', label: 'Teaching Tools' } }];
+  try {
+    var response = await fetch(base + '/resources/retained-article');
+    assert.equal(response.status, 200);
+    var html = await response.text();
+    assert.ok(html.includes('Existing content'));
+    assert.ok(!html.includes('href="/resources"'));
+  } finally { articles = []; }
 });
