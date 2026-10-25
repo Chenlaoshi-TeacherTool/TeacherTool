@@ -1,0 +1,230 @@
+[
+  {
+    "href": "/teaching-tools/qr-code-generator",
+    "icon": "📌",
+    "titleKey": "teachingToolsIndex.qrTitle",
+    "descKey": "teachingToolsIndex.qrDesc"
+  },
+  {
+    "href": "/teaching-tools/lucky-wheel/",
+    "icon": "🎡",
+    "titleKey": "home.luckyWheelTitle",
+    "descKey": "home.luckyWheelDesc"
+  },
+  {
+    "href": "/teaching-tools/random-group-generator",
+    "icon": "🎲",
+    "titleKey": "teachingToolsIndex.groupTitle",
+    "descKey": "teachingToolsIndex.groupDesc"
+  },
+  {
+    "href": "/teaching-tools/team-race",
+    "icon": "🏁",
+    "titleKey": "teachingToolsIndex.teamRaceTitle",
+    "descKey": "teachingToolsIndex.teamRaceDesc"
+  },
+  {
+    "href": "/teaching-tools/reward-grid/",
+    "icon": "🎁",
+    "titleKey": "teachingToolsIndex.rewardGridTitle",
+    "descKey": "teachingToolsIndex.rewardGridDesc"
+  },
+  {
+    "href": "/teaching-tools/classroom-noise-monitor",
+    "icon": "🔊",
+    "titleKey": "teachingToolsIndex.noiseMonitorTitle",
+    "descKey": "teachingToolsIndex.noiseMonitorDesc"
+  },
+  {
+    "href": "/teaching-tools/time-machine",
+    "icon": "⏳",
+    "titleKey": "teachingToolsIndex.timeMachineTitle",
+    "descKey": "teachingToolsIndex.timeMachineDesc"
+  },
+  {
+    "href": "/teaching-tools/class-pet-points",
+    "icon": "🐾",
+    "titleKey": "teachingToolsIndex.petTitle",
+    "descKey": "teachingToolsIndex.petDesc"
+  },
+  {
+    "href": "/teaching-tools/word-list-library/word-list-library.html",
+    "icon": "🗂️",
+    "titleKey": "teachingToolsIndex.libraryTitle",
+    "descKey": "teachingToolsIndex.libraryDesc"
+  },
+  {
+    "href": "/teaching-tools/yu-duoyinzi-font",
+    "icon": "🈶",
+    "titleKey": "teachingToolsIndex.fontTitle",
+    "descKey": "teachingToolsIndex.fontDesc"
+  },
+  {
+    "href": "/teaching-tools/question-bank-library/question-bank-library.html",
+    "icon": "🧠",
+    "titleKey": "teachingToolsIndex.questionBankTitle",
+    "descKey": "teachingToolsIndex.questionBankDesc"
+  },
+  {
+    "href": "/low-prep/word-sudoku/word-sudoku-widget.html",
+    "icon": "🧩",
+    "titleKey": "teachingToolsIndex.sudokuTitle",
+    "descKey": "teachingToolsIndex.sudokuDesc"
+  },
+  {
+    "href": "/low-prep/word-cloud/word-cloud-widget.html",
+    "icon": "☁️",
+    "titleKey": "teachingToolsIndex.wordCloudTitle",
+    "descKey": "teachingToolsIndex.wordCloudDesc"
+  },
+  {
+    "href": "/teaching-tools/vocabulary-booklet/vocabulary-booklet.html",
+    "icon": "📖",
+    "titleKey": "teachingToolsIndex.vocabBookletTitle",
+    "descKey": "teachingToolsIndex.vocabBookletDesc"
+  },
+  {
+    "href": "/teaching-tools/independent-reading",
+    "icon": "📖",
+    "titleKey": "teachingToolsIndex.independentReadingTitle",
+    "descKey": "teachingToolsIndex.independentReadingDesc"
+  },
+  {
+    "href": "/teaching-tools/missing-radicals",
+    "icon": "✍️",
+    "titleKey": "teachingToolsIndex.missingPartsTitle",
+    "descKey": "teachingToolsIndex.missingPartsDesc"
+  },
+  {
+    "href": "/teaching-tools/social-media-classroom-tools/",
+    "icon": "🗨️",
+    "titleKey": "teachingToolsIndex.socialMediaHubTitle",
+    "descKey": "teachingToolsIndex.socialMediaHubDesc"
+  },
+  {
+    "href": "/teaching-tools/tear-paper-bingo",
+    "icon": "🟨",
+    "titleKey": "teachingToolsIndex.tearPaperBingoTitle",
+    "descKey": "teachingToolsIndex.tearPaperBingoDesc"
+  },
+  {
+    "href": "/teaching-tools/would-you-rather",
+    "icon": "🤔",
+    "titleKey": "teachingToolsIndex.wouldYouRatherTitle",
+    "descKey": "teachingToolsIndex.wouldYouRatherDesc"
+  },
+  {
+    "href": "/teaching-tools/jeopardy",
+    "icon": "🏆",
+    "titleKey": "teachingToolsIndex.jeopardyTitle",
+    "descKey": "teachingToolsIndex.jeopardyDesc"
+  },
+  {
+    "href": "/teaching-tools/character-race",
+    "icon": "🌻",
+    "titleKey": "teachingToolsIndex.termRaceTitle",
+    "descKey": "teachingToolsIndex.termRaceDesc"
+  },
+  {
+    "href": "/teaching-tools/maze-generator",
+    "icon": "🧭",
+    "titleKey": "teachingToolsIndex.mazeTitle",
+    "descKey": "teachingToolsIndex.mazeDesc"
+  },
+  {
+    "href": "/teaching-tools/tarsia-puzzle",
+    "icon": "🧩",
+    "titleKey": "teachingToolsIndex.tarsiaTitle",
+    "descKey": "teachingToolsIndex.tarsiaDesc"
+  },
+  {
+    "href": "/teaching-tools/bingo-generator",
+    "icon": "🎯",
+    "titleKey": "teachingToolsIndex.bingoTitle",
+    "descKey": "teachingToolsIndex.bingoDesc"
+  },
+  {
+    "href": "/teaching-tools/emoji-search",
+    "icon": "🔎",
+    "titleKey": "teachingToolsIndex.emojiSearchTitle",
+    "descKey": "teachingToolsIndex.emojiSearchDesc"
+  },
+  {
+    "href": "/teaching-tools/image-revealer",
+    "icon": "🖼️",
+    "titleKey": "teachingToolsIndex.imageRevealerTitle",
+    "descKey": "teachingToolsIndex.imageRevealerDesc"
+  },
+  {
+    "href": "/teaching-tools/zoom-reveal",
+    "icon": "🔍",
+    "titleKey": "teachingToolsIndex.zoomRevealTitle",
+    "descKey": "teachingToolsIndex.zoomRevealDesc"
+  },
+  {
+    "href": "/teaching-tools/name-tent-generator",
+    "icon": "🔺",
+    "titleKey": "teachingToolsIndex.nameTentTitle",
+    "descKey": "teachingToolsIndex.nameTentDesc"
+  },
+  {
+    "href": "/teaching-tools/flash-card-generator",
+    "icon": "🗂️",
+    "titleKey": "teachingToolsIndex.flashCardTitle",
+    "descKey": "teachingToolsIndex.flashCardDesc"
+  },
+  {
+    "href": "/teaching-tools/decode-practice",
+    "icon": "🔡",
+    "titleKey": "teachingToolsIndex.decodeTitle",
+    "descKey": "teachingToolsIndex.decodeDesc"
+  },
+  {
+    "href": "/teaching-tools/vocab-glossary",
+    "icon": "📖",
+    "titleKey": "teachingToolsIndex.glossaryTitle",
+    "descKey": "teachingToolsIndex.glossaryDesc"
+  },
+  {
+    "href": "/teaching-tools/vocab-puzzle",
+    "icon": "🧩",
+    "titleKey": "teachingToolsIndex.vocabPuzzleTitle",
+    "descKey": "teachingToolsIndex.vocabPuzzleDesc"
+  },
+  {
+    "href": "/teaching-tools/worksheet-generator",
+    "icon": "📝",
+    "titleKey": "teachingToolsIndex.worksheetTitle",
+    "descKey": "teachingToolsIndex.worksheetDesc"
+  },
+  {
+    "href": "/teaching-tools/stroke-order-worksheet",
+    "icon": "✍️",
+    "titleKey": "teachingToolsIndex.strokeOrderTitle",
+    "descKey": "teachingToolsIndex.strokeOrderDesc"
+  },
+  {
+    "href": "/teaching-tools/hanzi-batch/index.html",
+    "icon": "🎨",
+    "titleKey": "teachingToolsIndex.hanziBatchTitle",
+    "descKey": "teachingToolsIndex.hanziBatchDesc"
+  },
+  {
+    "href": "/teaching-tools/sentence-reorder",
+    "icon": "🧩",
+    "titleKey": "teachingToolsIndex.sentenceReorderTitle",
+    "descKey": "teachingToolsIndex.sentenceReorderDesc"
+  },
+  {
+    "href": "/teaching-tools/witchs-poison",
+    "icon": "🧪",
+    "titleKey": "teachingToolsIndex.poisonGameTitle",
+    "descKey": "teachingToolsIndex.poisonGameDesc"
+  },
+  {
+    "href": "/teaching-tools/book-generator",
+    "icon": "🎧",
+    "titleKey": "teachingToolsIndex.bookGenTitle",
+    "descKey": "teachingToolsIndex.bookGenDesc"
+  }
+]

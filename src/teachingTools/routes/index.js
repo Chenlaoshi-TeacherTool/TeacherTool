@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var siteContentStore = require('../services/siteContentStore');
 var siteMap = require('../config/siteMap');
+var popularTools = require('../services/popularTools');
 
 siteContentStore.refresh().catch(function (err) {
   console.error('Could not load site content from DAB at startup:', err.message);
@@ -18,8 +19,10 @@ router.get('/set-language', function(req, res) {
 /* GET home page. */
 var ebayStoreUrl = siteMap.children('shop').find(function(item) { return item.key === 'physical-products'; }).redirect;
 
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Home', ebayStoreUrl: ebayStoreUrl });
+router.get('/', async function(req, res, next) {
+  try {
+    res.render('index', { title: 'Home', ebayStoreUrl: ebayStoreUrl, popularTools: await popularTools.getCards() });
+  } catch (err) { next(err); }
 });
 
 router.get('/privacy', function(req, res, next) {

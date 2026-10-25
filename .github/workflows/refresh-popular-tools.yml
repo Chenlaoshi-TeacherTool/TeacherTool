@@ -1,0 +1,35 @@
+name: Refresh popular teaching tools
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: popular-teaching-tools
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+      - run: npm ci --omit=dev
+        working-directory: src/teachingTools
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_40455166CA3D452BB2F8E24698C0ED76 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D196E7570F344B148742DAF19260137F }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_242D5CD45A904F3D8C067D10D38E0BDD }}
+      - run: node scripts/collect-popular-tools.js --azure-settings
+        working-directory: src/teachingTools
