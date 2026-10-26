@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CLS Quiz City — Classroom Quick Play</title>
+  <%- include('../partials/seo', { pageDescription: 'A local classroom quiz board game for two to four teams. Answer, explore and build your knowledge city.' }) %>
+  <link rel="stylesheet" href="/teaching-tools/quiz-city/quiz-city.css">
+  <script src="/teaching-tools/quiz-city/engine.js" defer></script>
+  <script src="/teaching-tools/quiz-city/quiz-city.js" defer></script>
+</head>
+<body>
+<main class="city-app">
+  <header class="topbar">
+    <a href="/teaching-tools" class="back" data-en="← Teaching tools" data-zh="← 教学工具">← Teaching tools</a>
+    <div class="brand"><span>CLS</span><div><h1>Quiz City</h1><p>CLASSROOM QUICK PLAY</p></div></div>
+    <nav aria-label="Game controls">
+      <button id="language" type="button">中文 / EN</button>
+      <button id="sound" type="button" aria-pressed="false" data-en="Sound off" data-zh="音效关">Sound off</button>
+      <button id="motion" type="button" aria-pressed="true" data-en="Animation on" data-zh="动画开">Animation on</button>
+      <button id="fullscreen" type="button" data-en="Full screen" data-zh="全屏">Full screen</button>
+    </nav>
+  </header>
+  <div class="gamebar"><span class="pill" id="round">ROUND 1</span><span id="turn-label"></span><strong id="clock">15:00</strong><button id="pause" type="button" disabled>Pause</button><button id="finish" type="button" disabled data-en="Finish round" data-zh="本轮结束结算">Finish round</button><button id="setup-open" type="button" data-en="New game / Questions" data-zh="新对局 / 题库">New game / Questions</button></div>
+  <button id="show-results" type="button" hidden data-en="View rankings" data-zh="查看排名">View rankings</button>
+  <section class="playfield" aria-label="Quiz City game">
+    <aside id="teams-left" class="teams"></aside>
+    <div class="board-shell"><div id="board" class="board">
+      <div class="city-center">
+        <div class="city-label"><span data-en="LEARN • EXPLORE • BUILD" data-zh="学习 · 探索 · 建造">LEARN • EXPLORE • BUILD</span><h2 data-en="A city of bright ideas" data-zh="让知识点亮城市">A city of bright ideas</h2></div>
+        <svg class="city-art" viewBox="0 0 600 360" role="img" aria-label="Original knowledge city illustration">
+          <defs><linearGradient id="island" x2="0" y2="1"><stop stop-color="#c9f3a7"/><stop offset="1" stop-color="#79cd94"/></linearGradient><linearGradient id="roof" x2="1" y2="1"><stop stop-color="#62dfda"/><stop offset="1" stop-color="#238fbc"/></linearGradient><filter id="shadow"><feDropShadow dx="0" dy="9" stdDeviation="5" flood-color="#236854" flood-opacity=".18"/></filter></defs>
+          <ellipse cx="300" cy="307" rx="235" ry="35" fill="#2c8062" opacity=".13"/>
+          <path d="M65 255 280 155 539 254 320 343Z" fill="#64ad86"/><path d="M65 243 280 143 539 242 320 331Z" fill="url(#island)"/>
+          <path d="m111 251 180-79 204 76-178 70Z" fill="none" stroke="#fff3c9" stroke-width="17"/>
+          <g filter="url(#shadow)"><path d="m226 159 77-38 95 39v118l-78 36-94-40Z" fill="#fff0c6"/><path d="m320 197 78-37v118l-78 36Z" fill="#e4b778"/>
+          <path d="m211 157 88-76 113 77-91 46Z" fill="url(#roof)"/><path d="m211 157 110 47 91-46v13l-91 45-110-47Z" fill="#237d9a"/>
+          <path d="M251 196v62m27-50v62m78-59v62m24-74v62" stroke="#fff9e4" stroke-width="13"/>
+          <path d="M291 302v-53q15-26 30-12v78" fill="#449fbc"/>
+          <path d="m270 147 28-16 31 14-30 16Z" fill="#fff6cc"/><path d="m270 147v17l29 14 30-17v-16l-30 16Z" fill="#ffe795"/>
+          <path d="m276 117 22-10 22 9-21 11Z" fill="#fff"/><path d="m299 127v32" stroke="#e7bb5c" stroke-width="4"/>
+          <path d="m126 197 48-25 47 25v72l-47 24-48-23Z" fill="#f9bda6"/><path d="m174 221 47-24v72l-47 24Z" fill="#e49487"/><path d="m116 197 58-61 56 61-56 28Z" fill="#f38489"/>
+          <path d="M142 226v22m24-12v22m24-28v23" stroke="#fff8d7" stroke-width="11"/>
+          <path d="m409 192 39-19 42 20v57l-40 22-41-20Z" fill="#bba9f1"/><path d="m450 212 40-19v57l-40 22Z" fill="#9182ce"/><path d="m399 191 50-37 51 38-50 24Z" fill="#7d77c9"/><path d="M421 218v18m20-8v18m26-29v18" stroke="#fff4ca" stroke-width="9"/>
+          <path d="m353 112 20-10 22 10v73l-21 10-21-10Z" fill="#fff0b8"/><path d="m374 123 21-11v73l-21 10Z" fill="#e8c274"/><path d="m347 112 26-36 28 36-27 14Z" fill="#efb854"/><circle cx="369" cy="144" r="10" fill="#fff"/><path d="M369 138v7l5 3" fill="none" stroke="#388f95" stroke-width="3"/></g>
+          <g fill="#318f6a"><path d="M92 230v-24m411 65v-25m-288 54v-24" stroke="#8a8050" stroke-width="6"/><circle cx="92" cy="198" r="22"/><circle cx="503" cy="238" r="24"/><circle cx="215" cy="267" r="19"/></g>
+          <g fill="#fff6c5"><circle cx="110" cy="115" r="4"/><circle cx="469" cy="123" r="5"/><path d="m177 91 5-12 5 12 12 5-12 5-5 12-5-12-12-5Zm266 43 4-9 4 9 9 4-9 4-4 9-4-9-9-4Z"/></g>
+        </svg>
+        <div class="center-bottom"><span class="city-seal">Q</span><span data-en="Every answer builds something." data-zh="每个答案，都让城市成长。">Every answer builds something.</span></div>
+      </div>
+    </div></div>
+    <aside id="teams-right" class="teams"></aside>
+  </section>
+  <section class="control-deck"><div><span class="eyebrow" data-en="YOUR NEXT ADVENTURE" data-zh="开启下一段探索">YOUR NEXT ADVENTURE</span><p id="status" role="status" aria-live="polite"></p></div><div class="roll-controls"><output id="dice" aria-label="Dice result">1</output><button id="roll" type="button" class="primary" disabled data-en="Roll the dice" data-zh="掷骰子">Roll the dice</button></div></section>
+  <p class="footnote" data-en="Correct +20 • Buildings earn visit fees • Highest total assets wins • Autosaved on this browser" data-zh="答对 +20 · 建筑收取参观费 · 总资产最高获胜 · 自动保存在此浏览器">Correct +20 • Buildings earn visit fees • Highest total assets wins • Autosaved on this browser</p>
+  <p id="storage-warning" role="status" hidden></p>
+  <details class="history"><summary data-en="Recent turns & rules" data-zh="最近回合与规则">Recent turns & rules</summary><p data-en="Answer first, then resolve the tile. Buying is optional. Visit fees are capped at available coins. Challenge: one extra question, correct +30. Chance: +35 or −15. Bonus +30, repairs −25, landing on Launch Plaza +20. At time-up, finish the entire current round. Ties share a rank. Pausing freezes the timer and actions; reloading restores paused." data-zh="先答题，再处理格子。建筑可自愿购买；参观费最多扣现有金币。挑战：额外答一题，答对 +30；机会：+35 或 −15；奖励 +30；维修 −25；停在启航广场 +20。时间到后完成当前整轮；同资产并列。暂停冻结计时和操作，刷新后以暂停状态恢复。"></p><ol id="history"></ol></details>
+</main>
+<dialog id="setup-dialog" aria-labelledby="setup-title"><form id="setup-form"><div class="dialog-head"><div><span class="eyebrow">WELCOME TO QUIZ CITY</span><h2 id="setup-title" data-en="Build a brilliant lesson." data-zh="一起建造知识之城">Build a brilliant lesson.</h2></div><button id="setup-close" type="button" data-en="Close" data-zh="关闭">Close</button></div><p data-en="One screen. A whole classroom. Set up your teams and questions." data-zh="一块屏幕，全班参与。设置队伍和题库就能开始。"></p><div class="setup-options"><label><span data-en="Teams" data-zh="队伍数">Teams</span><select id="team-count"><option>2</option><option>3</option><option selected>4</option></select></label><label><span data-en="Minutes" data-zh="分钟">Minutes</span><select id="duration"><option>10</option><option selected>15</option><option>20</option><option>30</option></select></label></div><div id="team-names" class="name-inputs"></div><label for="questions" data-en="Question bank" data-zh="题库">Question bank</label><p class="help" data-en="One per line: question | answer. For multiple choice: question | exact answer | choice 1; choice 2; choice 3 (2–6 choices). Questions repeat. Save bank also applies to the current game at a turn boundary." data-zh="每行：题目 | 答案。选择题：题目 | 完整正确选项 | 选项1; 选项2; 选项3（2～6项）。题库循环使用。保存题库也会在回合间应用到当前对局。"></p><textarea id="questions" rows="6" maxlength="100000" required spellcheck="false"></textarea><p id="setup-error" role="alert"></p><div class="actions"><button id="save-bank" type="button" data-en="Save question bank" data-zh="保存题库">Save question bank</button><button type="submit" class="primary" data-en="Start new game" data-zh="开始新对局">Start new game</button></div><p class="help" data-en="Starting a new game replaces the saved match. Questions stay in this browser." data-zh="开始新对局会替换已保存的对局。题库仅保存在此浏览器。"></p></form></dialog>
+<dialog id="turn-dialog" aria-labelledby="turn-title"><div class="dialog-head"><span id="card-eyebrow" class="eyebrow"></span><span id="card-team" class="pill"></span><button id="card-pause" type="button" data-en="Pause" data-zh="暂停">Pause</button></div><h2 id="turn-title"></h2><div id="card-content"></div><div id="card-actions" class="actions"></div></dialog>
+<dialog id="result-dialog" aria-labelledby="result-title"><span class="eyebrow">QUIZ CITY • CLASSROOM QUICK PLAY</span><h2 id="result-title" data-en="A city worth celebrating!" data-zh="为你们的知识之城喝彩！">A city worth celebrating!</h2><p data-en="Total assets = coins + building purchase prices. Equal totals share a rank." data-zh="总资产 = 金币 + 建筑购买价；总资产相同则并列。"></p><div id="rankings"></div><button id="result-close" type="button" data-en="View board" data-zh="查看棋盘">View board</button><button id="result-new" type="button" class="primary" data-en="New game" data-zh="新对局">New game</button></dialog>
+</body>
+</html>
