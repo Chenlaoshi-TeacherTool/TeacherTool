@@ -15,6 +15,7 @@
   var lastAnimation = 0;
   var resultShown = false;
   var lastSave = 0;
+  var setupMode = 'play';
   var sample = 'What is 6 × 7? | 42 | 36; 42; 48\n说出三种水果。 | 例如：苹果、香蕉、橙子\nWhich planet do we live on? | Earth | Mars; Earth; Venus\n用“因为……所以……”说一句话。 | 合理的因果句即可\nHow many sides does a hexagon have? | 6 | 5; 6; 8\n把“你好”翻译成英文。 | Hello\nName a way to help our planet. | e.g. Recycle, save water, plant trees\n“明天”的前一天是什么？ | 今天';
   function byId(id) { return document.getElementById(id); }
   function text(en, cn) { return zh ? cn : en; }
@@ -176,8 +177,35 @@
     if (!parsedBank.questions.length || parsedBank.invalid.length) { byId('setup-error').textContent = parsedBank.invalid.length ? text('Check format on lines: ', '请检查以下行的格式：') + parsedBank.invalid.join(', ') : text('Add at least one question and answer.', '请至少输入一道题和答案。'); return null; }
     return parsedBank.questions;
   }
+  function setMode(mode) {
+    setupMode = mode;
+    byId('mode-play').setAttribute('aria-pressed', mode === 'play');
+    byId('mode-print').setAttribute('aria-pressed', mode === 'print');
+    byId('print-controls').hidden = mode !== 'print';
+    byId('print-preview').hidden = mode !== 'print';
+    byId('projection-submit').hidden = mode === 'print';
+    byId('projection-note').hidden = mode === 'print';
+  }
+  async function generatePrint() {
+    if (!byId('setup-form').reportValidity()) return;
+    var questions = parsed(); if (!questions) return;
+    var teamNames = Array.from(byId('team-names').querySelectorAll('input')).map(function(input) { return input.value.trim(); });
+    if (teamNames.some(function(name) { return !name; }) || new Set(teamNames).size !== teamNames.length) { byId('setup-error').textContent = text('Give every team a different name.', '请为每队填写不同的队名。'); return; }
+    write(bankKey, byId('questions').value);
+    byId('setup-dialog').close(); byId('print-dialog').showModal();
+    byId('print-run').disabled = true;
+    byId('print-status').textContent = text('Preparing pages…', '正在生成页面……');
+    try {
+      var result = await window.QuizCityPrint.prepare(byId('print-frame'), { questions: questions, teams: teamNames, minutes: Number(byId('duration').value), lang: zh ? 'zh' : 'en', layout: byId('print-layout').value, paper: byId('print-paper').value, key: byId('print-key').checked, kit: byId('print-kit').checked }, document.querySelector('.city-art'));
+      var summary = result.boards + text(' board(s) · ', ' 张棋盘 · ') + result.pages + text(' pages.', ' 页。');
+      if (result.repeats) summary += text(' Repeated question slots: ', ' 重复题格数：') + result.repeats + '.';
+      if (result.warnings.length) summary += text(' Text does not fit: ', ' 以下内容超出可读范围：') + result.warnings.join(', ') + text('. Choose the large board or shorten the text, then regenerate. Printing is disabled to prevent clipping.', '。请选择大棋盘或缩短文字后重新生成；已暂停打印以免截断内容。');
+      byId('print-status').textContent = summary; byId('print-status').classList.toggle('print-error', Boolean(result.warnings.length));
+      byId('print-run').disabled = Boolean(result.warnings.length);
+    } catch (error) { byId('print-status').textContent = text('Preview could not be generated. Return to settings and try again.', '预览生成失败，请返回设置后重试。'); }
+  }
   byId('setup-form').addEventListener('submit', function(event) {
-    event.preventDefault(); var questions = parsed(); if (!questions) return;
+    event.preventDefault(); if (setupMode === 'print') { generatePrint(); return; } var questions = parsed(); if (!questions) return;
     var teamNames = Array.from(byId('team-names').querySelectorAll('input')).map(function(input) { return input.value.trim(); });
     if (teamNames.some(function(name) { return !name; }) || new Set(teamNames).size !== teamNames.length) { byId('setup-error').textContent = text('Give every team a different name.', '请为每队填写不同的队名。'); return; }
     write(bankKey, byId('questions').value); state = engine.create(teamNames, Number(byId('duration').value), questions); lastTime = Date.now(); resultShown = false; reveal = false; selected = -1; byId('setup-dialog').close(); update();
@@ -189,6 +217,12 @@
     byId('setup-error').textContent = questions.length + text(' questions saved.', ' 道题已保存。') + (state && state.phase !== 'ready' ? text(' Applies to the next new game; finish this turn to change the current bank.', ' 将用于新对局；如需替换当前题库，请先完成本回合。') : '');
   });
   byId('team-count').addEventListener('change', names);
+  byId('mode-play').addEventListener('click', function() { setMode('play'); });
+  byId('mode-print').addEventListener('click', function() { setMode('print'); });
+  byId('print-preview').addEventListener('click', generatePrint);
+  byId('print-back').addEventListener('click', function() { byId('print-dialog').close(); openSetup(); });
+  byId('print-dialog').addEventListener('cancel', function(event) { event.preventDefault(); byId('print-dialog').close(); openSetup(); });
+  byId('print-run').addEventListener('click', function() { byId('print-frame').contentWindow.focus(); byId('print-frame').contentWindow.print(); });
   byId('setup-open').addEventListener('click', openSetup);
   byId('setup-close').addEventListener('click', function() { byId('setup-dialog').close(); render(); });
   byId('setup-dialog').addEventListener('cancel', function() { setTimeout(render, 0); });

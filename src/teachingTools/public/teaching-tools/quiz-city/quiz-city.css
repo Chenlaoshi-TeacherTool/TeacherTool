@@ -9,3 +9,17 @@
 #show-results { display: block; margin: 0 auto 16px; }
 #show-results[hidden] { display: none; }
 .team-die { position: absolute; right: 8px; top: 7px; color: #527b76; font: 25px 'Segoe UI Symbol', sans-serif; }
+.mode-switch { display: flex; gap: 8px; margin-top: 22px; }
+.mode-switch button { flex: 1; }
+.mode-switch button[aria-pressed="true"] { background: #dceee1; border: 2px solid #197f7d; }
+.print-settings { border: 1px solid #c5d9c6; border-radius: 14px; padding: 12px; margin-bottom: 18px; background: #eff5e7; }
+.print-settings .setup-options { flex-wrap: wrap; margin: 0 0 14px; gap: 12px; }
+.print-settings > label { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 8px 0; }
+.print-settings input { accent-color: #197f7d; }
+#print-dialog { width: min(1200px, 96vw); max-width: none; }
+#print-dialog .dialog-head { flex-wrap: wrap; }
+#print-dialog h2 { flex: 1; font-size: 23px; margin: 0; }
+#print-frame { width: 100%; height: 65vh; border: 1px solid #bbd1c0; border-radius: 10px; background: #d9e4df; }
+#print-status { font-size: 13px; line-height: 1.5; }
+.print-error { color: #a43731; font-weight: 800; }
+[hidden] { display: none !important; }

@@ -79,7 +79,7 @@ test('game route renders both languages, assets load, and directory and sitemap 
       assert.equal(response.status, 200); var html = await response.text();
       assert.ok(html.includes('<html lang="' + lang + '">')); assert.ok(html.includes('CLS Quiz City'));
     }
-    for (var asset of ['engine.js', 'quiz-city.js', 'quiz-city.css']) { assert.equal((await fetch(base + '/teaching-tools/quiz-city/' + asset)).status, 200); }
+    for (var asset of ['engine.js', 'quiz-city.js', 'quiz-city.css', 'print-model.js', 'print.js', 'print.css']) { assert.equal((await fetch(base + '/teaching-tools/quiz-city/' + asset)).status, 200); }
     for (var route of ['/teaching-tools', '/sitemap.xml']) { assert.ok((await (await fetch(base + route)).text()).includes('/teaching-tools/quiz-city')); }
   } finally { server.closeAllConnections(); await new Promise(function(resolve) { server.close(resolve); }); }
 });
