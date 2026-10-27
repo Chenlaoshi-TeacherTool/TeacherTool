@@ -109,7 +109,7 @@
       'buildVocabularyPairs', 'questionBankPicker',
       'qaInput', 'buildQaPairs', 'pairEditor', 'validationMessage', 'loadSample', 'generatePuzzle',
       'reshufflePuzzle', 'clearPuzzle', 'previewStatus', 'pagePreview', 'previewNote', 'printPuzzle',
-      'downloadPdf', 'downloadPptx', 'emojiPicker', 'closeEmojiPicker', 'emojiSearch', 'emojiGrid',
+      'downloadPdf', 'emojiPicker', 'closeEmojiPicker', 'emojiSearch', 'emojiGrid',
       'customEmoji', 'useCustomEmoji', 'printPages', 'tarsiaToast'
     ].forEach(function (id) { elements[id] = document.getElementById(id); });
   }
@@ -186,8 +186,7 @@
       if (event.key === 'Enter') { event.preventDefault(); chooseEmoji(elements.customEmoji.value); }
     });
     elements.printPuzzle.addEventListener('click', printPuzzle);
-    elements.downloadPdf.addEventListener('click', function () { exportPuzzle('pdf'); });
-    elements.downloadPptx.addEventListener('click', function () { exportPuzzle('pptx'); });
+    elements.downloadPdf.addEventListener('click', exportPuzzle);
     window.addEventListener('storage', function (event) {
       if (event.key && event.key.indexOf('clwl:') === 0) loadWordLists();
     });
@@ -944,9 +943,9 @@
     return true;
   }
 
-  async function exportPuzzle(format) {
+  async function exportPuzzle() {
     if (!ensureCurrentPuzzle()) return;
-    var button = format === 'pdf' ? elements.downloadPdf : elements.downloadPptx;
+    var button = elements.downloadPdf;
     var original = button.textContent;
     button.disabled = true;
     button.textContent = 'Preparing…';
@@ -957,14 +956,9 @@
         return window.DeckExport.svgToJpeg(svg, PAGE_WIDTH, PAGE_HEIGHT, 2, .94);
       }));
       var filename = slugify(state.title) || 'tarsia-puzzle';
-      if (format === 'pdf') {
-        var pdf = window.DeckExport.buildPDF(images, { pageWidth: 612, pageHeight: 792 });
-        window.DeckExport.download(filename + '.pdf', pdf, 'application/pdf');
-      } else {
-        var pptx = window.DeckExport.buildPPTX(images, { pageWidth: 612, pageHeight: 792 });
-        window.DeckExport.download(filename + '.pptx', pptx, 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
-      }
-      showToast((format === 'pdf' ? 'PDF' : 'PowerPoint') + ' downloaded with both pages.');
+      var pdf = window.DeckExport.buildPDF(images, { pageWidth: 612, pageHeight: 792 });
+      window.DeckExport.download(filename + '.pdf', pdf, 'application/pdf');
+      showToast('PDF downloaded with both pages.');
     } catch (error) {
       console.error(error);
       showToast('The download could not be prepared. Try Print / Save PDF instead.');
