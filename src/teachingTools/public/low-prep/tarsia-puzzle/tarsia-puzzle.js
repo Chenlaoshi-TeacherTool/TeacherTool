@@ -11,7 +11,9 @@
   var activeEmojiRow = -1;
   var wordLists = [];
   var wordIndex = new Map();
-  var SIDE_ORDER = ['chinese', 'english', 'pinyin', 'emoji'];
+  var SIDE_ORDER = ['chinese', 'english', 'pinyin', 'th', 'vi', 'es', 'fr', 'ru', 'emoji'];
+  var TRANSLATION_LANGUAGES = ['th', 'vi', 'es', 'fr', 'ru'];
+  var translatedWords = new Map();
 
   var vocabularySample = [
     ['苹果', 'apple', 'píng guǒ', '🍎'], ['香蕉', 'banana', 'xiāng jiāo', '🍌'],
@@ -106,7 +108,7 @@
     [
       'puzzleTitle', 'puzzleSize', 'vocabularyControls', 'qaControls', 'contentHeading', 'sideChoiceCount',
       'pairCount', 'toggleWordLibrary', 'wordLibraryPanel', 'wordListPicker', 'vocabularyInput',
-      'buildVocabularyPairs', 'questionBankPicker',
+      'buildVocabularyPairs', 'translationStatus', 'questionBankPicker',
       'qaInput', 'buildQaPairs', 'pairEditor', 'validationMessage', 'loadSample', 'generatePuzzle',
       'reshufflePuzzle', 'clearPuzzle', 'previewStatus', 'pagePreview', 'previewNote', 'printPuzzle',
       'downloadPdf', 'emojiPicker', 'closeEmojiPicker', 'emojiSearch', 'emojiGrid',
@@ -284,6 +286,9 @@
       var py = record.py || (known && known.py) || (window.ChenWordlist && window.ChenWordlist.toPinyin(chinese, { spaced: true })) || '';
       var emoji = normalizeEmoji(record.emoji) || matchEmoji([chinese, en, py].join(' '));
       var values = { chinese: chinese, english: en, pinyin: py, emoji: emoji };
+      TRANSLATION_LANGUAGES.forEach(function (lang) {
+        values[lang] = translatedWords.get(lang + '|' + chinese) || '';
+      });
       return {
         a: values[state.sideTypes[0]] || '',
         b: values[state.sideTypes[1]] || '',
@@ -296,6 +301,49 @@
     renderPairEditor();
     saveDraft();
     if (!silent) showToast('Matches filled. Review any unfamiliar terms before generating.');
+    fillTranslatedPairs(records);
+  }
+
+  async function fillTranslatedPairs(records) {
+    var languages = state.sideTypes.filter(function (side) { return TRANSLATION_LANGUAGES.indexOf(side) >= 0; });
+    elements.translationStatus.textContent = '';
+    if (!languages.length) return;
+    var pairs = state.pairs;
+    var vocabulary = elements.vocabularyInput.value;
+    var sides = state.sideTypes.slice();
+    var words = records.map(function (record) { return record.source; }).filter(Boolean);
+    if (!words.length) return;
+    elements.translationStatus.textContent = elements.translationStatus.dataset.loading;
+    function isCurrent() {
+      return state.mode === 'vocabulary' && state.pairs === pairs &&
+        elements.vocabularyInput.value === vocabulary && state.sideTypes.join('|') === sides.join('|');
+    }
+    try {
+      var response = await fetch('/api/translate-words', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ words: words, to: languages })
+      });
+      if (!response.ok) throw new Error('Translation unavailable');
+      var data = await response.json();
+      if (!isCurrent()) return;
+      var incomplete = false;
+      records.forEach(function (record, index) {
+        languages.forEach(function (lang) {
+          var value = data.translations && data.translations[record.source] && data.translations[record.source][lang];
+          if (typeof value !== 'string' || !value.trim()) { incomplete = true; return; }
+          translatedWords.set(lang + '|' + record.source, value);
+          var side = sides[0] === lang ? 'a' : 'b';
+          if (!pairs[index][side]) pairs[index][side] = value;
+        });
+      });
+      markDirty();
+      renderPairEditor();
+      saveDraft();
+      elements.translationStatus.textContent = incomplete ? elements.translationStatus.dataset.failed : elements.translationStatus.dataset.ready;
+    } catch (error) {
+      if (isCurrent()) elements.translationStatus.textContent = elements.translationStatus.dataset.failed;
+    }
   }
 
   function buildQaPairs(silent) {
@@ -360,7 +408,7 @@
     var needed = requiredPairCount();
     var completed = completedPairCount();
     if (state.mode === 'vocabulary' && state.sideTypes.length !== 2) {
-      return { ok: false, message: 'Choose exactly two match sides: Chinese, English, Pinyin, or Emoji.' };
+      return { ok: false, message: 'Choose exactly two match sides.' };
     }
     if (strict && completed < needed) return { ok: false, message: 'Complete all ' + needed + ' matching pairs before generating.' };
 
