@@ -227,6 +227,10 @@ router.get('/teaching-tools/vocab-puzzle', function(req, res, next) {
   res.render('low-prep-activities/vocab-puzzle', { title: '生词拼图生成器 · PDF Puzzle Maker', toolGuide: siteContentStore.get().toolGuides['vocab-puzzle'] });
 });
 
+router.get('/teaching-tools/secret-message', function(req, res, next) {
+  res.render('low-prep-activities/secret-message', { title: '图形密码解密练习纸 · Secret Message Worksheet', toolGuide: siteContentStore.get().toolGuides['secret-message'] });
+});
+
 router.get('/teaching-tools/worksheet-generator', function(req, res, next) {
   res.render('low-prep-activities/worksheet-generator', { title: '练习单生成器 · Chinese Worksheet Generator', toolGuide: siteContentStore.get().toolGuides['worksheet-generator'] });
 });
@@ -243,7 +247,7 @@ router.get('/low-prep-activities', function(req, res) {
   'word-sudoku', 'word-cloud', 'independent-reading', 'tear-paper-bingo',
   'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle',
   'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary',
-  'stroke-order-worksheet', 'vocab-puzzle', 'worksheet-generator'
+  'stroke-order-worksheet', 'vocab-puzzle', 'worksheet-generator', 'secret-message'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -286,7 +290,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/bingo-generator', '/teaching-tools/emoji-search', '/teaching-tools/image-revealer', '/teaching-tools/zoom-reveal',
     '/teaching-tools/name-tent-generator', '/teaching-tools/flash-card-generator', '/teaching-tools/sentence-reorder', '/teaching-tools/witchs-poison',
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary',
-    '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator',
+    '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator', '/teaching-tools/secret-message',
     '/teaching-tools/hanzi-batch/index.html'
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
