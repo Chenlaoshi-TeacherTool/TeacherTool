@@ -9,32 +9,85 @@
   <link rel="stylesheet" href="/teaching-tools/team-race/team-race.css">
   <script src="/teaching-tools/team-race/team-race.js" defer></script>
 </head>
-<body>
+<body class="race-page">
+<% var zh = lang === 'zh'; var teamNames = { top: zh ? '兔子队' : 'Team Rabbit', bottom: zh ? '小鸡队' : 'Team Chick' }; %>
 <main class="race-wrap">
-  <a href="/teaching-tools"><%= lang === 'zh' ? '← 返回教学工具' : '← Back to Teaching Tools' %></a>
-  <header><p class="eyebrow">CLS · CLASSROOM PLAY</p><h1><%= lang === 'zh' ? '两队答题竞速' : 'Team Quiz Race' %> 🏁</h1><p><%= lang === 'zh' ? '答对一题，前进一格。小鸡队和兔子队，谁先抵达终点？' : 'One correct answer, one step forward. Who will reach the finish first?' %></p></header>
+  <a href="/teaching-tools"><%= zh ? '← 返回教学工具' : '← Back to Teaching Tools' %></a>
+  <header><p class="eyebrow">CLS · CLASSROOM PLAY</p><h1><%= zh ? '两队答题竞速' : 'Team Quiz Race' %> 🏁</h1><p><%= zh ? '答对一题，前进一格。兔子队走上面的小路，小鸡队走下面的小路，谁先抵达终点？' : 'One correct answer, one step forward. Team Rabbit takes the top path, Team Chick the bottom. Who reaches the finish first?' %></p></header>
   <section class="setup panel">
-    <label for="questions"><%= lang === 'zh' ? '今天的题目' : "Today's questions" %></label>
-    <p id="question-help"><%= lang === 'zh' ? '每行一道题，空行自动跳过。两队共用题目，答对后切换下一题；题目用完会循环。修改后点击开始游戏生效。' : 'One question per line; blank lines are skipped. Teams share questions. Each correct answer advances to the next question; the list repeats. Press Start to apply edits.' %></p>
-    <textarea id="questions" rows="4" aria-describedby="question-help" placeholder="<%= lang === 'zh' ? '请用“喜欢”说一句话。\n说出三种水果。\n你今天感觉怎么样？' : 'Make a sentence with like.\nName three fruits.\nHow do you feel today?' %>"></textarea>
-    <div class="actions"><button id="start" class="<%= lang === 'zh' ? 'art-button' : '' %>" type="button"><% if (lang === 'zh') { %><img src="/teaching-tools/team-race/assets/start-button.png" alt="开始游戏"><% } else { %>Start game<% } %></button><button id="restart" class="secondary" type="button" disabled><%= lang === 'zh' ? '重新开始' : 'Restart' %></button></div>
-    <p id="status" role="status" aria-live="polite"><%= lang === 'zh' ? '输入题目，准备出发！' : 'Add questions to get ready!' %></p>
+    <label for="questions"><%= zh ? '今天的题目' : "Today's questions" %></label>
+    <p id="question-help"><%= zh ? '每行一道题，空行自动跳过。两队共用题目，答对后切换下一题；题目用完会循环。修改后点击开始游戏生效。' : 'One question per line; blank lines are skipped. Teams share questions. Each correct answer advances to the next question; the list repeats. Press Start to apply edits.' %></p>
+    <textarea id="questions" rows="4" aria-describedby="question-help" placeholder="<%= zh ? '请用“喜欢”说一句话。\n说出三种水果。\n你今天感觉怎么样？' : 'Make a sentence with like.\nName three fruits.\nHow do you feel today?' %>"></textarea>
+    <div class="actions"><button id="start" class="<%= zh ? 'art-button' : '' %>" type="button"><% if (zh) { %><img src="/teaching-tools/team-race/assets/start-button.png" alt="开始游戏"><% } else { %>Start game<% } %></button><button id="restart" class="secondary" type="button" disabled><%= zh ? '重新开始' : 'Restart' %></button></div>
+    <p id="status" role="status" aria-live="polite"><%= zh ? '输入题目，准备出发！' : 'Add questions to get ready!' %></p>
   </section>
-  <section class="question panel" aria-label="<%= lang === 'zh' ? '当前题目' : 'Current question' %>"><p id="question-number" class="eyebrow"><%= lang === 'zh' ? '准备好了吗？' : 'READY TO RACE?' %></p><h2 id="current-question" aria-live="polite"><%= lang === 'zh' ? '先输入题目，再开始游戏' : 'Add questions, then start the game' %></h2></section>
-  <section class="race-board panel" aria-label="<%= lang === 'zh' ? '双队赛道' : 'Two-team race track' %>">
-    <% ['top', 'bottom'].forEach(function(team, index) { %>
-    <div class="team <%= team %>">
-      <div class="team-heading"><h2><%= lang === 'zh' ? (index === 0 ? '上队 · 兔子队' : '下队 · 小鸡队') : (index === 0 ? 'Top · Team Rabbit' : 'Bottom · Team Chick') %></h2><output id="<%= team %>-score">0 / 10</output></div>
-      <div class="track"><div class="course">
-        <div class="cells" aria-hidden="true"><% for (var step = 1; step <= 10; step++) { %><span><%= step %></span><% } %></div>
-        <div id="<%= team %>-runner" class="runner" role="img" aria-label="<%= lang === 'zh' ? (index === 0 ? '向右跑的兔子' : '向右跑的小鸡') : (index === 0 ? 'Rabbit running right' : 'Chick running right') %>"><span><img src="/teaching-tools/team-race/assets/<%= index === 0 ? 'rabbit' : 'chick' %>.png" alt=""></span></div>
-        <img class="finish" src="/teaching-tools/team-race/assets/flag.png" alt="" aria-hidden="true">
-      </div></div>
-      <div class="team-controls"><button id="<%= team %>-correct" class="correct <%= lang === 'zh' ? 'art-button' : '' %>" type="button" disabled><% if (lang === 'zh') { %><img src="/teaching-tools/team-race/assets/<%= team %>-button.png" alt="<%= index === 0 ? '上队答对，前进一格' : '下队答对，前进一格' %>"><% } else { %><%= index === 0 ? 'Top team correct +1 ★' : 'Bottom team correct +1 ★' %><% } %></button><div class="team-progress"><img src="/teaching-tools/team-race/assets/star.png" alt=""><progress id="<%= team %>-progress" max="10" value="0" aria-label="<%= lang === 'zh' ? (index === 0 ? '上队进度' : '下队进度') : (index === 0 ? 'Top team progress' : 'Bottom team progress') %>"></progress></div></div>
+  <div id="game-stage" class="game-stage">
+  <div class="game-toolbar" hidden>
+    <div class="game-brand"><span aria-hidden="true">🏁</span><div><small>CLS · CLASSROOM PLAY</small><strong><%= zh ? '森林竞速赛' : 'Woodland Quiz Rally' %></strong></div></div>
+    <div class="game-actions"><button id="edit-questions" type="button"><%= zh ? '编辑题目' : 'Edit questions' %></button><button id="game-restart" type="button"><%= zh ? '再来一局' : 'Restart race' %></button><button id="fullscreen" type="button" aria-pressed="false"><%= zh ? '全屏投影' : 'Full screen' %></button></div>
+  </div>
+  <div class="board-area">
+  <div class="race-map" id="race-map">
+    <div class="map-land">
+      <svg viewBox="0 0 1600 900" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="race-grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9d98a"/><stop offset="1" stop-color="#93c06a"/></linearGradient>
+          <linearGradient id="race-cliff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c99a5f"/><stop offset="1" stop-color="#a7774a"/></linearGradient>
+          <linearGradient id="race-water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd3f0"/><stop offset="1" stop-color="#5fb6e3"/></linearGradient>
+          <path id="race-island" d="M110,190 C150,90 360,70 560,82 C760,60 1000,58 1200,76 C1380,70 1520,120 1540,240 C1570,400 1560,560 1530,690 C1500,800 1350,842 1150,838 C950,850 700,846 480,842 C280,846 120,820 84,700 C50,560 60,320 110,190Z"/>
+          <g id="race-tree">
+            <rect x="-9" y="-6" width="18" height="46" rx="6" fill="#9b6b3e"/>
+            <circle cx="-26" cy="-14" r="34" fill="#5e9c4e"/><circle cx="24" cy="-16" r="34" fill="#5e9c4e"/><circle cx="0" cy="-46" r="40" fill="#6fae58"/>
+            <circle cx="-12" cy="-56" r="14" fill="#8cc56b" opacity=".8"/>
+          </g>
+        </defs>
+        <use href="#race-island" fill="url(#race-cliff)" transform="translate(0,34)"/>
+        <use href="#race-island" fill="url(#race-grass)" stroke="#7fae5a" stroke-width="4"/>
+        <g fill="#c8e39c" opacity=".7"><ellipse cx="330" cy="470" rx="170" ry="60"/><ellipse cx="1260" cy="460" rx="160" ry="55"/><ellipse cx="800" cy="140" rx="200" ry="38"/><ellipse cx="800" cy="770" rx="220" ry="40"/></g>
+        <path d="M1478,94 C1440,170 1525,230 1500,300 L1520,302 C1550,230 1470,170 1505,96Z" fill="url(#race-water)" opacity=".9"/>
+        <path d="M1505,600 C1470,680 1540,740 1515,860 L1540,862 C1565,740 1500,680 1530,600Z" fill="url(#race-water)" opacity=".9"/>
+        <g fill="none" stroke-linecap="round">
+          <path id="top-path" d="M170,205 C270,120 420,128 530,192 S760,286 880,206 S1110,128 1230,196 S1400,300 1440,420" stroke="#e9d9a8" stroke-width="44"/>
+          <path d="M170,205 C270,120 420,128 530,192 S760,286 880,206 S1110,128 1230,196 S1400,300 1440,420" stroke="#fff" stroke-width="7" stroke-dasharray="26 22" opacity=".9"/>
+          <path id="bottom-path" d="M170,695 C270,780 420,772 530,708 S760,614 880,694 S1110,772 1230,704 S1400,600 1440,480" stroke="#e9d9a8" stroke-width="44"/>
+          <path d="M170,695 C270,780 420,772 530,708 S760,614 880,694 S1110,772 1230,704 S1400,600 1440,480" stroke="#fff" stroke-width="7" stroke-dasharray="26 22" opacity=".9"/>
+        </g>
+        <use href="#race-tree" transform="translate(150,120) scale(.95)"/>
+        <use href="#race-tree" transform="translate(690,96) scale(.7)"/>
+        <use href="#race-tree" transform="translate(1040,98) scale(.75)"/>
+        <use href="#race-tree" transform="translate(1380,140) scale(.85)"/>
+        <use href="#race-tree" transform="translate(150,810) scale(.9)"/>
+        <use href="#race-tree" transform="translate(690,840) scale(.7)"/>
+        <use href="#race-tree" transform="translate(1060,840) scale(.75)"/>
+        <g transform="translate(1330,815) scale(.8)">
+          <rect x="-9" y="-6" width="18" height="46" rx="6" fill="#9b6b3e"/>
+          <circle cx="-26" cy="-14" r="34" fill="#f2a9b8"/><circle cx="24" cy="-16" r="34" fill="#f2a9b8"/><circle cx="0" cy="-46" r="40" fill="#f7c2cc"/>
+        </g>
+        <g fill="#6aa955"><ellipse cx="420" cy="300" rx="34" ry="20"/><ellipse cx="1110" cy="300" rx="30" ry="18"/><ellipse cx="420" cy="600" rx="34" ry="20"/><ellipse cx="1110" cy="600" rx="30" ry="18"/></g>
+        <g fill="#fff6c8"><circle cx="300" cy="330" r="6"/><circle cx="318" cy="342" r="5"/><circle cx="980" cy="110" r="6"/><circle cx="560" cy="790" r="6"/><circle cx="1210" cy="790" r="5"/><circle cx="1290" cy="330" r="6"/></g>
+        <g fill="#f4a3b6"><circle cx="286" cy="345" r="5"/><circle cx="994" cy="122" r="5"/><circle cx="574" cy="802" r="5"/><circle cx="1300" cy="580" r="6"/></g>
+      </svg>
+      <div id="race-nodes" class="race-nodes" aria-hidden="true" data-start-label="<%= zh ? '起点' : 'Start' %>"></div>
+      <% ['top', 'bottom'].forEach(function(team) { %>
+      <div id="<%= team %>-runner" class="runner <%= team %>" role="img" aria-label="<%= teamNames[team] %>"><img src="/teaching-tools/team-race/assets/<%= team === 'top' ? 'rabbit' : 'chick' %>.png" alt=""></div>
+      <% }); %>
+      <div class="finish" aria-hidden="true"><span><img src="/teaching-tools/team-race/assets/flag.png" alt=""></span><b><%= zh ? '终点' : 'Finish' %></b></div>
+    </div>
+    <section class="question" aria-label="<%= zh ? '当前题目' : 'Current question' %>">
+      <p id="question-number" class="question-tag"><%= zh ? '准备好了吗？' : 'READY TO RACE?' %></p>
+      <h2 id="current-question" aria-live="polite"><%= zh ? '先输入题目，再开始游戏' : 'Add questions, then start the game' %></h2>
+      <div class="question-nav"><button id="prev-question" type="button" disabled><%= zh ? '← 上一题' : '← Previous' %></button><button id="skip-question" type="button" disabled><%= zh ? '跳过 →' : 'Skip →' %></button></div>
+    </section>
+    <% ['top', 'bottom'].forEach(function(team) { %>
+    <div class="team <%= team %>" data-name="<%= teamNames[team] %>">
+      <div class="team-heading"><img src="/teaching-tools/team-race/assets/<%= team === 'top' ? 'rabbit' : 'chick' %>.png" alt=""><h2><%= teamNames[team] %></h2><output id="<%= team %>-score">0<small> / 10</small></output></div>
+      <button id="<%= team %>-correct" class="correct" type="button" disabled><%= zh ? '答对 +1 ★' : 'Correct +1 ★' %><kbd aria-hidden="true"><%= team === 'top' ? '↑' : '↓' %></kbd></button>
     </div>
     <% }); %>
     <div id="winner" role="status" aria-live="assertive" hidden></div>
-  </section>
+  </div>
+  </div>
+  </div>
 </main>
 <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
