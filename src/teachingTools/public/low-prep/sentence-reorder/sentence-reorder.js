@@ -235,14 +235,11 @@
     return chip && chip.classList.contains('is-locked');
   }
 
-  function unlockedSegment(chip) {
-    var segment = 0;
-    var node = chip && chip.parentElement ? chip.parentElement.firstElementChild : null;
-    while (node && node !== chip) {
-      if (isLockedChip(node)) segment++;
-      node = node.nextElementSibling;
-    }
-    return segment;
+  function restoreLockedPositions(track, originalChips) {
+    var movable = Array.from(track.children).filter(function (chip) { return !isLockedChip(chip); });
+    originalChips.forEach(function (chip) {
+      track.appendChild(isLockedChip(chip) ? chip : movable.shift());
+    });
   }
 
   function refreshLockedChips() {
@@ -266,19 +263,17 @@
     var track = document.getElementById('word-track');
     if (!track) return;
     if (isLockedChip(event.currentTarget)) return;
-    var chips = Array.prototype.slice.call(track.children);
+    var originalChips = Array.from(track.children);
+    var chips = originalChips.filter(function (chip) { return !isLockedChip(chip); });
     var index = chips.indexOf(event.currentTarget);
-    if (event.key === 'ArrowLeft' && index > 0 && !isLockedChip(chips[index - 1])) {
-      track.insertBefore(chips[index], chips[index - 1]);
-      event.currentTarget.focus();
-      syncOrderFromDom();
-      event.preventDefault();
-    } else if (event.key === 'ArrowRight' && index < chips.length - 1 && !isLockedChip(chips[index + 1])) {
-      track.insertBefore(chips[index + 1], chips[index]);
-      event.currentTarget.focus();
-      syncOrderFromDom();
-      event.preventDefault();
-    }
+    var target = event.key === 'ArrowLeft' ? index - 1 : event.key === 'ArrowRight' ? index + 1 : -1;
+    if (target < 0 || target >= chips.length) return;
+    if (target < index) track.insertBefore(chips[index], chips[target]);
+    else track.insertBefore(chips[target], chips[index]);
+    restoreLockedPositions(track, originalChips);
+    event.currentTarget.focus();
+    syncOrderFromDom();
+    event.preventDefault();
   }
 
   var DRAG_START_THRESHOLD = 4;
@@ -291,7 +286,7 @@
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      segment: unlockedSegment(chip),
+      originalChips: Array.from(chip.parentElement.children),
       started: false
     };
     // Listen on the document, not the chip itself: once the chip is
@@ -360,7 +355,6 @@
     Array.prototype.forEach.call(track.children, function (chip) {
       if (!chip.classList.contains('word-chip')) return;
       if (isLockedChip(chip)) return;
-      if (drag && unlockedSegment(chip) !== drag.segment) return;
       var rect = chip.getBoundingClientRect();
       var cx = rect.left + rect.width / 2;
       var cy = rect.top + rect.height / 2;
@@ -383,6 +377,7 @@
     if (drag.started) {
       drag.placeholder.parentElement.insertBefore(chip, drag.placeholder);
       drag.placeholder.remove();
+      restoreLockedPositions(document.getElementById('word-track'), drag.originalChips);
       chip.classList.remove('is-dragging');
       chip.style.position = '';
       chip.style.left = '';

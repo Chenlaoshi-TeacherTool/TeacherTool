@@ -112,14 +112,11 @@
     return chip && chip.classList.contains('is-locked');
   }
 
-  function unlockedSegment(chip) {
-    let segment = 0;
-    let node = chip && chip.parentElement ? chip.parentElement.firstElementChild : null;
-    while (node && node !== chip) {
-      if (isLockedChip(node)) segment += 1;
-      node = node.nextElementSibling;
-    }
-    return segment;
+  function restoreLockedPositions(track, originalChips) {
+    var movable = Array.from(track.children).filter(function (chip) { return !isLockedChip(chip); });
+    originalChips.forEach(function (chip) {
+      track.appendChild(isLockedChip(chip) ? chip : movable.shift());
+    });
   }
 
   function refreshLockedChips() {
@@ -208,19 +205,17 @@
     const track = document.getElementById('studentWordTrack');
     if (!track) return;
     if (isLockedChip(event.currentTarget)) return;
-    const chips = Array.from(track.children);
-    const index = chips.indexOf(event.currentTarget);
-    if (event.key === 'ArrowLeft' && index > 0 && !isLockedChip(chips[index - 1])) {
-      track.insertBefore(chips[index], chips[index - 1]);
-      event.currentTarget.focus();
-      syncOrderFromDom();
-      event.preventDefault();
-    } else if (event.key === 'ArrowRight' && index < chips.length - 1 && !isLockedChip(chips[index + 1])) {
-      track.insertBefore(chips[index + 1], chips[index]);
-      event.currentTarget.focus();
-      syncOrderFromDom();
-      event.preventDefault();
-    }
+    var originalChips = Array.from(track.children);
+    var chips = originalChips.filter(function (chip) { return !isLockedChip(chip); });
+    var index = chips.indexOf(event.currentTarget);
+    var target = event.key === 'ArrowLeft' ? index - 1 : event.key === 'ArrowRight' ? index + 1 : -1;
+    if (target < 0 || target >= chips.length) return;
+    if (target < index) track.insertBefore(chips[index], chips[target]);
+    else track.insertBefore(chips[target], chips[index]);
+    restoreLockedPositions(track, originalChips);
+    event.currentTarget.focus();
+    syncOrderFromDom();
+    event.preventDefault();
   }
 
   function onPointerDown(event) {
@@ -231,7 +226,7 @@
       pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
-      segment: unlockedSegment(chip),
+      originalChips: Array.from(chip.parentElement.children),
       started: false
     };
     document.addEventListener('pointermove', onPointerMove);
@@ -289,7 +284,6 @@
     Array.from(track.children).forEach((chip) => {
       if (!chip.classList.contains('reorder-student-chip')) return;
       if (isLockedChip(chip)) return;
-      if (drag && unlockedSegment(chip) !== drag.segment) return;
       const rect = chip.getBoundingClientRect();
       const dx = x - (rect.left + rect.width / 2);
       const dy = y - (rect.top + rect.height / 2);
@@ -311,6 +305,7 @@
     if (drag.started) {
       drag.placeholder.parentElement.insertBefore(drag.chip, drag.placeholder);
       drag.placeholder.remove();
+      restoreLockedPositions(document.getElementById('studentWordTrack'), drag.originalChips);
       drag.chip.classList.remove('is-dragging');
       drag.chip.removeAttribute('style');
       syncOrderFromDom();
