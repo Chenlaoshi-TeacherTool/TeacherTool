@@ -3,6 +3,12 @@ var router = express.Router();
 var siteContentStore = require('../services/siteContentStore');
 var siteMap = require('../config/siteMap');
 var popularTools = require('../services/popularTools');
+var toolPreviews = require('../config/toolPreviews.json');
+
+router.use(function(req, res, next) {
+  res.locals.toolPreviews = toolPreviews;
+  next();
+});
 
 siteContentStore.refresh().catch(function (err) {
   console.error('Could not load site content from DAB at startup:', err.message);

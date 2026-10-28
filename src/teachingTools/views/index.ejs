@@ -9,6 +9,7 @@
     <title>Chen Laoshi's Teaching Toolkit</title>
     <%- include('partials/seo', { pageDescription: 'Practical classroom tools, adaptable teaching activities, and thoughtful resources for educators across subjects.' }) %>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
+    <link rel="stylesheet" href="/stylesheets/tool-snapshots.css?v=1">
     <style>
         .home-hero {
             position: relative;
@@ -206,10 +207,11 @@
 
             <div class="home-tools-grid" id="tools">
                 <% popularTools.forEach(function(tool) { %>
-                <a class="home-tool-card" href="<%= tool.href %>">
-                    <span class="home-tool-card__icon" aria-hidden="true"><%= tool.icon %></span>
+                <a class="home-tool-card snapshot-card" href="<%= tool.href %>">
+                    <%- include('partials/tool-snapshot', { previewHref: tool.href }) %>
                     <h3><%= t(tool.titleKey) %></h3>
                     <p><%= t(tool.descKey) %></p>
+                    <span class="btn" aria-hidden="true"><%= t('teachingToolsIndex.openTool') %> →</span>
                 </a>
                 <% }); %>
             </div>

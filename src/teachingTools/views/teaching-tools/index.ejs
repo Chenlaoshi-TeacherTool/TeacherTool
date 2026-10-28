@@ -168,6 +168,7 @@
         }
     </style>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
+    <link rel="stylesheet" href="/stylesheets/tool-snapshots.css?v=1">
 </head>
 <body>
     <a href="/" class="back-btn">← <%= t('teachingToolsIndex.backToHomepage') %></a>
@@ -192,73 +193,85 @@
                 <p><%= t('teachingToolsIndex.classroomToolsDesc') %></p>
             </div>
             <div class="tools-grid">
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/qr-code-generator' }) %>
                     <h3>📌 <%= t('teachingToolsIndex.qrTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.worksAcrossSubjects') %></p>
                     <p><%= t('teachingToolsIndex.qrDesc') %></p>
                     <a href="/teaching-tools/qr-code-generator" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/lucky-wheel/' }) %>
                     <h3>🎡 <%= t('home.luckyWheelTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.worksAcrossSubjects') %></p>
                     <p><%= t('home.luckyWheelDesc') %></p>
                     <a href="/teaching-tools/lucky-wheel/" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/random-group-generator' }) %>
                     <h3>🎲 <%= t('teachingToolsIndex.groupTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.worksAcrossSubjects') %></p>
                     <p><%= t('teachingToolsIndex.groupDesc') %></p>
                     <a href="/teaching-tools/random-group-generator" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/quiz-city' }) %>
                     <h3>CLS Quiz City</h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.worksAcrossSubjects') %></p>
                     <p><%= lang === 'zh' ? '2～4队答题、探索城市、购买建筑，来一场课堂知识冒险。' : 'Answer, explore and build a knowledge city in a quick classroom game for 2–4 teams.' %></p>
                     <a href="/teaching-tools/quiz-city" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/team-race' }) %>
                     <h3>🏁 <%= t('teachingToolsIndex.teamRaceTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.worksAcrossSubjects') %></p>
                     <p><%= t('teachingToolsIndex.teamRaceDesc') %></p>
                     <a href="/teaching-tools/team-race" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/reward-grid/' }) %>
                     <h3>🎁 <%= t('teachingToolsIndex.rewardGridTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.worksAcrossSubjects') %></p>
                     <p><%= t('teachingToolsIndex.rewardGridDesc') %></p>
                     <a href="/teaching-tools/reward-grid/" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/classroom-noise-monitor' }) %>
                     <h3>🔊 <%= t('teachingToolsIndex.noiseMonitorTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.noiseMonitorScope') %></p>
                     <p><%= t('teachingToolsIndex.noiseMonitorDesc') %></p>
                     <a href="/teaching-tools/classroom-noise-monitor" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/time-machine' }) %>
                     <h3>⏳ <%= t('teachingToolsIndex.timeMachineTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.timeMachineScope') %></p>
                     <p><%= t('teachingToolsIndex.timeMachineDesc') %></p>
                     <a href="/teaching-tools/time-machine" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/class-pet-points' }) %>
                     <h3>🐾 <%= t('teachingToolsIndex.petTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.petScope') %></p>
                     <p><%= t('teachingToolsIndex.petDesc') %></p>
                     <a href="/teaching-tools/class-pet-points" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/word-list-library/word-list-library.html' }) %>
                     <h3>🗂️ <%= t('teachingToolsIndex.libraryTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.libraryScope') %></p>
                     <p><%= t('teachingToolsIndex.libraryDesc') %></p>
                     <a href="/teaching-tools/word-list-library/word-list-library.html" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/yu-duoyinzi-font' }) %>
                     <h3>🈶 <%= t('teachingToolsIndex.fontTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.fontScope') %></p>
                     <p><%= t('teachingToolsIndex.fontDesc') %></p>
                     <a href="/teaching-tools/yu-duoyinzi-font" class="btn"><%= t('teachingToolsIndex.viewAndDownload') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/question-bank-library/question-bank-library.html' }) %>
                     <h3>🧠 <%= t('teachingToolsIndex.questionBankTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.questionBankScope') %></p>
                     <p><%= t('teachingToolsIndex.questionBankDesc') %></p>
@@ -273,169 +286,197 @@
                 <p><%= t('teachingToolsIndex.lowPrepDesc') %></p>
             </div>
             <div class="tools-grid">
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/low-prep/word-sudoku/word-sudoku-widget.html' }) %>
                     <h3>🧩 <%= t('teachingToolsIndex.sudokuTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.sudokuScope') %></p>
                     <p><%= t('teachingToolsIndex.sudokuDesc') %></p>
                     <a href="/low-prep/word-sudoku/word-sudoku-widget.html" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/low-prep/word-cloud/word-cloud-widget.html' }) %>
                     <h3>☁️ <%= t('teachingToolsIndex.wordCloudTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.wordCloudScope') %></p>
                     <p><%= t('teachingToolsIndex.wordCloudDesc') %></p>
                     <a href="/low-prep/word-cloud/word-cloud-widget.html" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html' }) %>
                     <h3>📖 <%= t('teachingToolsIndex.vocabBookletTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.tenToFifteenPrintable') %></p>
                     <p><%= t('teachingToolsIndex.vocabBookletDesc') %></p>
                     <a href="/teaching-tools/vocabulary-booklet/vocabulary-booklet.html" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/independent-reading' }) %>
                     <h3>📖 <%= t('teachingToolsIndex.independentReadingTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.independentReadingScope') %></p>
                     <p><%= t('teachingToolsIndex.independentReadingDesc') %></p>
                     <a href="/teaching-tools/independent-reading" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/missing-radicals' }) %>
                     <h3>✍️ <%= t('teachingToolsIndex.missingPartsTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.missingPartsScope') %></p>
                     <p><%= t('teachingToolsIndex.missingPartsDesc') %></p>
                     <a href="/teaching-tools/missing-radicals" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/social-media-classroom-tools/' }) %>
                     <h3>🗨️ <%= t('teachingToolsIndex.socialMediaHubTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.socialMediaHubScope') %></p>
                     <p><%= t('teachingToolsIndex.socialMediaHubDesc') %></p>
                     <a href="/teaching-tools/social-media-classroom-tools/" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/tear-paper-bingo' }) %>
                     <h3>🟨 <%= t('teachingToolsIndex.tearPaperBingoTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.tearPaperBingoScope') %></p>
                     <p><%= t('teachingToolsIndex.tearPaperBingoDesc') %></p>
                     <a href="/teaching-tools/tear-paper-bingo" class="btn"><%= t('teachingToolsIndex.previewAndDownload') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/would-you-rather' }) %>
                     <h3>🤔 <%= t('teachingToolsIndex.wouldYouRatherTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.wouldYouRatherScope') %></p>
                     <p><%= t('teachingToolsIndex.wouldYouRatherDesc') %></p>
                     <a href="/teaching-tools/would-you-rather" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/jeopardy' }) %>
                     <h3>🏆 <%= t('teachingToolsIndex.jeopardyTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.jeopardyScope') %></p>
                     <p><%= t('teachingToolsIndex.jeopardyDesc') %></p>
                     <a href="/teaching-tools/jeopardy" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/character-race' }) %>
                     <h3>🌻 <%= t('teachingToolsIndex.termRaceTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.termRaceScope') %></p>
                     <p><%= t('teachingToolsIndex.termRaceDesc') %></p>
                     <a href="/teaching-tools/character-race" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/maze-generator' }) %>
                     <h3>🧭 <%= t('teachingToolsIndex.mazeTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.tenToFifteenPrintable') %></p>
                     <p><%= t('teachingToolsIndex.mazeDesc') %></p>
                     <a href="/teaching-tools/maze-generator" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/tarsia-puzzle' }) %>
                     <h3>🧩 <%= t('teachingToolsIndex.tarsiaTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.tenToFifteenPrintable') %></p>
                     <p><%= t('teachingToolsIndex.tarsiaDesc') %></p>
                     <a href="/teaching-tools/tarsia-puzzle" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/bingo-generator' }) %>
                     <h3>🎯 <%= t('teachingToolsIndex.bingoTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.bingoScope') %></p>
                     <p><%= t('teachingToolsIndex.bingoDesc') %></p>
                     <a href="/teaching-tools/bingo-generator" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/emoji-search' }) %>
                     <h3>🔎 <%= t('teachingToolsIndex.emojiSearchTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.emojiSearchScope') %></p>
                     <p><%= t('teachingToolsIndex.emojiSearchDesc') %></p>
                     <a href="/teaching-tools/emoji-search" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/image-revealer' }) %>
                     <h3>🖼️ <%= t('teachingToolsIndex.imageRevealerTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.savesInBrowserScope') %></p>
                     <p><%= t('teachingToolsIndex.imageRevealerDesc') %></p>
                     <a href="/teaching-tools/image-revealer" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/zoom-reveal' }) %>
                     <h3>🔍 <%= t('teachingToolsIndex.zoomRevealTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.savesInBrowserScope') %></p>
                     <p><%= t('teachingToolsIndex.zoomRevealDesc') %></p>
                     <a href="/teaching-tools/zoom-reveal" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/name-tent-generator' }) %>
                     <h3>🔺 <%= t('teachingToolsIndex.nameTentTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.nameTentScope') %></p>
                     <p><%= t('teachingToolsIndex.nameTentDesc') %></p>
                     <a href="/teaching-tools/name-tent-generator" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/flash-card-generator' }) %>
                     <h3>🗂️ <%= t('teachingToolsIndex.flashCardTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.flashCardScope') %></p>
                     <p><%= t('teachingToolsIndex.flashCardDesc') %></p>
                     <a href="/teaching-tools/flash-card-generator" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/decode-practice' }) %>
                     <h3>🔡 <%= t('teachingToolsIndex.decodeTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.decodeScope') %></p>
                     <p><%= t('teachingToolsIndex.decodeDesc') %></p>
                     <a href="/teaching-tools/decode-practice" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/vocab-glossary' }) %>
                     <h3>📖 <%= t('teachingToolsIndex.glossaryTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.glossaryScope') %></p>
                     <p><%= t('teachingToolsIndex.glossaryDesc') %></p>
                     <a href="/teaching-tools/vocab-glossary" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/vocab-puzzle' }) %>
                     <h3>🧩 <%= t('teachingToolsIndex.vocabPuzzleTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.vocabPuzzleScope') %></p>
                     <p><%= t('teachingToolsIndex.vocabPuzzleDesc') %></p>
                     <a href="/teaching-tools/vocab-puzzle" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/secret-message' }) %>
                     <h3>🔐 <%= t('teachingToolsIndex.secretMessageTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.secretMessageScope') %></p>
                     <p><%= t('teachingToolsIndex.secretMessageDesc') %></p>
                     <a href="/teaching-tools/secret-message" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/worksheet-generator' }) %>
                     <h3>📝 <%= t('teachingToolsIndex.worksheetTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.worksheetScope') %></p>
                     <p><%= t('teachingToolsIndex.worksheetDesc') %></p>
                     <a href="/teaching-tools/worksheet-generator" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/stroke-order-worksheet' }) %>
                     <h3>✍️ <%= t('teachingToolsIndex.strokeOrderTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.strokeOrderScope') %></p>
                     <p><%= t('teachingToolsIndex.strokeOrderDesc') %></p>
                     <a href="/teaching-tools/stroke-order-worksheet" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/hanzi-batch/index.html' }) %>
                     <h3>🎨 <%= t('teachingToolsIndex.hanziBatchTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.hanziBatchScope') %></p>
                     <p><%= t('teachingToolsIndex.hanziBatchDesc') %></p>
                     <a href="/teaching-tools/hanzi-batch/index.html" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/sentence-reorder' }) %>
                     <h3>🧩 <%= t('teachingToolsIndex.sentenceReorderTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.sentenceReorderScope') %></p>
                     <p><%= t('teachingToolsIndex.sentenceReorderDesc') %></p>
                     <a href="/teaching-tools/sentence-reorder" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/witchs-poison' }) %>
                     <h3>🧪 <%= t('teachingToolsIndex.poisonGameTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.poisonGameScope') %></p>
                     <p><%= t('teachingToolsIndex.poisonGameDesc') %></p>
                     <a href="/teaching-tools/witchs-poison" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div class="tool-card">
+                <div class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/book-generator' }) %>
                     <h3>🎧 <%= t('teachingToolsIndex.bookGenTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.bookGenScope') %></p>
                     <p><%= t('teachingToolsIndex.bookGenDesc') %></p>
