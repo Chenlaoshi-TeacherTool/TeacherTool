@@ -26,7 +26,12 @@
   button { font:inherit; cursor:pointer; border:0; font-weight:750; }
   #reset { padding:10px 16px; color:#356e57; background:#edf3e6; border-radius:12px; }
   button:disabled { cursor:wait; opacity:.65; }
-  .stage { text-align:center; padding:24px; }
+  .stage { position:relative; text-align:center; padding:24px; }
+  #fullscreen { position:absolute; z-index:3; top:16px; right:16px; padding:8px 14px; color:#356e57; background:#edf3e6; border-radius:12px; font-size:14px; }
+  /* Fill the screen with the wheel; size it by whichever side is shorter. */
+  .stage:fullscreen { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; border:0; border-radius:0; background:#faf8ef; }
+  .stage:fullscreen .wheel-wrap { width:min(92vw, calc(100vh - 190px)); max-width:none; margin:0 auto; }
+  .stage:fullscreen #result { width:min(92vw, 900px); font-size:clamp(20px,3vw,32px); }
   .wheel-wrap { position:relative; max-width:560px; margin:12px auto 0; }
   canvas { display:block; width:100%; height:auto; }
   .pointer { position:absolute; z-index:2; top:0; left:50%; transform:translateX(-50%); width:30px; height:38px; background:#194f45; clip-path:polygon(0 0,100% 0,50% 100%); }
@@ -66,6 +71,7 @@
       <p class="hint">重置会清除抽取结果，并重新读取上方内容；不会清空你的词句。</p>
     </section>
     <section class="panel stage" aria-label="幸运转盘">
+      <button id="fullscreen" type="button" hidden>⛶ 全屏</button>
       <div class="wheel-wrap"><div class="pointer" aria-hidden="true"></div><canvas id="wheel" width="1000" height="1000" role="img" aria-label="幸运转盘"></canvas><button id="spin" type="button">开始</button></div>
       <p id="result" role="status" aria-live="polite">准备好了，转一转！</p>
       <p class="keyboard">点击中心按钮，或按 <kbd>SPACE</kbd> 开始</p>
@@ -100,13 +106,15 @@
     wheel: '幸运转盘', start: '开始', again: '再转', spinning: '旋转中',
     ready: '准备好了，转一转！', empty: '请先输入至少一个词语或句子',
     progress: '好运转动中…', chosen: '本次抽中：', finished: '全部抽完啦！点“再玩一次”从头开始',
-    sectors: n => n + ' 个扇形', wheelLabel: n => '幸运转盘，共 ' + n + ' 个扇形'
+    sectors: n => n + ' 个扇形', wheelLabel: n => '幸运转盘，共 ' + n + ' 个扇形',
+    fullscreen: '⛶ 全屏', exitFullscreen: '✕ 退出全屏'
   } : {
     wheel: 'Lucky Wheel', start: 'Spin', again: 'Again', spinning: 'Spinning',
     ready: 'Ready? Give it a spin!', empty: 'Enter at least one word or sentence to begin.',
     progress: 'Spinning…', chosen: 'Selected: ', finished: 'All picked! Click “Play again” to start over.',
     sectors: n => n + (n === 1 ? ' sector' : ' sectors'),
-    wheelLabel: n => 'Lucky wheel with ' + n + (n === 1 ? ' sector' : ' sectors')
+    wheelLabel: n => 'Lucky wheel with ' + n + (n === 1 ? ' sector' : ' sectors'),
+    fullscreen: '⛶ Full screen', exitFullscreen: '✕ Exit full screen'
   };
   document.documentElement.lang = isChinese ? 'zh-CN' : 'en';
   if (!isChinese) {
@@ -247,6 +255,23 @@
   reset.addEventListener('click', reload);
   input.addEventListener('input', reload);
   document.getElementById('keep').addEventListener('click', () => modal.close());
+  // Full screen shows only the wheel panel; Safari on iPad still needs the webkit prefix.
+  const stage = document.querySelector('.stage');
+  const fullscreen = document.getElementById('fullscreen');
+  const fullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+  function updateFullscreen() {
+    fullscreen.textContent = fullscreenElement() ? text.exitFullscreen : text.fullscreen;
+  }
+  if (stage.requestFullscreen || stage.webkitRequestFullscreen) {
+    fullscreen.hidden = false;
+    updateFullscreen();
+    fullscreen.addEventListener('click', () => {
+      if (fullscreenElement()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else (stage.requestFullscreen || stage.webkitRequestFullscreen).call(stage);
+    });
+    document.addEventListener('fullscreenchange', updateFullscreen);
+    document.addEventListener('webkitfullscreenchange', updateFullscreen);
+  }
   // Bring back every entry from the text box, then spin from the start.
   playAgain.addEventListener('click', () => {
     reload();
