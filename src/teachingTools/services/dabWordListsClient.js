@@ -42,8 +42,8 @@ function toPublicList(row, items) {
 }
 
 async function getAllPublicLists() {
-  var lists = await dabGet('/wordlists');
-  var items = await dabGet('/wordlistitems');
+  var lists = await dabGet('/wordlists?$first=-1');
+  var items = await dabGet('/wordlistitems?$first=-1');
   var itemsByListId = {};
   items.forEach(function (item) {
     (itemsByListId[item.list_id] = itemsByListId[item.list_id] || []).push(item);
@@ -57,7 +57,7 @@ async function getPublicListBySlug(slug) {
   var lists = await dabGet("/wordlists?$filter=slug eq '" + slug.replace(/'/g, "''") + "'");
   var list = lists[0];
   if (!list) return null;
-  var items = await dabGet('/wordlistitems?$filter=list_id eq ' + list.id);
+  var items = await dabGet('/wordlistitems?$first=-1&$filter=list_id eq ' + list.id);
   return toPublicList(list, items);
 }
 
