@@ -8,7 +8,7 @@ export async function loadChar(char) {
   }).catch(e => { cache.delete(char); throw e; }));
   return cache.get(char);
 }
-const palettes = { rainbow: ['#c3362b','#2b805f','#2c70b4','#b76255','#8d59a8','#d38b29','#358c90','#78468d','#b64e82','#4c70a9'], warm: ['#b93931','#da7436','#ab4b69','#c79529'], cool: ['#2e6da4','#318980','#6254a1','#458caf'] };
+const palettes = { rainbow: ['#d63a2f','#ec8a1c','#e0b400','#3a9a4a','#1fa3b3','#2f6fd0','#8a4fbf'], warm: ['#b93931','#da7436','#ab4b69','#c79529'], cool: ['#2e6da4','#318980','#6254a1','#458caf'] };
 export function color(i, o) { return o.scheme === 'single' ? o.color : palettes[o.scheme][i % palettes[o.scheme].length]; }
 export function grid(o) {
   const lines = o.grid === 'square' ? '' : '<path d="M300 18V582M18 300H582"/>' + (o.grid === 'mi' ? '<path d="M18 18L582 582M582 18L18 582"/>' : '');
