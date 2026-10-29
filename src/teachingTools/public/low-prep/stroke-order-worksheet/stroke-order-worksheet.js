@@ -4,7 +4,7 @@ const SOURCES = [
   c => `https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(c)}.json`,
   c => `https://unpkg.com/hanzi-writer-data@2.0.1/${encodeURIComponent(c)}.json`
 ];
-const PALETTE = ['#E63946','#F08A24','#2A9D8F','#3A6EA5','#9B5DE5','#D63A8A','#1B9AAA','#6A994E','#C8553D','#5A4FCF'];
+const PALETTE = ['#d63a2f','#ec8a1c','#e0b400','#3a9a4a','#1fa3b3','#2f6fd0','#8a4fbf'];
 const GRAY = '#C3CAD3', INK = '#1E2635', TRACE = '#D6DBE2', GRID = '#E6A3A3';
 
 const $ = s => document.querySelector(s);
