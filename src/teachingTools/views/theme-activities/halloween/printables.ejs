@@ -20,7 +20,7 @@
       <% printables.forEach(function(item, index) { %>
       <button type="button" class="resource-card printable-card" data-dialog="printable-<%= index %>">
         <% if (item.limitedFree) { %><span class="printable-badge"><%= lang === 'zh' ? '限时免费' : 'Free for a limited time' %></span><% } %>
-        <span class="resource-card__meta">🎃 <%= item.pages %> <%= lang === 'zh' ? '页 · PDF / Word' : 'pages · PDF / Word' %></span>
+        <span class="resource-card__meta">🎃 <%= item.pages %> <%= lang === 'zh' ? '页' : 'pages' %> · <%= item.docx ? 'PDF / Word' : 'PDF' %></span>
         <h2><%= item.title %></h2>
         <p><%= lang === 'zh' ? item.zh : item.en %></p>
         <span class="resource-card__link"><%= lang === 'zh' ? '下载' : 'Download' %> →</span>
@@ -36,11 +36,16 @@
             <strong>PDF</strong>
             <span><%= lang === 'zh' ? '直接打印' : 'Ready to print' %></span>
           </a>
+          <% if (item.docx) { %>
           <a class="printable-option" href="<%= item.docx %>" download>
             <strong>Word</strong>
             <span><%= lang === 'zh' ? '可编辑修改' : 'Editable' %></span>
           </a>
+          <% } %>
         </div>
+        <% if (item.createHref) { %>
+        <p><%= lang === 'zh' ? '想创建自己的 Secret Message？' : 'Want to create your own Secret Message?' %> <a class="text-link" href="<%= item.createHref %>"><%= lang === 'zh' ? '前往图形密码生成器' : 'Open the Secret Message generator' %> →</a></p>
+        <% } %>
       </dialog>
       <% }) %>
     </div>

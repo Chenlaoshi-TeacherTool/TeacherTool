@@ -47,6 +47,14 @@ router.get('/theme-activities/:theme', function(req, res, next) {
 var PRINTABLES_BASE = 'https://chenlaoshitteaching.blob.core.windows.net/printables/';
 var halloweenPrintables = [
   {
+    title: '万圣节图形密码 · Secret Message',
+    en: 'Decode Halloween pictures to reveal a secret message from your teacher. Includes a worksheet and answer key.',
+    zh: '对照图形密码表，写出汉字，解开老师的万圣节秘密信息。含练习纸和答案页。',
+    pages: 2,
+    pdf: '/printables/halloween/halloween-secret-message.pdf',
+    createHref: '/teaching-tools/secret-message'
+  },
+  {
     title: '万圣节方位词_Gallery_Walk',
     en: 'Read each position-word sentence, find the matching picture around the room, and write its letter. Includes 10 picture cards and an answer key.',
     zh: '读方位词句子，在教室里找到对应的图片并写下字母。含 10 张图片卡和答案。',
