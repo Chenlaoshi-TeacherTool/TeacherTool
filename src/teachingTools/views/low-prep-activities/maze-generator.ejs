@@ -50,6 +50,17 @@
           </div>
           <p class="maze-help"><%= t('mazeGenerator.qaHelpPrefix') %><strong>|</strong><%= t('mazeGenerator.qaHelpSuffix') %></p>
           <div id="mazeBankPicker"></div>
+          <section id="mazePersonalBankPicker" class="maze-personal-library" aria-labelledby="mazePersonalTitle">
+            <h3 id="mazePersonalTitle">My question banks</h3>
+            <p>Use a question bank saved in your <a href="/teaching-tools/question-bank-library/question-bank-library.html">unified My Library</a>. Preview first, then apply eight questions with distinct answers.</p>
+            <label for="mazePersonalBank">Personal question bank</label>
+            <select id="mazePersonalBank" disabled></select>
+            <p id="mazePersonalStatus" role="status" aria-live="polite">Loading personal question banks…</p>
+            <button id="mazePersonalPreview" class="maze-secondary" type="button" disabled>Preview 8 questions</button>
+            <div id="mazePersonalResults"></div>
+            <label id="mazePersonalReplaceLabel" hidden><input id="mazePersonalReplace" type="checkbox"> Replace my current maze questions with this preview.</label>
+            <button id="mazePersonalApply" class="maze-secondary" type="button" hidden disabled>Use these 8 questions</button>
+          </section>
           <div class="maze-pair-editor">
             <label class="maze-pair-label" for="mazePairInput">
               <span><%= t('mazeGenerator.eightPairsLabel') %></span>
@@ -83,7 +94,10 @@
 
   <script src="/vendor/jszip.min.js"></script>
   <script src="/shared/library-picker.js"></script>
-  <script src="/low-prep/maze-generator/maze-generator.js?v=answer-route-13"></script>
+  <script src="/shared/library-v2.js"></script>
+  <script src="/shared/library-store.js"></script>
+  <script src="/low-prep/maze-generator/maze-library.js"></script>
+  <script src="/low-prep/maze-generator/maze-generator.js?v=personal-library-1"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

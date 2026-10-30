@@ -28,6 +28,14 @@
 
 .maze-layout { max-width: 980px; margin: 0 auto; }
 .maze-builder { display: grid; gap: 18px; }
+.maze-personal-library { margin: 18px 0; padding: 18px; border: 1px solid var(--maze-line); border-radius: 14px; background: var(--maze-mist); }
+.maze-personal-library h3 { margin-top: 0; }
+.maze-personal-library p, .maze-personal-library li { line-height: 1.6; overflow-wrap: anywhere; }
+.maze-personal-library label { display: block; margin: 10px 0; }
+.maze-personal-library select { width: 100%; min-width: 0; padding: 10px; }
+.maze-personal-library button { margin: 8px 8px 8px 0; }
+.maze-personal-library [hidden] { display: none !important; }
+.maze-personal-library #mazePersonalReplace { width: auto; }
 .maze-panel, .maze-preview-panel { border: 1px solid #e5ddc9; border-radius: 20px; background: var(--maze-paper); box-shadow: 0 12px 28px rgba(24, 66, 55, .09); }
 .maze-panel { padding: 24px; }
 .maze-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .7fr); column-gap: 28px; align-items: end; }

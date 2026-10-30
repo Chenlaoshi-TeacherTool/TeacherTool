@@ -11,6 +11,7 @@
   var toastTimer;
   var lastRouteIndex = -1;
   var routeQueue = [];
+  var personalSourceSnapshot = null;
 
   var sourceQuestions = [
     '春天到了，小草和小树在做什么？',
@@ -124,14 +125,16 @@
   }
 
   function readData() {
-    return {
+    var data = {
       title: $('#mazeTitle').value.trim(),
       pairs: parsePairText($('#mazePairInput').value)
     };
+    if (personalSourceSnapshot && JSON.stringify(data.pairs) === JSON.stringify(personalSourceSnapshot.pairs)) data.sourceRefs = personalSourceSnapshot.sourceRefs;
+    return data;
   }
 
   function saveDraft() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(readData())); } catch (error) { /* Browser storage is optional. */ }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(readData())); return true; } catch (error) { return false; }
   }
 
   function loadDraft() {
@@ -182,6 +185,7 @@
   function importPresetBanks(banks) {
     try {
       var pairs = pickBalancedPairs(banks);
+      personalSourceSnapshot = null;
       if (!$('#mazeTitle').value.trim()) {
         $('#mazeTitle').value = banks.map(function (bank) { return bank.theme || bank.name; }).join(' · ') + ' Maze';
       }
@@ -208,6 +212,21 @@
       onImport: function (banks) {
         importPresetBanks(banks);
         picker.reset();
+      }
+    });
+  }
+
+  function initPersonalBankPicker() {
+    if (!window.ChenMazeLibrary) return;
+    window.ChenMazeLibrary.mount({
+      readCurrent: function () {
+        return { title: $('#mazeTitle').value, pairsText: $('#mazePairInput').value, hasContent: readData().pairs.some(function (pair) { return pair.question || pair.answer; }) };
+      },
+      apply: function (selection, name) {
+        if (!$('#mazeTitle').value.trim()) $('#mazeTitle').value = (name + ' Maze').slice(0, 60);
+        personalSourceSnapshot = { pairs: selection.pairs, sourceRefs: selection.sourceRefs };
+        fillPairRows(selection.pairs);
+        return saveDraft();
       }
     });
   }
@@ -459,6 +478,7 @@
   }
 
   function loadSample() {
+    personalSourceSnapshot = null;
     $('#mazeTitle').value = sample.title;
     fillPairRows(sample.pairs);
     saveDraft();
@@ -466,6 +486,7 @@
   }
 
   function clearAll() {
+    personalSourceSnapshot = null;
     $('#mazeTitle').value = '';
     fillPairRows(emptyPairs());
     saveDraft();
@@ -474,6 +495,7 @@
 
   function setup() {
     var saved = loadDraft();
+    if (Array.isArray(saved.sourceRefs) && saved.sourceRefs.length === PAIR_COUNT) personalSourceSnapshot = { pairs: saved.pairs, sourceRefs: saved.sourceRefs };
     $('#mazeTitle').value = saved.title || '';
     fillPairRows(saved.pairs);
     $('#mazeTitle').addEventListener('input', saveDraft);
@@ -482,6 +504,7 @@
     $('#loadMazeSample').addEventListener('click', loadSample);
     $('#clearMaze').addEventListener('click', clearAll);
     initQuestionBankPicker();
+    initPersonalBankPicker();
   }
 
   setup();
