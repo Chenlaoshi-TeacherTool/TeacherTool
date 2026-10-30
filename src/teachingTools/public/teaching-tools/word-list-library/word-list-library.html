@@ -13,6 +13,7 @@
   <script src="/javascripts/clarity.js"></script>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="./word-list-library.css">
+  <link rel="stylesheet" href="/shared/library-import-preview.css">
   <link rel="stylesheet" href="/stylesheets/classroom-guide.css?v=library-guides-1">
 </head>
 <body>
@@ -194,9 +195,37 @@ conclusion | | an explanation based on results</textarea>
         </div>
       </div>
     </section>
+    <section class="card library-import-preview" id="libraryImportPreview" aria-labelledby="libraryImportTitle">
+      <h2 id="libraryImportTitle">Preview a library backup</h2>
+      <p>Review a vocabulary-list or question-bank backup, then choose whether to save it to your unified library in this browser.</p>
+      <button class="btn btn-secondary" id="libraryUseDraft" type="button">Preview current vocabulary draft</button>
+      <label for="libraryBackupFile">Choose a JSON backup (up to 5 MB)</label>
+      <input id="libraryBackupFile" type="file" accept=".json,application/json">
+      <p role="status" aria-live="polite">Choose a JSON backup to preview.</p>
+      <div class="library-import-results"></div>
+      <button class="btn btn-secondary" id="libraryDownloadConverted" type="button" disabled>Download converted backup</button>
+      <button class="btn btn-secondary" id="libraryCheckImport" type="button" disabled>Check import again</button>
+      <div class="library-import-check" id="libraryImportCheck" role="status" aria-live="polite"></div>
+      <label id="libraryKeepBothLabel" hidden><input id="libraryKeepBoth" type="checkbox"> Keep both copies of conflicting collections; do not replace existing data.</label>
+      <button class="btn btn-primary" id="librarySaveImport" type="button" disabled>Save to unified library</button>
+    </section>
+    <section class="card library-personal" id="libraryPersonal" aria-labelledby="libraryPersonalTitle">
+      <h2 id="libraryPersonalTitle">Your unified library</h2>
+      <p>Vocabulary lists and question banks saved here are available on both Library pages. Keep a downloaded backup for another browser or device.</p>
+      <div class="library-personal-filters">
+        <label>Search your library<input id="libraryPersonalSearch" type="search" placeholder="Collection name or content"></label>
+        <label>Collection type<select id="libraryPersonalFilter"><option value="">All collections</option><option value="vocabulary">Vocabulary lists</option><option value="question-bank">Question banks</option></select></label>
+      </div>
+      <p id="libraryPersonalStatus" role="status" aria-live="polite">Loading your unified library…</p>
+      <div class="library-personal-results" id="libraryPersonalResults"></div>
+      <button class="btn btn-secondary" id="libraryPersonalBackup" type="button" disabled>Download library backup</button>
+    </section>
   </main>
 
   <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/library-v2.js"></script>
+  <script src="/shared/library-store.js"></script>
+  <script src="/shared/library-import-preview.js" defer></script>
   <script src="./word-list-library.js"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
