@@ -13,7 +13,6 @@
     status: document.getElementById('gameStatus'),
     check: document.getElementById('checkButton'),
     shuffle: document.getElementById('shuffleButton'),
-    reveal: document.getElementById('revealButton'),
     prev: document.getElementById('prevButton'),
     next: document.getElementById('nextButton'),
     reset: document.getElementById('resetButton'),
@@ -188,12 +187,6 @@
     }
   }
 
-  function revealAnswer() {
-    state.order = sentenceWords().slice();
-    renderStage();
-    setStatus('This is the correct order.', '');
-  }
-
   function resetProgress() {
     if (!window.confirm('Clear your answers and start this game again?')) return;
     state.currentIndex = 0;
@@ -315,7 +308,6 @@
 
   elements.check.addEventListener('click', checkAnswers);
   elements.shuffle.addEventListener('click', () => loadPuzzle(state.currentIndex, true));
-  elements.reveal.addEventListener('click', revealAnswer);
   elements.prev.addEventListener('click', () => {
     if (state.currentIndex > 0) loadPuzzle(state.currentIndex - 1, true);
   });

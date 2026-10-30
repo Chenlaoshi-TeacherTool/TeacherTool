@@ -123,7 +123,7 @@
     dialog.className = 'game-share-dialog';
     dialog.innerHTML = `
       <form method="dialog" class="game-share-dialog-card">
-        <button class="game-share-dialog-close" value="cancel" aria-label="Close share dialog">×</button>
+        <button class="game-share-dialog-close" value="cancel" formnovalidate aria-label="Close share dialog">×</button>
         <div class="game-share-dialog-heading">
           <span aria-hidden="true">🔗</span>
           <div><p>Online student game</p><h2>Create a share link</h2></div>
@@ -189,7 +189,7 @@
     dialog.className = 'game-share-dialog game-share-manager-dialog';
     dialog.innerHTML = `
       <form method="dialog" class="game-share-dialog-card">
-        <button class="game-share-dialog-close" value="cancel" aria-label="Close link manager">×</button>
+        <button class="game-share-dialog-close" value="cancel" formnovalidate aria-label="Close link manager">×</button>
         <div class="game-share-dialog-heading">
           <span aria-hidden="true">🗂️</span>
           <div><p>Saved in this browser</p><h2>My student links</h2></div>
