@@ -202,4 +202,24 @@
   .reorder-player-nav { justify-content: stretch; }
 }
 
-.reorder-player-actions button[hidden] { display: none; }
+.reorder-player-actions button[hidden],
+.reorder-student-completion button[hidden] { display: none; }
+
+.reorder-assessment-review { margin-top: 24px; scroll-margin-top: 20px; }
+.reorder-assessment-review[hidden] { display: none; }
+.reorder-assessment-review h2 { margin: 8px 0; overflow-wrap: anywhere; }
+.reorder-assessment-review > p { line-height: 1.55; }
+.reorder-review-score { font-size: 22px; font-weight: 800; color: var(--game-green); }
+.reorder-review-list { display: grid; gap: 12px; margin: 20px 0 0; padding: 0; list-style: none; }
+.reorder-review-list li { padding: 14px 16px; border: 1px solid #a8c5ab; border-radius: 12px; background: #f0f7e9; break-inside: avoid; }
+.reorder-review-list li.is-incorrect { border-color: #e0aaa0; background: #fff0ed; }
+.reorder-review-list strong { color: #245c39; }
+.reorder-review-list .is-incorrect strong { color: #943b2f; }
+.reorder-review-list p { margin: 8px 0 0; color: #193d38; line-height: 1.65; overflow-wrap: anywhere; }
+
+#sentencePuzzleCard[hidden], #resetButton[hidden], #studentNameGate[hidden] { display: none; }
+#studentNameForm { display: grid; gap: 12px; }
+#studentNameInput { width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid #a8c5ab; border-radius: 10px; font: inherit; box-sizing: border-box; }
+#studentNameGate p { line-height: 1.6; }
+#studentNameError { color: #943b2f; }
+#assessmentReviewName { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }

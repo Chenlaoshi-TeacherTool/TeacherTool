@@ -203,3 +203,48 @@ test('assessment links retain their mode through publishing and unlocking', asyn
   assert.doesNotMatch(html, /id="submitButton"[^>]*hidden/);
   assert.match(html, /sentences visited/);
 });
+
+test('quiz submissions are scored once per normalised student name across sessions', async function () {
+  var data = validSentenceReorderData();
+  data.mode = 'assessment';
+  var publishedResponse = await fetch(baseUrl + '/api/game-shares', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, password: 'quiz-once', data: data })
+  });
+  var published = await publishedResponse.json();
+  async function unlock() {
+    var response = await fetch(baseUrl + published.url + '/unlock', {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ password: 'quiz-once' }), redirect: 'manual'
+    });
+    return response.headers.get('set-cookie').split(';')[0];
+  }
+  var cookie = await unlock();
+  function request(action, body, auth) {
+    return fetch(baseUrl + published.url + '/' + action, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: auth || '' }, body: JSON.stringify(body)
+    });
+  }
+  assert.equal((await request('attempt', { studentName: 'Alice' })).status, 401);
+  assert.equal((await request('attempt', { studentName: ' ' }, cookie)).status, 400);
+  var fresh = await request('attempt', { studentName: 'Alice' }, cookie);
+  assert.equal((await fresh.json()).submission, null);
+  assert.equal((await request('submit', { studentName: 'Alice', answers: [] }, cookie)).status, 400);
+  var answers = [data.sentences[0].words, data.sentences[1].words.slice().reverse()];
+  var response = await request('submit', { studentName: 'Alice', answers: answers, score: 999 }, cookie);
+  assert.equal(response.status, 201);
+  var submission = (await response.json()).submission;
+  assert.equal(submission.score, 1);
+  assert.deepEqual(submission.correct, [true, false]);
+  var anotherSession = await unlock();
+  var restored = (await (await request('attempt', { studentName: '  ALICE  ' }, anotherSession)).json()).submission;
+  assert.deepEqual(restored, submission);
+  var repeat = await request('submit', { studentName: 'alice', answers: data.sentences.map(s => s.words) }, anotherSession);
+  assert.equal(repeat.status, 409);
+  assert.deepEqual((await repeat.json()).submission, submission);
+  var simultaneous = await Promise.all([0, 1].map(function () {
+    return request('submit', { studentName: 'Bob', answers: answers }, cookie);
+  }));
+  assert.deepEqual(simultaneous.map(r => r.status).sort(), [201, 409]);
+  assert.equal((await (await request('attempt', { studentName: 'Carol' }, cookie)).json()).submission, null);
+});

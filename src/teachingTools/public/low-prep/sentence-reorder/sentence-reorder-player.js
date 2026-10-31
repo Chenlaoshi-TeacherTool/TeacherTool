@@ -6,8 +6,15 @@
 
   const data = game.data;
   const assessment = data.mode === 'assessment';
-  const progressKey = `shared-sentence-reorder-progress:${game.shareId}`;
+  let progressKey = `shared-sentence-reorder-progress:${game.shareId}`;
   const elements = {
+    nameGate: document.getElementById('studentNameGate'),
+    nameForm: document.getElementById('studentNameForm'),
+    nameInput: document.getElementById('studentNameInput'),
+    nameError: document.getElementById('studentNameError'),
+    start: document.getElementById('startQuizButton'),
+    puzzleCard: document.getElementById('sentencePuzzleCard'),
+    reviewName: document.getElementById('assessmentReviewName'),
     stage: document.getElementById('studentSentenceStage'),
     progress: document.getElementById('progressCount'),
     sentenceProgress: document.getElementById('sentenceProgress'),
@@ -18,14 +25,21 @@
     prev: document.getElementById('prevButton'),
     next: document.getElementById('nextButton'),
     reset: document.getElementById('resetButton'),
+    review: document.getElementById('assessmentReview'),
+    reviewTitle: document.getElementById('assessmentReviewTitle'),
+    reviewScore: document.getElementById('assessmentReviewScore'),
+    reviewList: document.getElementById('assessmentReviewList'),
     completion: document.getElementById('completionPanel'),
     completionMessage: document.getElementById('completionMessage'),
+    playAgain: document.getElementById('playAgainButton'),
     closeCompletion: document.getElementById('closeCompletionButton')
   };
 
   let drag = null;
   const saved = loadProgress();
   const state = {
+    studentName: '',
+    submitting: false,
     currentIndex: saved.currentIndex,
     solved: saved.solved,
     answers: saved.answers,
@@ -100,7 +114,7 @@
   function makeChip(word) {
     const chip = document.createElement('button');
     chip.type = 'button';
-    chip.disabled = assessment && state.submitted;
+    chip.disabled = assessment && (state.submitted || state.submitting);
     chip.className = 'reorder-student-chip';
     chip.textContent = word;
     chip.dataset.word = word;
@@ -154,10 +168,11 @@
     const words = sentenceWords();
     elements.progress.textContent = `${complete} / ${data.sentences.length}`;
     elements.sentenceProgress.textContent = `Sentence ${state.currentIndex + 1} of ${data.sentences.length} · ${words.length} words`;
-    elements.submit.disabled = state.submitted || complete < data.sentences.length;
-    elements.shuffle.disabled = assessment && state.submitted;
-    elements.prev.disabled = state.currentIndex === 0;
-    elements.next.disabled = state.currentIndex >= data.sentences.length - 1;
+    elements.submit.disabled = state.submitted || state.submitting || complete < data.sentences.length;
+    elements.shuffle.disabled = assessment && (state.submitted || state.submitting);
+    elements.prev.disabled = state.submitting || state.currentIndex === 0;
+    elements.next.disabled = state.submitting || state.currentIndex >= data.sentences.length - 1;
+    renderAssessmentReview();
   }
 
   function loadPuzzle(index, reshuffle) {
@@ -214,30 +229,104 @@
     }
   }
 
+  function isSentenceCorrect(index) {
+    const words = data.sentences[index].words;
+    const answer = state.answers[index];
+    return Boolean(answer && answer.length === words.length && answer.every((word, wordIndex) => normalize(word) === normalize(words[wordIndex])));
+  }
+
   function assessmentResult() {
-    const correct = data.sentences.filter((sentence, index) => {
-      const answer = state.answers[index];
-      return answer && answer.every((word, wordIndex) => normalize(word) === normalize(sentence.words[wordIndex]));
-    }).length;
+    const correct = data.sentences.filter((_sentence, index) => isSentenceCorrect(index)).length;
     return `You got ${correct} of ${data.sentences.length} sentences correct.`;
   }
 
-  function submitAssessment() {
-    if (!assessment || state.submitted || drag || state.answers.some((answer) => !answer)) return;
-    if (!window.confirm('Submit all answers? You cannot change them after submitting.')) return;
+  function renderAssessmentReview() {
+    elements.review.hidden = !assessment || !state.submitted;
+    elements.reviewList.replaceChildren();
+    if (elements.review.hidden) return;
+    elements.reviewName.textContent = 'Student / 学生：' + state.studentName;
+    elements.reviewScore.textContent = assessmentResult();
+    data.sentences.forEach((_sentence, index) => {
+      const correct = isSentenceCorrect(index);
+      const item = document.createElement('li');
+      item.className = correct ? 'is-correct' : 'is-incorrect';
+      const heading = document.createElement('strong');
+      heading.textContent = `${index + 1}. ${correct ? '✓ Correct / 正确' : '✗ Incorrect / 错误'}`;
+      const answer = document.createElement('p');
+      answer.textContent = 'Your answer / 你的答案：' + (state.answers[index] || []).join(' ');
+      item.append(heading, answer);
+      elements.reviewList.append(item);
+    });
+  }
+
+  async function quizRequest(action, body) {
+    const response = await fetch(`/play/${encodeURIComponent(game.shareId)}/${action}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok && !(response.status === 409 && result.submission)) {
+      throw new Error(result.error || 'Could not connect. Please try again.');
+    }
+    return result;
+  }
+
+  function applySubmission(submission) {
+    state.studentName = submission.studentName;
+    state.answers = submission.answers;
     state.submitted = true;
-    saveProgress();
+  }
+
+  async function startAssessment(event) {
+    event.preventDefault();
+    if (!elements.nameInput.reportValidity()) return;
+    elements.start.disabled = true;
+    elements.nameError.hidden = true;
+    try {
+      const result = await quizRequest('attempt', { studentName: elements.nameInput.value });
+      state.studentName = result.studentName;
+      const nameKey = state.studentName.normalize('NFKC').trim().replace(/\s+/g, ' ').toLowerCase();
+      progressKey = `shared-sentence-reorder-progress:${game.shareId}:${nameKey}`;
+      Object.assign(state, loadProgress(), { submitted: false });
+      if (result.submission) applySubmission(result.submission);
+      elements.nameGate.hidden = true;
+      elements.puzzleCard.hidden = false;
+      loadPuzzle(state.currentIndex, true);
+      if (state.submitted) elements.review.scrollIntoView({ block: 'start' });
+    } catch (error) {
+      elements.nameError.textContent = error.message;
+      elements.nameError.hidden = false;
+    } finally {
+      elements.start.disabled = false;
+    }
+  }
+
+  async function submitAssessment() {
+    if (!assessment || !state.studentName || state.submitted || state.submitting || drag || state.answers.some((answer) => !answer)) return;
+    if (!window.confirm('Submit all answers? Each name can submit only once. You cannot change them afterwards.')) return;
+    state.submitting = true;
     renderStage();
     renderProgress();
-    const result = assessmentResult();
-    setStatus(result, '');
-    elements.completionMessage.textContent = result;
-    elements.completion.hidden = false;
-    elements.closeCompletion.focus();
+    try {
+      const result = await quizRequest('submit', { studentName: state.studentName, answers: state.answers });
+      applySubmission(result.submission);
+      saveProgress();
+      loadPuzzle(state.currentIndex, false);
+      elements.completionMessage.textContent = assessmentResult();
+      elements.completion.hidden = false;
+      elements.closeCompletion.focus();
+    } catch (error) {
+      setStatus(error.message, 'is-error');
+    } finally {
+      state.submitting = false;
+      renderStage();
+      renderProgress();
+    }
   }
 
   function resetProgress() {
+    if (assessment) return;
     if (!window.confirm('Clear your answers and start this game again?')) return;
+    elements.completion.hidden = true;
     state.currentIndex = 0;
     state.solved = Array(data.sentences.length).fill(false);
     state.answers = Array(data.sentences.length).fill(null);
@@ -248,7 +337,7 @@
   function onChipKeyDown(event) {
     const track = document.getElementById('studentWordTrack');
     if (!track) return;
-    if (isLockedChip(event.currentTarget) || (assessment && state.submitted)) return;
+    if (isLockedChip(event.currentTarget) || (assessment && (state.submitted || state.submitting))) return;
     var originalChips = Array.from(track.children);
     var chips = originalChips.filter(function (chip) { return !isLockedChip(chip); });
     var index = chips.indexOf(event.currentTarget);
@@ -371,10 +460,17 @@
     if (state.currentIndex < data.sentences.length - 1) loadPuzzle(state.currentIndex + 1, true);
   });
   elements.reset.addEventListener('click', resetProgress);
+  elements.playAgain.addEventListener('click', resetProgress);
   elements.closeCompletion.addEventListener('click', () => {
     elements.completion.hidden = true;
-    (assessment ? elements.next : elements.check).focus();
+    if (assessment) {
+      elements.reviewTitle.focus({ preventScroll: true });
+      elements.review.scrollIntoView({ block: 'start' });
+    } else {
+      elements.check.focus();
+    }
   });
 
-  loadPuzzle(state.currentIndex, true);
+  if (assessment) elements.nameForm.addEventListener('submit', startAssessment);
+  else loadPuzzle(state.currentIndex, true);
 })();

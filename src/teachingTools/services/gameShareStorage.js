@@ -95,11 +95,63 @@ async function deleteShare(shareId) {
     : localDeleteShare(shareId);
 }
 
+function submissionKey(shareId, studentName) {
+  assertShareId(shareId);
+  var normalized = studentName.normalize('NFKC').trim().replace(/\s+/g, ' ').toLowerCase();
+  return shareId + '/submissions/' + require('crypto').createHash('sha256').update(normalized).digest('hex') + '.json';
+}
+
+async function getSubmission(shareId, studentName) {
+  var key = submissionKey(shareId, studentName);
+  if (isAzureConfigured()) {
+    var blob = getContainerClient().getBlockBlobClient(key);
+    if (!(await blob.exists())) return null;
+    return JSON.parse((await blob.downloadToBuffer()).toString('utf8'));
+  }
+  try {
+    return JSON.parse(await fs.readFile(path.join(LOCAL_ROOT, key), 'utf8'));
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
+}
+
+async function saveSubmission(shareId, studentName, submission) {
+  var key = submissionKey(shareId, studentName);
+  if (isAzureConfigured()) {
+    try {
+      await getContainerClient().getBlockBlobClient(key).uploadData(Buffer.from(JSON.stringify(submission)), {
+        conditions: { ifNoneMatch: '*' },
+        blobHTTPHeaders: { blobContentType: 'application/json; charset=utf-8' }
+      });
+      return true;
+    } catch (error) {
+      if (error.statusCode === 409 || error.statusCode === 412) return false;
+      throw error;
+    }
+  }
+  var destination = path.join(LOCAL_ROOT, key);
+  await fs.mkdir(path.dirname(destination), { recursive: true });
+  var temporary = destination + '.' + require('crypto').randomUUID() + '.tmp';
+  await fs.writeFile(temporary, JSON.stringify(submission), 'utf8');
+  try {
+    await fs.link(temporary, destination);
+    return true;
+  } catch (error) {
+    if (error.code === 'EEXIST') return false;
+    throw error;
+  } finally {
+    await fs.unlink(temporary);
+  }
+}
+
 module.exports = {
   isAzureConfigured: isAzureConfigured,
   validShareId: validShareId,
   saveManifest: saveManifest,
   getManifest: getManifest,
   deleteShare: deleteShare,
+  getSubmission: getSubmission,
+  saveSubmission: saveSubmission,
   LOCAL_ROOT: LOCAL_ROOT
 };
