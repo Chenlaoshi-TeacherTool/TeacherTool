@@ -5,6 +5,7 @@
   if (!game || !game.data || !Array.isArray(game.data.sentences) || !game.data.sentences.length) return;
 
   const data = game.data;
+  const assessment = data.mode === 'assessment';
   const progressKey = `shared-sentence-reorder-progress:${game.shareId}`;
   const elements = {
     stage: document.getElementById('studentSentenceStage'),
@@ -12,6 +13,7 @@
     sentenceProgress: document.getElementById('sentenceProgress'),
     status: document.getElementById('gameStatus'),
     check: document.getElementById('checkButton'),
+    submit: document.getElementById('submitButton'),
     shuffle: document.getElementById('shuffleButton'),
     prev: document.getElementById('prevButton'),
     next: document.getElementById('nextButton'),
@@ -26,6 +28,8 @@
   const state = {
     currentIndex: saved.currentIndex,
     solved: saved.solved,
+    answers: saved.answers,
+    submitted: saved.submitted,
     order: []
   };
 
@@ -37,10 +41,16 @@
         : Array(data.sentences.length).fill(false);
       return {
         currentIndex: Math.max(0, Math.min(Number(saved.currentIndex) || 0, data.sentences.length - 1)),
-        solved
+        solved,
+        answers: data.sentences.map((sentence, index) => {
+          const answer = saved.answers && saved.answers[index];
+          return Array.isArray(answer) && JSON.stringify(answer.slice().sort()) === JSON.stringify(sentence.words.slice().sort())
+            ? answer : null;
+        }),
+        submitted: assessment && saved.submitted === true
       };
     } catch (_error) {
-      return { currentIndex: 0, solved: Array(data.sentences.length).fill(false) };
+      return { currentIndex: 0, solved: Array(data.sentences.length).fill(false), answers: Array(data.sentences.length).fill(null), submitted: false };
     }
   }
 
@@ -48,7 +58,9 @@
     try {
       localStorage.setItem(progressKey, JSON.stringify({
         currentIndex: state.currentIndex,
-        solved: state.solved
+        solved: state.solved,
+        answers: state.answers,
+        submitted: state.submitted
       }));
     } catch (_error) {
       /* Storage may be disabled. */
@@ -88,6 +100,7 @@
   function makeChip(word) {
     const chip = document.createElement('button');
     chip.type = 'button';
+    chip.disabled = assessment && state.submitted;
     chip.className = 'reorder-student-chip';
     chip.textContent = word;
     chip.dataset.word = word;
@@ -119,6 +132,7 @@
   }
 
   function refreshLockedChips() {
+    if (assessment) return;
     const words = sentenceWords();
     const track = document.getElementById('studentWordTrack');
     if (!track) return;
@@ -136,18 +150,26 @@
   }
 
   function renderProgress() {
-    const complete = state.solved.filter(Boolean).length;
+    const complete = assessment ? state.answers.filter(Boolean).length : state.solved.filter(Boolean).length;
     const words = sentenceWords();
     elements.progress.textContent = `${complete} / ${data.sentences.length}`;
     elements.sentenceProgress.textContent = `Sentence ${state.currentIndex + 1} of ${data.sentences.length} · ${words.length} words`;
+    elements.submit.disabled = state.submitted || complete < data.sentences.length;
+    elements.shuffle.disabled = assessment && state.submitted;
     elements.prev.disabled = state.currentIndex === 0;
     elements.next.disabled = state.currentIndex >= data.sentences.length - 1;
   }
 
   function loadPuzzle(index, reshuffle) {
     state.currentIndex = index;
-    state.order = reshuffle ? shuffle(sentenceWords()) : sentenceWords().slice();
-    if (reshuffle) setStatus('Arrange the words, then check your answer.', '');
+    state.order = assessment
+      ? (state.answers[index] || shuffle(sentenceWords())).slice()
+      : reshuffle ? shuffle(sentenceWords()) : sentenceWords().slice();
+    if (assessment) {
+      state.answers[index] = state.order.slice();
+      setStatus(state.submitted ? assessmentResult() : 'Arrange every sentence, then submit all answers. No hints are shown before submission.', '');
+    }
+    if (reshuffle && !assessment) setStatus('Arrange the words, then check your answer.', '');
     renderStage();
     renderProgress();
     saveProgress();
@@ -157,10 +179,15 @@
     const track = document.getElementById('studentWordTrack');
     if (!track) return;
     state.order = Array.from(track.children).map((chip) => chip.dataset.word);
+    if (assessment) {
+      state.answers[state.currentIndex] = state.order.slice();
+      saveProgress();
+    }
     refreshLockedChips();
   }
 
   function checkAnswers() {
+    if (assessment) return;
     const words = sentenceWords();
     const track = document.getElementById('studentWordTrack');
     const chips = Array.from(track.children);
@@ -187,17 +214,41 @@
     }
   }
 
+  function assessmentResult() {
+    const correct = data.sentences.filter((sentence, index) => {
+      const answer = state.answers[index];
+      return answer && answer.every((word, wordIndex) => normalize(word) === normalize(sentence.words[wordIndex]));
+    }).length;
+    return `You got ${correct} of ${data.sentences.length} sentences correct.`;
+  }
+
+  function submitAssessment() {
+    if (!assessment || state.submitted || drag || state.answers.some((answer) => !answer)) return;
+    if (!window.confirm('Submit all answers? You cannot change them after submitting.')) return;
+    state.submitted = true;
+    saveProgress();
+    renderStage();
+    renderProgress();
+    const result = assessmentResult();
+    setStatus(result, '');
+    elements.completionMessage.textContent = result;
+    elements.completion.hidden = false;
+    elements.closeCompletion.focus();
+  }
+
   function resetProgress() {
     if (!window.confirm('Clear your answers and start this game again?')) return;
     state.currentIndex = 0;
     state.solved = Array(data.sentences.length).fill(false);
+    state.answers = Array(data.sentences.length).fill(null);
+    state.submitted = false;
     loadPuzzle(0, true);
   }
 
   function onChipKeyDown(event) {
     const track = document.getElementById('studentWordTrack');
     if (!track) return;
-    if (isLockedChip(event.currentTarget)) return;
+    if (isLockedChip(event.currentTarget) || (assessment && state.submitted)) return;
     var originalChips = Array.from(track.children);
     var chips = originalChips.filter(function (chip) { return !isLockedChip(chip); });
     var index = chips.indexOf(event.currentTarget);
@@ -307,7 +358,12 @@
   }
 
   elements.check.addEventListener('click', checkAnswers);
-  elements.shuffle.addEventListener('click', () => loadPuzzle(state.currentIndex, true));
+  elements.submit.addEventListener('click', submitAssessment);
+  elements.shuffle.addEventListener('click', () => {
+    if (assessment && state.submitted) return;
+    if (assessment) state.answers[state.currentIndex] = null;
+    loadPuzzle(state.currentIndex, true);
+  });
   elements.prev.addEventListener('click', () => {
     if (state.currentIndex > 0) loadPuzzle(state.currentIndex - 1, true);
   });
@@ -317,7 +373,7 @@
   elements.reset.addEventListener('click', resetProgress);
   elements.closeCompletion.addEventListener('click', () => {
     elements.completion.hidden = true;
-    elements.check.focus();
+    (assessment ? elements.next : elements.check).focus();
   });
 
   loadPuzzle(state.currentIndex, true);

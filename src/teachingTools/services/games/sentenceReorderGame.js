@@ -47,6 +47,7 @@ function sanitize(payload) {
   return {
     title: cleanText(payload.title, 'Game title', 120, false) || 'Sentence Reorder',
     relaxed: Boolean(payload.relaxed),
+    mode: payload.mode === 'assessment' ? 'assessment' : 'practice',
     sentences: payload.sentences.map(cleanSentence)
   };
 }

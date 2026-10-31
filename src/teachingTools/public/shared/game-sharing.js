@@ -130,6 +130,13 @@
         </div>
         <div class="game-share-dialog-form" data-share-form>
           <label>Game title<input name="shareTitle" maxlength="120" required></label>
+          <label data-share-mode hidden>Link version / 链接版本
+            <select name="shareMode">
+              <option value="practice">Practice / 练习版 — instant feedback</option>
+              <option value="assessment">Quiz / 测验版 — score after submission</option>
+            </select>
+            <span>Quiz: no hints while working. Submit all sentences to see the total score.<br>测验版：做题时不提示对错，全部提交后显示答对题数。</span>
+          </label>
           <label>Password<input name="sharePassword" type="password" minlength="4" maxlength="64" autocomplete="new-password" required></label>
           <p class="game-share-dialog-note">Students open the link and enter this password. The link expires after 90 days.</p>
           <p class="game-share-dialog-error" data-share-error role="alert" hidden></p>
@@ -313,6 +320,9 @@
     submit.textContent = 'Create link';
     titleInput.value = typeof options.title === 'function' ? options.title() : (options.title || 'Shared Classroom Game');
     passwordInput.value = '';
+    const modeInput = dialog.querySelector('[name="shareMode"]');
+    dialog.querySelector('[data-share-mode]').hidden = options.gameType !== 'sentence-reorder';
+    modeInput.value = 'practice';
 
     submit.onclick = async () => {
       if (!titleInput.reportValidity() || !passwordInput.reportValidity()) return;
@@ -325,10 +335,15 @@
           version: options.version || 1,
           title: titleInput.value,
           password: passwordInput.value,
-          data: options.getData()
+          data: options.gameType === 'sentence-reorder'
+            ? { ...options.getData(), mode: modeInput.value }
+            : options.getData()
         });
         urlInput.value = published.absoluteUrl;
         passwordResultInput.value = passwordInput.value;
+        dialog.querySelector('.game-share-dialog-success').textContent = options.gameType === 'sentence-reorder'
+          ? (modeInput.value === 'assessment' ? '✓ Quiz link created / 测验版链接已创建' : '✓ Practice link created / 练习版链接已创建')
+          : '✓ Student link created';
         renderQrCode(qrTarget, qrWrap, published.absoluteUrl);
         dialog.querySelector('[data-open-link]').href = published.absoluteUrl;
         dialog.querySelector('[data-copy-link]').onclick = async (event) => {

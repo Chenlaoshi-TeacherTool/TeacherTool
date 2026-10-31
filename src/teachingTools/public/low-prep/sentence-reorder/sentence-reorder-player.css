@@ -201,3 +201,5 @@
   .reorder-player-nav { display: grid; grid-template-columns: 1fr; }
   .reorder-player-nav { justify-content: stretch; }
 }
+
+.reorder-player-actions button[hidden] { display: none; }

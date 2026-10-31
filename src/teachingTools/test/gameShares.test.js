@@ -179,3 +179,27 @@ test('rejects unsupported game types and malformed Sudoku data', async function 
   assert.equal(invalidSentence.status, 400);
   assert.match((await invalidSentence.json()).error, /at least two words/i);
 });
+
+test('assessment links retain their mode through publishing and unlocking', async function () {
+  var data = validSentenceReorderData();
+  data.mode = 'assessment';
+  var response = await fetch(baseUrl + '/api/game-shares', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, password: 'quiz1234', data: data })
+  });
+  assert.equal(response.status, 201);
+  var published = await response.json();
+  var unlock = await fetch(baseUrl + published.url + '/unlock', {
+    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ password: 'quiz1234' }), redirect: 'manual'
+  });
+  assert.equal(unlock.status, 302);
+  var cookie = unlock.headers.get('set-cookie').split(';')[0];
+  var player = await fetch(baseUrl + published.url, { headers: { Cookie: cookie } });
+  assert.equal(player.status, 200);
+  var html = await player.text();
+  assert.match(html, /"mode":"assessment"/);
+  assert.match(html, /id="checkButton"[^>]*hidden/);
+  assert.doesNotMatch(html, /id="submitButton"[^>]*hidden/);
+  assert.match(html, /sentences visited/);
+});
