@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= lang === 'zh' ? '中文教学专区' : 'Chinese Teaching' %> · CLS Teaching Tools</title>
+  <%- include('partials/seo', { pageDescription: lang === 'zh' ? '按汉字与书写、词汇与句型、阅读与表达、教材配套查找已有中文教学资源。' : 'Find existing Chinese teaching resources by classroom task.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <style>.task-section { margin-bottom: 40px; scroll-margin-top: 24px; } .task-nav { display:flex; flex-wrap:wrap; gap:16px; margin-top:24px; } .task-section h2 { color:#194f45; } .resource-card__link { display:inline-block; margin-top:12px; }</style>
+</head>
+<body>
+  <header class="content-hero"><div class="content-shell">
+    <a href="/" class="text-link">← <%= lang === 'zh' ? '首页' : 'Home' %></a>
+    <h1><%= lang === 'zh' ? '中文教学专区' : 'Chinese Teaching' %></h1>
+    <p><%= lang === 'zh' ? '为中文课堂准备的识字、书写、词汇、句型和教材配套资源。' : 'Character recognition, writing, vocabulary, sentence patterns, and textbook resources for Chinese classrooms.' %></p>
+    <% var groups = [
+      { id:'characters', zh:'汉字与书写', en:'Characters & writing', items:[
+        ['stroke-order-worksheet','strokeOrderTitle','strokeOrderDesc'],
+        ['missing-radicals','missingPartsTitle','missingPartsDesc'],
+        ['hanzi-batch/index.html','hanziBatchTitle','hanziBatchDesc'],
+        ['yu-duoyinzi-font','fontTitle','fontDesc']
+      ] },
+      { id:'vocabulary', zh:'词汇与句型', en:'Vocabulary & sentence patterns', items:[
+        ['word-list-library/word-list-library.html','libraryTitle','libraryDesc'],
+        ['flash-card-generator','flashCardTitle','flashCardDesc'],
+        ['sentence-reorder','sentenceReorderTitle','sentenceReorderDesc'],
+        ['vocabulary-booklet/vocabulary-booklet.html','vocabBookletTitle','vocabBookletDesc']
+      ] },
+      { id:'reading', zh:'阅读与表达', en:'Reading & expression', items:[
+        ['independent-reading','independentReadingTitle','independentReadingDesc'],
+        ['book-generator','bookGenTitle','bookGenDesc'],
+        ['social-media-classroom-tools/','socialMediaHubTitle','socialMediaHubDesc'],
+        ['question-bank-library/question-bank-library.html','questionBankTitle','questionBankDesc']
+      ] },
+      { id:'textbooks', zh:'教材配套', en:'Textbook companion', items:[] }
+    ]; %>
+    <nav class="task-nav" aria-label="<%= lang === 'zh' ? '教学任务' : 'Teaching tasks' %>">
+      <% groups.forEach(function(group) { %><a class="text-link" href="#<%= group.id %>"><%= lang === 'zh' ? group.zh : group.en %></a><% }); %>
+    </nav>
+  </div></header>
+  <main class="content-section"><div class="content-shell">
+    <% groups.forEach(function(group) { %>
+    <section class="task-section" id="<%= group.id %>" aria-labelledby="<%= group.id %>-title">
+      <h2 id="<%= group.id %>-title"><%= lang === 'zh' ? group.zh : group.en %></h2>
+      <div class="resource-grid">
+        <% group.items.forEach(function(item) { %>
+        <article class="resource-card">
+          <h3><%= t('teachingToolsIndex.' + item[1]) %></h3>
+          <p><%= t('teachingToolsIndex.' + item[2]) %></p>
+          <a class="resource-card__link" href="/teaching-tools/<%= item[0] %>"><%= lang === 'zh' ? '打开资源' : 'Open resource' %> →</a>
+        </article>
+        <% }); %>
+        <% if (group.id === 'textbooks') { %>
+        <article class="resource-card">
+          <h3><%= lang === 'zh' ? '暨南大学《中文》教材配套' : 'Jinan University “中文” companion' %></h3>
+          <p><%= lang === 'zh' ? '现有第一至三册目录，专属配套材料尚未添加。可先用上方通用工具，配合课本词汇和句型自建活动。' : 'Directories for levels 1–3 are available; dedicated materials have not been added yet. Use the tools above with your textbook vocabulary and sentence patterns.' %></p>
+          <a class="resource-card__link" href="/textbook-companion"><%= lang === 'zh' ? '查看教材栏目' : 'View textbook section' %> →</a>
+        </article>
+        <% } %>
+      </div>
+    </section>
+    <% }); %>
+  </div></main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body></html>

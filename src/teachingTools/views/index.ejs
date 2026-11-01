@@ -243,6 +243,15 @@
         </div>
     </section>
 
+    <section class="content-section" style="background:#edf5df" aria-labelledby="chinese-teaching-title">
+      <div class="content-shell">
+        <h2 id="chinese-teaching-title"><%= lang === 'zh' ? '中文教学专区' : 'Chinese Teaching' %></h2>
+        <p><%= lang === 'zh' ? '为中文课堂准备的识字、书写、词汇、句型和教材配套资源。' : 'Character recognition, writing, vocabulary, sentence patterns, and textbook resources for Chinese classrooms.' %></p>
+        <a class="btn" href="/chinese-teaching"><%= lang === 'zh' ? '按教学任务查找资源' : 'Browse by teaching task' %> →</a>
+      </div>
+    </section>
+
+
     <section class="shop-preview" aria-labelledby="shop-preview-heading">
         <div class="shop-preview-copy">
             <div class="eyebrow"><%= t('home.shopEyebrow') %></div>

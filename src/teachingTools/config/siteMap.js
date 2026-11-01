@@ -29,6 +29,8 @@ var SECTIONS = [
     key: 'tools', href: '/teaching-tools', en: 'Teaching Tools', zh: '教学工具', nav: true,
     admin: ['toolguides', 'wordlists', 'questionbanks']
   },
+  { key: 'library', href: '/teaching-tools/word-list-library/word-list-library.html', en: 'My Library', zh: '我的资源库', nav: true, sitemap: false, admin: [] },
+  { key: 'chinese', href: '/chinese-teaching', en: 'Chinese Teaching', zh: '中文教学专区', admin: [] },
   {
     key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: [],
     children: [
@@ -109,7 +111,7 @@ function flatten(items) {
 
 // Every structural URL that serves its own page, for the sitemap and tests.
 function allPaths() {
-  return flatten(SECTIONS).filter(function(item) { return !item.redirect; }).map(function(item) { return item.href; });
+  return flatten(SECTIONS).filter(function(item) { return !item.redirect && item.sitemap !== false; }).map(function(item) { return item.href; });
 }
 
 // Compact data for the client-side nav/footer in milk-tea-footer.js.

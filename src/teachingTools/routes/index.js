@@ -80,6 +80,10 @@ router.get('/teaching-tools/lucky-wheel', function(req, res) {
   res.redirect(302, '/teaching-tools/lucky-wheel/');
 });
 
+router.get('/chinese-teaching', function(req, res) {
+  res.render('chinese-teaching', { title: 'Chinese Teaching' });
+});
+
 router.get('/teaching-tools', function(req, res, next) {
   res.render('teaching-tools/index', { title: 'Teaching Tools' });
 });
