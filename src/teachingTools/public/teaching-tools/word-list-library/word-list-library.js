@@ -137,6 +137,7 @@
   function renderSavedLists() {
     els.savedLists.replaceChildren();
     var lists = window.ChenWordlist.listAll();
+    els.savedLists.closest('section').hidden = lists.length === 0;
     if (!lists.length) {
       var empty = document.createElement('p');
       empty.className = 'saved-empty';

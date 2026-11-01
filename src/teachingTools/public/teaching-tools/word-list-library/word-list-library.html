@@ -37,6 +37,31 @@
       <a href="/teaching-tools/question-bank-library/question-bank-library.html">📝 Question banks</a>
     </nav>
 
+
+
+    <section class="saved card" aria-labelledby="savedTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Saved on this device</p>
+          <h2 id="savedTitle">Your vocabulary library</h2>
+        </div>
+        <span class="storage-note" id="storageNote"></span>
+      </div>
+      <div class="saved-lists" id="savedLists"></div>
+    </section>
+
+    <section class="card library-personal" id="libraryPersonal" aria-labelledby="libraryPersonalTitle">
+      <h2 id="libraryPersonalTitle">Your unified library</h2>
+      <p>Vocabulary lists and question banks saved here are available on both Library pages. Keep a downloaded backup for another browser or device.</p>
+      <div class="library-personal-filters">
+        <label>Search your library<input id="libraryPersonalSearch" type="search" placeholder="Collection name or content"></label>
+        <label>Collection type<select id="libraryPersonalFilter"><option value="">All collections</option><option value="vocabulary">Vocabulary lists</option><option value="question-bank">Question banks</option></select></label>
+      </div>
+      <p id="libraryPersonalStatus" role="status" aria-live="polite">Loading your unified library…</p>
+      <div class="library-personal-results" id="libraryPersonalResults"></div>
+      <button class="btn btn-secondary" id="libraryPersonalBackup" type="button" disabled>Download library backup</button>
+    </section>
+
     <section class="intro card">
       <div>
         <p class="eyebrow">Your shared vocabulary foundation</p>
@@ -133,16 +158,7 @@ conclusion | | an explanation based on results</textarea>
       </section>
     </div>
 
-    <section class="saved card" aria-labelledby="savedTitle">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Saved on this device</p>
-          <h2 id="savedTitle">Your vocabulary library</h2>
-        </div>
-        <span class="storage-note" id="storageNote"></span>
-      </div>
-      <div class="saved-lists" id="savedLists"></div>
-    </section>
+
 
     <section class="account card" aria-labelledby="accountTitle">
       <div>
@@ -208,17 +224,7 @@ conclusion | | an explanation based on results</textarea>
       <label id="libraryKeepBothLabel" hidden><input id="libraryKeepBoth" type="checkbox"> Keep both copies of conflicting collections; do not replace existing data.</label>
       <button class="btn btn-primary" id="librarySaveImport" type="button" disabled>Save to unified library</button>
     </section>
-    <section class="card library-personal" id="libraryPersonal" aria-labelledby="libraryPersonalTitle">
-      <h2 id="libraryPersonalTitle">Your unified library</h2>
-      <p>Vocabulary lists and question banks saved here are available on both Library pages. Keep a downloaded backup for another browser or device.</p>
-      <div class="library-personal-filters">
-        <label>Search your library<input id="libraryPersonalSearch" type="search" placeholder="Collection name or content"></label>
-        <label>Collection type<select id="libraryPersonalFilter"><option value="">All collections</option><option value="vocabulary">Vocabulary lists</option><option value="question-bank">Question banks</option></select></label>
-      </div>
-      <p id="libraryPersonalStatus" role="status" aria-live="polite">Loading your unified library…</p>
-      <div class="library-personal-results" id="libraryPersonalResults"></div>
-      <button class="btn btn-secondary" id="libraryPersonalBackup" type="button" disabled>Download library backup</button>
-    </section>
+
   </main>
 
   <script src="/shared/library-i18n.js"></script>

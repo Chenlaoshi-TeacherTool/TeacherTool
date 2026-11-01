@@ -279,6 +279,7 @@
   function renderSavedBanks() {
     els.savedBanks.replaceChildren();
     var banks = window.ChenQuestionBank.listAll();
+    els.savedBanks.closest('section').hidden = banks.length === 0;
     if (!banks.length) {
       var empty = document.createElement('p');
       empty.className = 'saved-empty';
@@ -296,7 +297,7 @@
       var actions = document.createElement('div');
       actions.className = 'saved-actions';
       actions.append(
-        createActionButton('Open', 'load', bank.id),
+        createActionButton(window.LibraryI18n.t('Open'), 'load', bank.id),
         createActionButton(window.LibraryI18n.t('Remove'), 'remove', bank.id, true)
       );
       card.append(title, detail, actions);

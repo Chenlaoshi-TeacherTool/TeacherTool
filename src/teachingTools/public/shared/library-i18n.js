@@ -2,6 +2,9 @@
   'use strict';
   var chinese = /(?:^|; )lang=zh(?:;|$)/.test(document.cookie);
   var messages = {
+  "Browse preset Chinese question banks or import a JSON backup below. Excel uploads are not available yet.": "浏览预设中文题库，或在下方导入 JSON 备份。Excel 上传功能尚未开放。",
+  "Open": "打开",
+  "Previously saved question banks in this browser.": "此前保存在当前浏览器中的题库。",
   "My Library": "我的资源库",
   "My Library · Chen Laoshi's Teaching Toolkit": "我的资源库 · 陈老师教学工具包",
   "Question Banks · Chen Laoshi's Teaching Toolkit": "我的题库 · 陈老师教学工具包",

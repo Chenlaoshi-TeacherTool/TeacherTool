@@ -61,6 +61,8 @@
         .tool-use-filters button[aria-pressed="true"] { background: #194f45; color: white; }
         .tool-use-filters button:focus-visible { outline: 3px solid #bf7f35; outline-offset: 3px; }
         .tool-search input { box-sizing: border-box; }
+        .tool-empty-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .tool-empty-actions[hidden] { display: none; }
         .tool-card[hidden] {
             display: none;
         }
@@ -194,6 +196,10 @@
           <% }); %>
         </div>
         <p id="toolSearchStatus" class="tool-search-status" role="status"><%= t('teachingToolsIndex.searchStatusDefault') %></p>
+        <div id="toolEmptyActions" class="tool-empty-actions" hidden>
+            <button id="clearToolSearch" class="btn" type="button"><%= lang === 'zh' ? '清除搜索' : 'Clear search' %></button>
+            <button id="showAllTools" class="btn" type="button"><%= lang === 'zh' ? '查看全部工具' : 'View all tools' %></button>
+        </div>
     </section>
 
     <main class="tool-sections">
@@ -317,21 +323,21 @@
                     <p><%= t('teachingToolsIndex.vocabBookletDesc') %></p>
                     <a href="/teaching-tools/vocabulary-booklet/vocabulary-booklet.html" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div data-uses="" class="tool-card snapshot-card">
+                <div data-uses="print" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/independent-reading' }) %>
                     <h3>📖 <%= t('teachingToolsIndex.independentReadingTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.independentReadingScope') %></p>
                     <p><%= t('teachingToolsIndex.independentReadingDesc') %></p>
                     <a href="/teaching-tools/independent-reading" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div data-uses="" class="tool-card snapshot-card">
+                <div data-uses="print project" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/missing-radicals' }) %>
                     <h3>✍️ <%= t('teachingToolsIndex.missingPartsTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.missingPartsScope') %></p>
                     <p><%= t('teachingToolsIndex.missingPartsDesc') %></p>
                     <a href="/teaching-tools/missing-radicals" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div data-uses="" class="tool-card snapshot-card">
+                <div data-uses="print independent" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/social-media-classroom-tools/' }) %>
                     <h3>🗨️ <%= t('teachingToolsIndex.socialMediaHubTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.socialMediaHubScope') %></p>
@@ -485,7 +491,7 @@
                     <p><%= t('teachingToolsIndex.poisonGameDesc') %></p>
                     <a href="/teaching-tools/witchs-poison" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div data-uses="" class="tool-card snapshot-card">
+                <div data-uses="independent" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/book-generator' }) %>
                     <h3>🎧 <%= t('teachingToolsIndex.bookGenTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.bookGenScope') %></p>
@@ -538,6 +544,8 @@
             var cards = Array.prototype.slice.call(document.querySelectorAll('.tool-card'));
             var sections = Array.prototype.slice.call(document.querySelectorAll('.tool-section'));
 
+            var emptyActions = document.getElementById('toolEmptyActions');
+            var clearSearch = document.getElementById('clearToolSearch');
             var selectedUse = 'all';
             var chinese = <%- JSON.stringify(lang === 'zh') %>;
             var useButtons = document.querySelectorAll('[data-use]');
@@ -558,6 +566,8 @@
                     section.hidden = sectionCards.every(function (card) { return card.hidden; });
                 });
 
+                emptyActions.hidden = matches !== 0;
+                clearSearch.hidden = !query;
                 status.textContent = chinese ? '找到 ' + matches + ' 个工具和活动' + (query ? '：' + search.value.trim() : '') + '。' : 'Showing ' + matches + ' tools and activities' + (query ? ' for “' + search.value.trim() + '”' : '') + '.';
             }
 
@@ -567,6 +577,18 @@
                     useButtons.forEach(function(item) { item.setAttribute('aria-pressed', String(item === button)); });
                     updateToolResults();
                 });
+            });
+            clearSearch.addEventListener('click', function() {
+                search.value = '';
+                updateToolResults();
+                search.focus();
+            });
+            document.getElementById('showAllTools').addEventListener('click', function() {
+                selectedUse = 'all';
+                search.value = '';
+                useButtons.forEach(function(item) { item.setAttribute('aria-pressed', String(item.dataset.use === 'all')); });
+                updateToolResults();
+                search.focus();
             });
             search.addEventListener('input', updateToolResults);
             updateToolResults();

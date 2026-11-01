@@ -37,11 +37,37 @@
       <a class="active" href="/teaching-tools/question-bank-library/question-bank-library.html" aria-current="page">📝 Question banks</a>
     </nav>
 
+
+
+    <section class="saved card" aria-labelledby="savedTitle" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Personal library</p>
+          <h2 id="savedTitle">Your saved question banks</h2>
+        </div>
+      </div>
+      <p class="personal-library-note">Previously saved question banks in this browser.</p>
+      <div class="saved-banks" id="savedBanks"></div>
+      <span class="storage-note" id="storageNote"></span>
+    </section>
+
+    <section class="card library-personal" id="libraryPersonal" aria-labelledby="libraryPersonalTitle">
+      <h2 id="libraryPersonalTitle">Your unified library</h2>
+      <p>Vocabulary lists and question banks saved here are available on both Library pages. Keep a downloaded backup for another browser or device.</p>
+      <div class="library-personal-filters">
+        <label>Search your library<input id="libraryPersonalSearch" type="search" placeholder="Collection name or content"></label>
+        <label>Collection type<select id="libraryPersonalFilter"><option value="">All collections</option><option value="vocabulary">Vocabulary lists</option><option value="question-bank">Question banks</option></select></label>
+      </div>
+      <p id="libraryPersonalStatus" role="status" aria-live="polite">Loading your unified library…</p>
+      <div class="library-personal-results" id="libraryPersonalResults"></div>
+      <button class="btn btn-secondary" id="libraryPersonalBackup" type="button" disabled>Download library backup</button>
+    </section>
+
     <section class="intro card">
       <div>
         <p class="eyebrow">Your shared question foundation</p>
         <h2>Choose a question bank, then find the right prompt in seconds.</h2>
-        <p>The current teacher-curated starter banks focus on Chinese language learning. The question format, filters, and upcoming personal uploads are designed for any subject.</p>
+        <p>Browse preset Chinese question banks or import a JSON backup below. Excel uploads are not available yet.</p>
       </div>
       <div class="intro-badges" aria-label="Question bank features">
         <span>Teacher curated</span>
@@ -146,18 +172,7 @@
       </section>
     </div>
 
-    <section class="saved card personal-tools" aria-labelledby="savedTitle" aria-disabled="true">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Personal library</p>
-          <h2 id="savedTitle">Your saved question banks</h2>
-        </div>
-        <span class="coming-soon-badge">Coming soon</span>
-      </div>
-      <p class="personal-library-note">When personal uploads are available, you will be able to keep your own question banks here without changing the Chen Laoshi preset banks.</p>
-      <div class="saved-banks" id="savedBanks" hidden></div>
-      <span class="storage-note" id="storageNote" hidden></span>
-    </section>
+
 
     <section class="next-uses card" aria-labelledby="nextUsesTitle">
       <div>
@@ -222,17 +237,7 @@
       <label id="libraryKeepBothLabel" hidden><input id="libraryKeepBoth" type="checkbox"> Keep both copies of conflicting collections; do not replace existing data.</label>
       <button class="btn btn-primary" id="librarySaveImport" type="button" disabled>Save to unified library</button>
     </section>
-    <section class="card library-personal" id="libraryPersonal" aria-labelledby="libraryPersonalTitle">
-      <h2 id="libraryPersonalTitle">Your unified library</h2>
-      <p>Vocabulary lists and question banks saved here are available on both Library pages. Keep a downloaded backup for another browser or device.</p>
-      <div class="library-personal-filters">
-        <label>Search your library<input id="libraryPersonalSearch" type="search" placeholder="Collection name or content"></label>
-        <label>Collection type<select id="libraryPersonalFilter"><option value="">All collections</option><option value="vocabulary">Vocabulary lists</option><option value="question-bank">Question banks</option></select></label>
-      </div>
-      <p id="libraryPersonalStatus" role="status" aria-live="polite">Loading your unified library…</p>
-      <div class="library-personal-results" id="libraryPersonalResults"></div>
-      <button class="btn btn-secondary" id="libraryPersonalBackup" type="button" disabled>Download library backup</button>
-    </section>
+
   </main>
 
   <script src="/vendor/jszip.min.js"></script>
