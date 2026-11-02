@@ -65,7 +65,13 @@
     var style = document.createElement('link'); style.rel = 'stylesheet'; style.href = '/shared/teacher-account.css'; document.head.appendChild(style);
     bar = node('div'); bar.id = 'teacherAccountBar'; bar.setAttribute('aria-label', labels.title);
     var nav = document.querySelector('#siteMainNav .site-main-nav-inner');
-    if (nav) nav.appendChild(bar); else { var header = node('header'); header.className = 'teacher-account-header'; header.appendChild(bar); document.body.prepend(header); }
+    var langSwitch = nav && nav.querySelector('.site-lang-switch');
+    if (langSwitch) {
+      // Keep account buttons in the top-right corner next to the language switch.
+      var tools = node('div'); tools.className = 'site-nav-tools';
+      langSwitch.replaceWith(tools);
+      tools.append(bar, langSwitch);
+    } else if (nav) nav.appendChild(bar); else { var header = node('header'); header.className = 'teacher-account-header'; header.appendChild(bar); document.body.prepend(header); }
     dialog = document.createElement('dialog'); dialog.id = 'teacherAccountDialog'; dialog.setAttribute('aria-labelledby', 'teacherAccountTitle'); document.body.appendChild(dialog);
     render();
     refresh();
