@@ -19,7 +19,7 @@ test('library language follows the site cookie and retains complete English labe
   var zh = localization('zh');
   assert.equal(en.document.documentElement.lang, 'en');
   assert.equal(zh.document.documentElement.lang, 'zh');
-  for (var label of ['My Library', 'Build preview', 'Download library backup', 'Saved in this browser', 'Coming soon']) {
+  for (var label of ['My materials', 'Build preview', 'Download library backup', 'Saved in this browser', 'Coming soon']) {
     assert.equal(en.window.LibraryI18n.t(label), label);
     assert.match(zh.window.LibraryI18n.t(label), /[\u4e00-\u9fff]/);
   }

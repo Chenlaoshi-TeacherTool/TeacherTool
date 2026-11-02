@@ -5,7 +5,6 @@
 .site-nav-tools #teacherAccountBar { flex-wrap: nowrap; gap: 6px; padding: 0; }
 .site-nav-tools #teacherAccountBar a, .site-nav-tools #teacherAccountBar button { padding: 5px 11px; border-color: #d7e3c7; border-radius: 999px; font-size: .78rem; font-weight: 800; white-space: nowrap; }
 @media (max-width: 1600px) { .site-nav-tools { grid-area: language; } }
-@media (max-width: 640px) { .site-nav-tools #teacherAccountBar a:first-child { display: none; } }
 .teacher-account-header { padding: 10px 24px; background: #edf5df; }
 #teacherAccountDialog { width: min(460px, calc(100% - 32px)); padding: 28px; border: 1px solid #d8e5c7; border-radius: 20px; box-sizing: border-box; color: #194f45; background: #fffdf7; }
 #teacherAccountDialog::backdrop { background: rgba(16, 62, 55, .4); }

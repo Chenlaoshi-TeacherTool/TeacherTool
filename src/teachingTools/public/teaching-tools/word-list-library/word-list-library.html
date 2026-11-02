@@ -4,16 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#194f45">
-  <title>My Library · Chen Laoshi's Teaching Toolkit</title>
+  <title>My materials · Chen Laoshi's Teaching Toolkit</title>
   <meta name="description" content="Create reusable term, pronunciation, and definition lists for classroom activities in any subject.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/word-list-library/word-list-library.html">
   <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
-  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="My Library · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Create reusable term, pronunciation, and definition lists for classroom activities in any subject."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/word-list-library/word-list-library.html"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="Chen Laoshi's Teaching Toolkit"><meta property="og:title" content="My materials · Chen Laoshi's Teaching Toolkit"><meta property="og:description" content="Create reusable term, pronunciation, and definition lists for classroom activities in any subject."><meta property="og:url" content="https://clsteachingtools.com/teaching-tools/word-list-library/word-list-library.html"><meta property="og:image" content="https://clsteachingtools.com/images/chen-laoshi-toolkit-og.png"><meta name="twitter:card" content="summary_large_image">
   <script src="/javascripts/clarity.js"></script>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="./word-list-library.css">
   <link rel="stylesheet" href="/shared/library-import-preview.css">
+  <link rel="stylesheet" href="/shared/cloud-library.css">
   <link rel="stylesheet" href="/stylesheets/classroom-guide.css?v=library-guides-1">
 </head>
 <body>
@@ -23,11 +24,11 @@
       <div class="brand">
         <div class="brand-icon" aria-hidden="true">🗂️</div>
         <div>
-          <h1>My Library</h1>
+          <h1>My materials</h1>
           <p>Save reusable vocabulary and question banks for future activities.</p>
         </div>
       </div>
-      <div class="hero-note">Saved in this browser</div>
+      <div class="hero-note">Browser saving · cloud sync when signed in</div>
     </div>
   </header>
 
@@ -36,6 +37,8 @@
       <a class="active" href="/teaching-tools/word-list-library/word-list-library.html" aria-current="page">📚 Vocabulary lists</a>
       <a href="/teaching-tools/question-bank-library/question-bank-library.html">📝 Question banks</a>
     </nav>
+
+    <section class="card cloud-library" id="cloudLibrary" aria-labelledby="cloudLibraryTitle"></section>
 
 
 
@@ -160,18 +163,6 @@ conclusion | | an explanation based on results</textarea>
 
 
 
-    <section class="account card" aria-labelledby="accountTitle">
-      <div>
-        <p class="eyebrow">Coming next</p>
-        <h2 id="accountTitle">Your cloud vocabulary library</h2>
-        <p id="accountStatus">Checking account-sync setup…</p>
-      </div>
-      <div class="account-actions" id="accountActions">
-        <span class="coming-soon-label">Coming soon</span>
-        <button class="account-link" id="googleSignInButton" type="button" disabled>G&nbsp; Continue with Google</button>
-        <button class="account-link microsoft" id="microsoftSignInButton" type="button" disabled>▣&nbsp; Continue with Microsoft</button>
-      </div>
-    </section>
 
     <section class="classroom-guide" aria-labelledby="classroom-guide-title">
       <div class="classroom-guide-inner">
@@ -233,7 +224,7 @@ conclusion | | an explanation based on results</textarea>
   <script src="/shared/library-store.js"></script>
   <script src="/shared/library-import-preview.js" defer></script>
   <script src="./word-list-library.js"></script>
-  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/shared/cloud-library.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>

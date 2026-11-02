@@ -5,7 +5,7 @@ var crypto = require('node:crypto');
 var auth = require('../services/authUser');
 var repository = require('../services/teacherLibraryRepository');
 var core = require('../public/shared/library-v2');
-var PAGE = '/teaching-tools/teacher-library/teacher-library.html';
+var PAGE = '/teaching-tools/word-list-library/word-list-library.html';
 
 function accountProvider() {
   var provider = process.env.TEACHER_ACCOUNT_PROVIDER || 'teachers';

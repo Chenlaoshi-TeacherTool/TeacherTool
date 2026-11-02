@@ -25,9 +25,6 @@
     els.savedLists = document.getElementById('savedLists');
     els.storageNote = document.getElementById('storageNote');
     els.presetLists = document.getElementById('presetLists');
-    els.accountStatus = document.getElementById('accountStatus');
-    els.googleSignInButton = document.getElementById('googleSignInButton');
-    els.microsoftSignInButton = document.getElementById('microsoftSignInButton');
 
     if (!window.ChenWordlist) {
       setStatus(window.LibraryI18n.t('The vocabulary core did not load. Please refresh this page.'));
@@ -48,7 +45,6 @@
     buildList();
     renderSavedLists();
     loadPresetLists();
-    loadAccountState();
   }
 
   function buildList() {
@@ -222,28 +218,6 @@
       })
       .catch(function (error) { setStatus(window.LibraryI18n.t(error.message) || window.LibraryI18n.t('That starter pack could not be loaded.')); })
       .finally(function () { button.disabled = false; });
-  }
-
-  function loadAccountState() {
-    fetch('/api/auth/me')
-      .then(function (response) {
-        if (!response.ok) throw new Error(window.LibraryI18n.t('Account status is unavailable.'));
-        return response.json();
-      })
-      .then(function (account) {
-        if (account.signedIn && account.user) {
-          els.accountStatus.textContent = window.LibraryI18n.t('Signed in as ') + account.user.name + window.LibraryI18n.t('. Cloud word-list syncing will become available once the storage connection is enabled.');
-          return;
-        }
-        if (account.authConfigured) {
-          els.accountStatus.textContent = window.LibraryI18n.t('Cloud sign-in has been prepared, but registration and sign-in are not open yet. Public starter packs and browser-only saves remain available to everyone.');
-          return;
-        }
-        els.accountStatus.textContent = window.LibraryI18n.t('Cloud sync is planned for a future release. Registration and sign-in are not available yet; for now, you can use starter packs, browser saving, or a JSON backup.');
-      })
-      .catch(function () {
-        els.accountStatus.textContent = window.LibraryI18n.t('Cloud-sync status is unavailable. Browser saving and starter packs are still ready to use.');
-      });
   }
 
   function createActionButton(label, action, id, danger) {

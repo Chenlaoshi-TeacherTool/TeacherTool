@@ -1,0 +1,14 @@
+.cloud-library { margin-top: 19px; padding: 23px; border-color: #d5e1c5; background: linear-gradient(130deg, #f9fcef, #fffdf7); }
+.cloud-library [hidden] { display: none !important; }
+.cloud-library h2 { margin: 4px 0 0; }
+.cloud-library-status, .cloud-library-note, .cloud-library-exchange { max-width: 760px; margin: 8px 0 0; color: var(--muted, #5d7168); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.cloud-library-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.cloud-library-actions:empty { display: none; }
+.cloud-library-actions a.btn { text-decoration: none; }
+.cloud-library-collections details { margin: 10px 0; padding: 10px 12px; border: 1px solid #d8e5c7; border-radius: 10px; background: #fffdf7; }
+.cloud-library-collections summary { cursor: pointer; font-weight: 800; overflow-wrap: anywhere; }
+.cloud-library-collections li { line-height: 1.6; overflow-wrap: anywhere; }
+.cloud-library-confirm { display: block; margin: 12px 0; font-size: 13px; line-height: 1.6; }
+.cloud-library-workspace > .btn { margin-top: 4px; }
+@media (max-width: 720px) { .cloud-library { padding: 18px; } }
+@media print { .cloud-library { display: none !important; } }

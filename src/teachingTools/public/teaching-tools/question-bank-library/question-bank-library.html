@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="./question-bank-library.css">
   <link rel="stylesheet" href="/shared/library-import-preview.css">
+  <link rel="stylesheet" href="/shared/cloud-library.css">
   <link rel="stylesheet" href="/stylesheets/classroom-guide.css?v=library-guides-1">
 </head>
 <body>
@@ -23,11 +24,11 @@
       <div class="brand">
         <div class="brand-icon" aria-hidden="true">🗂️</div>
         <div>
-          <h1>My Library</h1>
+          <h1>My materials</h1>
           <p>Save reusable vocabulary and question banks for future activities.</p>
         </div>
       </div>
-      <div class="hero-note">Saved in this browser</div>
+      <div class="hero-note">Browser saving · cloud sync when signed in</div>
     </div>
   </header>
 
@@ -36,6 +37,8 @@
       <a href="/teaching-tools/word-list-library/word-list-library.html">📚 Vocabulary lists</a>
       <a class="active" href="/teaching-tools/question-bank-library/question-bank-library.html" aria-current="page">📝 Question banks</a>
     </nav>
+
+    <section class="card cloud-library" id="cloudLibrary" aria-labelledby="cloudLibraryTitle"></section>
 
 
 
@@ -247,7 +250,7 @@
   <script src="/shared/library-store.js"></script>
   <script src="/shared/library-import-preview.js" defer></script>
   <script src="./question-bank-library.js"></script>
-  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/shared/cloud-library.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>
