@@ -21,6 +21,8 @@
     status: document.getElementById('gameStatus'),
     check: document.getElementById('checkButton'),
     submit: document.getElementById('submitButton'),
+    downloadReport: document.getElementById('downloadReportButton'),
+    downloadReportStatus: document.getElementById('downloadReportStatus'),
     shuffle: document.getElementById('shuffleButton'),
     prev: document.getElementById('prevButton'),
     next: document.getElementById('nextButton'),
@@ -259,6 +261,26 @@
     });
   }
 
+  async function downloadReport() {
+    if (!state.submitted || !window.QuizReport) return;
+    elements.downloadReport.disabled = true;
+    elements.downloadReportStatus.textContent = 'Preparing PDF… / 正在生成 PDF……';
+    try {
+      await window.QuizReport.download({
+        title: game.title || data.title,
+        studentName: state.studentName,
+        submittedAt: state.submittedAt,
+        score: data.sentences.filter((_sentence, index) => isSentenceCorrect(index)).length,
+        items: data.sentences.map((_sentence, index) => ({ correct: isSentenceCorrect(index), answer: (state.answers[index] || []).join(' ') }))
+      });
+      elements.downloadReportStatus.textContent = 'Downloaded. Send the PDF to your teacher. / 已下载，请把 PDF 发给老师。';
+    } catch (error) {
+      elements.downloadReportStatus.textContent = error.message;
+    } finally {
+      elements.downloadReport.disabled = false;
+    }
+  }
+
   async function quizRequest(action, body) {
     const response = await fetch(`/play/${encodeURIComponent(game.shareId)}/${action}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
@@ -273,6 +295,7 @@
   function applySubmission(submission) {
     state.studentName = submission.studentName;
     state.answers = submission.answers;
+    state.submittedAt = submission.submittedAt || null;
     state.submitted = true;
   }
 
@@ -448,6 +471,7 @@
 
   elements.check.addEventListener('click', checkAnswers);
   elements.submit.addEventListener('click', submitAssessment);
+  if (elements.downloadReport) elements.downloadReport.addEventListener('click', downloadReport);
   elements.shuffle.addEventListener('click', () => {
     if (assessment && state.submitted) return;
     if (assessment) state.answers[state.currentIndex] = null;
