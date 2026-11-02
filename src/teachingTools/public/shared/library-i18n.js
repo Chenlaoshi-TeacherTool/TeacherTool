@@ -372,7 +372,20 @@
   "The cloud copy changed on another device. Reload and review before saving again.": "云端副本已在其他设备上更改，请重新读取并检查后再保存。",
   "Cloud saving failed. Keep your browser copy or download a backup.": "云端保存失败，请保留浏览器中的副本或下载备份。",
   "This cloud library exceeds 5 MB.": "云端资料超过 5 MB。",
-  "The cloud library is not valid JSON.": "云端资料不是有效的 JSON。"
+  "The cloud library is not valid JSON.": "云端资料不是有效的 JSON。",
+  "Have an activation code?": "有激活码？",
+  "Activate": "激活",
+  "Cloud saving is not active on this account. Enter an activation code to turn it on.": "此账号还没有开通云端保存，输入激活码即可开通。",
+  "Cloud saving ended on ": "云端保存已于 ",
+  ". Your materials can still be viewed and exported. Enter an activation code to continue saving.": " 到期。资料仍可查看和导出，输入激活码即可继续保存。",
+  "Free trial: cloud saving until ": "免费试用中：云端保存到 ",
+  "Member: cloud saving until ": "会员：云端保存到 ",
+  "Activated: ": "激活成功：增加 ",
+  " days added. Cloud saving until ": " 天，云端保存到 ",
+  "Activation requests must come from this website.": "激活请求必须来自本网站。",
+  "Too many incorrect codes. Please wait 15 minutes and try again.": "输错次数太多，请 15 分钟后再试。",
+  "This activation code is not valid or has already been used.": "激活码无效或已被使用。",
+  "The code could not be checked right now. Please try again later.": "暂时无法核对激活码，请稍后再试。"
 };
   function t(value) {
     if (!chinese || typeof value !== 'string') return value;

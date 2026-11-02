@@ -29,7 +29,7 @@ var SECTIONS = [
     key: 'tools', href: '/teaching-tools', en: 'Teaching Tools', zh: '教学工具', nav: true,
     admin: ['toolguides', 'wordlists', 'questionbanks']
   },
-  { key: 'library', href: '/teaching-tools/word-list-library/word-list-library.html', en: 'My materials', zh: '我的资料', nav: true, sitemap: false, admin: [] },
+  { key: 'library', href: '/teaching-tools/word-list-library/word-list-library.html', en: 'My materials', zh: '我的资料', nav: true, sitemap: false, admin: ['memberships'] },
   { key: 'chinese', href: '/chinese-teaching', en: 'Chinese Teaching', zh: '中文教学专区', admin: [] },
   {
     key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: [],
@@ -84,7 +84,8 @@ var ADMIN_EDITORS = {
   questionbanks: { href: '/admin/questionbanks', label: 'Question Banks', description: 'Banks and questions, plus Excel bulk import' },
   textbooks: { href: '/admin/textbooks', label: 'Textbooks', description: 'Textbook lessons: words, sentence patterns, and activities, plus Excel import' },
   recommendations: { href: '/admin/recommendations', label: 'Classroom Finds', description: 'Product pages, affiliate links, and printable labels' },
-  articles: { href: '/admin/articles', label: 'Articles', description: 'Existing /resources/:slug articles' }
+  articles: { href: '/admin/articles', label: 'Articles', description: 'Existing /resources/:slug articles' },
+  memberships: { href: '/admin/memberships', label: 'Memberships', description: 'Activation codes that extend teacher cloud saving' }
 };
 
 function label(item, lang) {

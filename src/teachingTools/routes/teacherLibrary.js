@@ -5,7 +5,10 @@ var crypto = require('node:crypto');
 var auth = require('../services/authUser');
 var repository = require('../services/teacherLibraryRepository');
 var core = require('../public/shared/library-v2');
+var activationCodes = require('../services/activationCodes');
 var PAGE = '/teaching-tools/word-list-library/word-list-library.html';
+var REDEEM_LIMIT = 5;
+var REDEEM_WINDOW_MS = 15 * 60 * 1000;
 
 function accountProvider() {
   var provider = process.env.TEACHER_ACCOUNT_PROVIDER || 'teachers';
@@ -33,7 +36,13 @@ function create(options) {
   var origin = options.origin || process.env.SITE_URL || 'https://clsteachingtools.com';
   origin = new URL(origin).origin;
   var providers = options.providers || [accountProvider()];
+  var trialDays = options.trialDays || Number(process.env.TEACHER_TRIAL_DAYS) || 3;
+  var failedRedeems = new Map();
   var router = express.Router();
+  function sameSite(req, purpose) {
+    return req.get('origin') === origin && req.get('x-library-request') === purpose && (!req.get('sec-fetch-site') || req.get('sec-fetch-site') === 'same-origin');
+  }
+  function membership(saved) { return saved ? { canWrite: saved.canWrite, writeUntil: saved.writeUntil || null, trial: Boolean(saved.trial) } : null; }
   router.use(function (req, res, next) { res.set('Cache-Control', 'private, no-store'); res.set('X-Content-Type-Options', 'nosniff'); next(); });
   router.get('/session', async function (req, res) {
     var available = accountsEnabled();
@@ -41,10 +50,13 @@ function create(options) {
     var saved = null;
     var cloudAvailable = enabled();
     try {
-      saved = user && cloudAvailable ? await store.load(ownerKey(user)) : null;
-    } catch (error) { cloudAvailable = false; }
+      if (user && cloudAvailable) {
+        await store.ensureTrial(ownerKey(user), trialDays);
+        saved = await store.load(ownerKey(user));
+      }
+    } catch (error) { cloudAvailable = false; saved = null; }
       res.json({ available: available, cloudAvailable: cloudAvailable, signedIn: Boolean(user), user: user ? { name: user.name, provider: user.provider } : null,
-        accountId: user ? ownerKey(user) : null, canWrite: Boolean(saved && saved.canWrite),
+        accountId: user ? ownerKey(user) : null, canWrite: Boolean(saved && saved.canWrite), membership: membership(saved),
         methods: ['email'].concat((options.googleEnabled || process.env.TEACHER_GOOGLE_ENABLED === 'true') ? ['google'] : []),
         login: available ? providers.map(function (provider) { return { provider: provider, url: '/.auth/login/' + provider + '?post_login_redirect_uri=' + encodeURIComponent(PAGE) }; }) : [],
         logout: '/.auth/logout?post_logout_redirect_uri=' + encodeURIComponent(PAGE) });
@@ -61,8 +73,29 @@ function create(options) {
       var saved = await store.load(req.libraryOwner);
       var library = saved.content === null ? null : (await core.preview(saved.content)).data;
       res.set('ETag', '"' + saved.revision + '"');
-      res.json({ library: library, revision: saved.revision, canWrite: saved.canWrite, accountId: req.libraryOwner });
+      res.json({ library: library, revision: saved.revision, canWrite: saved.canWrite, membership: membership(saved), accountId: req.libraryOwner });
     } catch (error) { res.status(503).json({ error: 'Your private library could not be loaded. Existing data has been kept.' }); }
+  });
+  router.post('/redeem', function (req, res, next) {
+    if (!sameSite(req, 'redeem') || !req.is('application/json')) return res.status(403).json({ error: 'Activation requests must come from this website.' });
+    var failed = failedRedeems.get(req.libraryOwner);
+    if (failed && failed.until > Date.now() && failed.count >= REDEEM_LIMIT) return res.status(429).json({ error: 'Too many incorrect codes. Please wait 15 minutes and try again.' });
+    next();
+  }, express.json({ limit: '2kb' }), async function (req, res) {
+    var codeHash = activationCodes.hash(req.body && req.body.code);
+    try {
+      var result = codeHash ? await store.redeem(req.libraryOwner, codeHash) : { outcome: 'invalid' };
+      if (result.outcome !== 'redeemed') {
+        var failed = failedRedeems.get(req.libraryOwner);
+        if (!failed || failed.until <= Date.now()) failed = { count: 0, until: Date.now() + REDEEM_WINDOW_MS };
+        failed.count += 1;
+        if (failedRedeems.size > 5000) failedRedeems.forEach(function (entry, key) { if (entry.until <= Date.now()) failedRedeems.delete(key); });
+        failedRedeems.set(req.libraryOwner, failed);
+        return res.status(400).json({ error: 'This activation code is not valid or has already been used.' });
+      }
+      failedRedeems.delete(req.libraryOwner);
+      res.json({ days: result.days, writeUntil: result.writeUntil });
+    } catch (error) { res.status(503).json({ error: 'The code could not be checked right now. Please try again later.' }); }
   });
   router.put('/mine', function (req, res, next) {
     if (req.get('x-library-account') !== req.libraryOwner) return res.status(409).json({ error: 'The signed-in account changed. Reload your private library before saving.' });

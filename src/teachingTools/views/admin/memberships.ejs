@@ -1,0 +1,40 @@
+<%- include('layout-head') %>
+<h1>Memberships</h1>
+<p>Each activation code extends a teacher's cloud saving once. New accounts get a 3-day trial automatically on first sign-in.</p>
+
+<% if (created) { %>
+  <div style="border:2px solid #16a34a;border-radius:6px;padding:14px;margin:16px 0;">
+    <p><strong><%= created.codes.length %> code(s), <%= created.days %> days<%= created.label ? ' · ' + created.label : '' %>.</strong>
+      Copy them now: only their hashes are stored, so this page cannot show them again.</p>
+    <textarea id="newCodes" rows="<%= Math.min(created.codes.length, 12) %>" readonly style="font-family:monospace;"><%= created.codes.join('\n') %></textarea>
+    <div class="actions"><button type="button" onclick="navigator.clipboard.writeText(document.getElementById('newCodes').value); this.textContent='Copied';">Copy codes</button></div>
+  </div>
+<% } %>
+
+<h2 style="font-size:1.1rem;">Create codes</h2>
+<form method="POST" action="/admin/memberships/codes">
+  <label for="days">Plan</label>
+  <select id="days" name="days" required>
+    <% planDays.forEach(function (days) { %><option value="<%= days %>"><%= days %> days</option><% }) %>
+  </select>
+  <label for="count">Number of codes (1–100)</label>
+  <input id="count" name="count" type="number" min="1" max="100" value="1" required>
+  <label for="label">Note (optional, e.g. buyer email or order number)</label>
+  <input id="label" name="label" type="text" maxlength="100">
+  <div class="actions"><button type="submit">Create codes</button></div>
+</form>
+
+<h2 style="font-size:1.1rem;margin-top:28px;">Recent batches</h2>
+<% if (!batches.length) { %>
+  <p>No codes yet.</p>
+<% } else { %>
+  <table>
+    <thead><tr><th>Created (UTC)</th><th>Note</th><th>Days</th><th>Used / total</th></tr></thead>
+    <tbody>
+      <% batches.forEach(function (batch) { %>
+        <tr><td><%= new Date(batch.created_at).toISOString().slice(0, 16).replace('T', ' ') %></td><td><%= batch.batch_label || '' %></td><td><%= batch.days %></td><td><%= batch.redeemed %> / <%= batch.total %></td></tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
+<%- include('layout-foot') %>

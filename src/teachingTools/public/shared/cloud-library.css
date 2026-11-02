@@ -12,3 +12,9 @@
 .cloud-library-workspace > .btn { margin-top: 4px; }
 @media (max-width: 720px) { .cloud-library { padding: 18px; } }
 @media print { .cloud-library { display: none !important; } }
+.cloud-library-plan { margin: 0; padding: 10px 12px; border: 1px solid #cfe1b8; border-radius: 10px; background: #f1f8e4; color: #194f45; font-size: 14px; font-weight: 800; }
+.cloud-library-plan.is-expired { border-color: #f0d38a; background: #fff6dc; color: #7e5112; }
+.cloud-library-redeem { margin-top: 12px; }
+.cloud-library-redeem label { display: block; font-size: 13px; font-weight: 800; }
+.cloud-library-redeem .cloud-library-actions { margin-top: 6px; }
+.cloud-library-redeem input { flex: 1 1 220px; min-width: 0; max-width: 320px; padding: 9px 11px; border: 1px solid #c9d8c1; border-radius: 10px; font: inherit; font-family: ui-monospace, Consolas, monospace; text-transform: uppercase; }

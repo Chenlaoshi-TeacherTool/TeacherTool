@@ -4,10 +4,13 @@ var assert = require('node:assert/strict');
 var test = require('node:test');
 var express = require('express');
 var service = require('../routes/teacherLibrary');
+var activationCodes = require('../services/activationCodes');
 var core = require('../public/shared/library-v2');
 
 var records = new Map();
 var grants = new Set();
+var trials = new Set();
+var codes = new Map();
 var origin;
 var server;
 var active = true;
@@ -17,7 +20,7 @@ var repository = {
   load: async function (owner) {
     if (storageFailure) throw new Error('private sql detail');
     var row = records.get(owner);
-    return { content: row ? row.content : null, revision: row ? row.revision : 0, canWrite: grants.has(owner) };
+    return { content: row ? row.content : null, revision: row ? row.revision : 0, canWrite: grants.has(owner), writeUntil: grants.has(owner) ? '2099-01-01T00:00:00.000Z' : null, trial: trials.has(owner) };
   },
   save: async function (owner, revision, content) {
     if (storageFailure) throw new Error('private sql detail');
@@ -27,6 +30,13 @@ var repository = {
     records.set(owner, { content: content, revision: revision + 1 });
     writes += 1;
     return { outcome: 'saved', revision: revision + 1 };
+  },
+  ensureTrial: async function (owner) { if (!trials.has(owner) && !grants.has(owner)) { trials.add(owner); grants.add(owner); } },
+  redeem: async function (owner, codeHash) {
+    var code = codes.get(codeHash);
+    if (!code || code.redeemedBy) return { outcome: 'invalid' };
+    code.redeemedBy = owner; grants.add(owner);
+    return { outcome: 'redeemed', days: code.days, writeUntil: '2099-01-01T00:00:00.000Z' };
   }
 };
 
@@ -45,7 +55,7 @@ test.before(async function () {
   origin = 'http://127.0.0.1:' + server.address().port;
 });
 test.after(function () { server.close(); });
-test.beforeEach(function () { records.clear(); grants.clear(); writes = 0; active = true; storageFailure = false; });
+test.beforeEach(function () { records.clear(); grants.clear(); trials.clear(); codes.clear(); writes = 0; active = true; storageFailure = false; });
 
 test('anonymous requests cannot read or save; session exposes only fixed login destinations', async function () {
   var response = await fetch(origin + '/api/teacher-library/mine');
@@ -157,4 +167,44 @@ test('teacher identities cannot use an administrator ID, while the original aad 
   } finally {
     [['AZURE_AUTH_ENABLED', saved.enabled], ['WEBSITE_INSTANCE_ID', saved.instance], ['ADMIN_USER_IDS', saved.admins]].forEach(function (entry) { if (entry[1] === undefined) delete process.env[entry[0]]; else process.env[entry[0]] = entry[1]; });
   }
+});
+
+function redeem(id, code, extra) {
+  return fetch(origin + '/api/teacher-library/redeem', { method: 'POST', headers: Object.assign({ 'test-user': id, origin: 'https://teachers.example', 'x-library-request': 'redeem', 'Content-Type': 'application/json' }, extra), body: JSON.stringify({ code: code }) });
+}
+
+test('a new teacher gets one automatic trial on first sign-in; an expired trial is not renewed', async function () {
+  var session = await (await fetch(origin + '/api/teacher-library/session', { headers: { 'test-user': 'carol' } })).json();
+  assert.equal(session.canWrite, true);
+  assert.equal(session.membership.trial, true);
+  grants.delete(owner('carol'));
+  session = await (await fetch(origin + '/api/teacher-library/session', { headers: { 'test-user': 'carol' } })).json();
+  assert.equal(session.canWrite, false);
+  assert.equal(session.membership.canWrite, false);
+});
+
+test('an activation code works once, accepts loose formatting, and only from this website', async function () {
+  var code = activationCodes.generate();
+  codes.set(activationCodes.hash(code), { days: 30 });
+  assert.equal((await redeem('dave', code, { origin: 'https://evil.example' })).status, 403);
+  var response = await redeem('dave', code.toLowerCase().replace(/-/g, ' '));
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).days, 30);
+  assert(grants.has(owner('dave')));
+  assert.equal((await redeem('erin', code)).status, 400);
+  assert.equal((await redeem('anonymous', code, { 'test-user': '' })).status, 401);
+});
+
+test('repeated wrong codes are rate limited per account', async function () {
+  for (var i = 0; i < 5; i += 1) assert.equal((await redeem('frank', 'CLS-2222-2222-2222')).status, 400);
+  assert.equal((await redeem('frank', 'CLS-2222-2222-2222')).status, 429);
+  assert.equal((await redeem('grace', 'CLS-2222-2222-2222')).status, 400);
+});
+
+test('activation codes avoid look-alike characters and are stored only as hashes', function () {
+  var code = activationCodes.generate();
+  assert.match(code, /^CLS-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{4}$/);
+  assert.equal(activationCodes.hash(code), activationCodes.hash(' ' + code.toLowerCase().replace(/-/g, '') + ' '));
+  assert.equal(activationCodes.hash('CLS-0000-OOOO-IIII'), null);
+  assert.notEqual(activationCodes.hash(code), code);
 });

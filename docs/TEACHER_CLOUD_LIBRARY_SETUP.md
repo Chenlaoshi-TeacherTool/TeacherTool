@@ -14,6 +14,15 @@
 
 目前只完成接入代码和模拟测试。没有创建 External ID 租户、注册新的身份应用、生成客户端密钥或配置 Google OAuth，不能宣布真实邮箱/Google 注册已可用。
 
+## 2026-11-01 进展：身份租户与会员
+
+- 已创建 External ID 租户 `clsteachers.onmicrosoft.com`（tenant `f97cdf0d-196b-40e4-85ae-8fa75537a4c6`，资源组 rg-xchen，美国区）。登录页 `clsteachers.ciamlogin.com`。
+- 应用注册 “CLS Teaching Tools”（client `110a74bc-4040-45d0-96e2-c33003942856`），回调为三个域名的 `/.auth/login/teachers/callback`；密钥只存在 App Service 设置 `TEACHERS_PROVIDER_AUTHENTICATION_SECRET`，2028-11-01 到期。
+- 用户流程 “Teachers sign up and sign in”：邮箱 + 密码注册，收集姓名。邮箱验证与找回密码使用租户默认的邮箱验证码，尚待真实注册验证。
+- App Service 认证已加入自定义 OIDC 提供方 `teachers`；管理员 `aad` 与匿名访问未改动。`/.auth/login/teachers` 已跳转到租户登录页。
+- Google 联合登录尚未配置，需要先在 Google Cloud 建 OAuth 客户端。
+- 会员：账号首次登录自动获得 `TEACHER_TRIAL_DAYS`（默认 3）天云端保存，每账号一次；激活码（30/90/180/365 天）在 `/admin/memberships` 生成，只存哈希，老师在“我的资料”兑换后从当前到期日顺延。需要先执行 `database/add-teacher-membership.sql`。
+
 ## 结构与权限
 
 - 老师账号通过 `TEACHER_ACCOUNTS_ENABLED=true`、Azure 实例环境和 `AZURE_AUTH_ENABLED=true` 启用；云库另外要求 `LIBRARY_CLOUD_ENABLED=true`。登录状态不再依赖云库数据库可用性。

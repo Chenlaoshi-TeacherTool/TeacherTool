@@ -13,6 +13,10 @@ Part of the Azure SQL migration described in `docs/azure-architecture-migration.
 - `add-textbook-lessons.sql` — adds the textbook companion tables (`textbook_lessons`,
   `textbook_lesson_items`) to an existing database. Run it once, then redeploy DAB. Lesson data is
   loaded from Excel at `/admin/textbooks/import`.
+- `add-teacher-private-library.sql` — private cloud library per teacher account
+  (`teacher_private_libraries`, `teacher_library_access`). Not exposed through DAB.
+- `add-teacher-membership.sql` — run after the private library file: adds the 3-day trial marker
+  and `teacher_activation_codes` (hashes only). Codes are created at `/admin/memberships`.
 - `dab-config.json` — Data API Builder configuration exposing all of the above tables as a
   read-only REST API for the public site, alongside direct-SQL writes from the admin CMS.
 

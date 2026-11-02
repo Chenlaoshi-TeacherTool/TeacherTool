@@ -11,6 +11,8 @@ var blobStorage = require('../services/blobStorage');
 var siteMap = require('../config/siteMap');
 var textbooks = require('../config/textbooks');
 var textbookImport = require('../services/textbookImport');
+var teacherLibraryRepository = require('../services/teacherLibraryRepository');
+var activationCodes = require('../services/activationCodes');
 var sql = sqlClient.sql;
 
 var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
@@ -1141,6 +1143,28 @@ router.post('/textbooks/lessons/:id/items/:itemId/delete', async function (req, 
     await pool.request().input('lessonId', sql.Int, req.params.id).input('itemId', sql.Int, req.params.itemId)
       .query('DELETE FROM textbook_lesson_items WHERE id = @itemId AND lesson_id = @lessonId');
     res.redirect('/admin/textbooks/lessons/' + req.params.id + '/edit');
+  } catch (err) { next(err); }
+});
+
+// Activation codes: shown once at creation, only their hashes are stored.
+router.get('/memberships', async function (req, res, next) {
+  try {
+    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.post('/memberships/codes', async function (req, res, next) {
+  try {
+    if (req.get('origin') && new URL(req.get('origin')).host !== req.get('host')) return res.status(403).send('Create codes from the admin page.');
+    var days = Number(req.body.days);
+    var count = Number(req.body.count);
+    var label = String(req.body.label || '').trim().slice(0, 100);
+    if (activationCodes.PLAN_DAYS.indexOf(days) === -1 || !Number.isInteger(count) || count < 1 || count > 100) return res.status(400).send('Choose a plan and 1–100 codes.');
+    var codes = [];
+    for (var i = 0; i < count; i += 1) codes.push(activationCodes.generate());
+    await teacherLibraryRepository.createCodes(codes.map(function (code) { return { hash: activationCodes.hash(code), days: days, label: label }; }), req.adminUser.name);
+    res.set('Cache-Control', 'private, no-store');
+    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: { codes: codes, days: days, label: label }, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser });
   } catch (err) { next(err); }
 });
 
