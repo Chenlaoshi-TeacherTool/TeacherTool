@@ -48,6 +48,8 @@
   workspace.append(planLine, redeemForm, tools, collections, element('p', t('Nothing uploads or replaces your materials automatically. Preview first, then confirm. On a shared computer, browser materials may not belong to this account.'), 'cloud-library-note'), swap, exchange, confirmLabel, apply);
   var heading = element('div'); heading.append(element('p', t('Cloud sync'), 'eyebrow'), title, status);
   root.replaceChildren(heading, actions, workspace);
+  // Stays hidden until the server confirms teacher accounts are open.
+  root.hidden = true;
 
   function here(url, param) {
     var target = new URL(url, location.origin);
@@ -83,7 +85,8 @@
     try {
       var session = await request('/session');
       if (selected !== epoch) return;
-      if (!session.available) { status.textContent = t('Teacher accounts are not open yet. Everything you save here stays in this browser.'); return; }
+      root.hidden = !session.available;
+      if (!session.available) return;
       if (!session.signedIn) {
         status.textContent = t('Sign in to keep your materials in the cloud and use them on any device. Without signing in, materials stay in this browser.');
         if (session.login.length && session.login[0].url.indexOf('/.auth/login/') === 0) {

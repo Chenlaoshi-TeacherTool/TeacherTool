@@ -37,7 +37,10 @@
 
   function render() {
     bar.replaceChildren();
-    if (session && session.signedIn) {
+    // Show nothing until the server confirms teacher accounts are open.
+    bar.hidden = !(session && session.available);
+    if (bar.hidden) return;
+    if (session.signedIn) {
       bar.appendChild(node('span', session.user.name));
       bar.appendChild(link(labels.logout, returnHere(session.logout, 'post_logout_redirect_uri')));
     } else {
