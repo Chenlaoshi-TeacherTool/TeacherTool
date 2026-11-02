@@ -23,6 +23,8 @@
 - Google 联合登录尚未配置，需要先在 Google Cloud 建 OAuth 客户端。
 - 会员：账号首次登录自动获得 `TEACHER_TRIAL_DAYS`（默认 3）天云端保存，每账号一次；激活码（30/90/180/365 天）在 `/admin/memberships` 生成，只存哈希，老师在“我的资料”兑换后从当前到期日顺延。需要先执行 `database/add-teacher-membership.sql`。
 
+- 会员限制（`config/membership.js`）：浏览器里运行的工具免费；占用服务器存储的功能归会员。开启 `MEMBERSHIP_LIMITS_ENABLED=true` 后，非会员新建的游戏和绘本链接 7 天过期，会员 180 天；绘本朗读和背景音乐只限会员。未开启时一律保持原来的 90 天。开启前须先开放老师账号，并同步更新隐私政策里“链接 90 天后过期”的说明。学生打开链接始终不需要账号。
+
 ## 结构与权限
 
 - 老师账号通过 `TEACHER_ACCOUNTS_ENABLED=true`、Azure 实例环境和 `AZURE_AUTH_ENABLED=true` 启用；云库另外要求 `LIBRARY_CLOUD_ENABLED=true`。登录状态不再依赖云库数据库可用性。

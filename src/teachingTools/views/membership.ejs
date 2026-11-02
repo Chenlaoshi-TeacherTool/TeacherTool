@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
   <title><%= t('membership.kicker') %> - Chen Laoshi's Teaching Toolkit</title>
-  <%- include('partials/seo', { pageDescription: 'Every classroom tool on Chen Laoshi’s Teaching Toolkit stays free. See the planned teacher membership for cloud saving and the founding member price.' }) %>
+  <%- include('partials/seo', { pageDescription: 'Most classroom tools on Chen Laoshi’s Teaching Toolkit are free. See the planned teacher membership for cloud saving, long-lasting student links, and the founding member price.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
 </head>
 <body>
@@ -15,29 +15,71 @@
   <main>
     <section class="content-section"><div class="content-shell">
       <% if (!paymentsOpen) { %><p class="plan-notice" role="note"><%= t('membership.notice') %></p><% } %>
-      <div class="plan-grid">
-        <article class="plan-card">
-          <h2><%= t('membership.freeName') %></h2>
-          <p class="plan-price"><strong><%= t('membership.freePrice') %></strong> <span><%= t('membership.freePer') %></span></p>
-          <ul><li><%= t('membership.freeLi1') %></li><li><%= t('membership.freeLi2') %></li><li><%= t('membership.freeLi3') %></li></ul>
-        </article>
-        <% plans.forEach(function (plan) { var half = plan.key === 'half-year'; %>
-          <article class="plan-card<%= plan.recommended ? ' plan-card--featured' : '' %>">
-            <p class="plan-badges"><span class="printable-badge printable-badge--inline"><%= t('membership.foundingBadge') %></span><% if (plan.recommended) { %> <span class="plan-best"><%= t('membership.recommended') %></span><% } %></p>
-            <h2><%= t(half ? 'membership.halfName' : 'membership.yearName') %></h2>
-            <p class="plan-price"><s aria-label="<%= t('membership.regularLabel') %>">$<%= plan.regular %></s> <strong>$<%= plan.founding %></strong> <span><%= t(half ? 'membership.perHalf' : 'membership.perYear') %></span></p>
-            <p class="plan-note"><%= t(half ? 'membership.halfMonthly' : 'membership.yearMonthly') %></p>
-            <ul><li><%= t('membership.paidLi1') %></li><li><%= t('membership.paidLi2') %></li><li><%= t('membership.paidLi3') %></li><li><%= t('membership.paidLi4') %></li><li><%= t('membership.paidLi5') %></li></ul>
-            <button class="btn plan-button" type="button" disabled><%= t('membership.comingSoon') %></button>
-          </article>
-        <% }) %>
+      <%
+        // Each row: feature label, then what the free plan and the paid plans get.
+        // true = included, false = not included, a string = translation key for a short note.
+        var rows = [
+          ['rowTools', true, true],
+          ['rowBrowser', true, true],
+          ['rowCloud', 'cellTrial', true],
+          ['rowShare', 'cellDays7', 'cellDays180'],
+          ['rowQuiz', 'cellQuizFree', 'cellQuizPaid'],
+          ['rowAudio', false, true],
+          ['rowEarly', false, true]
+        ];
+        function cell(value) {
+          if (value === true) return '<span class="plan-yes" aria-label="' + t('membership.included') + '">✓</span>';
+          if (value === false) return '<span class="plan-no" aria-label="' + t('membership.notIncluded') + '">—</span>';
+          return String(t('membership.' + value)).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        }
+      %>
+      <p class="plan-swipe" aria-hidden="true"><%= t('membership.swipeHint') %></p>
+      <div class="plan-table-wrap">
+        <table class="plan-table">
+          <caption class="visually-hidden"><%= t('membership.kicker') %></caption>
+          <thead>
+            <tr>
+              <th scope="col" class="plan-feature-head"><%= t('membership.featureLabel') %></th>
+              <th scope="col">
+                <span class="plan-name"><%= t('membership.freeName') %></span>
+                <span class="plan-price"><strong><%= t('membership.freePrice') %></strong> <span><%= t('membership.freePer') %></span></span>
+              </th>
+              <% plans.forEach(function (plan) { var half = plan.key === 'half-year'; %>
+                <th scope="col"<%- plan.recommended ? ' class="plan-featured"' : '' %>>
+                  <span class="plan-badges"><span class="printable-badge printable-badge--inline"><%= t('membership.foundingBadge') %></span><% if (plan.recommended) { %> <span class="plan-best"><%= t('membership.recommended') %></span><% } %></span>
+                  <span class="plan-name"><%= t(half ? 'membership.halfName' : 'membership.yearName') %></span>
+                  <span class="plan-price"><s aria-label="<%= t('membership.regularLabel') %>">$<%= plan.regular %></s> <strong>$<%= plan.founding %></strong> <span><%= t(half ? 'membership.perHalf' : 'membership.perYear') %></span></span>
+                  <span class="plan-note"><%= t(half ? 'membership.halfMonthly' : 'membership.yearMonthly') %></span>
+                </th>
+              <% }) %>
+            </tr>
+          </thead>
+          <tbody>
+            <% rows.forEach(function (row) { %>
+              <tr>
+                <th scope="row"><%= t('membership.' + row[0]) %></th>
+                <td><%- cell(row[1]) %></td>
+                <% plans.forEach(function (plan) { %><td<%- plan.recommended ? ' class="plan-featured"' : '' %>><%- cell(row[2]) %></td><% }) %>
+              </tr>
+            <% }) %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td></td>
+              <td></td>
+              <% plans.forEach(function (plan) { %><td<%- plan.recommended ? ' class="plan-featured"' : '' %>><button class="btn plan-button" type="button" disabled><%= t('membership.comingSoon') %></button></td><% }) %>
+            </tr>
+          </tfoot>
+        </table>
       </div>
+      <p class="plan-support"><%= t('membership.supportNote') %></p>
     </div></section>
     <section class="content-section content-section--soft"><div class="content-shell prose-grid">
       <article><h2><%= t('membership.faqTitle') %></h2>
         <h3><%= t('membership.q1') %></h3><p><%= t('membership.a1') %></p>
         <h3><%= t('membership.q2') %></h3><p><%= t('membership.a2') %></p>
         <h3><%= t('membership.q3') %></h3><p><%= t('membership.a3') %></p>
+        <h3><%= t('membership.q6') %></h3><p><%= t('membership.a6') %></p>
       </article>
       <article>
         <h3><%= t('membership.q4') %></h3><p><%= t('membership.a4') %></p>

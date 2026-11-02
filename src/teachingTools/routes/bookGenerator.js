@@ -7,6 +7,7 @@ var bcrypt = require('bcryptjs');
 var router = express.Router();
 var bookStorage = require('../services/bookGeneratorStorage');
 var siteContentStore = require('../services/siteContentStore');
+var membershipLimits = require('../services/membershipLimits');
 
 var MAX_PAGES = 20;
 var SIZE_LIMITS = {
@@ -14,7 +15,7 @@ var SIZE_LIMITS = {
   narration: 10 * 1024 * 1024,
   music: 15 * 1024 * 1024
 };
-var BOOK_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+var AUDIO_MEMBERS_ONLY = 'Narration and background music are part of the teacher membership. Books with pictures and captions can still be published.';
 var AUTH_COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 var upload = multer({
@@ -95,6 +96,9 @@ router.post('/api/book-generator/pages/upload', upload.single('file'), async fun
     if (!validDraftToken(draftId, req.body.draftToken)) {
       return res.status(403).json({ error: 'This published book cannot be changed from this browser.' });
     }
+    if (kind !== 'image' && !(await membershipLimits.canUseBookAudio(req))) {
+      return res.status(403).json({ error: AUDIO_MEMBERS_ONLY });
+    }
     if (req.file.size > SIZE_LIMITS[kind]) {
       return res.status(400).json({ error: 'File too large for ' + kind + ' (max ' + Math.round(SIZE_LIMITS[kind] / (1024 * 1024)) + 'MB).' });
     }
@@ -138,6 +142,10 @@ router.post('/api/book-generator/publish', async function (req, res) {
       }
     }
 
+    if ((body.musicBlob || pages.some(function (page) { return page.narrationBlob; })) && !(await membershipLimits.canUseBookAudio(req))) {
+      return res.status(403).json({ error: AUDIO_MEMBERS_ONLY });
+    }
+
     var passwordHash = await bcrypt.hash(String(password), 10);
     var deleteToken = existing ? existing.deleteToken : crypto.randomUUID();
     var now = new Date();
@@ -147,7 +155,7 @@ router.post('/api/book-generator/publish', async function (req, res) {
       passwordHash: passwordHash,
       deleteToken: deleteToken,
       createdAt: existing ? existing.createdAt : now.toISOString(),
-      expiresAt: new Date(now.getTime() + BOOK_TTL_MS).toISOString(),
+      expiresAt: new Date(now.getTime() + await membershipLimits.shareLifetimeMs(req)).toISOString(),
       pages: pages.map(function (page) {
         return {
           id: page.id,

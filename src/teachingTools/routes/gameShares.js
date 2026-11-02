@@ -5,9 +5,9 @@ var express = require('express');
 var bcrypt = require('bcryptjs');
 var registry = require('../services/gameShareRegistry');
 var storage = require('../services/gameShareStorage');
+var membershipLimits = require('../services/membershipLimits');
 
 var router = express.Router();
-var SHARE_TTL_MS = 90 * 24 * 60 * 60 * 1000;
 var AUTH_COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 var MAX_GAME_DATA_BYTES = 64 * 1024;
 var ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
@@ -100,7 +100,7 @@ router.post('/api/game-shares', async function (req, res) {
       passwordHash: await bcrypt.hash(password, 10),
       deleteToken: crypto.randomUUID(),
       createdAt: now.toISOString(),
-      expiresAt: new Date(now.getTime() + SHARE_TTL_MS).toISOString(),
+      expiresAt: new Date(now.getTime() + await membershipLimits.shareLifetimeMs(req)).toISOString(),
       payload: payload
     };
 

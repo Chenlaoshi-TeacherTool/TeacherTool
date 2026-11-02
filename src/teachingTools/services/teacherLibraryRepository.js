@@ -19,6 +19,15 @@ async function load(owner) {
   };
 }
 
+// Membership check without loading the saved library itself.
+async function hasActiveAccess(owner) {
+  var pool = await db.getPool();
+  var result = await pool.request().input('owner', db.sql.Char(64), owner).query(
+    'SELECT 1 AS active FROM dbo.teacher_library_access WHERE owner_key = @owner AND write_until > SYSUTCDATETIME();'
+  );
+  return result.recordset.length > 0;
+}
+
 async function save(owner, revision, content) {
   var pool = await db.getPool();
   var result = await pool.request().input('owner', db.sql.Char(64), owner)
@@ -88,4 +97,4 @@ async function listCodeBatches() {
   return result.recordset;
 }
 
-module.exports = { load: load, save: save, ensureTrial: ensureTrial, redeem: redeem, createCodes: createCodes, listCodeBatches: listCodeBatches };
+module.exports = { load: load, hasActiveAccess: hasActiveAccess, save: save, ensureTrial: ensureTrial, redeem: redeem, createCodes: createCodes, listCodeBatches: listCodeBatches };
