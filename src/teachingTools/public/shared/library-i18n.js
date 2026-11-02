@@ -329,6 +329,7 @@
   "My materials": "我的资料",
   "My materials · Chen Laoshi's Teaching Toolkit": "我的资料 · 陈老师教学工具包",
   "Browser saving · cloud sync when signed in": "保存在浏览器 · 登录后可云端同步",
+  "Cloud saving membership coming soon →": "云端保存会员即将推出 →",
   "Cloud sync": "云端同步",
   "Your teacher account": "我的老师账号",
   "Checking sign-in status…": "正在检查登录状态……",

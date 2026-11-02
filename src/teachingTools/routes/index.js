@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var siteContentStore = require('../services/siteContentStore');
 var siteMap = require('../config/siteMap');
+var membership = require('../config/membership');
 var popularTools = require('../services/popularTools');
 var toolPreviews = require('../config/toolPreviews.json');
 
@@ -33,6 +34,10 @@ router.get('/', async function(req, res, next) {
 
 router.get('/privacy', function(req, res, next) {
   res.render('privacy', { title: 'Privacy Policy' });
+});
+
+router.get('/membership', function(req, res, next) {
+  res.render('membership', { title: 'Membership', paymentsOpen: membership.paymentsOpen, plans: membership.plans });
 });
 
 router.get('/about', function(req, res, next) {

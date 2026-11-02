@@ -29,7 +29,7 @@ var SECTIONS = [
     key: 'tools', href: '/teaching-tools', en: 'Teaching Tools', zh: '教学工具', nav: true,
     admin: ['toolguides', 'wordlists', 'questionbanks']
   },
-  { key: 'library', href: '/teaching-tools/word-list-library/word-list-library.html', en: 'My materials', zh: '我的资料', nav: true, sitemap: false, admin: ['memberships'] },
+  { key: 'library', href: '/teaching-tools/word-list-library/word-list-library.html', en: 'My materials', zh: '我的资料', nav: true, sitemap: false, admin: [] },
   { key: 'chinese', href: '/chinese-teaching', en: 'Chinese Teaching', zh: '中文教学专区', admin: [] },
   {
     key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: [],
@@ -62,11 +62,12 @@ var SECTIONS = [
   },
   { key: 'about', href: '/about', en: 'About', zh: '关于', nav: true, admin: [] },
   { key: 'contact', href: '/contact', en: 'Contact', zh: '联系', nav: true, admin: [] },
+  { key: 'membership', href: '/membership', en: 'Membership', zh: '会员', admin: ['memberships'] },
   { key: 'privacy', href: '/privacy', en: 'Privacy Policy', zh: '隐私政策', admin: [] }
 ];
 
 // Legal footer links, in display order.
-var FOOTER = ['about', 'finds', 'contact', 'privacy'];
+var FOOTER = ['about', 'finds', 'membership', 'contact', 'privacy'];
 
 // Content that still has public pages but no section in the navigation.
 var UNLISTED = [

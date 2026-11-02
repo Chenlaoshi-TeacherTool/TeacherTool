@@ -176,3 +176,21 @@ body { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .printable-dialog[open] { animation: none; } .printable-card, .printable-option { transition: none; } }
 .printable-badge { position: absolute; top: -12px; right: 20px; padding: 5px 14px; border-radius: 999px; background: var(--coral); color: #fff; font-size: .85rem; font-weight: 900; letter-spacing: .04em; box-shadow: 0 6px 14px rgba(201, 80, 63, .35); transform: rotate(3deg); }
 .printable-badge--inline { position: static; display: inline-block; margin-bottom: 10px; box-shadow: none; transform: none; }
+
+/* Membership plans (/membership) */
+.plan-notice { margin: 0 0 28px; padding: 14px 18px; border: 1px solid #f0d38a; border-radius: 14px; background: #fff6dc; color: #7e5112; font-weight: 800; line-height: 1.6; }
+.plan-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: start; }
+.plan-card { display: flex; flex-direction: column; padding: 28px; border: 1px solid var(--line); border-radius: 21px; background: var(--paper); box-shadow: var(--shadow); }
+.plan-card--featured { border: 2px solid var(--sun-deep); }
+.plan-card h2 { margin: 0 0 6px; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-weight: 400; }
+.plan-badges { min-height: 0; margin: 0; }
+.plan-best { display: inline-block; margin-bottom: 10px; padding: 5px 12px; border-radius: 999px; background: var(--chalk); color: #fffdf7; font-size: .85rem; font-weight: 900; }
+.plan-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; margin: 4px 0 0; color: var(--muted); }
+.plan-price strong { color: var(--chalk); font-size: 2.4rem; line-height: 1; }
+.plan-price s { color: var(--muted); font-size: 1.1rem; }
+.plan-note { margin: 8px 0 0; color: var(--muted); font-size: .92rem; }
+.plan-card ul { margin: 18px 0 22px; padding-left: 20px; color: #405b52; line-height: 1.7; }
+.plan-button { margin-top: auto; }
+.plan-button:disabled { cursor: not-allowed; opacity: .6; }
+.prose-grid h3 { margin: 22px 0 6px; color: var(--chalk); font-size: 1.05rem; }
+@media (max-width: 900px) { .plan-grid { grid-template-columns: 1fr; } }
