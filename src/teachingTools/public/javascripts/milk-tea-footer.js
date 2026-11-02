@@ -104,9 +104,12 @@
         '</div>'
       ].join('');
       var currentPath = window.location.pathname;
+      var libraryPage = /^\/teaching-tools\/(word-list-library|question-bank-library)(\/|$)/.test(currentPath);
       Array.prototype.forEach.call(nav.querySelectorAll('.site-main-nav-links a'), function(link) {
         var path = link.getAttribute('href');
         var active = path === '/' ? currentPath === '/' : currentPath === path || currentPath.indexOf(path + '/') === 0;
+        if (libraryPage && path === '/teaching-tools') active = false;
+        if (path === '/teaching-tools/word-list-library/word-list-library.html') active = libraryPage;
         if (active) link.setAttribute('aria-current', 'page');
       });
       document.body.prepend(nav);
@@ -173,4 +176,10 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', createFooter);
   else createFooter();
+  if (!document.getElementById('teacherAccountScript')) {
+    var accountScript = document.createElement('script');
+    accountScript.id = 'teacherAccountScript';
+    accountScript.src = '/shared/teacher-account.js';
+    document.head.appendChild(accountScript);
+  }
 }());

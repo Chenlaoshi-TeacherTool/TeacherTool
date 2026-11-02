@@ -7,6 +7,7 @@
   var $ = function (selector, root) { return (root || document).querySelector(selector); };
 
   var draftId = null;
+  var draftToken = null;
   var pages = [];
   var music = null; // { blobName, fileName }
   var toastTimer = null;
@@ -36,6 +37,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         draftId: draftId,
+        draftToken: draftToken,
         title: $('#bookTitle').value,
         music: music,
         pages: pages.map(function (page) {
@@ -55,6 +57,7 @@
   function uploadAsset(pageId, kind, file) {
     var formData = new FormData();
     formData.append('draftId', draftId);
+    if (draftToken) formData.append('draftToken', draftToken);
     formData.append('pageId', pageId);
     formData.append('kind', kind);
     formData.append('file', file);
@@ -265,6 +268,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           draftId: draftId,
+          draftToken: draftToken,
           title: $('#bookTitle').value,
           password: password,
           musicBlob: music ? music.blobName : null,
@@ -315,7 +319,7 @@
   }
 
   function addMyBook(entry) {
-    var list = loadMyBooks();
+    var list = loadMyBooks().filter(function (book) { return book.bookId !== entry.bookId; });
     list.unshift(entry);
     saveMyBooks(list);
     renderMyBooks();
@@ -397,9 +401,9 @@
     });
   }
 
-  function init() {
-    var saved = loadDraft();
-    draftId = (saved && saved.draftId) || uuid();
+  function initializeEditor(saved) {
+    draftId = saved.draftId;
+    draftToken = saved.draftToken || null;
     music = (saved && saved.music) || null;
 
     if (saved && saved.music) {
@@ -416,6 +420,38 @@
     initMusic();
     initPublish();
     renderMyBooks();
+  }
+
+  function requestDraft(saved) {
+    var body = {};
+    if (saved && saved.draftId) {
+      body.draftId = saved.draftId;
+      var published = loadMyBooks().find(function (book) { return book.bookId === saved.draftId; });
+      if (published) body.deleteToken = published.deleteToken;
+    }
+    return fetch('/api/book-generator/drafts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (response) {
+      if (!response.ok) throw new Error('Could not resume this book draft.');
+      return response.json();
+    }).then(function (credentials) {
+      return Object.assign({}, saved || {}, credentials);
+    });
+  }
+
+  function init() {
+    var saved = loadDraft();
+    if (saved && saved.draftId && saved.draftToken) {
+      initializeEditor(saved);
+      return;
+    }
+    requestDraft(saved)
+      .then(initializeEditor)
+      .catch(function () {
+        requestDraft(null).then(initializeEditor).catch(function (error) { showToast(error.message); });
+      });
   }
 
   init();

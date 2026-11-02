@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>我的资料 · 老师工作台 · CLS Teaching Tools</title>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="./teacher-library.css">
+</head>
+<body>
+  <main class="teacher-library">
+    <a href="/teaching-tools/word-list-library/word-list-library.html">← 返回浏览器材料库</a>
+    <h1>我的资料</h1>
+    <p>一个老师账号，创建自己的词表和题库，再用于课堂活动。账号注册与会员权益分别管理，云端保存由账号权限决定。</p>
+    <p id="accountStatus" role="status" aria-live="polite">正在检查登录状态…</p>
+    <div id="loginLinks"></div>
+    <a id="logoutLink" hidden>退出登录</a>
+    <section id="createWorkspace" hidden aria-labelledby="createTitle">
+      <h2 id="createTitle">新建教学资料</h2>
+      <p id="createMode"></p>
+      <form id="materialCreateForm">
+        <label>资料名称<input id="materialName" maxlength="100" required placeholder="例如：第三课动物词汇"></label>
+        <label>资料类型<select id="materialKind"><option value="vocabulary">词表</option><option value="question-bank">题库</option></select></label>
+        <label>内容<textarea id="materialText" rows="7" required placeholder="词表：苹果 | píng guǒ | apple&#10;题库：哪种动物喜欢吃竹子？ | 熊猫"></textarea></label>
+        <p>每行一条。词表使用“词语 | 拼音 | 释义”或“词语 | 释义”；题库使用“问题 | 答案”。</p>
+        <button id="createPreview" type="submit">预览新资料</button>
+      </form>
+      <p id="createStatus" role="status" aria-live="polite"></p>
+      <label id="createConfirmLabel" hidden><input id="createConfirm" type="checkbox"> <span id="createConfirmText"></span></label>
+      <button id="createSave" type="button" disabled>保存这份资料</button>
+    </section>
+    <section id="cloudWorkspace" hidden aria-labelledby="cloudTitle">
+      <h2 id="cloudTitle">我的云端资料</h2>
+      <p id="cloudStatus" role="status" aria-live="polite"></p>
+      <button id="reloadCloud" type="button">重新读取云库</button>
+      <button id="downloadCloud" type="button" disabled>下载云库备份</button>
+      <div id="cloudCollections"></div>
+      <h2>与本浏览器交换材料</h2>
+      <p>材料不会自动上传或替换。请在预览后确认；共用电脑上的本地材料不一定属于当前登录账号。</p>
+      <button id="previewUpload" type="button" disabled>预览本地材料，准备保存到云端</button>
+      <button id="previewRestore" type="button" disabled>预览云端材料，准备加入本浏览器</button>
+      <p id="exchangeStatus" role="status" aria-live="polite"></p>
+      <label id="confirmLabel" hidden><input id="confirmExchange" type="checkbox"> <span id="confirmText"></span></label>
+      <button id="applyExchange" type="button" disabled>确认执行</button>
+    </section>
+  </main>
+  <script src="/shared/library-v2.js"></script>
+  <script src="/shared/library-store.js"></script>
+  <script src="./teacher-create.js"></script>
+  <script src="./teacher-library.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

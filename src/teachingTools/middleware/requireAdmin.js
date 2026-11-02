@@ -18,7 +18,7 @@ module.exports = function requireAdmin(req, res, next) {
     var redirectTo = '/.auth/login/aad?post_login_redirect_uri=' + encodeURIComponent(req.originalUrl);
     return res.redirect(redirectTo);
   }
-  if (adminIds().indexOf(user.id) === -1) {
+  if (user.provider !== 'aad' || adminIds().indexOf(user.id) === -1) {
     return res.status(403).send('Signed in as ' + user.name + ', but this account is not an admin.');
   }
   req.adminUser = user;

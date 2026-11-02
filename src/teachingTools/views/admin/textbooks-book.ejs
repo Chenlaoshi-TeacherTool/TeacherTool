@@ -1,0 +1,24 @@
+<%- include('layout-head') %>
+<h1><%= series.zh %> · <%= bookName %></h1>
+<p><a href="/admin/textbooks">&larr; Back to textbooks</a></p>
+<p>
+  <a class="button" href="/admin/textbooks/lessons/new?series=<%= encodeURIComponent(series.key) %>&book=<%= encodeURIComponent(bookSlug) %>&book_name=<%= encodeURIComponent(bookName) %>">+ New lesson</a>
+</p>
+<table>
+  <thead>
+    <tr><th>Order</th><th>Lesson</th><th>Title</th><th># Words</th><th>Published</th><th></th></tr>
+  </thead>
+  <tbody>
+    <% lessons.forEach(function (lesson) { %>
+    <tr>
+      <td><%= lesson.sort_order %></td>
+      <td><%= lesson.lesson_no == null ? '' : lesson.lesson_no %></td>
+      <td><%= lesson.title %></td>
+      <td><%= lesson.word_count %></td>
+      <td><%= lesson.is_published ? 'Yes' : 'Hidden' %></td>
+      <td><a href="/admin/textbooks/lessons/<%= lesson.id %>/edit">Edit</a></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('layout-foot') %>

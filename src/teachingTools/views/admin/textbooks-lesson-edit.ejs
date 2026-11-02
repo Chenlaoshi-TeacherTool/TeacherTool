@@ -1,0 +1,85 @@
+<%- include('layout-head') %>
+<h1><%= lesson ? 'Edit: ' + lesson.title : 'New lesson' %></h1>
+<p><a href="<%= defaults.book_slug ? bookPath(defaults.series, defaults.book_slug) : '/admin/textbooks' %>">&larr; Back to book</a></p>
+
+<form method="POST" action="<%= lesson ? '/admin/textbooks/lessons/' + lesson.id : '/admin/textbooks/lessons/new' %>">
+  <div class="q-grid">
+    <div>
+      <label>Series</label>
+      <select name="series">
+        <% seriesList.forEach(function (series) { %>
+        <option value="<%= series.key %>" <%= series.key === defaults.series ? 'selected' : '' %>><%= series.zh %> (<%= series.key %>)</option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label>Slug (unique, no spaces, e.g. bubian-1a-01)</label>
+      <input type="text" name="slug" value="<%= lesson ? lesson.slug : '' %>" required>
+    </div>
+    <div>
+      <label>Book slug (e.g. 1a, book-3)</label>
+      <input type="text" name="book_slug" value="<%= defaults.book_slug || '' %>" required>
+    </div>
+    <div>
+      <label>Book name (e.g. 一年级上册)</label>
+      <input type="text" name="book_name" value="<%= defaults.book_name || '' %>" required>
+    </div>
+    <div>
+      <label>Order in book</label>
+      <input type="text" name="sort_order" value="<%= lesson ? lesson.sort_order : '' %>">
+    </div>
+    <div>
+      <label>Lesson number (optional)</label>
+      <input type="text" name="lesson_no" value="<%= lesson && lesson.lesson_no != null ? lesson.lesson_no : '' %>">
+    </div>
+  </div>
+  <label>Title</label>
+  <input type="text" name="title" value="<%= lesson ? lesson.title : '' %>" required>
+  <label>Sentence patterns (one per line)</label>
+  <textarea name="sentence_patterns" rows="4"><%= lesson ? (lesson.sentence_patterns || '') : '' %></textarea>
+  <label>Activities (one per line)</label>
+  <textarea name="activities" rows="4"><%= lesson ? (lesson.activities || '') : '' %></textarea>
+  <label><input type="checkbox" name="is_published" <%= !lesson || lesson.is_published ? 'checked' : '' %>> Published</label>
+  <div class="actions">
+    <button type="submit"><%= lesson ? 'Save changes' : 'Create lesson' %></button>
+  </div>
+</form>
+
+<% if (lesson) { %>
+<h2 style="margin-top:24px;">Words (<%= items.length %>)</h2>
+<div class="items-grid" style="grid-template-columns: 1fr 1fr 2fr 90px auto auto;">
+  <div class="grid-header">Chinese</div>
+  <div class="grid-header">Pinyin</div>
+  <div class="grid-header">English</div>
+  <div class="grid-header">Kind</div>
+  <div class="grid-header"></div>
+  <div class="grid-header"></div>
+
+  <% items.forEach(function (item) { %>
+  <form class="row-form" method="POST" action="/admin/textbooks/lessons/<%= lesson.id %>/items/<%= item.id %>">
+    <div><input type="text" name="zh" value="<%= item.zh %>" required></div>
+    <div><input type="text" name="py" value="<%= item.py %>" required></div>
+    <div><input type="text" name="en" value="<%= item.en %>"></div>
+    <div><input type="text" name="kind" value="<%= item.kind || '' %>" placeholder="识字/写字/词语"></div>
+    <div><button type="submit">Save</button></div>
+  </form>
+  <form method="POST" action="/admin/textbooks/lessons/<%= lesson.id %>/items/<%= item.id %>/delete" onsubmit="return confirm('Delete this word?');">
+    <button type="submit" class="danger">Delete</button>
+  </form>
+  <% }) %>
+
+  <form class="row-form" method="POST" action="/admin/textbooks/lessons/<%= lesson.id %>/items">
+    <div><input type="text" name="zh" placeholder="Chinese" required></div>
+    <div><input type="text" name="py" placeholder="Pinyin" required></div>
+    <div><input type="text" name="en" placeholder="English"></div>
+    <div><input type="text" name="kind" placeholder="识字/写字/词语"></div>
+    <div><button type="submit">Add word</button></div>
+  </form>
+  <div></div>
+</div>
+
+<form method="POST" action="/admin/textbooks/lessons/<%= lesson.id %>/delete" onsubmit="return confirm('Delete this lesson and all its words?');" style="margin-top:24px;">
+  <button type="submit" class="danger">Delete this lesson</button>
+</form>
+<% } %>
+<%- include('layout-foot') %>

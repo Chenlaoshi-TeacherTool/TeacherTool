@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>Chinese UNO Card Generator - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Turn any Chinese vocabulary list into a printable, color-coded UNO-style card deck. Paste words with pinyin and English, add Skip/Reverse/Draw Two/Wild cards, and print in minutes.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/uno-card-generator/uno-card-generator.css?v=1">
+</head>
+<body class="uno-page">
+  <main class="uno-wrap">
+    <header class="uno-header">
+      <div class="uno-header-content">
+        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+        <p class="uno-eyebrow">Vocabulary card game</p>
+        <h1>🌻 Chinese UNO Card Generator</h1>
+        <p>Paste a Chinese vocabulary list and generate a full, color-coded UNO-style deck—complete with pinyin, English, and optional Skip / Reverse / Draw Two / Wild cards. Print it out and play.</p>
+        <div class="uno-hero-points" aria-label="Tool highlights">
+          <span>汉字 · 拼音 · English on every card</span>
+          <span>Quick Mode (40) or Full Game (80)</span>
+          <span>Printable, no cutting guesswork</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="uno-layout">
+      <section class="uno-builder" aria-label="Build your deck">
+
+        <section class="uno-panel">
+          <div class="uno-panel-heading">
+            <div>
+              <span class="uno-step">1</span>
+              <p class="uno-kicker">New Deck Generator</p>
+              <h2>Deck settings</h2>
+            </div>
+          </div>
+
+          <label>Game Mode</label>
+          <div class="uno-mode-toggle" role="group" aria-label="Game mode">
+            <button type="button" class="uno-mode-card is-active" data-mode="quick" data-count="40">
+              <span class="uno-mode-icon">⚡</span>
+              <span class="uno-mode-title">Quick Mode</span>
+              <span class="uno-mode-sub">40 Words</span>
+            </button>
+            <button type="button" class="uno-mode-card" data-mode="full" data-count="80">
+              <span class="uno-mode-icon">🗂️</span>
+              <span class="uno-mode-title">Full Game</span>
+              <span class="uno-mode-sub">80 Words</span>
+            </button>
+          </div>
+
+          <label for="uno-level" class="uno-field-label">Level</label>
+          <select id="uno-level">
+            <option value="beginner">Beginner (HSK 1-3)</option>
+            <option value="intermediate">Intermediate (HSK 4-5)</option>
+            <option value="advanced">Advanced (HSK 6+)</option>
+          </select>
+
+          <label for="uno-topic" class="uno-field-label">Topic (Optional)</label>
+          <input type="text" id="uno-topic" placeholder="e.g., Daily Life, Animals">
+
+          <button id="ai-generate-button" class="uno-primary uno-ai-button" type="button" disabled>
+            ✨ Generate AI Deck
+            <span class="uno-coming-soon-badge">Coming soon</span>
+          </button>
+        </section>
+
+        <section class="uno-panel">
+          <div class="uno-panel-heading">
+            <div>
+              <span class="uno-step">2</span>
+              <p class="uno-kicker">Generate from Text</p>
+              <h2>Paste your word list</h2>
+            </div>
+          </div>
+          <div class="uno-instructions">
+            <p><strong>Instructions:</strong> Paste words below. One card per line.</p>
+            <p>Format: 中文 拼音, English</p>
+            <p class="uno-instructions-note">Note: words repeat in order to fill the selected Game Mode.</p>
+          </div>
+          <textarea id="uno-text-input" rows="8" placeholder="苹果 píng guǒ, Apple&#10;老虎 lǎo hǔ, Tiger&#10;猕猴桃汁 mí hóu táo zhī, kiwi juice"></textarea>
+          <button id="build-from-text-button" class="uno-secondary" type="button">+ Build Deck from Text</button>
+          <p id="uno-setup-status" class="uno-setup-status" aria-live="polite">Paste at least one word to build a deck.</p>
+        </section>
+
+        <section class="uno-panel">
+          <div class="uno-panel-heading">
+            <div>
+              <span class="uno-step">3</span>
+              <p class="uno-kicker">Add Extra Cards (Optional)</p>
+              <h2>Special cards</h2>
+            </div>
+          </div>
+          <div class="uno-extras" role="group" aria-label="Extra card types">
+            <button type="button" class="uno-extra-chip uno-extra-chip--skip" data-extra="skip" aria-pressed="false">⛔ Skip</button>
+            <button type="button" class="uno-extra-chip uno-extra-chip--reverse" data-extra="reverse" aria-pressed="false">🔄 Reverse</button>
+            <button type="button" class="uno-extra-chip uno-extra-chip--draw" data-extra="draw2" aria-pressed="false">+2 Draw Two</button>
+            <button type="button" class="uno-extra-chip uno-extra-chip--wild" data-extra="wild" aria-pressed="false">🌻 Wild</button>
+          </div>
+          <p class="uno-help">Toggle the special cards you want mixed into the deck (4 of each, one per color where it applies).</p>
+        </section>
+      </section>
+
+      <section class="uno-preview-panel" aria-label="Card deck preview">
+        <div class="uno-preview-toolbar">
+          <div class="uno-total-cards">
+            <span class="uno-total-label">Total Cards</span>
+            <span id="uno-total-count">0</span>
+          </div>
+          <button id="print-deck-button" class="uno-primary" type="button" disabled>🖨️ Print Deck</button>
+        </div>
+
+        <div id="uno-preview-area" class="uno-preview-area">
+          <div id="uno-empty-state" class="uno-empty-state">
+            <div class="uno-empty-icon" aria-hidden="true">📄</div>
+            <h2>Deck is Empty</h2>
+            <p>Paste a word list on the left, then click Build Deck from Text.</p>
+          </div>
+          <div id="uno-card-grid" class="uno-card-grid" hidden></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/low-prep/uno-card-generator/uno-card-generator.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

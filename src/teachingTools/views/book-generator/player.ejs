@@ -37,7 +37,7 @@
   <audio id="musicAudio" loop></audio>
 
   <script>
-    window.__BOOK_DATA__ = <%- JSON.stringify(bookData) %>;
+    window.__BOOK_DATA__ = <%- bookDataJson %>;
     window.__BOOK_PLAYER_I18N__ = <%- JSON.stringify({
       startReading: t('bookPlayer.startReading'),
       pause: t('bookPlayer.pause'),

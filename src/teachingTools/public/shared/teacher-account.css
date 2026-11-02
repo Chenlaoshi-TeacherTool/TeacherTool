@@ -1,0 +1,10 @@
+#teacherAccountBar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 0; max-width: 100%; }
+#teacherAccountBar a, #teacherAccountBar button { padding: 7px 10px; border: 1px solid #c9d8c1; border-radius: 10px; color: #194f45; background: #fffdf7; font: inherit; font-size: 13px; text-decoration: none; cursor: pointer; }
+#teacherAccountBar span { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.teacher-account-header { padding: 10px 24px; background: #edf5df; }
+#teacherAccountDialog { width: min(460px, calc(100% - 32px)); padding: 28px; border: 1px solid #d8e5c7; border-radius: 20px; box-sizing: border-box; color: #194f45; background: #fffdf7; }
+#teacherAccountDialog::backdrop { background: rgba(16, 62, 55, .4); }
+#teacherAccountDialog p { line-height: 1.7; }
+#teacherAccountDialog a { display: block; padding: 12px; margin: 12px 0; border: 1px solid #356e57; border-radius: 12px; color: #194f45; text-decoration: none; text-align: center; }
+#teacherAccountDialog button { float: right; padding: 7px 10px; border: 1px solid #c9d8c1; border-radius: 8px; background: #edf5df; color: #194f45; cursor: pointer; }
+@media print { #teacherAccountBar, #teacherAccountDialog { display: none !important; } }

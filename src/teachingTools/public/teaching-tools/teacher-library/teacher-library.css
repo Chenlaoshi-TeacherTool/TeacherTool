@@ -1,0 +1,14 @@
+.teacher-library { width: min(900px, calc(100% - 32px)); margin: 36px auto; padding: 24px; box-sizing: border-box; background: #fffdf7; border: 1px solid #d8e5c7; border-radius: 18px; color: #194f45; }
+.teacher-library p, .teacher-library li { line-height: 1.7; overflow-wrap: anywhere; }
+.teacher-library button, #loginLinks a { display: inline-block; margin: 8px 10px 8px 0; padding: 10px 15px; border: 1px solid #356e57; border-radius: 12px; background: #edf5df; color: #194f45; font: inherit; cursor: pointer; }
+.teacher-library button:disabled { opacity: .5; cursor: default; }
+.teacher-library [hidden] { display: none !important; }
+.teacher-library section { margin-top: 24px; }
+.teacher-library details { margin: 12px 0; padding: 12px; border: 1px solid #d8e5c7; border-radius: 10px; }
+.teacher-library summary { cursor: pointer; font-weight: bold; overflow-wrap: anywhere; }
+#confirmLabel { display: block; margin: 16px 0; line-height: 1.7; }
+#materialCreateForm { display: grid; gap: 14px; }
+#materialCreateForm label { display: grid; gap: 7px; font-weight: bold; }
+#materialCreateForm input, #materialCreateForm select, #materialCreateForm textarea { width: 100%; min-width: 0; box-sizing: border-box; padding: 11px; border: 1px solid #c9d8c1; border-radius: 10px; color: #194f45; background: #fff; font: inherit; }
+#materialCreateForm textarea { resize: vertical; }
+#createConfirmLabel { display: block; line-height: 1.7; margin: 12px 0; }

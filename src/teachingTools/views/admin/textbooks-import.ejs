@@ -1,0 +1,43 @@
+<%- include('layout-head') %>
+<h1>Import textbook lessons</h1>
+<p><a href="/admin/textbooks">&larr; Back to textbooks</a></p>
+
+<% if (result && result.errors) { %>
+  <div style="color:#dc2626;">
+    <p>Nothing was imported. Fix these rows and upload again:</p>
+    <ul>
+      <% result.errors.slice(0, 50).forEach(function (error) { %><li><%= error %></li><% }) %>
+    </ul>
+    <% if (result.errors.length > 50) { %><p>…and <%= result.errors.length - 50 %> more.</p><% } %>
+  </div>
+<% } else if (result && result.counts) { %>
+  <p style="color:#16a34a;">
+    Done: <%= result.counts.lessonsCreated %> lesson(s) created, <%= result.counts.lessonsUpdated %> updated;
+    words replaced in <%= result.counts.lessonsWithWords %> lesson(s) (<%= result.counts.words %> words).
+  </p>
+<% } %>
+
+<form method="POST" action="/admin/textbooks/import" enctype="multipart/form-data">
+  <label>Excel file (.xlsx)</label>
+  <input type="file" name="file" accept=".xlsx" required>
+  <div class="actions">
+    <button type="submit">Upload and import</button>
+  </div>
+</form>
+
+<div style="margin-top:24px;font-size:0.9rem;color:#444;">
+  <p>The file needs a <code>课程</code> sheet (one row per lesson) and/or a <code>生词</code> sheet (one row per word). <a href="/admin/textbooks/export">Export all</a> gives a file in this exact shape.</p>
+  <ul>
+    <li>Lessons are matched by <code>slug</code>: a new slug creates a lesson, an existing one is updated.</li>
+    <li>Each lesson that has rows in <code>生词</code> gets its word list <strong>replaced</strong> by those rows, in file order. Lessons with no word rows keep their words.</li>
+    <li>If any row has a problem, nothing is imported and the problems are listed.</li>
+  </ul>
+  <table>
+    <thead><tr><th>Sheet</th><th>Columns</th></tr></thead>
+    <tbody>
+      <tr><td><code>课程</code></td><td><code>slug</code>, <code>series</code> (bubian / nihao / qingsong), <code>book_slug</code>, <code>book_name</code> (or 册), <code>sort_order</code>, <code>lesson_no</code>, <code>title</code> (or 课题), <code>sentence_patterns</code> (or 句型), <code>activities</code> (or 活动建议). Patterns and activities: one per line.</td></tr>
+      <tr><td><code>生词</code></td><td><code>slug</code> (the lesson), <code>zh</code>, <code>py</code>, <code>en</code> (may be empty), <code>kind</code> (识字 / 写字 / 词语; a <code>note</code> column is read as kind too).</td></tr>
+    </tbody>
+  </table>
+</div>
+<%- include('layout-foot') %>

@@ -10,6 +10,9 @@ Part of the Azure SQL migration described in `docs/azure-architecture-migration.
   `routes/api.js`, `services/siteContentStore.js`, and the admin CMS have no fallback to
   hardcoded data anymore, so `DAB_BASE_URL` and a reachable DAB instance are required for the
   site to serve word lists, question banks, tool guides, or articles.
+- `add-textbook-lessons.sql` — adds the textbook companion tables (`textbook_lessons`,
+  `textbook_lesson_items`) to an existing database. Run it once, then redeploy DAB. Lesson data is
+  loaded from Excel at `/admin/textbooks/import`.
 - `dab-config.json` — Data API Builder configuration exposing all of the above tables as a
   read-only REST API for the public site, alongside direct-SQL writes from the admin CMS.
 

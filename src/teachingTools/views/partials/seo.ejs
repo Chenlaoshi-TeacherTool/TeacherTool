@@ -13,6 +13,7 @@
   var seoPageType = typeof pageType !== 'undefined' ? pageType : 'website';
   var seoNoindex = typeof noindex !== 'undefined' && noindex;
 %>
+<% if (seoPath === '/' && typeof baiduSiteVerification !== 'undefined' && baiduSiteVerification) { %><meta name="baidu-site-verification" content="<%= baiduSiteVerification %>"><% } %>
 <meta name="description" content="<%= seoDescription %>">
 <% if (seoNoindex) { %><meta name="robots" content="noindex, nofollow"><% } else { %><meta name="robots" content="index, follow, max-image-preview:large"><% } %>
 <link rel="canonical" href="<%= seoCanonical %>">

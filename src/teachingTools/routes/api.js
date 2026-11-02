@@ -6,6 +6,7 @@ var dabQuestionBanks = require('../services/dabQuestionBanksClient');
 var authUser = require('../services/authUser');
 var wordTranslator = require('../services/wordTranslator');
 var router = express.Router();
+router.use('/teacher-library', require('./teacherLibrary'));
 
 var azureAuthEnabled = authUser.azureAuthEnabled;
 var currentUser = authUser.currentUser;

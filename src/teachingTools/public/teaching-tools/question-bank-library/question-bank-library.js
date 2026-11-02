@@ -67,7 +67,7 @@
     els.presetSearchStatus = document.getElementById('presetSearchStatus');
 
     if (!window.ChenQuestionBank || !window.JSZip) {
-      setStatus('The question-bank importer could not load. Please refresh this page.');
+      setStatus(window.LibraryI18n.t('The question-bank importer could not load. Please refresh this page.'));
       return;
     }
 
@@ -86,8 +86,8 @@
     els.presetSearch.addEventListener('search', renderPresetBanks);
 
     els.storageNote.textContent = window.ChenQuestionBank.hasStorage
-      ? 'Question banks stay in this browser until you remove them.'
-      : 'Browser saving is unavailable in this session.';
+      ? window.LibraryI18n.t('Question banks stay in this browser until you remove them.')
+      : window.LibraryI18n.t('Browser saving is unavailable in this session.');
 
     renderSavedBanks();
     renderBankSelect();
@@ -99,15 +99,15 @@
     var file = els.file.files && els.file.files[0];
     if (!file) return;
     if (!/\.xlsx$/i.test(file.name)) {
-      setImportStatus('Please choose an .xlsx Excel file.', 'error');
+      setImportStatus(window.LibraryI18n.t('Please choose an .xlsx Excel file.'), 'error');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setImportStatus('This file is larger than 5 MB. Please use a smaller question-bank file.', 'error');
+      setImportStatus(window.LibraryI18n.t('This file is larger than 5 MB. Please use a smaller question-bank file.'), 'error');
       return;
     }
 
-    setImportStatus('Checking “' + file.name + '”…', 'loading');
+    setImportStatus(window.LibraryI18n.t('Checking “') + file.name + '”…', 'loading');
     setStatus('');
     try {
       var result = await importWorkbook(file);
@@ -121,8 +121,8 @@
       renderCurrentBank();
       setImportStatus(makeImportStatus(result.summary), result.summary.issues.length ? 'error' : 'ready');
       setStatus(result.summary.issues.length
-        ? 'Fix the issues in your Excel file, then import it again.'
-        : 'Preview ready. Review the questions, then save this bank to your browser.');
+        ? window.LibraryI18n.t('Fix the issues in your Excel file, then import it again.')
+        : window.LibraryI18n.t('Preview ready. Review the questions, then save this bank to your browser.'));
     } catch (error) {
       pendingBank = null;
       importSummary = null;
@@ -130,7 +130,7 @@
       els.saveImportButton.disabled = true;
       els.clearImportButton.disabled = false;
       renderCurrentBank();
-      setImportStatus(error.message || 'This Excel file could not be read.', 'error');
+      setImportStatus(window.LibraryI18n.t(error.message) || window.LibraryI18n.t('This Excel file could not be read.'), 'error');
     }
   }
 
@@ -146,10 +146,10 @@
       renderBankSelect(currentBank.id);
       renderFilters();
       renderCurrentBank();
-      setImportStatus('Saved “' + currentBank.name + '” to this browser.', 'ready');
-      setStatus('Your question bank is ready to use and download as a backup.');
+      setImportStatus(window.LibraryI18n.t('Saved “') + currentBank.name + window.LibraryI18n.t('” to this browser.'), 'ready');
+      setStatus(window.LibraryI18n.t('Your question bank is ready to use and download as a backup.'));
     } catch (error) {
-      setStatus(error.message || 'This question bank could not be saved.');
+      setStatus(window.LibraryI18n.t(error.message) || window.LibraryI18n.t('This question bank could not be saved.'));
     }
   }
 
@@ -159,7 +159,7 @@
     els.file.value = '';
     els.saveImportButton.disabled = true;
     els.clearImportButton.disabled = true;
-    setImportStatus('No file selected yet. Select the spreadsheet you shared to preview its questions here.', '');
+    setImportStatus(window.LibraryI18n.t('No file selected yet. Select the spreadsheet you shared to preview its questions here.'), '');
     var selectedId = els.bankSelect.value;
     currentBank = selectedId ? window.ChenQuestionBank.load(selectedId) : null;
     els.downloadButton.disabled = !currentBank;
@@ -186,12 +186,12 @@
     els.bankSelect.replaceChildren();
     var placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = presetBanks.length ? 'Choose a Chen Laoshi preset bank' : 'Loading preset banks…';
+    placeholder.textContent = presetBanks.length ? window.LibraryI18n.t('Choose a Chen Laoshi preset bank') : window.LibraryI18n.t('Loading preset banks…');
     els.bankSelect.append(placeholder);
     presetBanks.forEach(function (bank) {
       var option = document.createElement('option');
       option.value = bank.id;
-      option.textContent = bank.name + ' · ' + bank.count + ' questions';
+      option.textContent = bank.name + ' · ' + bank.count + window.LibraryI18n.t(' questions');
       els.bankSelect.append(option);
     });
     els.bankSelect.disabled = !presetBanks.length;
@@ -203,7 +203,7 @@
   function loadPresetBanks() {
     fetch('/api/questionbanks/presets')
       .then(function (response) {
-        if (!response.ok) throw new Error('Preset question banks could not be loaded.');
+        if (!response.ok) throw new Error(window.LibraryI18n.t('Preset question banks could not be loaded.'));
         return response.json();
       })
       .then(function (payload) {
@@ -213,8 +213,8 @@
         renderCurrentBank();
       })
       .catch(function () {
-        els.presetBanks.innerHTML = '<p class="saved-empty">Preset question banks are unavailable right now. Please try again shortly.</p>';
-        els.resultsNote.textContent = 'Preset question banks are unavailable right now.';
+        els.presetBanks.innerHTML = (window.LibraryI18n.chinese ? "<p class=\"saved-empty\">暂时无法加载预设题库，请稍后重试。</p>" : '<p class="saved-empty">Preset question banks are unavailable right now. Please try again shortly.</p>');
+        els.resultsNote.textContent = window.LibraryI18n.t('Preset question banks are unavailable right now.');
       });
   }
 
@@ -226,10 +226,10 @@
       return [bank.name, bank.theme, bank.description].join(' ').toLocaleLowerCase().indexOf(query) !== -1;
     });
     els.presetSearchStatus.textContent = query
-      ? 'Showing ' + matches.length + ' topic ' + (matches.length === 1 ? 'bank' : 'banks') + ' for “' + query + '”.'
-      : presetBanks.length + ' topic banks ready to explore.';
+      ? window.LibraryI18n.t('Showing ') + matches.length + window.LibraryI18n.t(' topic ') + (window.LibraryI18n.chinese ? '题库' : matches.length === 1 ? 'bank' : 'banks') + window.LibraryI18n.t(' for “') + query + '”.'
+      : presetBanks.length + window.LibraryI18n.t(' topic banks ready to explore.');
     if (!matches.length) {
-      els.presetBanks.innerHTML = '<p class="saved-empty">No topic matches that search. Try another word or theme.</p>';
+      els.presetBanks.innerHTML = (window.LibraryI18n.chinese ? "<p class=\"saved-empty\">没有符合搜索条件的主题，请换个词语或主题。</p>" : '<p class="saved-empty">No topic matches that search. Try another word or theme.</p>');
       return;
     }
     matches.forEach(function (bank) {
@@ -237,7 +237,7 @@
       card.className = 'preset-bank';
       card.type = 'button';
       card.dataset.presetId = bank.id;
-      card.setAttribute('aria-label', 'Explore ' + bank.name);
+      card.setAttribute('aria-label', window.LibraryI18n.t('Explore ') + bank.name);
       var icon = document.createElement('span');
       icon.className = 'preset-icon';
       icon.setAttribute('aria-hidden', 'true');
@@ -258,7 +258,7 @@
   function loadPresetBank(id) {
     fetch('/api/questionbanks/presets/' + encodeURIComponent(id))
       .then(function (response) {
-        if (!response.ok) throw new Error('That preset question bank could not be loaded.');
+        if (!response.ok) throw new Error(window.LibraryI18n.t('That preset question bank could not be loaded.'));
         return response.json();
       })
       .then(function (bank) {
@@ -269,20 +269,21 @@
         renderBankSelect(bank.id);
         renderFilters();
         renderCurrentBank();
-        setStatus('Loaded “' + bank.name + '”.');
+        setStatus(window.LibraryI18n.t('Loaded “') + bank.name + '”.');
       })
       .catch(function (error) {
-        setStatus(error.message || 'That preset question bank could not be loaded.');
+        setStatus(window.LibraryI18n.t(error.message) || window.LibraryI18n.t('That preset question bank could not be loaded.'));
       });
   }
 
   function renderSavedBanks() {
     els.savedBanks.replaceChildren();
     var banks = window.ChenQuestionBank.listAll();
+    els.savedBanks.closest('section').hidden = banks.length === 0;
     if (!banks.length) {
       var empty = document.createElement('p');
       empty.className = 'saved-empty';
-      empty.textContent = 'No question banks have been saved in this browser yet.';
+      empty.textContent = window.LibraryI18n.t('No question banks have been saved in this browser yet.');
       els.savedBanks.append(empty);
       return;
     }
@@ -292,12 +293,12 @@
       var title = document.createElement('h3');
       title.textContent = bank.name;
       var detail = document.createElement('p');
-      detail.textContent = bank.questionCount + ' questions · ' + bank.themeCount + ' themes';
+      detail.textContent = bank.questionCount + window.LibraryI18n.t(' questions · ') + bank.themeCount + window.LibraryI18n.t(' themes');
       var actions = document.createElement('div');
       actions.className = 'saved-actions';
       actions.append(
-        createActionButton('Open', 'load', bank.id),
-        createActionButton('Remove', 'remove', bank.id, true)
+        createActionButton(window.LibraryI18n.t('Open'), 'load', bank.id),
+        createActionButton(window.LibraryI18n.t('Remove'), 'remove', bank.id, true)
       );
       card.append(title, detail, actions);
       els.savedBanks.append(card);
@@ -315,7 +316,7 @@
       renderBankSelect();
       renderFilters();
       renderCurrentBank();
-      setStatus('Removed that question bank from this browser.');
+      setStatus(window.LibraryI18n.t('Removed that question bank from this browser.'));
       return;
     }
     pendingBank = null;
@@ -325,7 +326,7 @@
     renderFilters();
     renderCurrentBank();
     els.downloadButton.disabled = !currentBank;
-    setStatus(currentBank ? 'Loaded “' + currentBank.name + '”.' : 'That question bank could not be found.');
+    setStatus(currentBank ? window.LibraryI18n.t('Loaded “') + currentBank.name + '”.' : window.LibraryI18n.t('That question bank could not be found.'));
   }
 
   function renderFilters() {
@@ -334,9 +335,9 @@
       return;
     }
     els.filters.hidden = false;
-    populateFilter(els.themeFilter, currentBank.questions.map(function (question) { return question.theme; }), 'All themes');
-    populateFilter(els.levelFilter, currentBank.questions.map(function (question) { return question.level; }), 'All levels');
-    populateFilter(els.typeFilter, currentBank.questions.map(function (question) { return question.type; }), 'All types');
+    populateFilter(els.themeFilter, currentBank.questions.map(function (question) { return question.theme; }), window.LibraryI18n.t('All themes'));
+    populateFilter(els.levelFilter, currentBank.questions.map(function (question) { return question.level; }), window.LibraryI18n.t('All levels'));
+    populateFilter(els.typeFilter, currentBank.questions.map(function (question) { return question.type; }), window.LibraryI18n.t('All types'));
   }
 
   function populateFilter(select, values, label) {
@@ -360,10 +361,10 @@
 
   function renderCurrentBank() {
     var count = currentBank && currentBank.questions ? currentBank.questions.length : 0;
-    els.questionTotal.textContent = count + ' question' + (count === 1 ? '' : 's');
+    els.questionTotal.textContent = count + window.LibraryI18n.t(' question') + (window.LibraryI18n.chinese || count === 1 ? '' : 's');
     els.questionList.replaceChildren();
     if (!currentBank || !count) {
-      els.resultsNote.textContent = 'Choose a Chen Laoshi preset bank to see its questions here.';
+      els.resultsNote.textContent = window.LibraryI18n.t('Choose a Chen Laoshi preset bank to see its questions here.');
       return;
     }
     renderQuestions();
@@ -386,11 +387,11 @@
         (!level || question.level === level) &&
         (!type || question.type === type);
     });
-    els.resultsNote.textContent = questions.length + ' of ' + currentBank.questions.length + ' questions shown in “' + currentBank.name + '”.';
+    els.resultsNote.textContent = questions.length + window.LibraryI18n.t(' of ') + currentBank.questions.length + window.LibraryI18n.t(' questions shown in “') + currentBank.name + '”.';
     if (!questions.length) {
       var empty = document.createElement('p');
       empty.className = 'saved-empty';
-      empty.textContent = 'No questions match these filters.';
+      empty.textContent = window.LibraryI18n.t('No questions match these filters.');
       els.questionList.append(empty);
       return;
     }
@@ -444,13 +445,13 @@
     var answer = document.createElement('p');
     answer.className = 'question-answer';
     var displayAnswer = getDisplayAnswer(question);
-    answer.innerHTML = '<strong>Answer:</strong> ';
+    answer.innerHTML = (window.LibraryI18n.chinese ? "<strong>答案：</strong> " : '<strong>Answer:</strong> ');
     answer.append(document.createTextNode(displayAnswer));
     card.append(answer);
     if (question.note) {
       var note = document.createElement('p');
       note.className = 'question-answer';
-      note.innerHTML = '<strong>Teacher note:</strong> ';
+      note.innerHTML = (window.LibraryI18n.chinese ? "<strong>教师备注：</strong> " : '<strong>Teacher note:</strong> ');
       note.append(document.createTextNode(question.note));
       card.append(note);
     }
@@ -472,7 +473,7 @@
     link.download = safeFilename(currentBank.name) + '.json';
     link.click();
     URL.revokeObjectURL(link.href);
-    setStatus('Downloaded a JSON backup of “' + currentBank.name + '”.');
+    setStatus(window.LibraryI18n.t('Downloaded a JSON backup of “') + currentBank.name + '”.');
   }
 
   async function importWorkbook(file) {
@@ -480,17 +481,17 @@
     var sharedStrings = await readSharedStrings(zip);
     var sheetPath = await findQuestionSheetPath(zip);
     var worksheetFile = zip.file(sheetPath);
-    if (!worksheetFile) throw new Error('The question sheet could not be found in this workbook.');
+    if (!worksheetFile) throw new Error(window.LibraryI18n.t('The question sheet could not be found in this workbook.'));
     var worksheet = parseXml(await worksheetFile.async('text'));
     var grid = readWorksheetGrid(worksheet, sharedStrings);
-    if (!grid.length) throw new Error('The question sheet is empty.');
+    if (!grid.length) throw new Error(window.LibraryI18n.t('The question sheet is empty.'));
 
     var headerRowIndex = grid.findIndex(function (row) {
       return REQUIRED_FIELDS.every(function (field) {
         return HEADER_ALIASES[field].some(function (header) { return row.indexOf(header) >= 0; });
       });
     });
-    if (headerRowIndex < 0) throw new Error('We could not find the expected question-bank column headers.');
+    if (headerRowIndex < 0) throw new Error(window.LibraryI18n.t('We could not find the expected question-bank column headers.'));
     var headers = grid[headerRowIndex];
     var headerMap = Object.fromEntries(headers.map(function (header, index) { return [String(header).trim(), index]; }));
     function headerIndex(field) {
@@ -498,7 +499,7 @@
       return alias == null ? null : headerMap[alias];
     }
     var missingHeaders = REQUIRED_FIELDS.filter(function (field) { return headerIndex(field) == null; });
-    if (missingHeaders.length) throw new Error('Missing columns: ' + missingHeaders.map(function (field) { return HEADER_ALIASES[field][0]; }).join(', ') + '.');
+    if (missingHeaders.length) throw new Error(window.LibraryI18n.t('Missing columns: ') + missingHeaders.map(function (field) { return HEADER_ALIASES[field][0]; }).join(', ') + '.');
 
     var issues = [];
     var ids = new Set();
@@ -521,17 +522,17 @@
       };
       var excelRow = headerRowIndex + rowIndex + 2;
       if (!question.id || !question.prompt || !question.answer) {
-        issues.push('Row ' + excelRow + ' is missing an ID, question, or answer.');
+        issues.push(window.LibraryI18n.t('Row ') + excelRow + window.LibraryI18n.t(' is missing an ID, question, or answer.'));
       }
-      if (ids.has(question.id)) issues.push('Question ID “' + question.id + '” appears more than once.');
+      if (ids.has(question.id)) issues.push(window.LibraryI18n.t('Question ID “') + question.id + window.LibraryI18n.t('” appears more than once.'));
       ids.add(question.id);
       if (/^(单选题|multiple choice)$/i.test(question.type) && ![question.optionA, question.optionB, question.optionC, question.optionD].every(Boolean)) {
-        issues.push('Multiple-choice question “' + question.id + '” is missing an option.');
+        issues.push(window.LibraryI18n.t('Multiple-choice question “') + question.id + window.LibraryI18n.t('” is missing an option.'));
       }
       return window.ChenQuestionBank.normalizeQuestion(question);
     }).filter(Boolean);
 
-    if (!questions.length) throw new Error('No questions were found below the header row.');
+    if (!questions.length) throw new Error(window.LibraryI18n.t('No questions were found below the header row.'));
     var bankName = grid.slice(headerRowIndex + 1).map(function (row) {
       var bankNameIndex = headerIndex('bankName');
       return bankNameIndex == null ? '' : String(row[bankNameIndex] || '').trim();
@@ -566,7 +567,7 @@
     var workbook = parseXml(await workbookFile.async('text'));
     var sheets = Array.from(workbook.getElementsByTagName('sheet'));
     var preferred = sheets.find(function (sheet) { return /^(Question Bank|题库)$/i.test(sheet.getAttribute('name') || ''); }) || sheets[0];
-    if (!preferred) throw new Error('This workbook does not include a worksheet.');
+    if (!preferred) throw new Error(window.LibraryI18n.t('This workbook does not include a worksheet.'));
     var relationId = getAttributeBySuffix(preferred, 'id');
     var relationsFile = zip.file('xl/_rels/workbook.xml.rels');
     if (!relationsFile || !relationId) return 'xl/worksheets/sheet1.xml';
@@ -626,14 +627,14 @@
 
   function parseXml(text) {
     var document = new DOMParser().parseFromString(text, 'application/xml');
-    if (document.getElementsByTagName('parsererror').length) throw new Error('This Excel file contains unreadable worksheet data.');
+    if (document.getElementsByTagName('parsererror').length) throw new Error(window.LibraryI18n.t('This Excel file contains unreadable worksheet data.'));
     return document;
   }
 
   function makeImportStatus(summary) {
-    var firstLine = summary.questions + ' questions · ' + summary.themes + ' themes · ' + summary.types + ' question types.';
-    if (!summary.issues.length) return firstLine + ' Your file is ready to save.';
-    return firstLine + ' ' + summary.issues.length + ' issue' + (summary.issues.length === 1 ? '' : 's') + ' found: ' + summary.issues.slice(0, 2).join(' ');
+    var firstLine = summary.questions + window.LibraryI18n.t(' questions · ') + summary.themes + window.LibraryI18n.t(' themes · ') + summary.types + window.LibraryI18n.t(' question types.');
+    if (!summary.issues.length) return firstLine + window.LibraryI18n.t(' Your file is ready to save.');
+    return firstLine + ' ' + summary.issues.length + window.LibraryI18n.t(' issue') + (window.LibraryI18n.chinese || summary.issues.length === 1 ? '' : 's') + window.LibraryI18n.t(' found: ') + summary.issues.slice(0, 2).join(' ');
   }
 
   function setImportStatus(message, state) {
@@ -641,7 +642,7 @@
     els.importStatus.replaceChildren();
     var title = document.createElement('p');
     title.className = 'status-title';
-    title.textContent = state === 'ready' ? 'Import preview ready' : state === 'error' ? 'Import needs attention' : state === 'loading' ? 'Reading your workbook' : 'No file selected yet.';
+    title.textContent = state === 'ready' ? window.LibraryI18n.t('Import preview ready') : state === 'error' ? window.LibraryI18n.t('Import needs attention') : state === 'loading' ? window.LibraryI18n.t('Reading your workbook') : window.LibraryI18n.t('No file selected yet.');
     var detail = document.createElement('p');
     detail.textContent = message;
     els.importStatus.append(title, detail);

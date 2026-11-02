@@ -85,3 +85,7 @@
   .game-share-manager-actions a,
   .game-share-manager-actions button { min-width: 0; padding-inline: 5px; }
 }
+
+.game-share-dialog [data-share-mode][hidden] { display: none; }
+.game-share-dialog select { width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid #c8d2c5; border-radius: 10px; background: #fff; color: #193d38; }
+.game-share-dialog [data-share-mode] span { font-weight: 400; line-height: 1.55; }

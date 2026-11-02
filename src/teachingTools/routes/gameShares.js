@@ -133,6 +133,50 @@ router.delete('/api/game-shares/:id', async function (req, res, next) {
   }
 });
 
+function requireAssessment(req, res, next) {
+  var manifest = req.gameShareManifest;
+  if (!req.signedCookies || req.signedCookies[cookieName(manifest.shareId)] !== '1') {
+    return res.status(401).json({ error: 'Enter the game password first.' });
+  }
+  if (manifest.gameType !== 'sentence-reorder' || manifest.payload.mode !== 'assessment') {
+    return res.status(400).json({ error: 'This link is not a quiz.' });
+  }
+  var name = typeof req.body.studentName === 'string' ? req.body.studentName.normalize('NFKC').trim().replace(/\s+/g, ' ') : '';
+  if (!name || name.length > 80) return res.status(400).json({ error: 'Enter your name (up to 80 characters).' });
+  req.studentName = name;
+  res.set('Cache-Control', 'no-store');
+  next();
+}
+
+router.post('/play/:id/attempt', loadManifest, requireAssessment, async function (req, res, next) {
+  try {
+    var submission = await storage.getSubmission(req.params.id, req.studentName);
+    res.json({ studentName: req.studentName, submission: submission });
+  } catch (error) { next(error); }
+});
+
+router.post('/play/:id/submit', loadManifest, requireAssessment, async function (req, res, next) {
+  try {
+    var existing = await storage.getSubmission(req.params.id, req.studentName);
+    if (existing) return res.status(409).json({ error: 'This name has already submitted this quiz.', submission: existing });
+    var data = req.gameShareManifest.payload;
+    var answers = req.body.answers;
+    if (!Array.isArray(answers) || answers.length !== data.sentences.length || answers.some(function (answer, index) {
+      return !Array.isArray(answer) || answer.some(function (word) { return typeof word !== 'string'; }) ||
+        JSON.stringify(answer.slice().sort()) !== JSON.stringify(data.sentences[index].words.slice().sort());
+    })) return res.status(400).json({ error: 'Complete every sentence before submitting.' });
+    function normalize(word) { return data.relaxed ? word.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '') : word; }
+    var correct = answers.map(function (answer, index) {
+      return answer.every(function (word, wordIndex) { return normalize(word) === normalize(data.sentences[index].words[wordIndex]); });
+    });
+    var submission = { studentName: req.studentName, answers: answers, correct: correct, score: correct.filter(Boolean).length, submittedAt: new Date().toISOString() };
+    if (!(await storage.saveSubmission(req.params.id, req.studentName, submission))) {
+      return res.status(409).json({ error: 'This name has already submitted this quiz.', submission: await storage.getSubmission(req.params.id, req.studentName) });
+    }
+    res.status(201).json({ submission: submission });
+  } catch (error) { next(error); }
+});
+
 router.get('/play/:id', loadManifest, function (req, res, next) {
   var manifest = req.gameShareManifest;
   var authorized = req.signedCookies && req.signedCookies[cookieName(manifest.shareId)] === '1';

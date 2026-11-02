@@ -23,7 +23,7 @@ for (const file of ['sentence-reorder.js', 'sentence-reorder-player.js']) {
       }
     };
     chips.forEach(chip => { chip.parentElement = track; });
-    const context = { document: { getElementById: () => track, removeEventListener() {} }, syncOrderFromDom() {}, onPointerMove() {}, drag: null };
+    const context = { document: { getElementById: () => track, removeEventListener() {} }, assessment: false, syncOrderFromDom() {}, onPointerMove() {}, drag: null };
     for (const name of ['isLockedChip', 'restoreLockedPositions', 'onChipKeyDown', 'findNearestChip', 'onPointerUp']) {
       const start = source.indexOf('  function ' + name + '(');
       let end = source.indexOf('\n  function ', start + 1);

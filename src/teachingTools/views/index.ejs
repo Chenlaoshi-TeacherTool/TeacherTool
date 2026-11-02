@@ -6,8 +6,8 @@
     <meta name="google-site-verification" content="hK7TpxV7vuEkO3PJkUcMAsZw4VzaJJk7XY9cJeCKsM0">
     <%- include('partials/adsense') %>
     <meta name="theme-color" content="#194f45">
-    <title>Chen Laoshi's Teaching Toolkit</title>
-    <%- include('partials/seo', { pageDescription: 'Practical classroom tools, adaptable teaching activities, and thoughtful resources for educators across subjects.' }) %>
+    <title>Chen Laoshi's Teaching Toolkit · 陈老师教学工具</title>
+    <%- include('partials/seo', { pageDescription: 'Practical classroom tools, adaptable teaching activities, and thoughtful resources for educators across subjects. 陈老师教学工具：中文教学、汉字练习、词汇活动与可打印课堂资源。' }) %>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
     <link rel="stylesheet" href="/stylesheets/tool-snapshots.css?v=1">
     <style>
@@ -105,7 +105,6 @@
         }
         .teacher-avatar { position: relative; overflow: hidden; border: 6px solid #fff6db; border-radius: 50%; background: #194f45; box-shadow: 0 0 0 7px #f8c63f, 0 19px 35px rgba(8, 45, 38, .35); }
         .teacher-avatar img { display: block; width: 100%; height: auto; }
-        .teacher-avatar::after { position: absolute; right: 11%; bottom: 5%; content: 'Chen Laoshi'; color: #194f45; font-family: 'Inter Variable', Arial, sans-serif; font-size: .72rem; font-weight: 900; letter-spacing: .04em; }
         .home-paths-section { padding: 68px 20px 74px; }
         .home-paths-shell { max-width: 1160px; margin: 0 auto; }
         .home-paths-header { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(280px, .7fr); gap: 48px; align-items: end; }
@@ -227,6 +226,14 @@
         </div>
     </main>
 
+    <section class="content-section" style="background:#edf5df" aria-labelledby="chinese-teaching-title">
+      <div class="content-shell">
+        <h2 id="chinese-teaching-title"><%= lang === 'zh' ? '中文教学专区' : 'Chinese Teaching' %></h2>
+        <p><%= lang === 'zh' ? '为中文课堂准备的识字、书写、词汇、句型和教材配套资源。' : 'Character recognition, writing, vocabulary, sentence patterns, and textbook resources for Chinese classrooms.' %></p>
+        <a class="btn" href="/chinese-teaching"><%= lang === 'zh' ? '按教学任务查找资源' : 'Browse by teaching task' %> →</a>
+      </div>
+    </section>
+
     <section class="content-section" aria-labelledby="home-recommendations-heading">
         <div class="content-shell recommendation-feature">
             <div>
@@ -242,6 +249,8 @@
             </aside>
         </div>
     </section>
+
+
 
     <section class="shop-preview" aria-labelledby="shop-preview-heading">
         <div class="shop-preview-copy">

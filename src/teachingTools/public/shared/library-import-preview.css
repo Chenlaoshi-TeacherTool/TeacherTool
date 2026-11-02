@@ -22,3 +22,8 @@
 .library-import-preview #libraryKeepBoth { width: auto; }
 .library-import-preview label[hidden] { display: none; }
 @media print { .library-personal { display: none !important; } }
+
+@media (max-width: 640px) {
+  .saved .section-heading { flex-direction: column; align-items: flex-start; }
+  .saved .storage-note { max-width: none; text-align: left; }
+}

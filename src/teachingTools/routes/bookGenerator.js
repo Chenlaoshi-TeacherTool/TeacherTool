@@ -30,6 +30,23 @@ function authCookieName(bookId) {
   return 'book_auth_' + bookId;
 }
 
+function draftToken(draftId) {
+  var secret = process.env.BOOK_DRAFT_SECRET || process.env.COOKIE_SECRET || 'dev-only-cookie-secret-change-in-production';
+  return crypto.createHmac('sha256', secret).update(draftId).digest('hex');
+}
+
+function validDraftToken(draftId, token) {
+  var expected = Buffer.from(draftToken(draftId));
+  var supplied = Buffer.from(String(token || ''));
+  return supplied.length === expected.length && crypto.timingSafeEqual(supplied, expected);
+}
+
+function safeEqual(left, right) {
+  var leftBuffer = Buffer.from(String(left || ''));
+  var rightBuffer = Buffer.from(String(right || ''));
+  return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);
+}
+
 // ===== Editor page =====
 
 router.get('/teaching-tools/book-generator', function (req, res) {
@@ -37,6 +54,23 @@ router.get('/teaching-tools/book-generator', function (req, res) {
     title: 'Book Generator',
     toolGuide: siteContentStore.get().toolGuides['book-generator'] || null
   });
+});
+
+router.post('/api/book-generator/drafts', async function (req, res, next) {
+  try {
+    var requestedId = req.body && req.body.draftId;
+    if (requestedId && !/^[a-zA-Z0-9-]+$/.test(requestedId)) {
+      return res.status(400).json({ error: 'Invalid draftId.' });
+    }
+    var draftId = requestedId || crypto.randomUUID();
+    var existing = requestedId ? await bookStorage.getManifest(draftId) : null;
+    if (existing && (!req.body.deleteToken || !existing.deleteToken || !safeEqual(req.body.deleteToken, existing.deleteToken))) {
+      return res.status(403).json({ error: 'This draft cannot be changed from this browser.' });
+    }
+    res.status(201).json({ draftId: draftId, draftToken: draftToken(draftId) });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // ===== Draft asset upload =====
@@ -57,6 +91,9 @@ router.post('/api/book-generator/pages/upload', upload.single('file'), async fun
     }
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded.' });
+    }
+    if (!validDraftToken(draftId, req.body.draftToken)) {
+      return res.status(403).json({ error: 'This published book cannot be changed from this browser.' });
     }
     if (req.file.size > SIZE_LIMITS[kind]) {
       return res.status(400).json({ error: 'File too large for ' + kind + ' (max ' + Math.round(SIZE_LIMITS[kind] / (1024 * 1024)) + 'MB).' });
@@ -82,6 +119,10 @@ router.post('/api/book-generator/publish', async function (req, res) {
     if (!draftId || !/^[a-zA-Z0-9-]+$/.test(draftId)) {
       return res.status(400).json({ error: 'Invalid draftId.' });
     }
+    if (!validDraftToken(draftId, body.draftToken)) {
+      return res.status(403).json({ error: 'This draft cannot be published from this browser.' });
+    }
+    var existing = await bookStorage.getManifest(draftId);
     if (!password || String(password).length < 4) {
       return res.status(400).json({ error: 'Password must be at least 4 characters.' });
     }
@@ -98,14 +139,14 @@ router.post('/api/book-generator/publish', async function (req, res) {
     }
 
     var passwordHash = await bcrypt.hash(String(password), 10);
-    var deleteToken = crypto.randomUUID();
+    var deleteToken = existing ? existing.deleteToken : crypto.randomUUID();
     var now = new Date();
     var manifest = {
       bookId: draftId,
       title: typeof body.title === 'string' ? body.title.slice(0, 200) : '',
       passwordHash: passwordHash,
       deleteToken: deleteToken,
-      createdAt: now.toISOString(),
+      createdAt: existing ? existing.createdAt : now.toISOString(),
       expiresAt: new Date(now.getTime() + BOOK_TTL_MS).toISOString(),
       pages: pages.map(function (page) {
         return {
@@ -175,9 +216,12 @@ router.get('/book/:id', async function (req, res, next) {
     });
     var musicUrl = manifest.musicBlob ? bookStorage.getReadUrl(bookId, manifest.musicBlob) : null;
 
+    var bookData = { title: manifest.title, pages: pages, musicUrl: musicUrl };
+
     res.render('book-generator/player', {
       title: manifest.title || 'Book',
-      bookData: { title: manifest.title, pages: pages, musicUrl: musicUrl }
+      bookData: bookData,
+      bookDataJson: JSON.stringify(bookData).replace(/</g, '\\u003c')
     });
   } catch (err) { next(err); }
 });

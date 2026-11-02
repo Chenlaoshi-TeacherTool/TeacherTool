@@ -130,6 +130,30 @@
           "actions": ["read"]
         }
       ]
+    },
+    "TextbookLesson": {
+      "source": "dbo.textbook_lessons",
+      "rest": {
+        "path": "/textbooklessons"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
+    },
+    "TextbookLessonItem": {
+      "source": "dbo.textbook_lesson_items",
+      "rest": {
+        "path": "/textbooklessonitems"
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": ["read"]
+        }
+      ]
     }
   }
 }

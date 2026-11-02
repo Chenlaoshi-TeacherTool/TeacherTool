@@ -31,6 +31,7 @@ app.use(function(req, res, next) {
   var protocol = forwardedProto || req.protocol || 'https';
   res.locals.siteUrl = process.env.SITE_URL || (forwardedHost ? protocol + '://' + forwardedHost : 'https://clsteachingtools.com');
   res.locals.requestPath = req.path || '/';
+  res.locals.baiduSiteVerification = process.env.BAIDU_SITE_VERIFICATION || '';
   next();
 });
 
@@ -66,6 +67,13 @@ app.get('/javascripts/milk-tea-footer.js', function(req, res) {
   res.type('application/javascript').send(navScript);
 });
 
+app.use(function(req, res, next) {
+  if (/^\/(?:api|admin|book|play)(?:\/|$)/.test(req.path) || /^\/teaching-tools\/(?:my-library|word-list-library|question-bank-library)(?:\/|$)/.test(req.path)) {
+    res.set('X-Robots-Tag', 'noindex, nofollow');
+    res.locals.noindex = true;
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));
 
 app.use('/', siteStructureRouter);

@@ -456,8 +456,10 @@ function bankPages() {
     rows.push({ head: true, text: (cat.name || ('Category ' + (ci + 1))) });
     cat.clues.forEach(function (cl, ri) {
       if (!cl.q) return;
-      rows.push({ text: valueOf(ri) + '　' + cl.q.replace(/\n/g, ' ') + (cl.dd ? '　[DD]' : '') });
-      rows.push({ ans: true, text: 'Answer: ' + (cl.a || '') });
+      wrapText(valueOf(ri) + '　' + cl.q.replace(/\n/g, ' ') + (cl.dd ? '　[DD]' : ''), 50)
+        .forEach(function (line) { rows.push({ text: line }); });
+      wrapText('Answer: ' + (cl.a || ''), 52)
+        .forEach(function (line) { rows.push({ ans: true, text: line }); });
     });
     rows.push({ text: '' });
   });
@@ -474,9 +476,9 @@ function bankPages() {
         g += '<rect x="24" y="' + (y - 20) + '" width="' + (W - 48) + '" height="30" rx="8" fill="#F6C43C" stroke="#1B2A47" stroke-width="2"/>';
         g += '<text x="34" y="' + (y + 2) + '" font-size="19" font-weight="700" fill="#1B2A47">' + esc(row.text) + '</text>';
       } else if (row.ans) {
-        g += '<text x="52" y="' + y + '" font-size="15" fill="#3E6E58">' + esc(row.text.slice(0, 52)) + '</text>';
+        g += '<text x="52" y="' + y + '" font-size="15" fill="#3E6E58">' + esc(row.text) + '</text>';
       } else if (row.text) {
-        g += '<text x="34" y="' + y + '" font-size="16" fill="#1B2A47">' + esc(row.text.slice(0, 50)) + '</text>';
+        g += '<text x="34" y="' + y + '" font-size="16" fill="#1B2A47">' + esc(row.text) + '</text>';
       }
       y += 36;
     });

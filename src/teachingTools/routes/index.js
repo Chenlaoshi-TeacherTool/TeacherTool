@@ -80,6 +80,10 @@ router.get('/teaching-tools/lucky-wheel', function(req, res) {
   res.redirect(302, '/teaching-tools/lucky-wheel/');
 });
 
+router.get('/chinese-teaching', function(req, res) {
+  res.render('chinese-teaching', { title: 'Chinese Teaching' });
+});
+
 router.get('/teaching-tools', function(req, res, next) {
   res.render('teaching-tools/index', { title: 'Teaching Tools' });
 });
@@ -301,8 +305,12 @@ router.get('/sitemap.xml', function(req, res) {
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
   paths = paths.concat(products.length ? products.map(function(product) { return '/classroom-finds/' + product.slug; }) : ['/classroom-finds/15-drawer-rolling-cart']);
-  var urls = paths.map(function(path) {
-    return '  <url><loc>' + baseUrl + path + '</loc></url>';
+  var privatePaths = ['/teaching-tools/word-list-library/word-list-library.html', '/teaching-tools/question-bank-library/question-bank-library.html'];
+  var urls = paths.filter(function(path, index) {
+    return privatePaths.indexOf(path) === -1 && paths.indexOf(path) === index;
+  }).map(function(path) {
+    var location = (baseUrl + path).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+    return '  <url><loc>' + location + '</loc></url>';
   }).join('\n');
   res.type('application/xml').send('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '\n</urlset>');
 });

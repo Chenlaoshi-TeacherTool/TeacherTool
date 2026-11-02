@@ -84,6 +84,39 @@ CREATE TABLE word_list_items (
 
 CREATE INDEX IX_word_list_items_list_id ON word_list_items(list_id);
 
+-- ===== Textbook companion (/textbook-companion), managed at /admin/textbooks =====
+-- Kept apart from word_lists so the hundreds of per-lesson lists stay out of
+-- the games' library picker. Series keys are listed in config/textbooks.js.
+
+CREATE TABLE textbook_lessons (
+    id                INT IDENTITY(1,1) PRIMARY KEY,
+    slug              NVARCHAR(100) NOT NULL UNIQUE,   -- e.g. "bubian-1a-01"
+    series            NVARCHAR(40)  NOT NULL,          -- "bubian" / "nihao" / "qingsong"
+    book_slug         NVARCHAR(40)  NOT NULL,          -- e.g. "1a", "book-3"
+    book_name         NVARCHAR(100) NOT NULL,          -- e.g. "一年级上册", "第三册"
+    sort_order        INT           NOT NULL DEFAULT 0,
+    lesson_no         INT           NULL,
+    title             NVARCHAR(200) NOT NULL,
+    sentence_patterns NVARCHAR(MAX) NULL,              -- one pattern per line
+    activities        NVARCHAR(MAX) NULL,              -- one activity per line
+    is_published      BIT           NOT NULL DEFAULT 1,
+    updated_at        DATETIME2     NOT NULL DEFAULT SYSUTCDATETIME()
+);
+
+CREATE INDEX IX_textbook_lessons_book ON textbook_lessons(series, book_slug, sort_order);
+
+CREATE TABLE textbook_lesson_items (
+    id          INT IDENTITY(1,1) PRIMARY KEY,
+    lesson_id   INT           NOT NULL FOREIGN KEY REFERENCES textbook_lessons(id) ON DELETE CASCADE,
+    zh          NVARCHAR(100) NOT NULL,
+    py          NVARCHAR(200) NOT NULL,
+    en          NVARCHAR(200) NOT NULL DEFAULT '',
+    kind        NVARCHAR(20)  NULL,                    -- 识字 / 写字 / 词语
+    sort_order  INT           NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IX_textbook_lesson_items_lesson_id ON textbook_lesson_items(lesson_id);
+
 -- ===== Site content (tool guides + articles), consumed by routes/index.js =====
 
 CREATE TABLE tool_guides (

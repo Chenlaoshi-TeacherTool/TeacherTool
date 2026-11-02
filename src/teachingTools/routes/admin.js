@@ -9,6 +9,8 @@ var sqlClient = require('../services/sqlClient');
 var siteContentStore = require('../services/siteContentStore');
 var blobStorage = require('../services/blobStorage');
 var siteMap = require('../config/siteMap');
+var textbooks = require('../config/textbooks');
+var textbookImport = require('../services/textbookImport');
 var sql = sqlClient.sql;
 
 var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
@@ -950,6 +952,195 @@ router.post('/recommendations/:slug/delete', async function (req, res, next) {
     await pool.request().input('slug', sql.NVarChar, req.params.slug).query('DELETE FROM recommendation_products WHERE slug = @slug');
     await siteContentStore.refresh();
     res.redirect('/admin/recommendations');
+  } catch (err) { next(err); }
+});
+
+// ===== Textbook companion lessons (see config/textbooks.js, services/textbookImport.js) =====
+
+function bookPath(series, bookSlug) {
+  return '/admin/textbooks/books/' + encodeURIComponent(series) + '/' + encodeURIComponent(bookSlug);
+}
+
+function lessonInputs(request, body) {
+  var lessonNo = body.lesson_no === '' || body.lesson_no === undefined ? null : Number(body.lesson_no);
+  return request
+    .input('slug', sql.NVarChar, String(body.slug || '').trim())
+    .input('series', sql.NVarChar, body.series)
+    .input('bookSlug', sql.NVarChar, String(body.book_slug || '').trim())
+    .input('bookName', sql.NVarChar, String(body.book_name || '').trim())
+    .input('sortOrder', sql.Int, Number(body.sort_order) || 0)
+    .input('lessonNo', sql.Int, Number.isInteger(lessonNo) ? lessonNo : null)
+    .input('title', sql.NVarChar, String(body.title || '').trim())
+    .input('patterns', sql.NVarChar, String(body.sentence_patterns || '').trim() || null)
+    .input('activities', sql.NVarChar, String(body.activities || '').trim() || null)
+    .input('isPublished', sql.Bit, body.is_published === 'on');
+}
+
+router.get('/textbooks', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().query(
+      'SELECT tl.series, tl.book_slug, MIN(tl.book_name) AS book_name, COUNT(DISTINCT tl.id) AS lesson_count, COUNT(tli.id) AS word_count ' +
+      'FROM textbook_lessons tl LEFT JOIN textbook_lesson_items tli ON tli.lesson_id = tl.id ' +
+      'GROUP BY tl.series, tl.book_slug ORDER BY tl.series, tl.book_slug'
+    );
+    var groups = textbooks.SERIES.map(function (series) {
+      return { series: series, books: result.recordset.filter(function (book) { return book.series === series.key; }) };
+    });
+    res.render('admin/textbooks-index', { title: 'Textbooks', groups: groups, bookPath: bookPath, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.get('/textbooks/import', function (req, res) {
+  res.render('admin/textbooks-import', { title: 'Import textbook lessons', result: null, adminUser: req.adminUser });
+});
+
+router.post('/textbooks/import', upload.single('file'), async function (req, res, next) {
+  function render(result) {
+    res.render('admin/textbooks-import', { title: 'Import textbook lessons', result: result, adminUser: req.adminUser });
+  }
+  try {
+    if (!req.file) return render({ errors: ['No file was uploaded.'] });
+    var workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(req.file.buffer);
+    var pool = await sqlClient.getPool();
+    var parsed = textbookImport.readWorkbook(workbook, await textbookImport.existingLessonIds(pool));
+    if (parsed.errors.length) return render({ errors: parsed.errors });
+    render({ counts: await textbookImport.applyImport(pool, sql, parsed) });
+  } catch (err) { next(err); }
+});
+
+router.get('/textbooks/export', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var lessons = await pool.request().query('SELECT * FROM textbook_lessons ORDER BY series, book_slug, sort_order, id');
+    var items = await pool.request().query('SELECT * FROM textbook_lesson_items ORDER BY lesson_id, sort_order, id');
+    var workbook = textbookImport.buildWorkbook(ExcelJS, lessons.recordset, items.recordset);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="textbook-lessons.xlsx"');
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) { next(err); }
+});
+
+router.get('/textbooks/books/:series/:book', async function (req, res, next) {
+  try {
+    var series = textbooks.findSeries(req.params.series);
+    if (!series) return res.status(404).send('Textbook series not found.');
+    var pool = await sqlClient.getPool();
+    var result = await pool.request()
+      .input('series', sql.NVarChar, series.key)
+      .input('bookSlug', sql.NVarChar, req.params.book)
+      .query(
+        'SELECT tl.id, tl.slug, tl.book_name, tl.sort_order, tl.lesson_no, tl.title, tl.is_published, COUNT(tli.id) AS word_count ' +
+        'FROM textbook_lessons tl LEFT JOIN textbook_lesson_items tli ON tli.lesson_id = tl.id ' +
+        'WHERE tl.series = @series AND tl.book_slug = @bookSlug ' +
+        'GROUP BY tl.id, tl.slug, tl.book_name, tl.sort_order, tl.lesson_no, tl.title, tl.is_published ORDER BY tl.sort_order, tl.id'
+      );
+    var bookName = result.recordset[0] ? result.recordset[0].book_name : req.params.book;
+    res.render('admin/textbooks-book', {
+      title: series.zh + ' ' + bookName, series: series, bookSlug: req.params.book, bookName: bookName,
+      lessons: result.recordset, adminUser: req.adminUser
+    });
+  } catch (err) { next(err); }
+});
+
+router.get('/textbooks/lessons/new', function (req, res) {
+  var series = textbooks.findSeries(req.query.series) || textbooks.SERIES[0];
+  res.render('admin/textbooks-lesson-edit', {
+    title: 'New lesson', seriesList: textbooks.SERIES, items: [], bookPath: bookPath,
+    lesson: null, defaults: { series: series.key, book_slug: req.query.book || '', book_name: req.query.book_name || '' },
+    adminUser: req.adminUser
+  });
+});
+
+router.post('/textbooks/lessons/new', async function (req, res, next) {
+  try {
+    if (!textbooks.findSeries(req.body.series)) return res.status(400).send('Unknown textbook series.');
+    var pool = await sqlClient.getPool();
+    var result = await lessonInputs(pool.request(), req.body).query(
+      'INSERT INTO textbook_lessons (slug, series, book_slug, book_name, sort_order, lesson_no, title, sentence_patterns, activities, is_published) ' +
+      'OUTPUT INSERTED.id VALUES (@slug, @series, @bookSlug, @bookName, @sortOrder, @lessonNo, @title, @patterns, @activities, @isPublished)'
+    );
+    res.redirect('/admin/textbooks/lessons/' + result.recordset[0].id + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.get('/textbooks/lessons/:id/edit', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var lessonResult = await pool.request().input('id', sql.Int, req.params.id).query('SELECT * FROM textbook_lessons WHERE id = @id');
+    var lesson = lessonResult.recordset[0];
+    if (!lesson) return res.status(404).send('Lesson not found.');
+    var itemsResult = await pool.request().input('lessonId', sql.Int, lesson.id)
+      .query('SELECT * FROM textbook_lesson_items WHERE lesson_id = @lessonId ORDER BY sort_order, id');
+    res.render('admin/textbooks-lesson-edit', {
+      title: 'Edit ' + lesson.title, seriesList: textbooks.SERIES, lesson: lesson, defaults: lesson,
+      items: itemsResult.recordset, bookPath: bookPath, adminUser: req.adminUser
+    });
+  } catch (err) { next(err); }
+});
+
+router.post('/textbooks/lessons/:id', async function (req, res, next) {
+  try {
+    if (!textbooks.findSeries(req.body.series)) return res.status(400).send('Unknown textbook series.');
+    var pool = await sqlClient.getPool();
+    await lessonInputs(pool.request(), req.body).input('id', sql.Int, req.params.id).query(
+      'UPDATE textbook_lessons SET slug=@slug, series=@series, book_slug=@bookSlug, book_name=@bookName, sort_order=@sortOrder, lesson_no=@lessonNo, ' +
+      'title=@title, sentence_patterns=@patterns, activities=@activities, is_published=@isPublished, updated_at=SYSUTCDATETIME() WHERE id=@id'
+    );
+    res.redirect('/admin/textbooks/lessons/' + req.params.id + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/textbooks/lessons/:id/delete', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var result = await pool.request().input('id', sql.Int, req.params.id)
+      .query('DELETE FROM textbook_lessons OUTPUT DELETED.series, DELETED.book_slug WHERE id = @id');
+    var deleted = result.recordset[0];
+    res.redirect(deleted ? bookPath(deleted.series, deleted.book_slug) : '/admin/textbooks');
+  } catch (err) { next(err); }
+});
+
+router.post('/textbooks/lessons/:id/items', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    var maxResult = await pool.request().input('lessonId', sql.Int, req.params.id)
+      .query('SELECT ISNULL(MAX(sort_order), -1) + 1 AS nextOrder FROM textbook_lesson_items WHERE lesson_id = @lessonId');
+    await pool.request()
+      .input('lessonId', sql.Int, req.params.id)
+      .input('zh', sql.NVarChar, req.body.zh)
+      .input('py', sql.NVarChar, req.body.py)
+      .input('en', sql.NVarChar, req.body.en || '')
+      .input('kind', sql.NVarChar, req.body.kind || null)
+      .input('sortOrder', sql.Int, maxResult.recordset[0].nextOrder)
+      .query('INSERT INTO textbook_lesson_items (lesson_id, zh, py, en, kind, sort_order) VALUES (@lessonId, @zh, @py, @en, @kind, @sortOrder)');
+    res.redirect('/admin/textbooks/lessons/' + req.params.id + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/textbooks/lessons/:id/items/:itemId', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request()
+      .input('lessonId', sql.Int, req.params.id)
+      .input('itemId', sql.Int, req.params.itemId)
+      .input('zh', sql.NVarChar, req.body.zh)
+      .input('py', sql.NVarChar, req.body.py)
+      .input('en', sql.NVarChar, req.body.en || '')
+      .input('kind', sql.NVarChar, req.body.kind || null)
+      .query('UPDATE textbook_lesson_items SET zh=@zh, py=@py, en=@en, kind=@kind WHERE id=@itemId AND lesson_id=@lessonId');
+    res.redirect('/admin/textbooks/lessons/' + req.params.id + '/edit');
+  } catch (err) { next(err); }
+});
+
+router.post('/textbooks/lessons/:id/items/:itemId/delete', async function (req, res, next) {
+  try {
+    var pool = await sqlClient.getPool();
+    await pool.request().input('lessonId', sql.Int, req.params.id).input('itemId', sql.Int, req.params.itemId)
+      .query('DELETE FROM textbook_lesson_items WHERE id = @itemId AND lesson_id = @lessonId');
+    res.redirect('/admin/textbooks/lessons/' + req.params.id + '/edit');
   } catch (err) { next(err); }
 });
 
