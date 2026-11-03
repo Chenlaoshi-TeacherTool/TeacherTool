@@ -34,6 +34,7 @@ var SECTIONS = [
   {
     key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: [],
     children: [
+      { key: 'self-introduction', href: '/theme-activities/self-introduction', en: 'Self-introduction', zh: '个人介绍' },
       {
         key: 'halloween', href: '/theme-activities/halloween', en: 'Halloween', zh: '万圣节', template: 'theme',
         children: [{ key: 'halloween-printables', href: '/theme-activities/halloween/printables', en: 'Halloween printables', zh: '万圣节可打印材料' }]

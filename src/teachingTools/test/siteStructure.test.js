@@ -26,13 +26,14 @@ test('new section pages render in both languages with the required categories', 
     '/textbook-companion/level-1': ['Homework packets', 'Projects', 'Vocabulary cards', 'Lesson agendas'],
     '/textbook-companion/level-2': ['Level 2'],
     '/textbook-companion/level-3': ['Level 3'],
+    '/theme-activities/self-introduction': ['Who Am I? 我是谁？阅读卡片', '/printables/self-introduction/who-am-i-reading-cards.pdf', '/printables/self-introduction/who-am-i-reading-cards.docx'],
     '/theme-activities/halloween': ['Vocabulary', 'Games', 'Printables', '/theme-activities/halloween/printables'],
     '/theme-activities/halloween/printables': ['万圣节方位词_Gallery_Walk', 'halloween-position-words-gallery-walk.pdf', 'halloween-position-words-gallery-walk.docx'],
     '/theme-activities/chinese-new-year': ['Vocabulary', 'Games', 'Printables'],
     '/theme-activities/animals': ['Vocabulary', 'Games', 'Printables'],
     '/theme-activities/weather': ['Printables', '/theme-activities/weather/songs'],
     '/theme-activities/weather/songs': ['<html lang="en">'],
-    '/theme-activities': ['/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals'],
+    '/theme-activities': ['/theme-activities/self-introduction', '/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals'],
     '/teaching-tools': ['/teaching-tools/random-group-generator']
   };
   for (var path of Object.keys(pages)) {
@@ -81,7 +82,7 @@ test('product detail pages preserve published content and fallback; unknown page
       assert.equal((await fetch(base + path)).status, 404, path);
     }
     var sitemap = await (await fetch(base + '/sitemap.xml')).text();
-    for (var path of ['/shop', '/textbook-companion/level-3', '/theme-activities/animals', '/classroom-finds/test-cart']) assert.ok(sitemap.includes(base + path));
+    for (var path of ['/theme-activities/self-introduction', '/shop', '/textbook-companion/level-3', '/theme-activities/animals', '/classroom-finds/test-cart']) assert.ok(sitemap.includes(base + path));
   } finally { products = []; }
 });
 
