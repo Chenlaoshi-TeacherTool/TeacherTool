@@ -246,6 +246,10 @@ router.get('/teaching-tools/character-unscrambler', function(req, res, next) {
   res.render('low-prep-activities/character-unscrambler', { title: '汉字拼图 · Character Unscrambler', toolGuide: siteContentStore.get().toolGuides['character-unscrambler'] });
 });
 
+router.get('/teaching-tools/measure-words', function(req, res, next) {
+  res.render('low-prep-activities/measure-words', { title: '量词大挑战 · Measure Word Challenge', toolGuide: siteContentStore.get().toolGuides['measure-words'] });
+});
+
 router.get('/teaching-tools/secret-message', function(req, res, next) {
   res.render('low-prep-activities/secret-message', { title: '图形密码解密练习纸 · Secret Message Worksheet', toolGuide: siteContentStore.get().toolGuides['secret-message'] });
 });
@@ -267,7 +271,7 @@ router.get('/low-prep-activities', function(req, res) {
   'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle',
   'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary',
   'stroke-order-worksheet', 'vocab-puzzle', 'worksheet-generator', 'secret-message',
-  'character-unscrambler'
+  'character-unscrambler', 'measure-words'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -311,7 +315,7 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/name-tent-generator', '/teaching-tools/flash-card-generator', '/teaching-tools/sentence-reorder', '/teaching-tools/witchs-poison',
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary',
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator', '/teaching-tools/secret-message',
-    '/teaching-tools/character-unscrambler',
+    '/teaching-tools/character-unscrambler', '/teaching-tools/measure-words',
     '/teaching-tools/hanzi-batch/index.html'
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];

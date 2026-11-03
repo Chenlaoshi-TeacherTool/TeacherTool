@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#194f45">
+  <title><%= title %> - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Practise Chinese measure words in a shared game.', noindex: true }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-share.css?v=1">
+  <link rel="stylesheet" href="/low-prep/measure-words/measure-words.css?v=1">
+</head>
+<body class="game-share-page mw-page">
+  <main class="mw-wrap">
+    <div id="mw-menu">
+      <header class="mw-header">
+        <div class="mw-header-content">
+          <p class="mw-eyebrow">Measure words · 量词 · Online game</p>
+          <h1 id="gameTitle"><%= title %></h1>
+          <p>Pick the right measure word. If you get one wrong, read the rule — every measure word has its own color.</p>
+        </div>
+      </header>
+      <section class="mw-panel">
+        <div class="mw-modes mw-modes-two">
+          <button type="button" class="mw-mode" data-mode="catch">
+            <span class="mw-mode-icon" aria-hidden="true">🎯</span>
+            <strong>抓量词 Catch It</strong>
+            <span>Beat the clock! Get 3 in a row for a combo. Tip: number keys 1–9 work too.</span>
+          </button>
+          <button type="button" class="mw-mode" data-mode="fill">
+            <span class="mw-mode-icon" aria-hidden="true">✏️</span>
+            <strong>填句子 Fill the Sentence</strong>
+            <span>Fill the blank in each sentence. Tap 🔊 to hear it.</span>
+          </button>
+        </div>
+        <p class="mw-pool-status" id="mw-best" role="status"></p>
+      </section>
+    </div>
+    <div id="mw-stage-host" class="mw-stage-host" hidden></div>
+  </main>
+
+  <script>window.__SHARED_GAME__ = <%- gameDataJson %>;</script>
+  <script src="/vendor/pinyin-pro.js"></script>
+  <script src="/low-prep/measure-words/measure-words-data.js?v=1"></script>
+  <script src="/low-prep/measure-words/measure-words-game.js?v=1"></script>
+  <script src="/low-prep/measure-words/measure-words-player.js?v=1"></script>
+</body>
+</html>

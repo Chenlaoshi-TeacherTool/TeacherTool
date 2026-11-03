@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>量词大挑战 · Measure Word Challenge - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'A Chinese measure word game for the whole class or Chromebooks: Catch It (60-second speed round with combos), Fill the Sentence (randomised numbers), and a red-vs-blue tug-of-war Team Battle. Color-coded measure words, pinyin toggle, read-aloud, challenge words, a results screen that shows which measure words get mixed up, and your own word list.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=2">
+  <link rel="stylesheet" href="/low-prep/measure-words/measure-words.css?v=1">
+</head>
+<body class="mw-page">
+  <main class="mw-wrap">
+    <header class="mw-header" id="mw-header">
+      <div class="mw-header-content">
+        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+        <p class="mw-eyebrow">Measure words · 量词</p>
+        <h1>🎯 量词大挑战 · Measure Word Challenge</h1>
+        <p>Project it on the board for the whole class, or share a link so students practise on their own Chromebooks. Every measure word keeps its own color, and a wrong answer shows the rule (把 → things with a handle you grab), so students learn the pattern instead of memorising lists.</p>
+        <div class="mw-hero-points" aria-label="Tool highlights">
+          <span>3 game modes</span>
+          <span>Pinyin on / off</span>
+          <span>Read aloud</span>
+          <span>Challenge words</span>
+          <span>Shows the most mixed-up measure words</span>
+        </div>
+      </div>
+    </header>
+
+    <div id="mw-setup" class="mw-setup">
+      <section class="mw-panel mw-modes-panel" aria-labelledby="mw-modes-heading">
+        <div class="mw-panel-heading">
+          <p class="mw-kicker">开始游戏 · Play</p>
+          <h2 id="mw-modes-heading">Choose a mode</h2>
+        </div>
+        <div class="mw-modes">
+          <button type="button" class="mw-mode" data-mode="catch">
+            <span class="mw-mode-icon" aria-hidden="true">🎯</span>
+            <strong>抓量词 Catch It</strong>
+            <span>See the picture and noun, pick the measure word. 60 seconds, combos for 3+ in a row. Warm-up or solo practice.</span>
+          </button>
+          <button type="button" class="mw-mode" data-mode="fill">
+            <span class="mw-mode-icon" aria-hidden="true">✏️</span>
+            <strong>填句子 Fill the Sentence</strong>
+            <span>教室里有二十（　）桌子。Numbers change every time, so each round is new. Add your own worksheet sentences below.</span>
+          </button>
+          <button type="button" class="mw-mode" data-mode="battle">
+            <span class="mw-mode-icon" aria-hidden="true">⚔️</span>
+            <strong>全班对战 Team Battle</strong>
+            <span>Red vs. blue tug-of-war on the projector. Teams answer out loud, you tap who got it, and the rope pulls their way.</span>
+          </button>
+        </div>
+        <p class="mw-pool-status" id="mw-pool-status" role="status"></p>
+        <div class="mw-share-row">
+          <button type="button" class="mw-secondary" id="mw-share"><span aria-hidden="true">🔗</span> 学生链接 Share with students</button>
+          <button type="button" class="mw-secondary" id="mw-links"><span aria-hidden="true">🗂️</span> My Links <span id="mw-link-count"></span></button>
+          <small>Students get Catch It and Fill the Sentence with this word list.</small>
+        </div>
+      </section>
+
+      <div class="mw-setup-grid">
+        <section class="mw-panel" aria-labelledby="mw-words-heading">
+          <div class="mw-panel-heading">
+            <span class="mw-step">1</span>
+            <p class="mw-kicker">量词 · Measure words</p>
+            <h2 id="mw-words-heading">Which measure words?</h2>
+          </div>
+          <div class="mw-mw-grid" id="mw-mw-grid"></div>
+          <label class="mw-check mw-challenge-toggle">
+            <input type="checkbox" id="mw-challenge">
+            <span><strong>⭐ 挑战词 Challenge words</strong> — mix in nouns students haven't learned that follow the same rule (床、伞、冰箱、杂志…) to see if they can reason it out.</span>
+          </label>
+          <details class="mw-bank-preview">
+            <summary>See the built-in word list · 查看内置词表</summary>
+            <div id="mw-bank-list"></div>
+          </details>
+        </section>
+
+        <section class="mw-panel" aria-labelledby="mw-custom-heading">
+          <div class="mw-panel-heading">
+            <span class="mw-step">2</span>
+            <p class="mw-kicker">自定义题库 · Your own words</p>
+            <h2 id="mw-custom-heading">Add words &amp; sentences</h2>
+          </div>
+          <label for="mw-custom-words">我的词 My words <small>(one per line: noun, measure word, optional emoji — 把/张 means both are right)</small></label>
+          <textarea id="mw-custom-words" rows="5" placeholder="桌子 张&#10;椅子 把/张 🪑&#10;衣服 件&#10;自行车 辆"></textarea>
+          <label class="mw-check"><input type="checkbox" id="mw-only-custom"> <span>只用我的词 Use only my words</span></label>
+
+          <label for="mw-custom-sentences">我的句子 My sentences <small>(put the answer in brackets — it becomes the blank)</small></label>
+          <textarea id="mw-custom-sentences" rows="5" placeholder="教室里有二十（张）桌子。&#10;我有三（本）中文书。&#10;这个学期我上五（门）课。"></textarea>
+          <label class="mw-check"><input type="checkbox" id="mw-random-numbers" checked> <span>数字随机变化 Change the numbers each time (二十 → 十二, 五…)</span></label>
+          <p class="mw-note" id="mw-custom-status" role="status"></p>
+        </section>
+
+        <section class="mw-panel" aria-labelledby="mw-settings-heading">
+          <div class="mw-panel-heading">
+            <span class="mw-step">3</span>
+            <p class="mw-kicker">设置 · Settings</p>
+            <h2 id="mw-settings-heading">Game settings</h2>
+          </div>
+          <div class="mw-field-grid">
+            <label>抓量词时间 Catch It time
+              <select id="mw-duration"><option value="30">30 s</option><option value="60" selected>60 s</option><option value="90">90 s</option><option value="120">120 s</option></select>
+            </label>
+            <label>填句子题数 Sentences
+              <select id="mw-rounds"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select>
+            </label>
+            <label>对战拉几步赢 Steps to win
+              <select id="mw-target"><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option><option value="8">8</option></select>
+            </label>
+            <label>对战题型 Battle questions
+              <select id="mw-battle-type"><option value="mix" selected>Mix</option><option value="noun">Picture + noun</option><option value="sentence">Sentences</option></select>
+            </label>
+          </div>
+          <label class="mw-check"><input type="checkbox" id="mw-pinyin" checked> <span>显示拼音 Show pinyin <small>(can also switch it during the game)</small></span></label>
+          <label class="mw-check"><input type="checkbox" id="mw-speak" checked> <span>🔊 自动朗读答案 Read the answer aloud (二十张桌子)</span></label>
+        </section>
+      </div>
+    </div>
+
+    <div id="mw-stage-host" class="mw-stage-host" hidden></div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/vendor/pinyin-pro.js"></script>
+  <script src="/shared/wordlist-core.js?v=cedict-1"></script>
+  <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
+  <script src="/shared/game-sharing.js?v=2"></script>
+  <script src="/low-prep/measure-words/measure-words-data.js?v=1"></script>
+  <script src="/low-prep/measure-words/measure-words-game.js?v=1"></script>
+  <script src="/low-prep/measure-words/measure-words.js?v=1"></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

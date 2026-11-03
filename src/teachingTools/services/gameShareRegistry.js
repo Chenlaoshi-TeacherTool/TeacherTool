@@ -16,5 +16,6 @@ function get(gameType, version) {
 
 register(require('./games/wordSudokuGame'));
 register(require('./games/sentenceReorderGame'));
+register(require('./games/measureWordsGame'));
 
 module.exports = { register: register, get: get };
