@@ -25,6 +25,16 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET || 'dev-only-cookie-secret-change-in-production'));
+// One canonical host: www.<site> forwards to the SITE_URL host, so teacher
+// sign-in cookies and same-origin checks on saves always see one origin.
+app.use(function(req, res, next) {
+  if (!process.env.SITE_URL || (req.method !== 'GET' && req.method !== 'HEAD')) return next();
+  var site = new URL(process.env.SITE_URL);
+  var host = (req.get('x-forwarded-host') || req.get('host') || '').split(',')[0].trim().toLowerCase();
+  if (host !== 'www.' + site.host) return next();
+  res.redirect(301, site.origin + req.originalUrl);
+});
+
 app.use(function(req, res, next) {
   var forwardedProto = (req.get('x-forwarded-proto') || '').split(',')[0].trim();
   var forwardedHost = (req.get('x-forwarded-host') || req.get('host') || '').split(',')[0].trim();
