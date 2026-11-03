@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#194f45">
+  <title>Quiz results · Chen Laoshi's Teaching Toolkit</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/teaching-tools/word-list-library/word-list-library.css">
+  <link rel="stylesheet" href="./my-activities.css">
+  <link rel="stylesheet" href="./quiz-results.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="/teaching-tools/my-activities/my-activities.html">← Back to My activities</a>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">📊</div>
+        <div>
+          <p class="results-kicker">Quiz results</p>
+          <h1 id="resultsTitle">Quiz results</h1>
+          <p id="resultsExpiry"></p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <p id="resultsStatus" class="activities-status" role="status" aria-live="polite">Loading results…</p>
+
+    <section id="resultsContent" class="card activities" hidden aria-labelledby="summaryTitle">
+      <div class="activities-head">
+        <h2 id="summaryTitle">Class summary</h2>
+        <div class="activities-filters">
+          <button id="refreshResults" class="small-button" type="button">Refresh</button>
+          <button id="downloadResults" class="small-button is-primary" type="button">Download Excel</button>
+        </div>
+      </div>
+      <div class="results-stats">
+        <p><strong id="statSubmitted">0</strong><span>Submitted</span></p>
+        <p><strong id="statAverage">–</strong><span>Average score</span></p>
+      </div>
+      <h3 class="results-subtitle">Correct rate by sentence</h3>
+      <ol id="sentenceRates" class="sentence-rates"></ol>
+    </section>
+
+    <section id="studentsSection" class="card activities" hidden aria-labelledby="studentsTitle">
+      <h2 id="studentsTitle">Students</h2>
+      <p class="activities-note">Select a student to see how they ordered each sentence.</p>
+      <div class="results-table-wrap">
+        <table class="results-table">
+          <thead><tr id="resultsHead"></tr></thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+      <p id="noSubmissions" class="activities-note" hidden>No students have submitted yet. Share the link and password, then select Refresh.</p>
+    </section>
+  </main>
+
+  <script src="/shared/library-i18n.js"></script>
+  <script src="./quiz-results.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

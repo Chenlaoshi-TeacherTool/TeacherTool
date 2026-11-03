@@ -175,6 +175,25 @@ router.post('/api/book-generator/publish', async function (req, res) {
   }
 });
 
+// ===== Summary for My activities (delete token proves the book is yours) =====
+
+router.post('/api/book-generator/summary', async function (req, res) {
+  try {
+    var books = Array.isArray(req.body && req.body.books) ? req.body.books.slice(0, 100) : [];
+    var results = await Promise.all(books.map(async function (book) {
+      var bookId = String(book && book.bookId || '');
+      if (!/^[a-zA-Z0-9-]+$/.test(bookId)) return { bookId: bookId, exists: false };
+      var manifest = await bookStorage.getManifest(bookId);
+      if (!manifest || isExpired(manifest) || !safeEqual(book.deleteToken, manifest.deleteToken)) return { bookId: bookId, exists: false };
+      return { bookId: bookId, exists: true, title: manifest.title, expiresAt: manifest.expiresAt, pages: manifest.pages.length };
+    }));
+    res.set('Cache-Control', 'private, no-store').json({ books: results });
+  } catch (err) {
+    console.error('book-generator summary error:', err);
+    res.status(500).json({ error: 'Could not load your books.' });
+  }
+});
+
 // ===== Delete a book (requires the delete token issued at publish time) =====
 
 router.delete('/api/book-generator/books/:id', async function (req, res) {

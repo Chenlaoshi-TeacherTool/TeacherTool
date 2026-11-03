@@ -78,7 +78,7 @@ app.get('/javascripts/milk-tea-footer.js', function(req, res) {
 });
 
 app.use(function(req, res, next) {
-  if (/^\/(?:api|admin|book|play)(?:\/|$)/.test(req.path) || /^\/teaching-tools\/(?:my-library|word-list-library|question-bank-library)(?:\/|$)/.test(req.path)) {
+  if (/^\/(?:api|admin|book|play)(?:\/|$)/.test(req.path) || /^\/teaching-tools\/(?:my-library|my-activities|word-list-library|question-bank-library)(?:\/|$)/.test(req.path)) {
     res.set('X-Robots-Tag', 'noindex, nofollow');
     res.locals.noindex = true;
   }

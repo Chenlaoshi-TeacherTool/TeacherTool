@@ -24,6 +24,9 @@ function create(options) {
     },
     canUseBookAudio: async function (req) {
       return !enabled() || isMember(req);
+    },
+    canViewQuizResults: async function (req) {
+      return !enabled() || isMember(req);
     }
   };
 }

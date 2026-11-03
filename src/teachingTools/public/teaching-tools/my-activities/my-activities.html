@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#194f45">
+  <title>My activities · Chen Laoshi's Teaching Toolkit</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+  <script src="/javascripts/clarity.js"></script>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/teaching-tools/word-list-library/word-list-library.css">
+  <link rel="stylesheet" href="/shared/cloud-library.css">
+  <link rel="stylesheet" href="./my-activities.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <a class="back-link" href="/teaching-tools">← Back to Teaching Tools</a>
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">🗂️</div>
+        <div>
+          <h1>My materials</h1>
+          <p>Everything you have shared with students, in one place.</p>
+        </div>
+      </div>
+      <a class="hero-note" href="/membership">Cloud saving membership coming soon →</a>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <nav class="library-tabs card" aria-label="Library sections">
+      <a href="/teaching-tools/word-list-library/word-list-library.html">📚 Vocabulary lists</a>
+      <a href="/teaching-tools/question-bank-library/question-bank-library.html">📝 Question banks</a>
+      <a class="active" href="/teaching-tools/my-activities/my-activities.html" aria-current="page">🎮 My activities</a>
+    </nav>
+
+    <section class="card activities" aria-labelledby="activitiesTitle">
+      <div class="activities-head">
+        <div>
+          <p class="eyebrow">Shared from this browser</p>
+          <h2 id="activitiesTitle">My activities</h2>
+          <p class="activities-note">Games, quizzes, and books you shared from this browser. Links made on another computer appear there.</p>
+        </div>
+        <div class="activities-filters">
+          <label class="visually-hidden" for="activitySearch">Search activities</label>
+          <input id="activitySearch" type="search" placeholder="Search by name" autocomplete="off">
+          <label class="visually-hidden" for="activityType">Activity type</label>
+          <select id="activityType">
+            <option value="">All activity types</option>
+            <option value="sentence-reorder">Sentence Reorder</option>
+            <option value="word-sudoku">Word Sudoku</option>
+            <option value="measure-words">Measure Word Challenge</option>
+            <option value="book">Books</option>
+          </select>
+        </div>
+      </div>
+      <p id="activitiesStatus" class="activities-status" role="status" aria-live="polite">Loading your activities…</p>
+      <ul id="activityList" class="activity-list"></ul>
+      <div id="activitiesEmpty" class="activities-empty" hidden>
+        <p>No shared activities yet. Create one and choose “Share with students”:</p>
+        <p class="activities-create">
+          <a href="/teaching-tools/sentence-reorder">🧩 Sentence Reorder</a>
+          <a href="/low-prep/word-sudoku/word-sudoku-widget.html">🔢 Word Sudoku</a>
+          <a href="/teaching-tools/measure-words">🍎 Measure Word Challenge</a>
+          <a href="/teaching-tools/book-generator">📖 Book Generator</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/shared/library-i18n.js"></script>
+  <script src="./my-activities.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

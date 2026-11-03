@@ -249,3 +249,66 @@ test('quiz submissions are scored once per normalised student name across sessio
   assert.deepEqual(simultaneous.map(r => r.status).sort(), [201, 409]);
   assert.equal((await (await request('attempt', { studentName: 'Carol' }, cookie)).json()).submission, null);
 });
+
+test('teachers see a quiz’s class results and spreadsheet only with the link’s delete token', async function () {
+  var data = validSentenceReorderData();
+  data.mode = 'assessment';
+  var published = await (await fetch(baseUrl + '/api/game-shares', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, title: '第一课 Quiz', password: 'results-pw', data: data })
+  })).json();
+  var unlock = await fetch(baseUrl + published.url + '/unlock', {
+    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ password: 'results-pw' }), redirect: 'manual'
+  });
+  var cookie = unlock.headers.get('set-cookie').split(';')[0];
+  for (var entry of [['王小明', [data.sentences[0].words, data.sentences[1].words]], ['Ana', [data.sentences[0].words, data.sentences[1].words.slice().reverse()]]]) {
+    await fetch(baseUrl + published.url + '/submit', { method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: cookie }, body: JSON.stringify({ studentName: entry[0], answers: entry[1] }) });
+  }
+  function post(pathname, body) {
+    return fetch(baseUrl + pathname, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  }
+
+  var summary = (await (await post('/api/game-shares/summary', { shares: [
+    { shareId: published.shareId, deleteToken: published.deleteToken },
+    { shareId: published.shareId, deleteToken: 'wrong' },
+    { shareId: 'not-a-share', deleteToken: 'x' }
+  ] })).json()).shares;
+  assert.equal(summary[0].exists, true);
+  assert.equal(summary[0].quiz, true);
+  assert.equal(summary[0].submissions, 2);
+  assert.deepEqual(summary[1], { shareId: published.shareId, exists: false });
+  assert.equal(summary[2].exists, false);
+
+  assert.equal((await post('/api/game-shares/' + published.shareId + '/results', {})).status, 404);
+  assert.equal((await post('/api/game-shares/' + published.shareId + '/results', { deleteToken: 'wrong' })).status, 404);
+  var resultsResponse = await post('/api/game-shares/' + published.shareId + '/results', { deleteToken: published.deleteToken });
+  assert.equal(resultsResponse.status, 200);
+  assert.equal(resultsResponse.headers.get('cache-control'), 'private, no-store');
+  var results = await resultsResponse.json();
+  assert.equal(results.title, '第一课 Quiz');
+  assert.equal(results.sentences.length, 2);
+  assert.deepEqual(results.submissions.map(function (s) { return s.studentName + ':' + s.score; }).sort(), ['Ana:1', '王小明:2']);
+
+  var xlsx = await post('/api/game-shares/' + published.shareId + '/results.xlsx', { deleteToken: published.deleteToken });
+  assert.equal(xlsx.status, 200);
+  assert.match(xlsx.headers.get('content-type'), /spreadsheetml/);
+  var ExcelJS = require('exceljs');
+  var workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(Buffer.from(await xlsx.arrayBuffer()));
+  var sheet = workbook.getWorksheet(1);
+  assert.equal(sheet.rowCount, 4);
+  var names = [sheet.getCell(2, 1).value, sheet.getCell(3, 1).value].sort();
+  assert.deepEqual(names, ['Ana', '王小明']);
+  assert.equal(sheet.getCell(4, 6).value, 0.5);
+  assert.equal(workbook.getWorksheet(2).rowCount, 5);
+});
+
+test('practice links have no results to show', async function () {
+  var published = await (await fetch(baseUrl + '/api/game-shares', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, password: 'practice', data: validSentenceReorderData() })
+  })).json();
+  var response = await fetch(baseUrl + '/api/game-shares/' + published.shareId + '/results', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deleteToken: published.deleteToken }) });
+  assert.equal(response.status, 404);
+});

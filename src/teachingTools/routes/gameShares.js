@@ -6,6 +6,7 @@ var bcrypt = require('bcryptjs');
 var registry = require('../services/gameShareRegistry');
 var storage = require('../services/gameShareStorage');
 var membershipLimits = require('../services/membershipLimits');
+var ExcelJS = require('exceljs');
 
 var router = express.Router();
 var AUTH_COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
@@ -223,6 +224,93 @@ router.post('/play/:id/unlock', loadManifest, async function (req, res, next) {
   } catch (error) {
     next(error);
   }
+});
+
+// ===== Teacher views (My activities). Proof of ownership is the delete token the
+// creating browser keeps; it travels in the request body, never in a URL. =====
+
+function isQuiz(manifest) {
+  return manifest.gameType === 'sentence-reorder' && manifest.payload && manifest.payload.mode === 'assessment';
+}
+
+async function ownedManifest(shareId, deleteToken) {
+  if (!storage.validShareId(shareId)) return null;
+  var manifest = await storage.getManifest(shareId);
+  if (!manifest || isExpired(manifest) || !safeEqual(deleteToken, manifest.deleteToken)) return null;
+  return manifest;
+}
+
+router.post('/api/game-shares/summary', async function (req, res, next) {
+  try {
+    var shares = Array.isArray(req.body && req.body.shares) ? req.body.shares.slice(0, 100) : [];
+    var results = await Promise.all(shares.map(async function (share) {
+      var shareId = String(share && share.shareId || '');
+      var manifest = await ownedManifest(shareId, share && share.deleteToken);
+      if (!manifest) return { shareId: shareId, exists: false };
+      var summary = { shareId: shareId, exists: true, title: manifest.title, gameType: manifest.gameType, expiresAt: manifest.expiresAt, quiz: isQuiz(manifest) };
+      if (summary.quiz) summary.submissions = (await storage.listSubmissions(shareId)).length;
+      return summary;
+    }));
+    res.set('Cache-Control', 'private, no-store').json({ shares: results });
+  } catch (error) { next(error); }
+});
+
+async function loadResults(req, res) {
+  var manifest = await ownedManifest(req.params.id, req.body && req.body.deleteToken);
+  if (!manifest || !isQuiz(manifest)) { res.status(404).json({ error: 'Quiz results were not found for this link.' }); return null; }
+  if (!(await membershipLimits.canViewQuizResults(req))) { res.status(403).json({ error: 'Class results are part of the teacher membership.' }); return null; }
+  res.set('Cache-Control', 'private, no-store');
+  return {
+    title: manifest.title,
+    expiresAt: manifest.expiresAt,
+    sentences: manifest.payload.sentences.map(function (sentence) { return sentence.words; }),
+    submissions: await storage.listSubmissions(req.params.id)
+  };
+}
+
+router.post('/api/game-shares/:id/results', async function (req, res, next) {
+  try {
+    var results = await loadResults(req, res);
+    if (results) res.json(results);
+  } catch (error) { next(error); }
+});
+
+router.post('/api/game-shares/:id/results.xlsx', async function (req, res, next) {
+  try {
+    var results = await loadResults(req, res);
+    if (!results) return;
+    var workbook = new ExcelJS.Workbook();
+    var count = results.sentences.length;
+    var sheet = workbook.addWorksheet('Results 结果');
+    sheet.addRow(['Student 学生', 'Score 得分', 'Percent 百分比', 'Submitted 提交时间'].concat(results.sentences.map(function (_words, index) { return 'S' + (index + 1); })));
+    results.submissions.forEach(function (submission) {
+      sheet.addRow([submission.studentName, submission.score + ' / ' + count, count ? Math.round(submission.score / count * 100) / 100 : 0, submission.submittedAt ? new Date(submission.submittedAt) : '']
+        .concat(results.sentences.map(function (_words, index) { return submission.correct[index] ? '✓' : '✗'; })));
+    });
+    var submitted = results.submissions.length;
+    sheet.addRow(['Class correct rate 全班正确率', '', '', ''].concat(results.sentences.map(function (_words, index) {
+      return submitted ? Math.round(results.submissions.filter(function (submission) { return submission.correct[index]; }).length / submitted * 100) / 100 : 0;
+    })));
+    sheet.getRow(1).font = { bold: true };
+    sheet.getRow(sheet.rowCount).font = { bold: true };
+    sheet.getColumn(1).width = 24; sheet.getColumn(2).width = 10; sheet.getColumn(3).width = 12; sheet.getColumn(4).width = 20;
+    sheet.getColumn(3).numFmt = '0%'; sheet.getColumn(4).numFmt = 'yyyy-mm-dd hh:mm';
+    for (var column = 5; column < 5 + count; column += 1) { sheet.getColumn(column).width = 7; sheet.getColumn(column).alignment = { horizontal: 'center' }; sheet.getCell(sheet.rowCount, column).numFmt = '0%'; }
+    sheet.views = [{ state: 'frozen', xSplit: 1, ySplit: 1 }];
+    var answers = workbook.addWorksheet('Answers 答案');
+    answers.addRow(['Student 学生', 'Sentence 句子', 'Result 结果', 'Student answer 学生答案', 'Correct answer 正确答案']);
+    results.submissions.forEach(function (submission) {
+      results.sentences.forEach(function (words, index) {
+        answers.addRow([submission.studentName, index + 1, submission.correct[index] ? '✓' : '✗', (submission.answers[index] || []).join(' '), words.join(' ')]);
+      });
+    });
+    answers.getRow(1).font = { bold: true };
+    answers.columns.forEach(function (column, index) { column.width = [24, 10, 10, 40, 40][index]; });
+    var buffer = await workbook.xlsx.writeBuffer();
+    res.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.set('Content-Disposition', "attachment; filename=quiz-results.xlsx; filename*=UTF-8''" + encodeURIComponent((results.title || 'quiz').slice(0, 60) + ' - results.xlsx'));
+    res.send(Buffer.from(buffer));
+  } catch (error) { next(error); }
 });
 
 module.exports = router;

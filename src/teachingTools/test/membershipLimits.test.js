@@ -35,3 +35,9 @@ test('a visitor who is not signed in is never treated as a member', async functi
     assert.equal(await real.shareLifetimeMs({ get: function () { return 'spoofed'; } }), 7 * DAY_MS);
   } finally { if (previous !== undefined) process.env.WEBSITE_INSTANCE_ID = previous; }
 });
+
+test('class quiz results are open to everyone until limits are on, then to members only', async function () {
+  assert.equal(await limits(false, false).canViewQuizResults({}), true);
+  assert.equal(await limits(true, false).canViewQuizResults({}), false);
+  assert.equal(await limits(true, true).canViewQuizResults({}), true);
+});

@@ -145,6 +145,31 @@ async function saveSubmission(shareId, studentName, submission) {
   }
 }
 
+// All submissions for one quiz, newest first; capped so one link can't load unbounded data.
+async function listSubmissions(shareId, limit) {
+  assertShareId(shareId);
+  var max = limit || 300;
+  var prefix = shareId + '/submissions/';
+  var bodies = [];
+  if (isAzureConfigured()) {
+    var container = getContainerClient();
+    for await (var blob of container.listBlobsFlat({ prefix: prefix })) {
+      if (!/\.json$/.test(blob.name)) continue;
+      if (bodies.length >= max) break;
+      bodies.push((await container.getBlockBlobClient(blob.name).downloadToBuffer()).toString('utf8'));
+    }
+  } else {
+    var names;
+    try { names = await fs.readdir(path.join(LOCAL_ROOT, prefix)); }
+    catch (error) { if (error.code === 'ENOENT') return []; throw error; }
+    for (var name of names.filter(function (file) { return /\.json$/.test(file); }).slice(0, max)) {
+      bodies.push(await fs.readFile(path.join(LOCAL_ROOT, prefix, name), 'utf8'));
+    }
+  }
+  return bodies.map(function (body) { return JSON.parse(body); })
+    .sort(function (left, right) { return String(right.submittedAt || '').localeCompare(String(left.submittedAt || '')); });
+}
+
 module.exports = {
   isAzureConfigured: isAzureConfigured,
   validShareId: validShareId,
@@ -153,5 +178,6 @@ module.exports = {
   deleteShare: deleteShare,
   getSubmission: getSubmission,
   saveSubmission: saveSubmission,
+  listSubmissions: listSubmissions,
   LOCAL_ROOT: LOCAL_ROOT
 };
