@@ -34,6 +34,7 @@ router.get('/theme-activities/self-introduction', function(req, res) {
       en: 'Read six personal introductions and match each one to a character letter. Practice names, ages, birthdays, hobbies, possessions, and places of residence.',
       zh: '阅读 6 段人物介绍，将每段与对应的人物字母配对。练习姓名、年龄、生日、爱好、物品和居住地等表达。',
       pages: 2,
+      limitedFree: true,
       pdf: '/printables/self-introduction/who-am-i-reading-cards.pdf',
       docx: '/printables/self-introduction/who-am-i-reading-cards.docx'
     }]
