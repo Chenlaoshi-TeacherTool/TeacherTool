@@ -144,27 +144,35 @@
   }
 
   // Lay the group's items out in rows, render them big, crop to the ink and
-  // cut into a grid. Every row arrangement and a few word spacings are tried:
-  // layouts with no blank cell win, then the ones printing largest on the
-  // worksheet, then the ones whose emptiest cell holds the most ink.
+  // cut into a grid. Every row arrangement (long words may wrap), a few word
+  // spacings and a slightly finer grid are tried: layouts with no blank cell
+  // win, then the ones printing largest on the worksheet, then the ones whose
+  // emptiest cell holds the most ink.
   function makePuzzle(group, opts, rng) {
     var area = puzzleArea(opts);
     var best = null;
-    arrangements(group).forEach(function (rows) {
+    arrangements(group).forEach(function (layout) {
       [0.04, 0.16, 0.3].forEach(function (gap) {
-        var art = renderArt(rows, gap, opts, 240);
-        var grid = gridFor(art.width / art.height, rows.length);
-        var ink = minCellInk(art, grid);
+        var art = renderArt(layout.rows, gap, opts, 240);
         var aspect = art.width / art.height;
         var w = Math.min(area.w, area.h * aspect);
         var fill = (w * w / aspect) / (area.w * area.h);
-        var total = (ink > 0.01 ? 1 : 0) + 0.4 * fill + ink;
-        if (!best || total > best.total) best = { total: total, rows: rows, gap: gap };
+        var base = gridFor(aspect, layout.rows.length);
+        [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(function (more) {
+          var grid = { rows: base.rows + more[0], cols: base.cols + more[1] };
+          var finer = more[0] + more[1];
+          var ink = cellInk(art, grid);
+          // An empty square rules a layout out; a faint one (under 4% strokes,
+          // easy to mistake for blank once printed) only costs a little.
+          var total = fill + 0.3 * ink.min - ink.empty - 0.12 * ink.faint -
+            (layout.wrapped ? 0.1 : 0) - finer * 0.04;
+          if (!best || total > best.total) best = { total: total, rows: layout.rows, gap: gap, grid: grid };
+        });
       });
     });
 
     var art = renderArt(best.rows, best.gap, opts, 1000);
-    var grid = gridFor(art.width / art.height, best.rows.length);
+    var grid = best.grid;
     var chars = [];
     group.forEach(function (w) {
       Array.from(w).forEach(function (ch) { if (chars.indexOf(ch) === -1) chars.push(ch); });
@@ -184,7 +192,9 @@
     return { art: art, rows: grid.rows, cols: grid.cols, cells: cells, order: order, chars: chars, group: group };
   }
 
-  // Ways to stack the group's items into rows: 1 row, 2 rows, … (balanced).
+  // Ways to stack the group into rows: whole items 1, 2, 3 rows (balanced),
+  // and, so a long word like 花草树木 isn't one thin strip, the characters
+  // themselves split evenly over 2–4 rows (words may then wrap).
   function arrangements(group) {
     var out = [];
     for (var n = 1; n <= Math.min(group.length, 3); n++) {
@@ -195,7 +205,31 @@
         rows.push(group.slice(start, start + take));
         start += take;
       }
-      out.push(rows);
+      out.push({ rows: rows, wrapped: false });
+    }
+    var total = group.reduce(function (sum, w) { return sum + Array.from(w).length; }, 0);
+    for (var m = 2; m <= Math.min(total, 4); m++) {
+      var per = Math.ceil(total / m);
+      var wrapped = false;
+      var lines = [[]];
+      var used = 0;
+      group.forEach(function (word) {
+        var chars = Array.from(word);
+        var piece = '';
+        chars.forEach(function (ch) {
+          if (used === per) {
+            if (piece) { lines[lines.length - 1].push(piece); wrapped = true; }
+            lines.push([]);
+            piece = '';
+            used = 0;
+          }
+          piece += ch;
+          used++;
+        });
+        if (piece) lines[lines.length - 1].push(piece);
+      });
+      lines = lines.filter(function (l) { return l.length; });
+      if (lines.length > 1) out.push({ rows: lines, wrapped: wrapped });
     }
     return out;
   }
@@ -219,7 +253,7 @@
   function renderArt(rows, gap, opts, size) {
     var charGap = size * 0.04;
     var wordGap = size * gap + size * 0.12;
-    var rowGap = size * 0.18;
+    var rowGap = size * 0.1;
     var rowWidths = rows.map(function (row) {
       var w = 0;
       row.forEach(function (word, i) { w += Array.from(word).length * size + (Array.from(word).length - 1) * charGap + (i ? wordGap : 0); });
@@ -302,8 +336,9 @@
     return x0 > x1 ? { x0: 0, y0: 0, x1: W, y1: H } : { x0: x0, y0: y0, x1: x1 + 1, y1: y1 + 1 };
   }
 
-  // Share of the emptiest cell that is covered by strokes (0–1).
-  function minCellInk(art, grid) {
+  // Stroke coverage per cell (0–1): the emptiest cell's share, and how many
+  // cells are empty (under 1.5%) or faint (under 4%).
+  function cellInk(art, grid) {
     var src = art.ink.canvas;
     var data = src.getContext('2d').getImageData(art.ink.x, art.ink.y, art.width, art.height).data;
     var counts = new Array(grid.rows * grid.cols).fill(0);
@@ -316,7 +351,12 @@
       }
     }
     var cellArea = (cw / 2) * (ch / 2);
-    return Math.min.apply(null, counts) / cellArea;
+    var shares = counts.map(function (n) { return n / cellArea; });
+    return {
+      min: Math.min.apply(null, shares),
+      empty: shares.filter(function (s) { return s < 0.015; }).length,
+      faint: shares.filter(function (s) { return s >= 0.015 && s < 0.04; }).length
+    };
   }
 
   function paintBackground(ctx, w, h, colors) {
