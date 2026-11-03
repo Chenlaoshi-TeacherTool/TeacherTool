@@ -226,6 +226,7 @@ test('quiz submissions are scored once per normalised student name across sessio
     });
   }
   assert.equal((await request('attempt', { studentName: 'Alice' })).status, 401);
+  assert.equal((await request('submit', { studentName: 'Alice', answers: data.sentences.map(function (sentence) { return sentence.words; }) })).status, 401);
   assert.equal((await request('attempt', { studentName: ' ' }, cookie)).status, 400);
   var fresh = await request('attempt', { studentName: 'Alice' }, cookie);
   assert.equal((await fresh.json()).submission, null);
