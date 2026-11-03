@@ -373,13 +373,6 @@
                     <p><%= t('teachingToolsIndex.measureWordsDesc') %></p>
                     <a href="/teaching-tools/measure-words" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
-                <div data-uses="project" class="tool-card snapshot-card">
-                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/character-race' }) %>
-                    <h3>🌻 <%= t('teachingToolsIndex.termRaceTitle') %></h3>
-                    <p class="tool-scope"><%= t('teachingToolsIndex.termRaceScope') %></p>
-                    <p><%= t('teachingToolsIndex.termRaceDesc') %></p>
-                    <a href="/teaching-tools/character-race" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
-                </div>
                 <div data-uses="print" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/maze-generator' }) %>
                     <h3>🧭 <%= t('teachingToolsIndex.mazeTitle') %></h3>
@@ -512,6 +505,12 @@
                     <p class="tool-scope"><%= t('teachingToolsIndex.bookGenScope') %></p>
                     <p><%= t('teachingToolsIndex.bookGenDesc') %></p>
                     <a href="/teaching-tools/book-generator" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
+                </div>
+                <div data-uses="" class="tool-card coming-soon">
+                    <h3>🌻 <%= t('teachingToolsIndex.termRaceTitle') %></h3>
+                    <p class="tool-scope"><%= t('teachingToolsIndex.termRaceScope') %></p>
+                    <p><%= t('teachingToolsIndex.termRaceDesc') %></p>
+                    <button class="btn" type="button" disabled><%= t('teachingToolsIndex.comingSoon') %></button>
                 </div>
                 <div data-uses="" class="tool-card coming-soon">
                     <h3>🌻 <%= t('teachingToolsIndex.unoTitle') %></h3>
