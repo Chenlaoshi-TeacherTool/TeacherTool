@@ -50,7 +50,7 @@
 
   function init() {
     [
-      'file-input', 'drop', 'file-status', 'thumbs-wrap', 'thumbs', 'thumb-selected', 'thumb-all', 'thumb-none',
+      'file-input', 'drop', 'file-status', 'thumbs-wrap', 'thumbs', 'thumb-selected', 'thumb-all', 'thumb-none', 'trim',
       'words', 'font', 'text-style', 'show-pinyin', 'title', 'pieces',
       'out-scrambled', 'out-board', 'out-cut', 'dashed', 'straight', 'size',
       'generate', 'page-count', 'reshape', 'png', 'pdf', 'print', 'status', 'empty', 'pages', 'print-area'
@@ -155,14 +155,22 @@
   }
 
   // Render a PDF page so its long side is `longSide` pixels, on white.
-  function renderPdfPage(pdf, num, longSide) {
+  // `box` (fractions of the page, see contentBox) renders only that region.
+  function renderPdfPage(pdf, num, longSide, box) {
     return pdf.getPage(num).then(function (page) {
       var base = page.getViewport({ scale: 1 });
-      var scale = longSide / Math.max(base.width, base.height);
-      var viewport = page.getViewport({ scale: scale });
+      box = box || { x: 0, y: 0, w: 1, h: 1 };
+      var bw = base.width * box.w;
+      var bh = base.height * box.h;
+      var scale = longSide / Math.max(bw, bh);
+      var viewport = page.getViewport({
+        scale: scale,
+        offsetX: -box.x * base.width * scale,
+        offsetY: -box.y * base.height * scale
+      });
       var canvas = document.createElement('canvas');
-      canvas.width = Math.round(viewport.width);
-      canvas.height = Math.round(viewport.height);
+      canvas.width = Math.round(bw * scale);
+      canvas.height = Math.round(bh * scale);
       var ctx = canvas.getContext('2d');
       ctx.fillStyle = '#fff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -193,6 +201,84 @@
       img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('the image could not be read')); };
       img.src = url;
     });
+  }
+
+  // ---- Trimming blank margins ------------------------------------------------------
+
+  // Where the ink is on a page, as fractions of its width/height, with a little
+  // padding. Kept no flatter than 2:1 either way, so one line of words doesn't
+  // become a thin strip of sliver pieces.
+  // Null when there is nothing worth trimming (blank or already full page).
+  function contentBox(canvas) {
+    var s = Math.min(1, 600 / Math.max(canvas.width, canvas.height));
+    var w = Math.max(1, Math.round(canvas.width * s));
+    var h = Math.max(1, Math.round(canvas.height * s));
+    var small = document.createElement('canvas');
+    small.width = w;
+    small.height = h;
+    var sctx = small.getContext('2d', { willReadFrequently: true });
+    sctx.drawImage(canvas, 0, 0, w, h);
+    var data = sctx.getImageData(0, 0, w, h).data;
+    var rowInk = new Uint32Array(h);
+    var colInk = new Uint32Array(w);
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        var i = (y * w + x) * 4;
+        if (Math.min(data[i], data[i + 1], data[i + 2]) < 230) { rowInk[y]++; colInk[x]++; }
+      }
+    }
+    // A row/column needs a couple of inked pixels, so scanner specks don't count.
+    function span(ink, n) {
+      var a = 0;
+      while (a < n && ink[a] < 2) a++;
+      var b = n - 1;
+      while (b > a && ink[b] < 2) b--;
+      return a < b ? [a, b + 1] : null;
+    }
+    var xs = span(colInk, w);
+    var ys = span(rowInk, h);
+    if (!xs || !ys) return null;
+
+    var cx = (xs[0] + xs[1]) / 2;
+    var cy = (ys[0] + ys[1]) / 2;
+    var pad = 0.04 * Math.max(xs[1] - xs[0], ys[1] - ys[0]);
+    var bw = xs[1] - xs[0] + pad * 2;
+    var bh = ys[1] - ys[0] + pad * 2;
+    bh = Math.max(bh, bw / 2);
+    bw = Math.max(bw, bh / 2);
+    if (bw >= w * 0.95 && bh >= h * 0.95) return null;
+    return { x: (cx - bw / 2) / w, y: (cy - bh / 2) / h, w: bw / w, h: bh / h };
+  }
+
+  function cropCanvas(src, box) {
+    var canvas = document.createElement('canvas');
+    canvas.width = Math.round(src.width * box.w);
+    canvas.height = Math.round(src.height * box.h);
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(src, -box.x * src.width, -box.y * src.height);
+    return canvas;
+  }
+
+  // The A4-resolution canvas for one uploaded page, trimmed or not (cached).
+  // PDFs are re-rendered at the trimmed region so zoomed-in text stays sharp.
+  function pageCanvas(p, trim) {
+    var key = trim ? 'trimmed' : 'full';
+    if (p[key]) return Promise.resolve(p[key]);
+    var made;
+    if (source.kind === 'image') {
+      var box = trim && contentBox(p.full);
+      made = Promise.resolve(box ? cropCanvas(p.full, box) : p.full);
+    } else if (!trim) {
+      made = renderPdfPage(source.pdf, p.num, A4_LONG);
+    } else {
+      made = renderPdfPage(source.pdf, p.num, 600).then(function (probe) {
+        var pdfBox = contentBox(probe);
+        return pdfBox ? renderPdfPage(source.pdf, p.num, A4_LONG, pdfBox) : pageCanvas(p, false);
+      });
+    }
+    return made.then(function (canvas) { p[key] = canvas; return canvas; });
   }
 
   function renderThumbs() {
@@ -434,6 +520,7 @@
       font: FONTS[el.font.value] || FONTS.kai,
       textStyle: el.textStyle.value,
       showPinyin: el.showPinyin.checked,
+      trim: el.trim.checked,
       scrambled: el.outScrambled.checked,
       board: el.outBoard.checked,
       cut: el.outCut.checked,
@@ -459,10 +546,7 @@
     if (!source) return Promise.reject(new Error('Upload a PDF first — or switch to “Type words” · 请先上传 PDF。'));
     var chosen = source.pages.filter(function (p) { return p.on; });
     if (!chosen.length) return Promise.reject(new Error('Select at least one page · 请至少选择一页。'));
-    return Promise.all(chosen.map(function (p) {
-      if (p.full) return p.full;
-      return renderPdfPage(source.pdf, p.num, A4_LONG).then(function (canvas) { p.full = canvas; return canvas; });
-    }));
+    return Promise.all(chosen.map(function (p) { return pageCanvas(p, opts.trim); }));
   }
 
   function generate() {

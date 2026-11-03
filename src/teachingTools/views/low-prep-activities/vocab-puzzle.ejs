@@ -60,6 +60,10 @@
               </div>
               <div id="vp-thumbs" class="vp-thumbs"></div>
             </div>
+
+            <div class="vp-options vp-options-spaced">
+              <label class="vp-check"><input type="checkbox" id="vp-trim" checked><span>Trim blank margins · 自动裁掉空白 <small>Zooms in on the words so a half-empty page doesn't give blank pieces.</small></span></label>
+            </div>
           </div>
 
           <div class="vp-tab-panel" data-panel="type" hidden>
@@ -164,7 +168,7 @@
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script src="/low-prep/vocab-puzzle/pdfjs/pdf.min.js"></script>
-  <script src="/low-prep/vocab-puzzle/vocab-puzzle.js?v=8" defer></script>
+  <script src="/low-prep/vocab-puzzle/vocab-puzzle.js?v=9" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
