@@ -364,6 +364,20 @@ h2 {
 
 .helper-inline { color: #9aa2b8; }
 
+.merge-toggle {
+  margin: 8px 2px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  color: var(--blue-dark);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.merge-toggle input { margin: 1px 0 0; accent-color: var(--blue-dark); }
+.merge-toggle small { color: var(--muted); font-weight: 400; }
+
 .option-block { margin-top: 20px; }
 
 .option-block h3 {

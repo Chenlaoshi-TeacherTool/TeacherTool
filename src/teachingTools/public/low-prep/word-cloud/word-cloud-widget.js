@@ -48,7 +48,8 @@
     scheme: 'colorful',
     font: 'default',
     background: '#ffffff',
-    sourceLang: 'en'
+    sourceLang: 'en',
+    mergeDuplicates: true
   };
 
   var els = {};
@@ -78,6 +79,7 @@
     els.toast = document.getElementById('toast');
     els.sourceLangSelect = document.getElementById('sourceLangSelect');
     els.libraryPicker = document.getElementById('wordCloudLibraryPicker');
+    els.mergeDuplicates = document.getElementById('mergeDuplicates');
 
     buildDisplayModeRow();
     buildSchemeRow();
@@ -95,6 +97,12 @@
       updateWordCount();
       regenerate();
       els.wordInput.focus();
+    });
+
+    els.mergeDuplicates.checked = state.mergeDuplicates;
+    els.mergeDuplicates.addEventListener('change', function () {
+      state.mergeDuplicates = els.mergeDuplicates.checked;
+      regenerate();
     });
 
     els.shuffleButton.addEventListener('click', regenerate);
@@ -261,8 +269,12 @@
 
   function translateCurrentEntries(announce) {
     var entries = parseEntries();
+    var queued = {};
     var pending = entries.filter(function (entry) {
-      return !Object.prototype.hasOwnProperty.call(translationCache, translationKey(entry.zh));
+      var key = translationKey(entry.zh);
+      if (queued[key] || Object.prototype.hasOwnProperty.call(translationCache, key)) return false;
+      queued[key] = true;
+      return true;
     });
     if (!pending.length) return Promise.resolve();
 
@@ -337,7 +349,7 @@
     var entries = [];
     els.wordInput.value.split(/\r?\n/).forEach(function (word) {
       var cleanWord = word.trim();
-      if (!cleanWord || seen[cleanWord]) return;
+      if (!cleanWord || (state.mergeDuplicates && seen[cleanWord])) return;
       seen[cleanWord] = true;
       entries.push({
         zh: cleanWord,

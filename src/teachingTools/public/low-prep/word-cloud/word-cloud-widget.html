@@ -13,7 +13,7 @@
   <script src="/javascripts/clarity.js"></script>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
-  <link rel="stylesheet" href="./word-cloud-widget.css?v=classroom-guide-1">
+  <link rel="stylesheet" href="./word-cloud-widget.css?v=merge-toggle-1">
 </head>
 <body>
   <header class="hero">
@@ -58,6 +58,10 @@
           <span id="wordCount">0 words entered</span>
           <span class="helper-inline">Suggested: 5–40</span>
         </div>
+        <label class="merge-toggle" for="mergeDuplicates">
+          <input type="checkbox" id="mergeDuplicates" checked>
+          <span>Merge duplicate words <small>(uncheck to show a repeated word once per line it appears on)</small></span>
+        </label>
 
         <div class="option-block">
           <h3><span aria-hidden="true">🔤</span> Display Content (multi-select)</h3>
