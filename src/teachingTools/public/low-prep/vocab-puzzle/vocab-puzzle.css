@@ -106,13 +106,7 @@
 
 .vp-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-/* ---------- tabs + drop zone ---------- */
-.vp-tabs { display: flex; gap: 6px; padding: 5px; border: 1px solid #e5ddc9; border-radius: 14px; background: #fbfaf4; }
-.vp-tab { flex: 1; padding: 10px; border: 0; border-radius: 10px; background: transparent; color: var(--vp-muted); font: 900 .86rem 'Nunito', 'Noto Sans SC', sans-serif; cursor: pointer; transition: background .15s, color .15s; }
-.vp-tab:hover { color: var(--vp-deep); }
-.vp-tab.is-active { background: var(--vp-green); color: #fffdf7; box-shadow: 0 3px 0 #23503f; }
-.vp-tab-panel { margin-top: 15px; }
-.vp-tab-panel[hidden] { display: none; }
+/* ---------- drop zone ---------- */
 
 .vp-panel .vp-drop {
   display: flex;

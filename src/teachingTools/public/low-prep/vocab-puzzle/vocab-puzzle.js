@@ -1,9 +1,10 @@
 (function () {
   'use strict';
 
-  // Whole-page jigsaw: an A4 page (from a PDF, an image, or typed words) is cut
-  // into N pieces, so characters end up split across pieces and students rebuild
-  // the words while putting the page back together.
+  // Whole-page jigsaw: an A4 page (from a PDF or an image) is cut into N pieces,
+  // so characters end up split across pieces and students rebuild the words
+  // while putting the page back together. Typed characters live in the
+  // Character Unscrambler tool instead.
 
   // ---- Constants -------------------------------------------------------------
 
@@ -25,14 +26,8 @@
   var KNOB_REACH = 0.3 * KNOB;
 
   var PDFJS_BASE = '/low-prep/vocab-puzzle/pdfjs/';
-  // Shared with the Article Vocabulary Builder: { word: [ { py, d: [defs] } ] }.
-  var CEDICT_URL = '/low-prep/vocab-glossary/cedict.json.gz';
 
-  var CJK = /[㐀-鿿豈-﫿]/;
-  var FONTS = {
-    kai: "'KaiTi', 'STKaiti', 'Kaiti SC', 'BiauKai', 'Noto Serif SC', serif",
-    sans: "'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Heiti SC', sans-serif"
-  };
+  var SANS = "'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Heiti SC', sans-serif";
   var LATIN = "'Nunito', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif";
 
   // ---- State -----------------------------------------------------------------
@@ -41,9 +36,6 @@
   var seed = newSeed();
   var source = null;   // { kind: 'pdf' | 'image', name, pdf?, image?, pages: [{ num, on, full? }] }
   var output = [];     // [{ canvas, label, file, dataUrl }]
-  var dict = null;
-  var dictPromise = null;
-  var activeTab = 'pdf';
   var el = {};
 
   document.addEventListener('DOMContentLoaded', init);
@@ -51,15 +43,11 @@
   function init() {
     [
       'file-input', 'drop', 'file-status', 'thumbs-wrap', 'thumbs', 'thumb-selected', 'thumb-all', 'thumb-none', 'trim',
-      'words', 'font', 'text-style', 'show-pinyin', 'title', 'pieces',
+      'title', 'pieces',
       'out-scrambled', 'out-board', 'out-cut', 'dashed', 'straight', 'size',
       'generate', 'page-count', 'reshape', 'png', 'pdf', 'print', 'status', 'empty', 'pages', 'print-area'
     ].forEach(function (id) {
       el[id.replace(/-(\w)/g, function (_, c) { return c.toUpperCase(); })] = document.getElementById('vp-' + id);
-    });
-
-    document.querySelectorAll('.vp-tab').forEach(function (tab) {
-      tab.addEventListener('click', function () { selectTab(tab.dataset.tab); });
     });
 
     el.fileInput.addEventListener('change', function () {
@@ -95,19 +83,6 @@
     el.png.addEventListener('click', downloadPngs);
     el.pdf.addEventListener('click', downloadPdf);
     el.print.addEventListener('click', printPages);
-  }
-
-  function selectTab(name) {
-    activeTab = name;
-    document.querySelectorAll('.vp-tab').forEach(function (tab) {
-      var on = tab.dataset.tab === name;
-      tab.classList.toggle('is-active', on);
-      tab.setAttribute('aria-selected', on ? 'true' : 'false');
-    });
-    document.querySelectorAll('.vp-tab-panel').forEach(function (panel) {
-      panel.hidden = panel.dataset.panel !== name;
-    });
-    if (name === 'type') el.words.focus();
   }
 
   // ---- Loading a PDF or image --------------------------------------------------
@@ -315,211 +290,11 @@
     el.thumbSelected.textContent = source ? source.pages.filter(function (p) { return p.on; }).length : 0;
   }
 
-  // ---- Typed words → an A4 page ----------------------------------------------------
-
-  function parseItems(text) {
-    return text.split(/[\r\n,，、;；\t]+/).map(function (s) { return s.trim(); }).filter(Boolean);
-  }
-
-  function loadDictionary() {
-    if (dict) return Promise.resolve(dict);
-    if (dictPromise) return dictPromise;
-    dictPromise = fetch(CEDICT_URL).then(function (res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      if (typeof DecompressionStream === 'undefined' || !res.body) throw new Error('this browser cannot decompress the dictionary');
-      return new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).text();
-    }).then(function (text) {
-      dict = JSON.parse(text);
-      return dict;
-    }).catch(function (err) {
-      dictPromise = null;
-      throw err;
-    });
-    return dictPromise;
-  }
-
-  // Pinyin for a word or sentence: longest dictionary match, left to right.
-  function pinyinFor(text) {
-    if (!dict) return '';
-    var chars = Array.from(text);
-    var out = [];
-    var i = 0;
-    while (i < chars.length) {
-      if (!CJK.test(chars[i])) { i++; continue; }
-      var hit = null;
-      for (var len = Math.min(8, chars.length - i); len >= 1; len--) {
-        var entry = dict[chars.slice(i, i + len).join('')];
-        if (entry) {
-          var best = entry.filter(function (e) { return e.py && e.py.charAt(0) === e.py.charAt(0).toLowerCase(); })[0] || entry[0];
-          hit = { len: len, py: (best.py || '').replace(/\s+/g, '') };
-          break;
-        }
-      }
-      if (hit) { out.push(hit.py); i += hit.len; } else { i++; }
-    }
-    return out.join(' ');
-  }
-
-  // Lay the words out centred on the page, with rows placed symmetrically
-  // around the middle on a half-band lattice: a row on a horizontal cut gets
-  // every word sliced top/bottom, and the centre of the page always sits on a
-  // cut line (horizontal if the row count is even, vertical if columns are even).
-  // Characters grow as large as the row count and word lengths allow.
-  function makeTextPage(items, opts) {
-    var W = A4_SHORT;
-    var H = A4_LONG;
-    var grid = GRIDS[pieceCount];
-    var R = grid[0];
-    var C = grid[1];
-    var canvas = document.createElement('canvas');
-    canvas.width = W;
-    canvas.height = H;
-    var ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, W, H);
-
-    var withPinyin = opts.showPinyin && !!dict;
-    var boxed = opts.textStyle === 'grid';
-    var half = H / R / 2;           // lattice step: half a band
-    var GAP = 0.7;                  // space between words, in character widths
-    var lens = items.map(function (w) { return Array.from(w).length; });
-
-    function dealRows(t) {
-      var rows = [];
-      var start = 0;
-      for (var i = 0; i < t; i++) {
-        var take = Math.ceil((items.length - start) / (t - i));
-        rows.push({ start: start, end: start + take });
-        start += take;
-      }
-      return rows;
-    }
-
-    var best = null;
-    for (var t = 1; t <= Math.min(items.length, 2 * R - 1); t++) {
-      for (var step = 2 * R; step >= 1; step--) {
-        if (t % 2 === 0 && step % 2 === 1) continue; // keep rows on the lattice
-        var first = R - (t - 1) * step / 2;
-        if (first < 1 || first + (t - 1) * step > 2 * R - 1) continue;
-        var rows = dealRows(t);
-        var units = Math.max.apply(null, rows.map(function (r) {
-          var n = 0;
-          for (var i = r.start; i < r.end; i++) n += lens[i];
-          return n + (r.end - r.start - 1) * GAP;
-        }));
-        var room = t === 1 ? H : step * half;
-        room = Math.min(room, 2 * first * half);
-        var size = Math.min(
-          (W * 0.86) / (units * (boxed ? 1.12 : 1)),
-          room * (withPinyin ? 0.46 : 0.6) / (boxed ? 1.12 : 1),
-          560
-        );
-        // Share of words a cut actually passes through: every word on a
-        // horizontal cut, otherwise only words that straddle a vertical cut.
-        var cutWords = 0;
-        for (var r = 0; r < t; r++) {
-          var row = rows[r];
-          if ((first + r * step) % 2 === 0) { cutWords += row.end - row.start; continue; }
-          var unit = size * (boxed ? 1.12 : 1);
-          var rowW = 0;
-          for (var q = row.start; q < row.end; q++) rowW += lens[q] * unit;
-          rowW += (row.end - row.start - 1) * GAP * unit;
-          var x0 = (W - rowW) / 2;
-          for (var q2 = row.start; q2 < row.end; q2++) {
-            var x1 = x0 + lens[q2] * unit;
-            for (var line = 1; line < C; line++) {
-              var lx = line * W / C;
-              if (lx > x0 + unit * 0.2 && lx < x1 - unit * 0.2) { cutWords++; break; }
-            }
-            x0 = x1 + GAP * unit;
-          }
-        }
-        var score = size * (0.65 + 0.35 * cutWords / items.length);
-        if (!best || score > best.score) {
-          best = { score: score, size: size, rows: rows, ys: rows.map(function (_, i) { return (first + i * step) * half; }) };
-        }
-        break; // the widest step that fits is best for this t
-      }
-    }
-
-    var size = best.size;
-    var gap = size * GAP * (boxed ? 1.12 : 1);
-    best.rows.forEach(function (row, ri) {
-      var words = items.slice(row.start, row.end);
-      ctx.font = '700 ' + size + 'px ' + opts.font;
-      var widths = words.map(function (w) {
-        var tw = ctx.measureText(w).width;
-        return boxed ? Math.max(tw + size * 0.2, Array.from(w).length * size * 1.12) : tw;
-      });
-      var total = widths.reduce(function (a, b) { return a + b; }, 0) + gap * (words.length - 1);
-      var x = (W - total) / 2;
-      words.forEach(function (word, i) {
-        drawWord(ctx, word, x + widths[i] / 2, best.ys[ri], size, W, opts, withPinyin);
-        x += widths[i] + gap;
-      });
-    });
-    return canvas;
-  }
-
-  function drawWord(ctx, item, cx, cy, size, maxW, opts, withPinyin) {
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '700 ' + size + 'px ' + opts.font;
-    var tw = ctx.measureText(item).width;
-    if (tw > maxW * 0.92) { size *= maxW * 0.92 / tw; ctx.font = '700 ' + size + 'px ' + opts.font; tw = ctx.measureText(item).width; }
-
-    if (opts.textStyle === 'grid') {
-      // A box per word, with 田字格-style guides behind each character.
-      var n = Array.from(item).length;
-      var cell = size * 1.12;
-      var bw = Math.max(tw + size * 0.2, n * cell);
-      var bh = cell;
-      ctx.save();
-      ctx.strokeStyle = '#9fc29a';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(cx - bw / 2, cy - bh / 2, bw, bh);
-      ctx.setLineDash([10, 10]);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#d3e3cd';
-      var startX = cx - (n * cell) / 2;
-      ctx.beginPath();
-      for (var k = 0; k < n; k++) {
-        var gx = startX + k * cell;
-        if (k > 0) { ctx.moveTo(gx, cy - bh / 2); ctx.lineTo(gx, cy + bh / 2); }
-        ctx.moveTo(gx + cell / 2, cy - bh / 2); ctx.lineTo(gx + cell / 2, cy + bh / 2);
-      }
-      ctx.moveTo(cx - bw / 2, cy); ctx.lineTo(cx + bw / 2, cy);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    ctx.fillStyle = '#103e37';
-    ctx.font = '700 ' + size + 'px ' + opts.font;
-    ctx.fillText(item, cx, cy + size * 0.04);
-
-    if (withPinyin) {
-      var py = pinyinFor(item);
-      if (py) {
-        var ps = size * 0.3;
-        ctx.font = '600 ' + ps + 'px ' + LATIN;
-        var pw = ctx.measureText(py).width;
-        if (pw > maxW * 0.92) { ps *= maxW * 0.92 / pw; ctx.font = '600 ' + ps + 'px ' + LATIN; }
-        ctx.fillStyle = '#356e57';
-        ctx.fillText(py, cx, cy - size * 0.62 - ps * 0.55);
-      }
-    }
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
-  }
-
   // ---- Generation -------------------------------------------------------------------
 
   function readOptions() {
     return {
       title: el.title.value.trim(),
-      font: FONTS[el.font.value] || FONTS.kai,
-      textStyle: el.textStyle.value,
-      showPinyin: el.showPinyin.checked,
       trim: el.trim.checked,
       scrambled: el.outScrambled.checked,
       board: el.outBoard.checked,
@@ -531,19 +306,7 @@
   }
 
   function collectSources(opts) {
-    if (activeTab === 'type') {
-      var items = parseItems(el.words.value);
-      if (!items.length) return Promise.reject(new Error('Type at least one word first · 请先输入词汇。'));
-      var ready = opts.showPinyin
-        ? loadDictionary().catch(function () { opts.showPinyin = false; })
-        : Promise.resolve();
-      return ready.then(function () {
-        return document.fonts && document.fonts.ready;
-      }).then(function () {
-        return [makeTextPage(items, opts)];
-      });
-    }
-    if (!source) return Promise.reject(new Error('Upload a PDF first — or switch to “Type words” · 请先上传 PDF。'));
+    if (!source) return Promise.reject(new Error('Upload a PDF first · 请先上传 PDF。'));
     var chosen = source.pages.filter(function (p) { return p.on; });
     if (!chosen.length) return Promise.reject(new Error('Select at least one page · 请至少选择一页。'));
     return Promise.all(chosen.map(function (p) { return pageCanvas(p, opts.trim); }));
@@ -650,11 +413,11 @@
       cut: opts.scrambled ? '答案 · Answer key' : '沿线剪开，打乱后再拼起来 · Cut along the lines, mix, then rebuild.'
     }[kind];
     var nameW = 560;
-    fitText(ctx, title, MARGIN, MARGIN + 48, p.pageW - MARGIN * 2 - nameW, 54, '800', LATIN + ', ' + FONTS.sans, '#194f45');
-    fitText(ctx, sub, MARGIN, MARGIN + 96, p.pageW - MARGIN * 2 - nameW, 28, '500', LATIN + ', ' + FONTS.sans, '#5d7168');
+    fitText(ctx, title, MARGIN, MARGIN + 48, p.pageW - MARGIN * 2 - nameW, 54, '800', LATIN + ', ' + SANS, '#194f45');
+    fitText(ctx, sub, MARGIN, MARGIN + 96, p.pageW - MARGIN * 2 - nameW, 28, '500', LATIN + ', ' + SANS, '#5d7168');
     ctx.textAlign = 'right';
     ctx.fillStyle = '#193d38';
-    ctx.font = '700 30px ' + LATIN + ', ' + FONTS.sans;
+    ctx.font = '700 30px ' + LATIN + ', ' + SANS;
     ctx.fillText(kind === 'cut' && opts.scrambled ? 'Teacher copy · 教师用' : '姓名 Name: _______________', p.pageW - MARGIN, MARGIN + 48);
     ctx.textAlign = 'left';
     return { canvas: canvas, ctx: ctx };

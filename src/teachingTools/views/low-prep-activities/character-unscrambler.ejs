@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>汉字拼图 · Character Unscrambler - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Type Chinese characters or words and print a cut-and-rebuild worksheet: each character is drawn large and cut into scrambled squares so every piece holds part of a stroke. Students rebuild the character and practise writing it. Download PNG or PDF.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/character-unscrambler/character-unscrambler.css?v=1">
+</head>
+<body class="cu-page">
+  <main class="cu-wrap">
+    <header class="cu-header">
+      <div class="cu-header-content">
+        <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
+        <p class="cu-eyebrow">Character recognition · 识字</p>
+        <h1>✂️ 汉字拼图 · Character Unscrambler</h1>
+        <p>Type a character or a few words. Each one is drawn large and cut into squares, so every square holds part of a stroke. Students cut the scrambled squares apart, rebuild the character, then practise writing it underneath.</p>
+        <div class="cu-hero-points" aria-label="Tool highlights">
+          <span>Every square has strokes</span>
+          <span>1–6 characters or words per puzzle</span>
+          <span>Worksheet · Board · Answer key</span>
+          <span>PNG · PDF · Print</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="cu-layout">
+      <section class="cu-builder" aria-label="Build your puzzle">
+
+        <section class="cu-panel">
+          <div class="cu-panel-heading">
+            <span class="cu-step">1</span>
+            <p class="cu-kicker">拼图内容 · Characters</p>
+            <h2>Type the characters</h2>
+          </div>
+
+          <label for="cu-words">Characters or words · 汉字或词语 <small>(one per line, or separated by commas / 、 / spaces)</small></label>
+          <textarea id="cu-words" rows="5" placeholder="花&#10;爸爸、妈妈、爷爷"></textarea>
+
+          <div class="cu-two">
+            <div>
+              <label for="cu-unit">Split by · 按什么分</label>
+              <select id="cu-unit">
+                <option value="word">Word · 按词</option>
+                <option value="char">Character · 按字</option>
+              </select>
+            </div>
+            <div>
+              <label for="cu-per">Per puzzle · 每张拼图放</label>
+              <select id="cu-per">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+              </select>
+            </div>
+          </div>
+          <p class="cu-note">Example: 6 words with “2 per puzzle” makes 3 puzzles. 例如：6 个词、每张放 2 个，会生成 3 张拼图。</p>
+        </section>
+
+        <section class="cu-panel">
+          <div class="cu-panel-heading">
+            <span class="cu-step">2</span>
+            <p class="cu-kicker">拼图设置 · Puzzle settings</p>
+            <h2>Style and cut</h2>
+          </div>
+
+          <label for="cu-title">Title on the sheet · 标题 <small>(optional)</small></label>
+          <input type="text" id="cu-title" placeholder="e.g. 第三课 · 我的家" maxlength="60">
+
+          <label>Squares · 切几块</label>
+          <div class="cu-levels" id="cu-levels" role="radiogroup" aria-label="Difficulty">
+            <button type="button" data-n="2" role="radio" aria-checked="false">Easy · 2×2</button>
+            <button type="button" data-n="3" role="radio" aria-checked="true" class="is-active">Medium · 3×3</button>
+            <button type="button" data-n="4" role="radio" aria-checked="false">Hard · 4×4</button>
+          </div>
+          <p class="cu-note">For one character. Words and several items get more squares along the long side so each square stays roughly square. 词语或多个字会按比例增加块数。</p>
+
+          <div class="cu-two">
+            <div>
+              <label for="cu-font">Font · 字体</label>
+              <select id="cu-font">
+                <option value="kai">楷体 Kai</option>
+                <option value="sans">黑体 Sans</option>
+              </select>
+            </div>
+            <div>
+              <label for="cu-color">Character colour · 字的颜色</label>
+              <select id="cu-color">
+                <option value="red">Red · 红</option>
+                <option value="black">Black · 黑</option>
+                <option value="green">Green · 绿</option>
+                <option value="blue">Blue · 蓝</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="cu-background">Background · 背景</label>
+          <select id="cu-background">
+            <option value="white">White · 白色</option>
+            <option value="pink">Soft pink · 淡粉</option>
+            <option value="green">Soft green · 淡绿</option>
+            <option value="blue">Soft blue · 淡蓝</option>
+            <option value="yellow">Soft yellow · 淡黄</option>
+          </select>
+
+          <label>Pages to print · 打印页面</label>
+          <div class="cu-options">
+            <label class="cu-check"><input type="checkbox" id="cu-out-sheet" checked><span>练习纸 · Worksheet <small>Scrambled squares for students to cut out and rebuild.</small></span></label>
+            <label class="cu-check"><input type="checkbox" id="cu-out-board"><span>拼贴底板 · Glue board <small>An empty grid, same size, to glue the squares onto.</small></span></label>
+            <label class="cu-check"><input type="checkbox" id="cu-out-answer" checked><span>答案 · Answer key <small>The whole character with the square letters in place.</small></span></label>
+          </div>
+
+          <label>Options · 选项</label>
+          <div class="cu-options">
+            <label class="cu-check"><input type="checkbox" id="cu-practice" checked><span>Writing practice boxes · 田字格练写 <small>Under the puzzle on the worksheet.</small></span></label>
+            <label class="cu-check"><input type="checkbox" id="cu-guides"><span>田字格 guides behind the character · 拼图里加田字格 <small>Helps students line the pieces up.</small></span></label>
+            <label class="cu-check"><input type="checkbox" id="cu-dashed" checked><span>Dashed cut lines · 虚线剪裁线</span></label>
+          </div>
+
+          <button id="cu-generate" class="cu-btn cu-btn-primary" type="button">✂️ Make puzzle · 生成拼图</button>
+        </section>
+      </section>
+
+      <section class="cu-preview-panel" aria-label="Puzzle preview">
+        <div class="cu-preview-toolbar">
+          <div class="cu-count-box">
+            <span class="cu-count-label">Pages</span>
+            <span id="cu-page-count">0</span>
+          </div>
+          <div class="cu-actions">
+            <button id="cu-reshuffle" class="cu-btn cu-btn-outline" type="button" disabled title="Same characters, new order">🔀 Reshuffle</button>
+            <button id="cu-png" class="cu-btn cu-btn-outline" type="button" disabled>⬇️ PNG</button>
+            <button id="cu-pdf" class="cu-btn cu-btn-primary" type="button" disabled>⬇️ PDF</button>
+            <button id="cu-print" class="cu-btn cu-btn-outline" type="button" disabled>🖨️ Print</button>
+          </div>
+        </div>
+        <p id="cu-status" class="cu-status" aria-live="polite">Type characters, then click “Make puzzle”.</p>
+
+        <div id="cu-empty" class="cu-empty">
+          <div class="cu-empty-icon" aria-hidden="true">✂️</div>
+          <h2>No puzzle yet · 还没有拼图</h2>
+          <p>Your worksheets will appear here. Pages print on A4.</p>
+        </div>
+
+        <div id="cu-pages" class="cu-pages"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="cu-print-area" aria-hidden="true"></div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/low-prep/character-unscrambler/character-unscrambler.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

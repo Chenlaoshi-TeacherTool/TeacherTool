@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#356e57">
   <title>生词拼图生成器 · PDF Puzzle Maker - Chen Laoshi's Teaching Toolkit</title>
-  <%- include('../partials/seo', { pageDescription: 'Upload an A4 PDF or type Chinese words and cut the whole page into a printable jigsaw puzzle. Characters are split across pieces, so students rebuild the words as they put the page back together. Download PNG or PDF.' }) %>
+  <%- include('../partials/seo', { pageDescription: 'Upload an A4 PDF or image and cut the whole page into a printable jigsaw puzzle. Characters are split across pieces, so students rebuild the words as they put the page back together. Download PNG or PDF.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/vocab-puzzle/vocab-puzzle.css?v=4">
+  <link rel="stylesheet" href="/low-prep/vocab-puzzle/vocab-puzzle.css?v=5">
 </head>
 <body class="vp-page">
   <main class="vp-wrap">
@@ -16,7 +16,7 @@
         <a href="/teaching-tools#low-prep-activities" class="back-btn">← Back to Teaching Tools</a>
         <p class="vp-eyebrow">Vocabulary review · 生词复习</p>
         <h1>🧩 生词拼图生成器 · PDF Puzzle Maker</h1>
-        <p>Upload an A4 PDF (a vocabulary page, a text, a worksheet) or type your words. The whole page is cut into jigsaw pieces — characters get split across pieces, so students have to rebuild the words to put the page back together.</p>
+        <p>Upload an A4 PDF (a vocabulary page, a text, a worksheet) or an image. The whole page is cut into jigsaw pieces — characters get split across pieces, so students have to rebuild the words to put the page back together.</p>
         <div class="vp-hero-points" aria-label="Tool highlights">
           <span>Whole page → jigsaw</span>
           <span>2–24 pieces</span>
@@ -36,12 +36,7 @@
             <h2>Choose the page</h2>
           </div>
 
-          <div class="vp-tabs" role="tablist">
-            <button type="button" class="vp-tab is-active" role="tab" aria-selected="true" data-tab="pdf">📄 上传 PDF · Upload PDF</button>
-            <button type="button" class="vp-tab" role="tab" aria-selected="false" data-tab="type">⌨️ 输入词汇 · Type words</button>
-          </div>
-
-          <div class="vp-tab-panel" data-panel="pdf">
+          <div>
             <label class="vp-drop" id="vp-drop" for="vp-file-input">
               <input type="file" id="vp-file-input" accept="application/pdf,.pdf,image/png,image/jpeg" hidden>
               <span class="vp-drop-icon" aria-hidden="true">📄</span>
@@ -65,30 +60,7 @@
               <label class="vp-check"><input type="checkbox" id="vp-trim" checked><span>Trim blank margins · 自动裁掉空白 <small>Zooms in on the words so a half-empty page doesn't give blank pieces.</small></span></label>
             </div>
           </div>
-
-          <div class="vp-tab-panel" data-panel="type" hidden>
-            <label for="vp-words">Words or sentences · 词语或句子 <small>(one per line, or separated by commas / 、)</small></label>
-            <textarea id="vp-words" rows="8" placeholder="苹果&#10;学校、朋友、老师&#10;我喜欢去图书馆看书。"></textarea>
-            <div class="vp-two">
-              <div>
-                <label for="vp-font">Font · 字体</label>
-                <select id="vp-font">
-                  <option value="kai">楷体 Kai</option>
-                  <option value="sans">黑体 Sans</option>
-                </select>
-              </div>
-              <div>
-                <label for="vp-text-style">Style · 样式</label>
-                <select id="vp-text-style">
-                  <option value="grid">Word boxes · 田字格风格</option>
-                  <option value="plain">Plain · 纯文字</option>
-                </select>
-              </div>
-            </div>
-            <div class="vp-options vp-options-spaced">
-              <label class="vp-check"><input type="checkbox" id="vp-show-pinyin"><span>Add pinyin above the words · 加拼音 <small>Filled in from the CC-CEDICT dictionary.</small></span></label>
-            </div>
-          </div>
+          <p class="vp-note">Want to type characters instead? Try <a href="/teaching-tools/character-unscrambler">✂️ 汉字拼图 · Character Unscrambler</a>. 想输入汉字做拼图？请用汉字拼图。</p>
         </section>
 
         <section class="vp-panel">
@@ -150,7 +122,7 @@
             <button id="vp-print" class="vp-btn vp-btn-outline" type="button" disabled>🖨️ Print</button>
           </div>
         </div>
-        <p id="vp-status" class="vp-status" aria-live="polite">Upload a PDF or type words, then click “Make puzzle”.</p>
+        <p id="vp-status" class="vp-status" aria-live="polite">Upload a PDF, then click “Make puzzle”.</p>
 
         <div id="vp-empty" class="vp-empty">
           <div class="vp-empty-icon" aria-hidden="true">🧩</div>
@@ -168,7 +140,7 @@
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script src="/low-prep/vocab-puzzle/pdfjs/pdf.min.js"></script>
-  <script src="/low-prep/vocab-puzzle/vocab-puzzle.js?v=9" defer></script>
+  <script src="/low-prep/vocab-puzzle/vocab-puzzle.js?v=10" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

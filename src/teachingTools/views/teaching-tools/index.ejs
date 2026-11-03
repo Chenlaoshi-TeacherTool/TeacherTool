@@ -450,6 +450,13 @@
                     <a href="/teaching-tools/vocab-puzzle" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
                 </div>
                 <div data-uses="print" class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/character-unscrambler' }) %>
+                    <h3>✂️ <%= t('teachingToolsIndex.charUnscramblerTitle') %></h3>
+                    <p class="tool-scope"><%= t('teachingToolsIndex.charUnscramblerScope') %></p>
+                    <p><%= t('teachingToolsIndex.charUnscramblerDesc') %></p>
+                    <a href="/teaching-tools/character-unscrambler" class="btn"><%= t('teachingToolsIndex.openGenerator') %></a>
+                </div>
+                <div data-uses="print" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/secret-message' }) %>
                     <h3>🔐 <%= t('teachingToolsIndex.secretMessageTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.secretMessageScope') %></p>
