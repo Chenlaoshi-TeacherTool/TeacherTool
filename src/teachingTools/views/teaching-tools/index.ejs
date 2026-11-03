@@ -121,6 +121,7 @@
             color: #667eea;
             margin-bottom: 15px;
         }
+        .tool-limited-free { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #fff3cd; color: #855500; font-size: .75rem; font-weight: 800; vertical-align: middle; }
         .tool-card p {
             margin-bottom: 20px;
         }
@@ -500,7 +501,7 @@
                 </div>
                 <div data-uses="independent" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/book-generator' }) %>
-                    <h3>🎧 <%= t('teachingToolsIndex.bookGenTitle') %></h3>
+                    <h3>🎧 <%= t('teachingToolsIndex.bookGenTitle') %> <span class="tool-limited-free"><%= lang === 'zh' ? '限时免费' : 'Free for a limited time' %></span></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.bookGenScope') %></p>
                     <p><%= t('teachingToolsIndex.bookGenDesc') %></p>
                     <a href="/teaching-tools/book-generator" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
