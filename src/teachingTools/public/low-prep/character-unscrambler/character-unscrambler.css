@@ -175,3 +175,7 @@
   #cu-print-area img { display: block; width: 100vw; height: 100vh; object-fit: contain; margin: 0; page-break-after: always; break-after: page; }
   #cu-print-area img:last-child { page-break-after: auto; break-after: auto; }
 }
+
+/* ---------- uploaded background ---------- */
+.cu-bg-upload[hidden] { display: none; }
+.cu-bg-upload input[type="file"] { box-sizing: border-box; width: 100%; padding: 9px 10px; border: 1px dashed #c9d8c4; border-radius: 12px; background: #f6faf3; font: 700 .85rem 'Nunito', 'Noto Sans SC', sans-serif; }

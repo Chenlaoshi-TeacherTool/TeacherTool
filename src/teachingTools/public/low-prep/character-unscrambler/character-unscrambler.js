@@ -20,7 +20,7 @@
     sans: "'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Heiti SC', sans-serif"
   };
   var LATIN = "'Nunito', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif";
-  var COLORS = { red: '#e0201b', black: '#1c1c1c', green: '#194f45', blue: '#1f4fa8' };
+  var COLORS = { red: '#e0201b', orange: '#bf7f35', black: '#1c1c1c', green: '#194f45', blue: '#1f4fa8' };
   var BACKGROUNDS = {
     white: null,
     pink: ['#fbe4ef', '#f3d4ea', '#fdf0f5'],
@@ -35,13 +35,15 @@
   var level = 3;
   var seed = newSeed();
   var output = [];   // [{ canvas, label, file, dataUrl }]
+  var bgImage = null;
   var el = {};
 
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
     [
-      'words', 'unit', 'per', 'font', 'color', 'background', 'guides', 'title', 'levels',
+      'words', 'unit', 'per', 'font', 'color', 'background', 'bg-upload', 'bg-file', 'bg-fade', 'bg-status',
+      'guides', 'title', 'levels',
       'out-sheet', 'out-board', 'out-answer', 'practice', 'dashed',
       'generate', 'page-count', 'reshuffle', 'png', 'pdf', 'print', 'status', 'empty', 'pages', 'print-area'
     ].forEach(function (id) {
@@ -63,6 +65,30 @@
     el.png.addEventListener('click', downloadPngs);
     el.pdf.addEventListener('click', downloadPdf);
     el.print.addEventListener('click', printPages);
+
+    el.background.addEventListener('change', function () {
+      el.bgUpload.hidden = el.background.value !== 'upload';
+    });
+    el.bgFile.addEventListener('change', function () {
+      var file = el.bgFile.files[0];
+      if (file) loadBackground(file);
+    });
+  }
+
+  // The uploaded picture, kept as an <img> until the page is reloaded.
+  function loadBackground(file) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      bgImage = img;
+      el.bgStatus.textContent = '“' + file.name + '” ready · 图片已载入。';
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      bgImage = null;
+      el.bgStatus.textContent = 'This picture could not be read — try a PNG or JPG · 无法读取，请换 PNG 或 JPG。';
+    };
+    img.src = url;
   }
 
   // ---- Input -----------------------------------------------------------------------
@@ -91,7 +117,10 @@
       per: parseInt(el.per.value, 10) || 1,
       font: FONTS[el.font.value] || FONTS.kai,
       color: COLORS[el.color.value] || COLORS.red,
-      background: BACKGROUNDS[el.background.value] || null,
+      background: el.background.value === 'upload'
+        ? (bgImage ? { image: bgImage, fade: parseFloat(el.bgFade.value) } : null)
+        : BACKGROUNDS[el.background.value] || null,
+      needsPicture: el.background.value === 'upload' && !bgImage,
       guides: el.guides.checked,
       title: el.title.value.trim(),
       sheet: el.outSheet.checked,
@@ -109,6 +138,10 @@
     var items = parseItems(el.words.value, opts.unit);
     if (!items.length) {
       el.status.textContent = 'Type at least one Chinese character first · 请先输入汉字。';
+      return;
+    }
+    if (opts.needsPicture) {
+      el.status.textContent = 'Choose a background picture first, or pick another background · 请先选择背景图片。';
       return;
     }
     if (!opts.sheet && !opts.board && !opts.answer) {
@@ -359,10 +392,23 @@
     };
   }
 
-  function paintBackground(ctx, w, h, colors) {
+  // `bg` is null (white), a list of wash colours, or { image, fade }.
+  function paintBackground(ctx, w, h, bg) {
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, w, h);
-    if (!colors) return;
+    if (!bg) return;
+    if (bg.image) {
+      // Cover the puzzle (crop, don't stretch), then fade toward white.
+      var img = bg.image;
+      var s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+      var dw = img.naturalWidth * s;
+      var dh = img.naturalHeight * s;
+      ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      ctx.fillStyle = 'rgba(255,255,255,' + bg.fade + ')';
+      ctx.fillRect(0, 0, w, h);
+      return;
+    }
+    var colors = bg;
     // Soft blobs of colour, like a faded watercolour wash.
     var blobs = [[0.15, 0.2, 0.55], [0.85, 0.3, 0.5], [0.4, 0.85, 0.6], [0.95, 0.95, 0.45], [0.55, 0.45, 0.4]];
     var m = Math.max(w, h);

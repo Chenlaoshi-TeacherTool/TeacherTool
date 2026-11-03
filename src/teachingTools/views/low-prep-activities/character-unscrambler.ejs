@@ -7,7 +7,7 @@
   <title>汉字拼图 · Character Unscrambler - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Type Chinese characters or words and print a cut-and-rebuild worksheet: each character is drawn large and cut into scrambled squares so every piece holds part of a stroke. Students rebuild the character and practise writing it. Download PNG or PDF.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/character-unscrambler/character-unscrambler.css?v=1">
+  <link rel="stylesheet" href="/low-prep/character-unscrambler/character-unscrambler.css?v=2">
 </head>
 <body class="cu-page">
   <main class="cu-wrap">
@@ -91,6 +91,7 @@
               <label for="cu-color">Character colour · 字的颜色</label>
               <select id="cu-color">
                 <option value="red">Red · 红</option>
+                <option value="orange">Orange · 橙</option>
                 <option value="black">Black · 黑</option>
                 <option value="green">Green · 绿</option>
                 <option value="blue">Blue · 蓝</option>
@@ -105,7 +106,26 @@
             <option value="green">Soft green · 淡绿</option>
             <option value="blue">Soft blue · 淡蓝</option>
             <option value="yellow">Soft yellow · 淡黄</option>
+            <option value="upload">Upload a picture · 上传图片</option>
           </select>
+
+          <div id="cu-bg-upload" class="cu-bg-upload" hidden>
+            <div class="cu-two">
+              <div>
+                <label for="cu-bg-file">Picture · 图片 <small>(PNG / JPG)</small></label>
+                <input type="file" id="cu-bg-file" accept="image/png,image/jpeg,image/webp">
+              </div>
+              <div>
+                <label for="cu-bg-fade">Picture strength · 图片深浅</label>
+                <select id="cu-bg-fade">
+                  <option value="0.7">Light · 淡</option>
+                  <option value="0.5" selected>Medium · 中</option>
+                  <option value="0.25">Strong · 深</option>
+                </select>
+              </div>
+            </div>
+            <p id="cu-bg-status" class="cu-note">The picture fills the whole puzzle behind the character, faded so the strokes stay clear. 图片会铺满拼图并调淡，字依然清楚。</p>
+          </div>
 
           <label>Pages to print · 打印页面</label>
           <div class="cu-options">
@@ -155,7 +175,7 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
-  <script src="/low-prep/character-unscrambler/character-unscrambler.js?v=2" defer></script>
+  <script src="/low-prep/character-unscrambler/character-unscrambler.js?v=4" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
