@@ -121,6 +121,31 @@
     } catch (error) { if (selected === epoch) status.textContent = t(error.message); }
   }
 
+  // Lists saved with the word-list and question-bank pages' own "Save in this
+  // browser" buttons live outside the unified library; cloud sync carries them too.
+  function legacyLists() {
+    var lists = [];
+    try { if (window.ChenWordlist) lists = lists.concat(window.ChenWordlist.exportAll().lists); } catch (error) {}
+    try {
+      if (window.ChenQuestionBank) {
+        lists = lists.concat(window.ChenQuestionBank.listAll().map(function (bank) { return window.ChenQuestionBank.load(bank.id); }).filter(Boolean));
+      }
+    } catch (error) {}
+    return lists;
+  }
+
+  // Puts cloud collections that began as such lists back where those pages show them.
+  function restoreLegacyLists(library) {
+    (library && library.collections || []).forEach(function (collection) {
+      var list = collection.legacy;
+      if (!list || !list.id) return;
+      try {
+        if (collection.kind === 'vocabulary' && window.ChenWordlist && Array.isArray(list.items) && !window.ChenWordlist.load(list.id)) window.ChenWordlist.save(list);
+        if (collection.kind === 'question-bank' && window.ChenQuestionBank && Array.isArray(list.questions) && !window.ChenQuestionBank.load(list.id)) window.ChenQuestionBank.save(list);
+      } catch (error) {}
+    });
+  }
+
   async function prepare(direction) {
     reset();
     var selected = ++epoch;
@@ -128,10 +153,20 @@
       if (!cloud || !local) return;
       if (direction === 'upload') {
         var loaded = await local.load();
+        var data = loaded.data;
+        var lists = legacyLists();
+        if (lists.length) {
+          // The page's own storage holds the version teachers edit, so it replaces any
+          // unified copy of the same list (e.g. one restored from the cloud earlier).
+          var ids = new Set(lists.map(function (list) { return list.id; }).filter(Boolean));
+          var converted = (await window.ChenLibraryV2.preview(JSON.stringify({ format: 'chenlaoshi-wordlist', version: 1, lists: lists }))).data;
+          data = JSON.parse(JSON.stringify(loaded.data));
+          data.collections = data.collections.filter(function (collection) { return !(collection.legacy && ids.has(collection.legacy.id)); }).concat(converted.collections);
+        }
         if (selected !== epoch) return;
-        if (!loaded.data.collections.length) throw new Error(t('This browser has no saved materials yet. Save a vocabulary list or question bank first.'));
-        plan = { direction: direction, data: loaded.data, raw: loaded.raw, revision: cloud.revision, accountId: accountId };
-        exchange.textContent = t('To upload: ') + summary(loaded.data) + t('. Current cloud library: ') + (cloud.library ? summary(cloud.library) : t('empty')) + stop;
+        if (!data.collections.length) throw new Error(t('This browser has no saved materials yet. Save a vocabulary list or question bank first.'));
+        plan = { direction: direction, data: data, raw: loaded.raw, revision: cloud.revision, accountId: accountId };
+        exchange.textContent = t('To upload: ') + summary(data) + t('. Current cloud library: ') + (cloud.library ? summary(cloud.library) : t('empty')) + stop;
         confirmText.textContent = t('Replace this account’s cloud copy with these browser materials. Download a cloud backup first if it already has materials.');
       } else {
         var prepared = await local.prepare(cloud.library);
@@ -186,6 +221,7 @@
         exchange.textContent = t('Saved to the cloud.');
       } else {
         await local.save(pending.localPlan, true);
+        restoreLegacyLists(pending.localPlan.incoming);
         exchange.textContent = t('Cloud materials were added to this browser. Reload the page to see them in your library.');
       }
       var done = exchange.textContent;
