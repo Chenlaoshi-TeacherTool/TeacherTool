@@ -725,9 +725,9 @@ h2 {
   html,
   body {
     min-width: 0;
-    min-height: 0;
+    min-height: 0 !important;
     height: auto;
-    background: #fff;
+    background: #fff !important;
   }
 
   body {
@@ -756,15 +756,18 @@ h2 {
 
   .columns { display: block; }
 
+  /* site-theme.css styles .card with !important borders, shadows and a
+     hover lift, so each needs an !important reset here. */
   .preview-card,
   .worksheet-shell,
   .paper {
     min-height: 0;
     padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: #fff;
-    box-shadow: none;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    transform: none !important;
   }
 
   .preview-card::before { display: none !important; }
@@ -775,10 +778,14 @@ h2 {
 
   .worksheet-shell { overflow: visible; }
 
+  /* Fixed height that fits inside both A4 (277mm) and Letter (259mm) once
+     the 10mm page margins are taken off, so the sheet never spills over. */
   .paper {
-    width: 156mm;
+    width: 100%;
+    height: 245mm;
     max-width: 100%;
     margin: 0 auto;
+    overflow: hidden;
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -806,18 +813,20 @@ h2 {
   .canvas-wrap {
     display: block;
     width: 100%;
-    height: auto;
+    height: 220mm;
+    aspect-ratio: auto;
     margin: 0 auto;
-    break-inside: avoid;
-    page-break-inside: avoid;
   }
 
   #cloudCanvas { display: none !important; }
 
   #cloudPrintImage {
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    margin: 0 auto;
     display: block;
+    object-fit: contain;
   }
 }
 

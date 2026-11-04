@@ -13,7 +13,7 @@
   <script src="/javascripts/clarity.js"></script>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
-  <link rel="stylesheet" href="./word-cloud-widget.css?v=print-3">
+  <link rel="stylesheet" href="./word-cloud-widget.css?v=print-4">
 </head>
 <body>
   <header class="hero">
@@ -94,10 +94,7 @@
               <p class="helper">Adjusting any setting regenerates automatically. Click "Shuffle Layout" for a new arrangement.</p>
             </div>
           </div>
-          <div>
-            <span class="ready-pill" id="readyPill">✓ Generated</span>
-            <button class="btn" id="puzzleButton" type="button" disabled>生成拼图 · Make Puzzle</button>
-          </div>
+          <span class="ready-pill" id="readyPill">✓ Generated</span>
         </div>
 
         <div class="worksheet-shell">
@@ -118,6 +115,7 @@
     <section class="card toolbar" aria-label="Generate and print options">
       <div class="actions">
         <button class="btn btn-secondary" id="shuffleButton" type="button"><span aria-hidden="true">↻</span> Shuffle Layout</button>
+        <button class="btn btn-secondary" id="puzzleButton" type="button" disabled><span aria-hidden="true">🧩</span> 生成拼图 · Make Puzzle</button>
         <button class="btn btn-primary" id="printButton" type="button"><span aria-hidden="true">🖨</span> Print / Save PDF</button>
       </div>
     </section>
