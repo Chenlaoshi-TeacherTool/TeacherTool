@@ -2,7 +2,7 @@
   'use strict';
   if (document.getElementById('teacherAccountBar')) return;
   var zh = document.documentElement.lang.indexOf('zh') === 0 || /(?:^|;\s*)lang=zh(?:;|$)/.test(document.cookie);
-  var labels = zh ? {login: '登录', register: '注册', materials: '我的资料', logout: '退出', title: '老师账号', close: '关闭', email: '邮箱注册／登录', google: '使用 Google 登录', pending: '老师注册登录尚未开放，现有免费工具仍可使用。', help: '继续后进入统一安全登录页，可注册邮箱账号、找回密码。', googleHelp: '在安全登录页选择 Google 继续。', googleSoon: 'Google 登录（即将推出）', error: '暂时无法读取登录状态，请稍后再试。'} : {login: 'Log in', register: 'Sign up', materials: 'My materials', logout: 'Log out', title: 'Teacher account', close: 'Close', email: 'Continue with email', google: 'Continue with Google', pending: 'Teacher accounts are not open yet. Existing free tools remain available.', help: 'Continue to the secure sign-in page to create an email account, reset a password.', googleHelp: 'Choose Google on the secure sign-in page.', googleSoon: 'Google sign-in (Coming soon)', error: 'Sign-in status is temporarily unavailable. Please try again.'};
+  var labels = zh ? {login: '登录', register: '注册', materials: '我的资料', logout: '退出', title: '老师账号', close: '关闭', email: '邮箱注册／登录', google: '使用 Google 登录', pending: '老师注册登录尚未开放，现有免费工具仍可使用。', help: '继续后进入统一安全登录页，可注册邮箱账号、找回密码。', googleHelp: '在安全登录页选择 Google 继续。第一次用 Google 请点「注册」。', sameEmail: '已经用邮箱和密码注册过的老师，请继续用「邮箱登录」。同一个邮箱不能再用 Google 注册。', googleSoon: 'Google 登录（即将推出）', error: '暂时无法读取登录状态，请稍后再试。'} : {login: 'Log in', register: 'Sign up', materials: 'My materials', logout: 'Log out', title: 'Teacher account', close: 'Close', email: 'Continue with email', google: 'Continue with Google', pending: 'Teacher accounts are not open yet. Existing free tools remain available.', help: 'Continue to the secure sign-in page to create an email account, reset a password.', googleHelp: 'Choose Google on the secure sign-in page. First time with Google? Use Sign up.', sameEmail: 'Already signed up with an email and password? Keep using Continue with email. The same email cannot also sign up with Google.', googleSoon: 'Google sign-in (Coming soon)', error: 'Sign-in status is temporarily unavailable. Please try again.'};
   var session = null;
   var revision = 0;
   var bar;
@@ -29,8 +29,10 @@
       var entry = session.login[0].url;
       if (entry.indexOf('/.auth/login/') !== 0) return;
       entry = returnHere(entry, 'post_login_redirect_uri');
+      // Sign up opens the sign-up page: "Sign in with Google" there never creates a new account.
+      if (mode === 'register') { var signup = new URL(entry, location.origin); signup.searchParams.set('prompt', 'create'); entry = signup.pathname + signup.search; }
       dialog.appendChild(link(labels.email, entry));
-      if ((session.methods || []).includes('google')) dialog.append(link(labels.google, entry), node('p', labels.googleHelp));
+      if ((session.methods || []).includes('google')) dialog.append(link(labels.google, entry), node('p', labels.googleHelp), node('p', labels.sameEmail));
       else {
         var comingSoon = node('button', labels.googleSoon);
         comingSoon.type = 'button';
