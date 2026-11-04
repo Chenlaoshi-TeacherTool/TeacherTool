@@ -719,12 +719,14 @@ h2 {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm;
+    margin: 10mm;
   }
 
   html,
   body {
     min-width: 0;
+    min-height: 0;
+    height: auto;
     background: #fff;
   }
 
@@ -733,8 +735,7 @@ h2 {
     -webkit-print-color-adjust: exact;
   }
 
-  .hero,
-  .back-link,
+  body > :not(.workspace),
   .input-card,
   .preview-card > .card-heading,
   .toolbar,
@@ -745,6 +746,7 @@ h2 {
 
   .workspace {
     width: 100%;
+    max-width: none;
     margin: 0;
     padding: 0;
   }
@@ -764,21 +766,44 @@ h2 {
 
   .preview-card::before { display: none !important; }
 
-  .worksheet-shell { display: block; }
+  .preview-card,
+  .worksheet-shell,
+  .paper { display: block; }
+
+  .worksheet-shell { overflow: visible; }
 
   .paper {
+    width: 166mm;
     max-width: 100%;
-    padding-top: 7mm;
+    margin: 0 auto;
     break-inside: avoid;
     page-break-inside: avoid;
   }
-  .paper-head { margin-bottom: 3mm; }
-  .title-input { font-size: 15pt; border: 0 !important; }
-  .paper-head span { font-size: 8pt; }
+  .paper-head {
+    display: block;
+    margin: 0 0 4mm;
+    padding-bottom: 3mm;
+    border-bottom: 1px solid #b7c4bc;
+    text-align: center;
+  }
+
+  .title-input {
+    display: block;
+    width: 100%;
+    margin: 0 0 2mm;
+    padding: 0;
+    border: 0 !important;
+    font-size: 18pt;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .paper-head span { font-size: 9pt; color: #414b47; }
 
   .canvas-wrap {
-    width: 180mm;
-    height: 250mm;
+    display: block;
+    width: 100%;
+    height: auto;
     margin: 0 auto;
     break-inside: avoid;
     page-break-inside: avoid;
@@ -788,9 +813,8 @@ h2 {
 
   #cloudPrintImage {
     width: 100%;
-    height: 100%;
+    height: auto;
     display: block;
-    object-fit: fill;
   }
 }
 
