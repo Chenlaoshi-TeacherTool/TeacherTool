@@ -26,6 +26,8 @@
   // the page area. `aspect` is height/width, `center` is where the spiral
   // starts (the visual middle, which isn't the box middle for a heart).
   var SHAPES = {
+    // No outline: words spread over the whole page area.
+    none: { label: 'No shape', icon: '⊘', aspect: 0, center: [0.5, 0.5], draw: function (p) { p.rect(0, 0, 1, 1); } },
     rect: { label: 'Rectangle', icon: '▭', aspect: 0, center: [0.5, 0.5], draw: function (p) { p.rect(0, 0, 1, 1); } },
     circle: { label: 'Circle', icon: '●', aspect: 1, center: [0.5, 0.5], draw: function (p) { p.ellipse(0.5, 0.5, 0.5, 0.5, 0, 0, Math.PI * 2); } },
     heart: {
@@ -91,7 +93,7 @@
     scheme: 'colorful',
     font: 'default',
     background: '#ffffff',
-    shape: 'rect',
+    shape: 'none',
     sourceLang: 'en',
     mergeDuplicates: true
   };
@@ -635,7 +637,10 @@
     var outline = shapeBox(shape, CANVAS_W, CANVAS_H, 10);
     ctx.strokeStyle = 'rgba(31, 42, 68, 0.14)';
     ctx.fillStyle = state.background;
-    if (state.shape === 'rect') {
+    if (state.shape === 'none') {
+      // White stays transparent so the page shows no frame at all.
+      if (state.background !== '#ffffff') ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    } else if (state.shape === 'rect') {
       roundRectPath(ctx, outline.x, outline.y, outline.w, outline.h, 18);
       ctx.fill();
       ctx.lineWidth = 1.5;
