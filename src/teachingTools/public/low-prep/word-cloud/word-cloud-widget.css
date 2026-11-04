@@ -203,7 +203,7 @@ h1 {
   display: grid;
   grid-template-columns: 460px minmax(0, 1fr);
   gap: 22px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .card {
@@ -471,7 +471,7 @@ h2 {
   flex: 1;
   padding: 16px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   overflow: hidden;
   border: 1px solid #e2e6ef;
@@ -481,7 +481,7 @@ h2 {
 
 .paper {
   width: 100%;
-  max-width: 430px;
+  max-width: 640px;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -502,7 +502,7 @@ h2 {
 
 .title-input {
   min-width: 0;
-  flex: 1;
+  flex: 1 1 12em;
   padding: 4px 2px;
   border: 0;
   border-bottom: 1px dashed transparent;
