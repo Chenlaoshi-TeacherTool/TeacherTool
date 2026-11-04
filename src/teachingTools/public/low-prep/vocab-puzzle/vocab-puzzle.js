@@ -83,11 +83,26 @@
     el.png.addEventListener('click', downloadPngs);
     el.pdf.addEventListener('click', downloadPdf);
     el.print.addEventListener('click', printPages);
+
+    var url = new URL(window.location.href);
+    if (url.searchParams.get('from') === 'word-cloud') {
+      url.searchParams.delete('from');
+      window.history.replaceState(window.history.state, '', url);
+      try {
+        var png = sessionStorage.getItem('word-cloud-puzzle');
+        sessionStorage.removeItem('word-cloud-puzzle');
+        if (!png) throw new Error('Missing word cloud image');
+        var bytes = Uint8Array.from(atob(png), function (byte) { return byte.charCodeAt(0); });
+        handleFile(new File([bytes], 'word-cloud.png', { type: 'image/png' }), true);
+      } catch (err) {
+        setNote(el.fileStatus, 'Could not import the word cloud · 无法导入词汇云，请返回词汇云页面重试。', 'error');
+      }
+    }
   }
 
   // ---- Loading a PDF or image --------------------------------------------------
 
-  function handleFile(file) {
+  function handleFile(file, autoGenerate) {
     var isPdf = /\.pdf$/i.test(file.name) || file.type === 'application/pdf';
     var isImage = /^image\/(png|jpeg)$/.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
     if (!isPdf && !isImage) {
@@ -102,6 +117,7 @@
       var n = src.pages.length;
       setNote(el.fileStatus, '“' + file.name + '” — ' + n + (n === 1 ? ' page' : ' pages') +
         '. Each selected page becomes one puzzle · 每个选中的页面生成一个拼图。', 'ok');
+      if (autoGenerate) generate();
     }).catch(function (err) {
       setNote(el.fileStatus, 'Could not open this file: ' + (err && err.message ? err.message : err), 'error');
     });

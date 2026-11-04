@@ -94,7 +94,10 @@
               <p class="helper">Adjusting any setting regenerates automatically. Click "Shuffle Layout" for a new arrangement.</p>
             </div>
           </div>
-          <span class="ready-pill" id="readyPill">✓ Generated</span>
+          <div>
+            <span class="ready-pill" id="readyPill">✓ Generated</span>
+            <button class="btn" id="puzzleButton" type="button" disabled>生成拼图 · Make Puzzle</button>
+          </div>
         </div>
 
         <div class="worksheet-shell">
@@ -161,7 +164,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/vendor/pinyin-pro.js" defer></script>
   <script src="/shared/library-picker.js" defer></script>
-  <script src="./word-cloud-widget.js" defer></script>
+  <script src="./word-cloud-widget.js?v=2" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

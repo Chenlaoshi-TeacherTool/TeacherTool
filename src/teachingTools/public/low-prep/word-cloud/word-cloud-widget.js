@@ -75,6 +75,7 @@
     els.paperTitle = document.getElementById('paperTitle');
     els.shuffleButton = document.getElementById('shuffleButton');
     els.printButton = document.getElementById('printButton');
+    els.puzzleButton = document.getElementById('puzzleButton');
     els.readyPill = document.getElementById('readyPill');
     els.toast = document.getElementById('toast');
     els.sourceLangSelect = document.getElementById('sourceLangSelect');
@@ -107,6 +108,16 @@
 
     els.shuffleButton.addEventListener('click', regenerate);
     els.printButton.addEventListener('click', printWorksheet);
+    els.puzzleButton.addEventListener('click', function () {
+      try {
+        var png = els.canvas.toDataURL('image/png').split(',')[1];
+        sessionStorage.setItem('word-cloud-puzzle', png);
+      } catch (err) {
+        showToast('Could not send the word cloud to the puzzle maker.');
+        return;
+      }
+      window.location.assign('/teaching-tools/vocab-puzzle?from=word-cloud');
+    });
     initLibraryPicker();
 
     updateWordCount();
@@ -556,6 +567,7 @@
 
   function regenerate() {
     var entries = updateWordCount();
+    els.puzzleButton.disabled = !entries.length;
     if (!entries.length) {
       lastPlacements = [];
       render([]);
