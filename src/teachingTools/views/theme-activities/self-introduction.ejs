@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
-  <%- include('../partials/seo', { pageDescription: 'Chinese self-introduction reading and matching cards in PDF and editable Word.' }) %>
+  <%- include('../partials/seo', { pageDescription: 'Chinese self-introduction reading cards and Guess Who game cards with printable and editable downloads.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
     <div class="content-shell">
       <a class="text-link" href="<%= parent.href %>">← <%= parent.label %></a>
       <h1><%= title %></h1>
-      <p><%= lang === 'zh' ? '通过阅读与人物配对活动练习个人介绍。选择 PDF 直接打印，或下载 Word 版自行修改。' : 'Practice self-introductions with reading and character matching. Print the PDF or download the editable Word file.' %></p>
+      <p><%= lang === 'zh' ? '通过阅读、人物配对和猜人游戏练习个人介绍。选择 PDF 直接打印，或下载可编辑版本。' : 'Practice self-introductions through reading, character matching, and Guess Who. Print the PDF or download an editable version.' %></p>
     </div>
   </header>
   <main class="content-section">
@@ -20,7 +20,7 @@
       <% printables.forEach(function(item, index) { %>
       <button type="button" class="resource-card printable-card" data-dialog="printable-<%= index %>">
         <% if (item.limitedFree) { %><span class="printable-badge"><%= lang === 'zh' ? '限时免费' : 'Free for a limited time' %></span><% } %>
-        <span class="resource-card__meta">👋 <%= item.pages %> <%= lang === 'zh' ? '页' : 'pages' %> · <%= item.docx ? 'PDF / Word' : 'PDF' %></span>
+        <span class="resource-card__meta">👋 <%= item.pages %> <%= lang === 'zh' ? '页' : 'pages' %> · PDF<%= item.docx ? ' / Word' : '' %><%= item.pptx ? ' / PowerPoint' : '' %></span>
         <h2><%= item.title %></h2>
         <p><%= lang === 'zh' ? item.zh : item.en %></p>
         <span class="resource-card__link"><%= lang === 'zh' ? '下载' : 'Download' %> →</span>
@@ -39,6 +39,12 @@
           <% if (item.docx) { %>
           <a class="printable-option" href="<%= item.docx %>" download>
             <strong>Word</strong>
+            <span><%= lang === 'zh' ? '可编辑修改' : 'Editable' %></span>
+          </a>
+          <% } %>
+          <% if (item.pptx) { %>
+          <a class="printable-option" href="<%= item.pptx %>" download>
+            <strong>PowerPoint</strong>
             <span><%= lang === 'zh' ? '可编辑修改' : 'Editable' %></span>
           </a>
           <% } %>

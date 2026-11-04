@@ -37,6 +37,14 @@ router.get('/theme-activities/self-introduction', function(req, res) {
       limitedFree: true,
       pdf: '/printables/self-introduction/who-am-i-reading-cards.pdf',
       docx: '/printables/self-introduction/who-am-i-reading-cards.docx'
+    }, {
+      title: 'Guess Who? 猜人游戏卡片',
+      en: 'Ask and answer questions in Chinese to guess your partner’s character.',
+      zh: '用中文提问和回答，猜出同伴选的是哪个人物。',
+      pages: 4,
+      limitedFree: true,
+      pdf: '/printables/self-introduction/guess-who-game-cards.pdf',
+      pptx: '/printables/self-introduction/guess-who-game-cards.pptx'
     }]
   });
 });
