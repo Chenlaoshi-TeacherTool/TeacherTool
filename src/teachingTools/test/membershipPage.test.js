@@ -36,11 +36,13 @@ test('when sales open, each plan pays its founding price through PayPal with buy
   membership.paymentsOpen = true;
   membership.foundingEndsAt = '2027-02-15';
   var html = await (await fetch(base + '/membership')).text();
-  assert.match(html, /href="https:\/\/paypal\.me\/chenlaoshitoolkit\/12USD"/);
   assert.match(html, /href="https:\/\/paypal\.me\/chenlaoshitoolkit\/19USD"/);
+  assert.match(html, /href="https:\/\/paypal\.me\/chenlaoshitoolkit\/29USD"/);
+  assert.match(html, /<s[^>]*>\$29<\/s> <strong>\$19<\/strong>/);
+  assert.match(html, /<s[^>]*>\$49<\/s> <strong>\$29<\/strong>/);
   assert.match(html, /id="buy"/);
   assert.match(html, /Founding member prices are available until February 15, 2027/);
   var zh = await (await fetch(base + '/membership', { headers: { Cookie: 'lang=zh' } })).text();
-  assert.match(zh, /PayPal 付款 \$19/);
+  assert.match(zh, /PayPal 付款 \$29/);
   assert.match(zh, /创始会员价有效期至 2027年2月15日/);
 });

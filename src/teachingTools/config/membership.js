@@ -30,8 +30,8 @@ module.exports = {
   graceDays: 30,
   refundDays: 3,
   plans: [
-    { key: 'half-year', days: 180, regular: 15, founding: 12 },
-    { key: 'year', days: 365, regular: 24, founding: 19, recommended: true }
+    { key: 'half-year', days: 180, regular: 29, founding: 19 },
+    { key: 'year', days: 365, regular: 49, founding: 29, recommended: true }
   ],
   shareLifetimeMs: {
     legacy: 90 * DAY_MS,
