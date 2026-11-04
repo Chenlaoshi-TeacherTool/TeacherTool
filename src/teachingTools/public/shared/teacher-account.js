@@ -22,7 +22,7 @@
     dialog.replaceChildren();
     var title = node('h2', mode === 'register' ? labels.register + ' · ' + labels.title : labels.login + ' · ' + labels.title);
     title.id = 'teacherAccountTitle';
-    var close = node('button', labels.close); close.type = 'button'; close.addEventListener('click', function () { dialog.close(); });
+    var close = node('button', '×'); close.type = 'button'; close.className = 'teacher-account-close'; close.setAttribute('aria-label', labels.close); close.title = labels.close; close.addEventListener('click', function () { dialog.close(); });
     dialog.append(title, close, node('p', labels.help));
     if (!session || !session.available || !session.login.length) dialog.appendChild(node('p', labels.pending));
     else {
