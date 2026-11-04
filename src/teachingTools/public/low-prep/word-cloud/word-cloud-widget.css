@@ -921,3 +921,12 @@ h2 {
   .btn-primary:hover:not(:disabled) { box-shadow: 0 11px 24px rgba(157, 57, 47, .32); }
   .toast { background: var(--blue-dark); }
 }
+
+.shape-icon {
+  width: 14px;
+  display: inline-block;
+  color: var(--danger);
+  font-size: 14px;
+  line-height: 1;
+  text-align: center;
+}

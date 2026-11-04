@@ -22,6 +22,49 @@
 
   var BACKGROUNDS = ['#ffffff', '#fdf6e3', '#fde2e4', '#e3f0ff', '#e6f6e9', '#efe6ff'];
 
+  // Each shape draws itself into a 1x1 unit box; layout stretches it into
+  // the page area. `aspect` is height/width, `center` is where the spiral
+  // starts (the visual middle, which isn't the box middle for a heart).
+  var SHAPES = {
+    rect: { label: 'Rectangle', icon: '▭', aspect: 0, center: [0.5, 0.5], draw: function (p) { p.rect(0, 0, 1, 1); } },
+    circle: { label: 'Circle', icon: '●', aspect: 1, center: [0.5, 0.5], draw: function (p) { p.ellipse(0.5, 0.5, 0.5, 0.5, 0, 0, Math.PI * 2); } },
+    heart: {
+      label: 'Heart', icon: '♥', aspect: 0.92, center: [0.5, 0.45],
+      draw: function (p) {
+        p.moveTo(0.5, 0.2);
+        p.bezierCurveTo(0.42, 0.04, 0.26, 0, 0.15, 0.04);
+        p.bezierCurveTo(-0.02, 0.1, -0.04, 0.36, 0.06, 0.52);
+        p.bezierCurveTo(0.16, 0.7, 0.36, 0.84, 0.5, 1);
+        p.bezierCurveTo(0.64, 0.84, 0.84, 0.7, 0.94, 0.52);
+        p.bezierCurveTo(1.04, 0.36, 1.02, 0.1, 0.85, 0.04);
+        p.bezierCurveTo(0.74, 0, 0.58, 0.04, 0.5, 0.2);
+        p.closePath();
+      }
+    },
+    cloud: {
+      label: 'Cloud', icon: '☁', aspect: 0.68, center: [0.5, 0.58],
+      // Overlapping puffs; all wound the same way so they fill as one shape.
+      draw: function (p) {
+        [[0.2, 0.66, 0.2], [0.38, 0.42, 0.26], [0.63, 0.36, 0.3], [0.83, 0.62, 0.17], [0.5, 0.74, 0.26], [0.72, 0.76, 0.22], [0.3, 0.78, 0.2]].forEach(function (c) {
+          p.moveTo(c[0] + c[2], c[1]);
+          p.arc(c[0], c[1], c[2], 0, Math.PI * 2);
+        });
+      }
+    },
+    star: {
+      label: 'Star', icon: '★', aspect: 0.95, center: [0.5, 0.56],
+      draw: function (p) {
+        for (var i = 0; i < 10; i++) {
+          var r = i % 2 ? 0.25 : 0.5;
+          var a = -Math.PI / 2 + i * Math.PI / 5;
+          var x = 0.5 + r * Math.cos(a), y = 0.53 + r * Math.sin(a) * 1.05;
+          if (i) p.lineTo(x, y); else p.moveTo(x, y);
+        }
+        p.closePath();
+      }
+    }
+  };
+
   var SOURCE_LANGUAGES = [
     { code: 'zh-CN', label: 'Chinese' },
     { code: 'en', label: 'English' },
@@ -48,6 +91,7 @@
     scheme: 'colorful',
     font: 'default',
     background: '#ffffff',
+    shape: 'rect',
     sourceLang: 'en',
     mergeDuplicates: true
   };
@@ -55,7 +99,6 @@
   var els = {};
   var toastTimer = null;
   var lastPlacements = [];
-  var layoutMeta = { cx: CANVAS_W / 2, cy: CANVAS_H / 2, bounds: { left: 24, right: CANVAS_W - 24, top: 24, bottom: CANVAS_H - 24 } };
   var measureCtx = document.createElement('canvas').getContext('2d');
   var pinyinCache = {};
   var translationCache = {};
@@ -70,6 +113,7 @@
     els.schemeRow = document.getElementById('schemeRow');
     els.fontSelect = document.getElementById('fontSelect');
     els.bgRow = document.getElementById('bgRow');
+    els.shapeRow = document.getElementById('shapeRow');
     els.canvas = document.getElementById('cloudCanvas');
     els.printImage = document.getElementById('cloudPrintImage');
     els.paperTitle = document.getElementById('paperTitle');
@@ -86,6 +130,7 @@
     buildSchemeRow();
     buildFontSelect();
     buildBgRow();
+    buildShapeRow();
     buildSourceLangSelect();
     els.wordInput.value = DEFAULT_WORDS.join('\n');
     els.wordInput.addEventListener('input', function () {
@@ -245,6 +290,24 @@
     });
   }
 
+  function buildShapeRow() {
+    els.shapeRow.innerHTML = '';
+    Object.keys(SHAPES).forEach(function (key) {
+      var shape = SHAPES[key];
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'scheme-btn' + (key === state.shape ? ' active' : '');
+      btn.innerHTML = '<span class="shape-icon" aria-hidden="true">' + shape.icon + '</span><span>' + shape.label + '</span>';
+      btn.addEventListener('click', function () {
+        state.shape = key;
+        Array.prototype.forEach.call(els.shapeRow.children, function (c) { c.classList.remove('active'); });
+        btn.classList.add('active');
+        regenerate();
+      });
+      els.shapeRow.appendChild(btn);
+    });
+  }
+
   function buildSourceLangSelect() {
     els.sourceLangSelect.innerHTML = '';
     SOURCE_LANGUAGES.forEach(function (language) {
@@ -397,9 +460,50 @@
     return false;
   }
 
-  function rectInBounds(rect, bounds) {
-    return rect.left >= bounds.left && rect.right <= bounds.right &&
-      rect.top >= bounds.top && rect.bottom <= bounds.bottom;
+  // Fits the chosen shape into the page area, keeping its proportions
+  // (rectangle fills the whole area). `pad` grows it, for the drawn outline.
+  function shapeBox(shape, W, H, pad) {
+    var marginX = W * 0.05, marginY = H * 0.05;
+    var w = W - marginX * 2, h = H - marginY * 2;
+    if (shape.aspect) {
+      // Let shapes stretch up to 15% taller so they use more of the page.
+      h = Math.min(h, w * shape.aspect * 1.15);
+      w = Math.min(w, h / shape.aspect);
+    }
+    var x = (W - w) / 2, y = (H - h) / 2;
+    return { x: x - pad, y: y - pad, w: w + pad * 2, h: h + pad * 2 };
+  }
+
+  function shapePath(shape, box) {
+    var unit = new Path2D();
+    shape.draw(unit);
+    var path = new Path2D();
+    path.addPath(unit, new DOMMatrix([box.w, 0, 0, box.h, box.x, box.y]));
+    return path;
+  }
+
+  // A word fits when points all around its box sit inside the shape.
+  function rectInShape(rect, path) {
+    var steps = 4;
+    for (var i = 0; i <= steps; i++) {
+      var fx = rect.left + (rect.right - rect.left) * i / steps;
+      var fy = rect.top + (rect.bottom - rect.top) * i / steps;
+      if (!measureCtx.isPointInPath(path, fx, rect.top) || !measureCtx.isPointInPath(path, fx, rect.bottom) ||
+          !measureCtx.isPointInPath(path, rect.left, fy) || !measureCtx.isPointInPath(path, rect.right, fy)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function shapeArea(path, box) {
+    var inside = 0, n = 40;
+    for (var i = 0; i < n; i++) {
+      for (var j = 0; j < n; j++) {
+        if (measureCtx.isPointInPath(path, box.x + box.w * (i + 0.5) / n, box.y + box.h * (j + 0.5) / n)) inside++;
+      }
+    }
+    return box.w * box.h * inside / (n * n);
   }
 
   function measureWord(word, fontSize, fontFamily) {
@@ -411,7 +515,7 @@
     };
   }
 
-  function tryPlace(word, fontSize, fontFamily, bounds, cx, cy, maxRadius, placedRects, ignoreOverlap) {
+  function tryPlace(word, fontSize, fontFamily, path, cx, cy, maxRadius, placedRects, ignoreOverlap) {
     var size = measureWord(word, fontSize, fontFamily);
     var w = size.w, h = size.h;
     var angle = Math.random() * Math.PI * 2;
@@ -423,7 +527,7 @@
       var x = cx + radius * Math.cos(angle);
       var y = cy + radius * Math.sin(angle);
       var rect = { left: x - w / 2, right: x + w / 2, top: y - h / 2, bottom: y + h / 2 };
-      if (rectInBounds(rect, bounds) &&
+      if (rectInShape(rect, path) &&
           (ignoreOverlap || !rectOverlapsAny(rect, placedRects, 2))) {
         return { x: x, y: y, rect: rect };
       }
@@ -435,12 +539,13 @@
   }
 
   function layoutWordCloud(chips, fontFamily, W, H) {
-    var cx = W / 2, cy = H / 2;
-    var marginX = W * 0.05, marginY = H * 0.05;
-    var bounds = { left: marginX, right: W - marginX, top: marginY, bottom: H - marginY };
-    var maxRadius = Math.sqrt(Math.pow(W / 2 - marginX, 2) + Math.pow(H / 2 - marginY, 2));
+    var shape = SHAPES[state.shape];
+    var box = shapeBox(shape, W, H, 0);
+    var path = shapePath(shape, box);
+    var cx = box.x + box.w * shape.center[0], cy = box.y + box.h * shape.center[1];
+    var maxRadius = Math.sqrt(box.w * box.w + box.h * box.h);
     var n = chips.length;
-    var area = (bounds.right - bounds.left) * (bounds.bottom - bounds.top);
+    var area = shapeArea(path, box);
     var density = Math.max(0.35, Math.min(1, 900 / (n + 6)));
     var maxFont = Math.max(22, Math.min(70, Math.sqrt((area * density) / (n * 3.2))));
     var minFont = Math.max(12, maxFont * 0.32);
@@ -466,14 +571,14 @@
       var placed = null;
       var attempts = 0;
       while (!placed && attempts < 6) {
-        placed = tryPlace(word, fontSize, fontFamily, bounds, cx, cy, maxRadius, placedRects, false);
+        placed = tryPlace(word, fontSize, fontFamily, path, cx, cy, maxRadius, placedRects, false);
         if (!placed) {
           fontSize = Math.max(10, Math.round(fontSize * 0.84));
           attempts++;
         }
       }
       if (!placed) {
-        placed = tryPlace(word, fontSize, fontFamily, bounds, cx, cy, maxRadius, placedRects, true);
+        placed = tryPlace(word, fontSize, fontFamily, path, cx, cy, maxRadius, placedRects, true);
         if (placed) overflowCount++;
       }
       if (!placed) {
@@ -488,7 +593,7 @@
       placements.push({ word: word, x: placed.x, y: placed.y, fontSize: fontSize, rank: t });
     });
 
-    return { placements: placements, cx: cx, cy: cy, bounds: bounds, overflowCount: overflowCount };
+    return { placements: placements, overflowCount: overflowCount };
   }
 
   function pickColor(scheme) {
@@ -525,13 +630,23 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
-    var bounds = layoutMeta.bounds;
-    roundRectPath(ctx, bounds.left - 10, bounds.top - 10, (bounds.right - bounds.left) + 20, (bounds.bottom - bounds.top) + 20, 18);
-    ctx.fillStyle = state.background;
-    ctx.fill();
+    var shape = SHAPES[state.shape];
+    var outline = shapeBox(shape, CANVAS_W, CANVAS_H, 10);
     ctx.strokeStyle = 'rgba(31, 42, 68, 0.14)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    ctx.fillStyle = state.background;
+    if (state.shape === 'rect') {
+      roundRectPath(ctx, outline.x, outline.y, outline.w, outline.h, 18);
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    } else {
+      // Stroke at double width, then fill over it: only the outer half of
+      // the line survives, so overlapping cloud puffs show one outline.
+      var path = shapePath(shape, outline);
+      ctx.lineWidth = 3;
+      ctx.stroke(path);
+      ctx.fill(path);
+    }
 
     if (placements && placements.length) {
       var fontFamily = fontFamilyFor(state.font);
@@ -585,7 +700,6 @@
     var fontFamily = fontFamilyFor(state.font);
     var chips = expandEntries(entries);
     var result = layoutWordCloud(chips, fontFamily, CANVAS_W, CANVAS_H);
-    layoutMeta = { cx: result.cx, cy: result.cy, bounds: result.bounds };
 
     result.placements.forEach(function (p) {
       p.color = pickColor(state.scheme);
