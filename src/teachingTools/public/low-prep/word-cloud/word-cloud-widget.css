@@ -524,6 +524,17 @@ h2 {
   white-space: nowrap;
 }
 
+.blank {
+  width: 6em;
+  margin: 0 1.2em 0 .3em;
+  display: inline-block;
+  vertical-align: baseline;
+  border-bottom: 1px solid currentColor;
+}
+
+.blank:last-child { margin-right: 0; }
+.blank-long { width: 11em; }
+
 .canvas-wrap {
   width: 100%;
   aspect-ratio: 210 / 297;
@@ -778,14 +789,10 @@ h2 {
 
   .worksheet-shell { overflow: visible; }
 
-  /* Fixed height that fits inside both A4 (277mm) and Letter (259mm) once
-     the 10mm page margins are taken off, so the sheet never spills over. */
   .paper {
     width: 100%;
-    height: 245mm;
     max-width: 100%;
     margin: 0 auto;
-    overflow: hidden;
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -808,12 +815,18 @@ h2 {
     text-align: center;
   }
 
-  .paper-head span { font-size: 9pt; color: #414b47; }
+  .paper-head span { font-size: 11pt; color: #414b47; }
+  .blank { width: 30mm; }
+  .blank-long { width: 55mm; }
 
+  /* In print, 100vh is the printable height of one page after the paper
+     size, margins and the print dialog's Scale are applied, so the cloud
+     always leaves room for the header and stays on page one. The image is
+     unbreakable: if it were any taller Chrome would push it to page two. */
   .canvas-wrap {
     display: block;
     width: 100%;
-    height: 220mm;
+    height: calc(100vh - 34mm);
     aspect-ratio: auto;
     margin: 0 auto;
   }
