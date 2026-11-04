@@ -38,9 +38,9 @@
     <section class="card activities" aria-labelledby="activitiesTitle">
       <div class="activities-head">
         <div>
-          <p class="eyebrow">Shared from this browser</p>
+          <p class="eyebrow" id="activitiesEyebrow">Shared from this browser</p>
           <h2 id="activitiesTitle">My activities</h2>
-          <p class="activities-note">Games, quizzes, and books you shared from this browser. Links made on another computer appear there.</p>
+          <p class="activities-note">Games, quizzes, and books you shared. Sign in to see the ones made on other computers too.</p>
         </div>
         <div class="activities-filters">
           <label class="visually-hidden" for="activitySearch">Search activities</label>
@@ -54,6 +54,12 @@
             <option value="book">Books</option>
           </select>
         </div>
+      </div>
+      <div id="accountBanner" class="activities-account" hidden></div>
+      <div id="activitiesMembersOnly" class="activities-members" hidden>
+        <p class="activities-members-title">My activities is part of the teacher membership.</p>
+        <p>Members can see every game, quiz, and book they shared, check class quiz results, and download them as a spreadsheet, on any device. Links you shared still work, and students can still download their own report.</p>
+        <a class="small-button is-primary" href="/membership">See membership plans</a>
       </div>
       <p id="activitiesStatus" class="activities-status" role="status" aria-live="polite">Loading your activities…</p>
       <ul id="activityList" class="activity-list"></ul>

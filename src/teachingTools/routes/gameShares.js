@@ -7,6 +7,7 @@ var registry = require('../services/gameShareRegistry');
 var storage = require('../services/gameShareStorage');
 var membershipLimits = require('../services/membershipLimits');
 var ExcelJS = require('exceljs');
+var teacherActivities = require('../services/teacherActivities');
 
 var router = express.Router();
 var AUTH_COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
@@ -93,6 +94,7 @@ router.post('/api/game-shares', async function (req, res) {
     var payload = adapter.sanitize(body.data);
     var now = new Date();
     var shareId = crypto.randomUUID();
+    var owner = teacherActivities.ownerKeyFor(req);
     var manifest = {
       shareId: shareId,
       gameType: adapter.type,
@@ -104,8 +106,10 @@ router.post('/api/game-shares', async function (req, res) {
       expiresAt: new Date(now.getTime() + await membershipLimits.shareLifetimeMs(req)).toISOString(),
       payload: payload
     };
+    if (owner) manifest.ownerKey = owner;
 
     await storage.saveManifest(shareId, manifest);
+    await teacherActivities.record(owner, { kind: 'game', id: shareId, gameType: adapter.type, title: manifest.title, createdAt: manifest.createdAt });
     res.status(201).json({
       shareId: shareId,
       url: '/play/' + shareId,
@@ -124,10 +128,11 @@ router.delete('/api/game-shares/:id', async function (req, res, next) {
     if (!storage.validShareId(req.params.id)) return next();
     var manifest = await storage.getManifest(req.params.id);
     if (!manifest) return res.status(404).json({ error: 'Game link not found.' });
-    if (!safeEqual(req.body && req.body.deleteToken, manifest.deleteToken)) {
+    if (!safeEqual(req.body && req.body.deleteToken, manifest.deleteToken) && !teacherActivities.isOwnerRequest(req, manifest)) {
       return res.status(403).json({ error: 'Not authorized to delete this game link.' });
     }
     await storage.deleteShare(req.params.id);
+    if (manifest.ownerKey) await teacherActivities.forget('game', req.params.id);
     res.json({ ok: true });
   } catch (error) {
     next(error);
@@ -226,26 +231,29 @@ router.post('/play/:id/unlock', loadManifest, async function (req, res, next) {
   }
 });
 
-// ===== Teacher views (My activities). Proof of ownership is the delete token the
-// creating browser keeps; it travels in the request body, never in a URL. =====
+// ===== Teacher views (My activities). Proof of ownership is either the delete
+// token the creating browser keeps (sent in the body, never in a URL) or the
+// signed-in teacher account recorded on the share. =====
 
 function isQuiz(manifest) {
   return manifest.gameType === 'sentence-reorder' && manifest.payload && manifest.payload.mode === 'assessment';
 }
 
-async function ownedManifest(shareId, deleteToken) {
+async function ownedManifest(req, shareId, deleteToken) {
   if (!storage.validShareId(shareId)) return null;
   var manifest = await storage.getManifest(shareId);
-  if (!manifest || isExpired(manifest) || !safeEqual(deleteToken, manifest.deleteToken)) return null;
+  if (!manifest || isExpired(manifest)) return null;
+  if (!safeEqual(deleteToken, manifest.deleteToken) && !teacherActivities.isOwnerRequest(req, manifest)) return null;
   return manifest;
 }
 
 router.post('/api/game-shares/summary', async function (req, res, next) {
   try {
+    if (!(await membershipLimits.canUseMyActivities(req))) return res.status(403).json({ error: 'My activities is part of the teacher membership.', membersOnly: true });
     var shares = Array.isArray(req.body && req.body.shares) ? req.body.shares.slice(0, 100) : [];
     var results = await Promise.all(shares.map(async function (share) {
       var shareId = String(share && share.shareId || '');
-      var manifest = await ownedManifest(shareId, share && share.deleteToken);
+      var manifest = await ownedManifest(req, shareId, share && share.deleteToken);
       if (!manifest) return { shareId: shareId, exists: false };
       var summary = { shareId: shareId, exists: true, title: manifest.title, gameType: manifest.gameType, expiresAt: manifest.expiresAt, quiz: isQuiz(manifest) };
       if (summary.quiz) summary.submissions = (await storage.listSubmissions(shareId)).length;
@@ -256,7 +264,7 @@ router.post('/api/game-shares/summary', async function (req, res, next) {
 });
 
 async function loadResults(req, res) {
-  var manifest = await ownedManifest(req.params.id, req.body && req.body.deleteToken);
+  var manifest = await ownedManifest(req, req.params.id, req.body && req.body.deleteToken);
   if (!manifest || !isQuiz(manifest)) { res.status(404).json({ error: 'Quiz results were not found for this link.' }); return null; }
   if (!(await membershipLimits.canViewQuizResults(req))) { res.status(403).json({ error: 'Class results are part of the teacher membership.' }); return null; }
   res.set('Cache-Control', 'private, no-store');

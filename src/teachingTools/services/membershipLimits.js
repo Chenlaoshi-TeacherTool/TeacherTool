@@ -27,6 +27,10 @@ function create(options) {
     },
     canViewQuizResults: async function (req) {
       return !enabled() || isMember(req);
+    },
+    // The My activities dashboard (all shared items, their status, account sync).
+    canUseMyActivities: async function (req) {
+      return !enabled() || isMember(req);
     }
   };
 }

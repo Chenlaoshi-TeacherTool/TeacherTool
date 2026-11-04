@@ -8,6 +8,7 @@ var router = express.Router();
 var bookStorage = require('../services/bookGeneratorStorage');
 var siteContentStore = require('../services/siteContentStore');
 var membershipLimits = require('../services/membershipLimits');
+var teacherActivities = require('../services/teacherActivities');
 
 var MAX_PAGES = 20;
 var SIZE_LIMITS = {
@@ -166,8 +167,11 @@ router.post('/api/book-generator/publish', async function (req, res) {
       }),
       musicBlob: body.musicBlob || null
     };
+    var owner = (existing && existing.ownerKey) || teacherActivities.ownerKeyFor(req);
+    if (owner) manifest.ownerKey = owner;
 
     await bookStorage.saveManifest(draftId, manifest);
+    if (owner && !(existing && existing.ownerKey)) await teacherActivities.record(owner, { kind: 'book', id: draftId, gameType: 'book', title: manifest.title, createdAt: manifest.createdAt });
     res.json({ bookId: draftId, url: '/book/' + draftId, deleteToken: deleteToken });
   } catch (err) {
     console.error('book-generator publish error:', err);
@@ -179,12 +183,13 @@ router.post('/api/book-generator/publish', async function (req, res) {
 
 router.post('/api/book-generator/summary', async function (req, res) {
   try {
+    if (!(await membershipLimits.canUseMyActivities(req))) return res.status(403).json({ error: 'My activities is part of the teacher membership.', membersOnly: true });
     var books = Array.isArray(req.body && req.body.books) ? req.body.books.slice(0, 100) : [];
     var results = await Promise.all(books.map(async function (book) {
       var bookId = String(book && book.bookId || '');
       if (!/^[a-zA-Z0-9-]+$/.test(bookId)) return { bookId: bookId, exists: false };
       var manifest = await bookStorage.getManifest(bookId);
-      if (!manifest || isExpired(manifest) || !safeEqual(book.deleteToken, manifest.deleteToken)) return { bookId: bookId, exists: false };
+      if (!manifest || isExpired(manifest) || (!safeEqual(book.deleteToken, manifest.deleteToken) && !teacherActivities.isOwnerRequest(req, manifest))) return { bookId: bookId, exists: false };
       return { bookId: bookId, exists: true, title: manifest.title, expiresAt: manifest.expiresAt, pages: manifest.pages.length };
     }));
     res.set('Cache-Control', 'private, no-store').json({ books: results });
@@ -203,11 +208,12 @@ router.delete('/api/book-generator/books/:id', async function (req, res) {
     if (!manifest) return res.status(404).json({ error: 'Book not found.' });
 
     var deleteToken = req.body && req.body.deleteToken;
-    if (!deleteToken || deleteToken !== manifest.deleteToken) {
+    if ((!deleteToken || !safeEqual(deleteToken, manifest.deleteToken)) && !teacherActivities.isOwnerRequest(req, manifest)) {
       return res.status(403).json({ error: 'Not authorized to delete this book.' });
     }
 
     await bookStorage.deleteBook(bookId);
+    if (manifest.ownerKey) await teacherActivities.forget('book', bookId);
     res.json({ ok: true });
   } catch (err) {
     console.error('book-generator delete error:', err);

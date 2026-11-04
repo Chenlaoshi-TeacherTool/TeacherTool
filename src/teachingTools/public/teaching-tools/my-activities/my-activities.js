@@ -1,8 +1,9 @@
 (function () {
   'use strict';
 
-  // Every shared game and book this browser created. The tools record them in
-  // localStorage together with a delete token; the server checks that token
+  // Every shared game and book this teacher created: the ones this browser
+  // recorded (with their delete tokens) plus, when signed in, the ones linked
+  // to the teacher account. The server checks the token or the signed-in owner
   // before it reports status, results, or deletes anything.
   var SHARES_KEY = 'teacher-game-shares:v1';
   var BOOKS_KEY = 'chen-laoshi-book-generator-my-books-v1';
@@ -16,6 +17,18 @@
   };
   var find = function (id) { return document.getElementById(id); };
   var activities = [];
+  var accountReady = false;
+  var membersOnlyView = false;
+
+  // Free accounts (once membership limits are on): explain instead of listing.
+  function showMembersOnly() {
+    find('activityList').replaceChildren();
+    find('accountBanner').hidden = true;
+    find('activitiesEmpty').hidden = true;
+    document.querySelector('.activities-filters').hidden = true;
+    find('activitiesStatus').textContent = '';
+    find('activitiesMembersOnly').hidden = false;
+  }
 
   function read(key) {
     try { var value = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(value) ? value : []; }
@@ -32,8 +45,13 @@
   }
 
   async function post(url, body) {
-    var response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), cache: 'no-store' });
-    if (!response.ok) throw new Error('status');
+    var response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Library-Request': 'activities' }, body: JSON.stringify(body), cache: 'no-store' });
+    if (!response.ok) {
+      var body = await response.json().catch(function () { return {}; });
+      var error = new Error(body.error || 'status');
+      error.membersOnly = Boolean(body.membersOnly);
+      throw error;
+    }
     return response.json();
   }
 
@@ -60,6 +78,7 @@
   }
 
   function forget(item) {
+    if (item.inAccount) fetch('/api/teacher-library/activities/' + item.kind + '/' + encodeURIComponent(item.id), { method: 'DELETE', headers: { 'X-Library-Request': 'activities' } }).catch(function () {});
     if (item.kind === 'game') write(SHARES_KEY, read(SHARES_KEY).filter(function (entry) { return entry.shareId !== item.id; }));
     else write(BOOKS_KEY, read(BOOKS_KEY).filter(function (entry) { return entry.bookId !== item.id; }));
     activities = activities.filter(function (entry) { return entry !== item; });
@@ -70,7 +89,7 @@
     if (!window.confirm(t('Delete this activity? Students will no longer be able to open the link. This cannot be undone.'))) return;
     var url = item.kind === 'game' ? '/api/game-shares/' + encodeURIComponent(item.id) : '/api/book-generator/books/' + encodeURIComponent(item.id);
     try {
-      var response = await fetch(url, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deleteToken: item.token }) });
+      var response = await fetch(url, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'X-Library-Request': 'activities' }, body: JSON.stringify({ deleteToken: item.token }) });
       if (!response.ok && response.status !== 404) throw new Error('delete');
       forget(item);
       find('activitiesStatus').textContent = t('Activity deleted.');
@@ -138,14 +157,79 @@
     if (activities.length && !shown.length) find('activitiesStatus').textContent = t('No activities match this search.');
   }
 
+  // Signed in: add the account's activities (from any device) to this browser's list.
+  async function loadAccount() {
+    var session;
+    try { session = await (await fetch('/api/teacher-library/session', { credentials: 'same-origin', cache: 'no-store' })).json(); }
+    catch (error) { return; }
+    if (!session || !session.available) return;
+    if (!session.signedIn) {
+      if (session.login && session.login[0] && session.login[0].url.indexOf('/.auth/login/') === 0) {
+        var url = new URL(session.login[0].url, location.origin);
+        url.searchParams.set('post_login_redirect_uri', location.pathname);
+        showBanner(t('Sign in to see the activities you shared on any device.'), t('Log in / Sign up'), function () { location.href = url.pathname + url.search; });
+      }
+      return;
+    }
+    if (session.cloudAvailable === false) return;
+    find('activitiesEyebrow').textContent = t('Your teacher account and this browser');
+    var response = await fetch('/api/teacher-library/activities', { credentials: 'same-origin', cache: 'no-store' });
+    if (response.status === 403 && (await response.json().catch(function () { return {}; })).membersOnly) { membersOnlyView = true; return; }
+    if (!response.ok) return;
+    var byId = Object.create(null);
+    activities.forEach(function (item) { byId[item.kind + ':' + item.id] = item; });
+    (await response.json()).activities.forEach(function (row) {
+      var key = row.kind + ':' + row.id;
+      if (byId[key]) { byId[key].inAccount = true; return; }
+      var type = row.kind === 'book' ? 'book' : (TYPES[row.gameType] ? row.gameType : 'sentence-reorder');
+      activities.push({ kind: row.kind, id: row.id, type: type, title: row.title, url: location.origin + (row.kind === 'book' ? '/book/' : '/play/') + row.id, token: null, createdAt: row.createdAt, expiresAt: null, inAccount: true });
+    });
+    activities.sort(function (left, right) { return String(right.createdAt || '').localeCompare(String(left.createdAt || '')); });
+    accountReady = true;
+  }
+
+  function showBanner(text, label, action) {
+    var banner = find('accountBanner');
+    banner.replaceChildren(element('p', text));
+    var go = button(label, 'small-button is-primary');
+    go.addEventListener('click', action);
+    banner.appendChild(go);
+    banner.hidden = false;
+  }
+
+  // Offers to link activities that exist only in this browser to the account.
+  function offerClaim() {
+    var banner = find('accountBanner');
+    if (!accountReady) return;
+    banner.hidden = true;
+    var local = activities.filter(function (item) { return item.token && !item.inAccount && item.status && item.status.exists; });
+    if (!local.length) return;
+    showBanner(local.length + t(' activities on this computer are not in your account yet. Add them to see them on any device.'), t('Add to my account'), async function () {
+      try {
+        var response = await fetch('/api/teacher-library/activities/claim', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Library-Request': 'activities' }, body: JSON.stringify({ items: local.map(function (item) { return { kind: item.kind, id: item.id, deleteToken: item.token }; }) }) });
+        var result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        local.forEach(function (item) { item.inAccount = true; });
+        banner.hidden = true;
+        find('activitiesStatus').textContent = result.added + t(' activities added to your account.');
+        render();
+      } catch (error) { find('activitiesStatus').textContent = t('Your activities could not be added right now. Please try again.'); }
+    });
+  }
+
   async function start() {
     activities = localActivities();
+    render();
+    try { await loadAccount(); } catch (error) {}
+    if (membersOnlyView) return showMembersOnly();
     render();
     if (!activities.length) { find('activitiesStatus').textContent = ''; return; }
     try {
       await loadStatus(activities);
-      find('activitiesStatus').textContent = activities.length + t(' activities shared from this browser.');
+      find('activitiesStatus').textContent = activities.length + (accountReady ? t(' activities.') : t(' activities shared from this browser.'));
+      offerClaim();
     } catch (error) {
+      if (error.membersOnly) return showMembersOnly();
       find('activitiesStatus').textContent = t('Link status could not be checked right now. Your list is still shown.');
     }
     render();

@@ -41,3 +41,9 @@ test('class quiz results are open to everyone until limits are on, then to membe
   assert.equal(await limits(true, false).canViewQuizResults({}), false);
   assert.equal(await limits(true, true).canViewQuizResults({}), true);
 });
+
+test('My activities is open to everyone until limits are on, then to members only', async function () {
+  assert.equal(await limits(false, false).canUseMyActivities({}), true);
+  assert.equal(await limits(true, false).canUseMyActivities({}), false);
+  assert.equal(await limits(true, true).canUseMyActivities({}), true);
+});

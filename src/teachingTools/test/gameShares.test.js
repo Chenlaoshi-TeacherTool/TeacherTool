@@ -312,3 +312,64 @@ test('practice links have no results to show', async function () {
   var response = await fetch(baseUrl + '/api/game-shares/' + published.shareId + '/results', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deleteToken: published.deleteToken }) });
   assert.equal(response.status, 404);
 });
+
+test('a share made while signed in is managed by its owner from any device, without the delete token', async function () {
+  var teacherActivities = require('../services/teacherActivities');
+  var original = { ownerKeyFor: teacherActivities.ownerKeyFor, repository: teacherActivities.repository };
+  var rows = [];
+  teacherActivities.ownerKeyFor = function (req) { return req.get('test-owner') || null; };
+  teacherActivities.repository = { add: async function (owner, item) { rows.push(Object.assign({ owner: owner }, item)); }, removeItem: async function (kind, id) { rows = rows.filter(function (row) { return row.id !== id; }); } };
+  try {
+    var data = validSentenceReorderData();
+    data.mode = 'assessment';
+    var published = await (await fetch(baseUrl + '/api/game-shares', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'test-owner': 'owner-a' },
+      body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, title: 'Owned quiz', password: 'owned-pw', data: data })
+    })).json();
+    assert.deepEqual(rows.map(function (row) { return row.owner + ':' + row.kind + ':' + row.title; }), ['owner-a:game:Owned quiz']);
+    var site = { 'Content-Type': 'application/json', origin: 'https://clsteachingtools.com', 'x-library-request': 'activities' };
+    function post(pathname, owner, headers) {
+      return fetch(baseUrl + pathname, { method: 'POST', headers: Object.assign({}, site, headers, owner ? { 'test-owner': owner } : {}), body: JSON.stringify({}) });
+    }
+    assert.equal((await post('/api/game-shares/' + published.shareId + '/results', 'owner-a')).status, 200);
+    assert.equal((await post('/api/game-shares/' + published.shareId + '/results', 'owner-b')).status, 404);
+    assert.equal((await post('/api/game-shares/' + published.shareId + '/results', 'owner-a', { origin: 'https://evil.example' })).status, 404);
+    assert.equal((await post('/api/game-shares/' + published.shareId + '/results', 'owner-a', { 'x-library-request': '' })).status, 404);
+    var summary = await (await fetch(baseUrl + '/api/game-shares/summary', { method: 'POST', headers: Object.assign({ 'test-owner': 'owner-a' }, site), body: JSON.stringify({ shares: [{ shareId: published.shareId }] }) })).json();
+    assert.equal(summary.shares[0].exists, true);
+    var denied = await fetch(baseUrl + '/api/game-shares/' + published.shareId, { method: 'DELETE', headers: Object.assign({ 'test-owner': 'owner-b' }, site), body: JSON.stringify({}) });
+    assert.equal(denied.status, 403);
+    var removed = await fetch(baseUrl + '/api/game-shares/' + published.shareId, { method: 'DELETE', headers: Object.assign({ 'test-owner': 'owner-a' }, site), body: JSON.stringify({}) });
+    assert.equal(removed.status, 200);
+    assert.deepEqual(rows, []);
+  } finally {
+    teacherActivities.ownerKeyFor = original.ownerKeyFor;
+    teacherActivities.repository = original.repository;
+  }
+});
+
+test('free teachers get a membership notice instead of activity status or class results once limits are on', async function () {
+  var membershipLimits = require('../services/membershipLimits');
+  var original = { activities: membershipLimits.canUseMyActivities, results: membershipLimits.canViewQuizResults };
+  membershipLimits.canUseMyActivities = async function () { return false; };
+  membershipLimits.canViewQuizResults = async function () { return false; };
+  try {
+    var data = validSentenceReorderData();
+    data.mode = 'assessment';
+    var published = await (await fetch(baseUrl + '/api/game-shares', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, password: 'free-pw', data: data })
+    })).json();
+    function post(pathname, body) { return fetch(baseUrl + pathname, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); }
+    var summary = await post('/api/game-shares/summary', { shares: [{ shareId: published.shareId, deleteToken: published.deleteToken }] });
+    assert.equal(summary.status, 403);
+    assert.equal((await summary.json()).membersOnly, true);
+    assert.equal((await post('/api/book-generator/summary', { books: [] })).status, 403);
+    assert.equal((await post('/api/game-shares/' + published.shareId + '/results', { deleteToken: published.deleteToken })).status, 403);
+    var removed = await fetch(baseUrl + '/api/game-shares/' + published.shareId, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deleteToken: published.deleteToken }) });
+    assert.equal(removed.status, 200, 'free teachers can still delete their own links');
+  } finally {
+    membershipLimits.canUseMyActivities = original.activities;
+    membershipLimits.canViewQuizResults = original.results;
+  }
+});

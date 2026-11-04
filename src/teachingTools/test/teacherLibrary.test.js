@@ -208,3 +208,66 @@ test('activation codes avoid look-alike characters and are stored only as hashes
   assert.equal(activationCodes.hash('CLS-0000-OOOO-IIII'), null);
   assert.notEqual(activationCodes.hash(code), code);
 });
+
+test('signed-in teachers list, claim, and remove their shared activities; tokens prove ownership', async function () {
+  var rows = [];
+  var manifests = {
+    '11111111-1111-4111-8111-111111111111': { title: 'Quiz A', gameType: 'sentence-reorder', deleteToken: 'token-a', createdAt: '2026-11-01T00:00:00.000Z', expiresAt: '2099-01-01T00:00:00.000Z' },
+    '22222222-2222-4222-8222-222222222222': { title: 'Taken', gameType: 'word-sudoku', deleteToken: 'token-b', ownerKey: owner('bob'), expiresAt: '2099-01-01T00:00:00.000Z' }
+  };
+  var activityRepo = {
+    list: async function (key) { return rows.filter(function (row) { return row.owner === key; }); },
+    add: async function (key, item) { if (!rows.some(function (row) { return row.owner === key && row.id === item.id; })) rows.push(Object.assign({ owner: key }, item)); },
+    remove: async function (key, kind, id) { rows = rows.filter(function (row) { return !(row.owner === key && row.kind === kind && row.id === id); }); }
+  };
+  var gameStore = {
+    validShareId: function (id) { return /^[0-9a-f-]{36}$/.test(id); },
+    getManifest: async function (id) { return manifests[id] ? JSON.parse(JSON.stringify(manifests[id])) : null; },
+    saveManifest: async function (id, manifest) { manifests[id] = manifest; }
+  };
+  var app = express();
+  app.use(service.create({ repository: repository, enabled: function () { return true; }, origin: 'https://teachers.example', providers: ['aad'], activities: activityRepo, stores: { game: gameStore, book: gameStore },
+    getUser: function (req) { return req.get('test-user') ? { id: req.get('test-user'), name: req.get('test-user'), provider: 'aad' } : null; } }));
+  var temporary = app.listen(0, '127.0.0.1');
+  await new Promise(function (resolve) { temporary.once('listening', resolve); });
+  var url = 'http://127.0.0.1:' + temporary.address().port;
+  function call(method, pathname, user, body, extra) {
+    return fetch(url + pathname, { method: method, headers: Object.assign({ 'test-user': user || '', 'Content-Type': 'application/json', origin: 'https://teachers.example', 'x-library-request': 'activities' }, extra), body: body ? JSON.stringify(body) : undefined });
+  }
+  try {
+    assert.equal((await call('GET', '/activities', '')).status, 401);
+    var claim = { items: [
+      { kind: 'game', id: '11111111-1111-4111-8111-111111111111', deleteToken: 'token-a' },
+      { kind: 'game', id: '11111111-1111-4111-8111-111111111111', deleteToken: 'wrong' },
+      { kind: 'game', id: '22222222-2222-4222-8222-222222222222', deleteToken: 'token-b' }
+    ] };
+    assert.equal((await call('POST', '/activities/claim', 'alice', claim, { origin: 'https://evil.example' })).status, 403);
+    var claimed = await (await call('POST', '/activities/claim', 'alice', claim)).json();
+    assert.deepEqual(claimed, { added: 1, skipped: 2 });
+    assert.equal(manifests['11111111-1111-4111-8111-111111111111'].ownerKey, owner('alice'));
+    assert.equal(manifests['22222222-2222-4222-8222-222222222222'].ownerKey, owner('bob'));
+    var aliceList = (await (await call('GET', '/activities', 'alice')).json()).activities;
+    assert.deepEqual(aliceList.map(function (row) { return row.title; }), ['Quiz A']);
+    assert.deepEqual((await (await call('GET', '/activities', 'bob')).json()).activities, []);
+    assert.equal((await call('DELETE', '/activities/game/11111111-1111-4111-8111-111111111111', 'alice', null, { 'x-library-request': '' })).status, 403);
+    assert.equal((await call('DELETE', '/activities/game/11111111-1111-4111-8111-111111111111', 'alice')).status, 200);
+    assert.deepEqual((await (await call('GET', '/activities', 'alice')).json()).activities, []);
+  } finally { temporary.close(); }
+});
+
+test('the account activity list and claim are members-only when limits say so', async function () {
+  var app = express();
+  app.use(service.create({ repository: repository, enabled: function () { return true; }, origin: 'https://teachers.example', providers: ['aad'],
+    activities: { list: async function () { return []; }, add: async function () {} }, limits: { canUseMyActivities: async function () { return false; } },
+    getUser: function () { return { id: 'free', name: 'free', provider: 'aad' }; } }));
+  var temporary = app.listen(0, '127.0.0.1');
+  await new Promise(function (resolve) { temporary.once('listening', resolve); });
+  var url = 'http://127.0.0.1:' + temporary.address().port;
+  try {
+    var list = await fetch(url + '/activities');
+    assert.equal(list.status, 403);
+    assert.equal((await list.json()).membersOnly, true);
+    var claim = await fetch(url + '/activities/claim', { method: 'POST', headers: { 'Content-Type': 'application/json', origin: 'https://teachers.example', 'x-library-request': 'activities' }, body: JSON.stringify({ items: [] }) });
+    assert.equal(claim.status, 403);
+  } finally { temporary.close(); }
+});

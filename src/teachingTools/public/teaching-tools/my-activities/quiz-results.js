@@ -20,7 +20,8 @@
 
   async function request(path) {
     return fetch('/api/game-shares/' + encodeURIComponent(shareId) + path, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deleteToken: share.deleteToken }), cache: 'no-store'
+      // Without this browser's delete token the server falls back to the signed-in owner.
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Library-Request': 'activities' }, body: JSON.stringify({ deleteToken: share ? share.deleteToken : undefined }), cache: 'no-store'
     });
   }
 
@@ -88,14 +89,11 @@
   }
 
   async function load() {
-    if (!share) {
-      find('resultsStatus').textContent = t('This quiz was not created in this browser, so its results cannot be shown here. Open My activities on the computer you used to create it.');
-      return;
-    }
     find('refreshResults').disabled = true;
     try {
       var response = await request('/results');
       var body = await response.json().catch(function () { return {}; });
+      if (response.status === 404 && !share) throw new Error('These results are not available here. Sign in to the teacher account that created this quiz, or open My activities on the computer you used to create it.');
       if (!response.ok) throw new Error(body.error || 'Results could not be loaded. Please try again.');
       results = body;
       renderSummary();

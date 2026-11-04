@@ -118,6 +118,59 @@ function create(options) {
       res.set('ETag', '"' + result.revision + '"').json({ revision: result.revision });
     } catch (error) { res.status(503).json({ error: 'Cloud saving failed. Keep your browser copy or download a backup.' }); }
   });
+  // ===== My activities across devices =====
+  var activities = options.activities || require('../services/teacherActivitiesRepository');
+  var stores = options.stores || { game: require('../services/gameShareStorage'), book: require('../services/bookGeneratorStorage') };
+  var limits = options.limits || require('../services/membershipLimits');
+  async function membersOnly(req, res) {
+    if (await limits.canUseMyActivities(req)) return false;
+    res.status(403).json({ error: 'My activities is part of the teacher membership.', membersOnly: true });
+    return true;
+  }
+  function activityRequest(req) { return sameSite(req, 'activities'); }
+  function expired(manifest) { return !manifest.expiresAt || new Date(manifest.expiresAt).getTime() < Date.now(); }
+  function tokenMatches(left, right) {
+    var a = Buffer.from(String(left || '')); var b = Buffer.from(String(right || ''));
+    return a.length > 0 && a.length === b.length && crypto.timingSafeEqual(a, b);
+  }
+
+  router.get('/activities', async function (req, res) {
+    if (await membersOnly(req, res)) return;
+    try { res.json({ activities: await activities.list(req.libraryOwner) }); }
+    catch (error) { res.status(503).json({ error: 'Your activities could not be loaded right now.' }); }
+  });
+
+  // Adds activities this browser created (proved by their delete tokens) to the signed-in account.
+  router.post('/activities/claim', express.json({ limit: '64kb' }), async function (req, res) {
+    if (!activityRequest(req)) return res.status(403).json({ error: 'Requests must come from this website.' });
+    if (await membersOnly(req, res)) return;
+    var items = Array.isArray(req.body && req.body.items) ? req.body.items.slice(0, 100) : [];
+    var added = 0; var skipped = 0;
+    try {
+      for (var item of items) {
+        var kind = item && item.kind === 'book' ? 'book' : 'game';
+        var id = String(item && item.id || '');
+        var valid = kind === 'game' ? stores.game.validShareId(id) : /^[a-zA-Z0-9-]{1,64}$/.test(id);
+        var manifest = valid ? await stores[kind].getManifest(id) : null;
+        if (!manifest || expired(manifest) || !tokenMatches(item.deleteToken, manifest.deleteToken) || (manifest.ownerKey && manifest.ownerKey !== req.libraryOwner)) { skipped += 1; continue; }
+        if (!manifest.ownerKey) {
+          manifest.ownerKey = req.libraryOwner;
+          await stores[kind].saveManifest(id, manifest);
+        }
+        await activities.add(req.libraryOwner, { kind: kind, id: id, gameType: kind === 'book' ? 'book' : manifest.gameType, title: manifest.title, createdAt: manifest.createdAt });
+        added += 1;
+      }
+      res.json({ added: added, skipped: skipped });
+    } catch (error) { res.status(503).json({ error: 'Your activities could not be added right now. Please try again.' }); }
+  });
+
+  // Removes an item from the account's list only; the shared link itself is untouched.
+  router.delete('/activities/:kind/:id', async function (req, res) {
+    if (!activityRequest(req)) return res.status(403).json({ error: 'Requests must come from this website.' });
+    if (['game', 'book'].indexOf(req.params.kind) === -1 || !/^[a-zA-Z0-9-]{1,64}$/.test(req.params.id)) return res.status(400).json({ error: 'Unknown activity.' });
+    try { await activities.remove(req.libraryOwner, req.params.kind, req.params.id); res.json({ ok: true }); }
+    catch (error) { res.status(503).json({ error: 'This activity could not be removed right now.' }); }
+  });
   router.use(function (error, req, res, next) {
     if (error.type === 'entity.too.large') return res.status(413).json({ error: 'This cloud library exceeds 5 MB.' });
     if (error instanceof SyntaxError) return res.status(400).json({ error: 'The cloud library is not valid JSON.' });
