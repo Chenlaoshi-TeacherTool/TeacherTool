@@ -62,7 +62,7 @@ async function redeem(owner, codeHash) {
     'SET NOCOUNT ON; SET XACT_ABORT ON; BEGIN TRANSACTION; ' +
     'DECLARE @used TABLE (days INT); ' +
     'UPDATE dbo.teacher_activation_codes WITH (UPDLOCK, HOLDLOCK) SET redeemed_by = @owner, redeemed_at = SYSUTCDATETIME() OUTPUT INSERTED.days INTO @used ' +
-    'WHERE code_hash = @code AND redeemed_by IS NULL; ' +
+    'WHERE code_hash = @code AND redeemed_by IS NULL AND revoked_at IS NULL; ' +
     "IF NOT EXISTS (SELECT 1 FROM @used) BEGIN ROLLBACK; SELECT 'invalid' AS outcome; RETURN; END; " +
     'DECLARE @days INT = (SELECT TOP 1 days FROM @used); ' +
     'IF EXISTS (SELECT 1 FROM dbo.teacher_library_access WITH (UPDLOCK, HOLDLOCK) WHERE owner_key = @owner) ' +
@@ -91,10 +91,29 @@ async function createCodes(codes, createdBy) {
 async function listCodeBatches() {
   var pool = await db.getPool();
   var result = await pool.request().query(
-    'SELECT TOP 50 batch_label, days, MIN(created_at) AS created_at, COUNT(*) AS total, COUNT(redeemed_at) AS redeemed ' +
+    'SELECT TOP 50 batch_label, days, MIN(created_at) AS created_at, COUNT(*) AS total, COUNT(redeemed_at) AS redeemed, COUNT(revoked_at) AS revoked ' +
     'FROM dbo.teacher_activation_codes GROUP BY batch_label, days ORDER BY MIN(created_at) DESC;'
   );
   return result.recordset;
 }
 
-module.exports = { load: load, hasActiveAccess: hasActiveAccess, save: save, ensureTrial: ensureTrial, redeem: redeem, createCodes: createCodes, listCodeBatches: listCodeBatches };
+// Deactivates a code (refunds). An unused code can no longer be redeemed; a used
+// one also takes its days back from the teacher who redeemed it.
+async function revokeCode(codeHash, revokedBy) {
+  var pool = await db.getPool();
+  var result = await pool.request().input('code', db.sql.Char(64), codeHash).input('by', db.sql.NVarChar(200), revokedBy || null).query(
+    'SET NOCOUNT ON; SET XACT_ABORT ON; BEGIN TRANSACTION; ' +
+    'DECLARE @days INT, @owner CHAR(64), @revoked DATETIME2; ' +
+    'SELECT @days = days, @owner = redeemed_by, @revoked = revoked_at FROM dbo.teacher_activation_codes WITH (UPDLOCK, HOLDLOCK) WHERE code_hash = @code; ' +
+    "IF @days IS NULL BEGIN ROLLBACK; SELECT 'not-found' AS outcome; RETURN; END; " +
+    "IF @revoked IS NOT NULL BEGIN ROLLBACK; SELECT 'already' AS outcome; RETURN; END; " +
+    'UPDATE dbo.teacher_activation_codes SET revoked_at = SYSUTCDATETIME(), revoked_by = @by WHERE code_hash = @code; ' +
+    'IF @owner IS NOT NULL UPDATE dbo.teacher_library_access SET write_until = DATEADD(DAY, -@days, write_until) WHERE owner_key = @owner; ' +
+    "COMMIT; SELECT 'revoked' AS outcome, @days AS days, CASE WHEN @owner IS NULL THEN 0 ELSE 1 END AS was_used, " +
+    '(SELECT write_until FROM dbo.teacher_library_access WHERE owner_key = @owner) AS write_until;'
+  );
+  var row = result.recordset[0];
+  return row.outcome === 'revoked' ? { outcome: 'revoked', days: row.days, wasUsed: Boolean(row.was_used), writeUntil: row.write_until } : { outcome: row.outcome };
+}
+
+module.exports = { revokeCode: revokeCode, load: load, hasActiveAccess: hasActiveAccess, save: save, ensureTrial: ensureTrial, redeem: redeem, createCodes: createCodes, listCodeBatches: listCodeBatches };

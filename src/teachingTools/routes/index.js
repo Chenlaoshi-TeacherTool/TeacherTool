@@ -37,7 +37,7 @@ router.get('/privacy', function(req, res, next) {
 });
 
 router.get('/membership', function(req, res, next) {
-  res.render('membership', { title: 'Membership', paymentsOpen: membership.paymentsOpen, plans: membership.plans });
+  res.render('membership', { title: 'Membership', paymentsOpen: membership.paymentsOpen, plans: membership.plans, paypalMe: membership.paypalMe, foundingEndsAt: membership.foundingEndsAt });
 });
 
 router.get('/about', function(req, res, next) {

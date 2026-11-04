@@ -11,6 +11,20 @@
   </div>
 <% } %>
 
+<% if (typeof revoked !== 'undefined' && revoked) { %>
+  <div style="border:2px solid <%= revoked.outcome === 'revoked' ? '#16a34a' : '#dc2626' %>;border-radius:6px;padding:14px;margin:16px 0;">
+    <% if (revoked.outcome === 'revoked' && revoked.wasUsed) { %>
+      <p><strong>Code deactivated.</strong> It had been used, so <%= revoked.days %> days were taken back from that teacher's cloud saving<%= revoked.writeUntil ? ' (now until ' + new Date(revoked.writeUntil).toISOString().slice(0, 10) + ')' : '' %>.</p>
+    <% } else if (revoked.outcome === 'revoked') { %>
+      <p><strong>Code deactivated.</strong> Nobody had used it, and it can no longer be redeemed.</p>
+    <% } else if (revoked.outcome === 'already') { %>
+      <p>This code was already deactivated. Nothing changed.</p>
+    <% } else { %>
+      <p>No code matches what you entered. Check it and try again.</p>
+    <% } %>
+  </div>
+<% } %>
+
 <h2 style="font-size:1.1rem;">Create codes</h2>
 <form method="POST" action="/admin/memberships/codes">
   <label for="days">Plan</label>
@@ -24,15 +38,23 @@
   <div class="actions"><button type="submit">Create codes</button></div>
 </form>
 
+<h2 style="font-size:1.1rem;margin-top:28px;">Deactivate a code (refund)</h2>
+<p>Enter the code you sent the teacher. If they already used it, its days are taken back from their cloud saving; if not, it simply stops working.</p>
+<form method="POST" action="/admin/memberships/revoke" onsubmit="return confirm('Deactivate this code? This cannot be undone.');">
+  <label for="revokeCode">Activation code</label>
+  <input id="revokeCode" name="code" type="text" maxlength="30" placeholder="CLS-XXXX-XXXX-XXXX" autocomplete="off" required style="font-family:monospace;">
+  <div class="actions"><button class="danger" type="submit">Deactivate code</button></div>
+</form>
+
 <h2 style="font-size:1.1rem;margin-top:28px;">Recent batches</h2>
 <% if (!batches.length) { %>
   <p>No codes yet.</p>
 <% } else { %>
   <table>
-    <thead><tr><th>Created (UTC)</th><th>Note</th><th>Days</th><th>Used / total</th></tr></thead>
+    <thead><tr><th>Created (UTC)</th><th>Note</th><th>Days</th><th>Used / total</th><th>Deactivated</th></tr></thead>
     <tbody>
       <% batches.forEach(function (batch) { %>
-        <tr><td><%= new Date(batch.created_at).toISOString().slice(0, 16).replace('T', ' ') %></td><td><%= batch.batch_label || '' %></td><td><%= batch.days %></td><td><%= batch.redeemed %> / <%= batch.total %></td></tr>
+        <tr><td><%= new Date(batch.created_at).toISOString().slice(0, 16).replace('T', ' ') %></td><td><%= batch.batch_label || '' %></td><td><%= batch.days %></td><td><%= batch.redeemed %> / <%= batch.total %></td><td><%= batch.revoked || 0 %></td></tr>
       <% }) %>
     </tbody>
   </table>

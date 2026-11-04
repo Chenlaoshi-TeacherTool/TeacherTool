@@ -211,3 +211,9 @@ body { margin: 0; }
   .plan-name { font-size: 1.25rem; }
   .plan-swipe { display: block; margin: 0 0 10px; color: var(--muted); font-size: .85rem; text-align: right; }
 }
+.plan-buy { margin: 0 0 24px; padding: 20px 24px; border: 1px solid #cfe1b8; border-radius: 18px; background: #f1f8e4; color: #194f45; }
+.plan-buy h2 { margin: 0 0 6px; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-weight: 400; }
+.plan-buy ol { margin: 8px 0 0; padding-left: 22px; line-height: 1.8; }
+.plan-buy-founding { margin: 0; color: #7e5112; font-weight: 800; }
+.plan-buy-refund { margin: 10px 0 0; color: var(--muted); font-size: .92rem; }
+a.plan-button { display: block; text-align: center; text-decoration: none; }

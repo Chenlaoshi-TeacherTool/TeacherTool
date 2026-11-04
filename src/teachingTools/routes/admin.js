@@ -1153,6 +1153,17 @@ router.get('/memberships', async function (req, res, next) {
   } catch (err) { next(err); }
 });
 
+// Deactivate one code, e.g. after a refund. The admin enters the code itself.
+router.post('/memberships/revoke', async function (req, res, next) {
+  try {
+    if (req.get('origin') && new URL(req.get('origin')).host !== req.get('host')) return res.status(403).send('Deactivate codes from the admin page.');
+    var hash = activationCodes.hash(req.body.code);
+    var result = hash ? await teacherLibraryRepository.revokeCode(hash, req.adminUser.name) : { outcome: 'not-found' };
+    res.set('Cache-Control', 'private, no-store');
+    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, revoked: result, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
 router.post('/memberships/codes', async function (req, res, next) {
   try {
     if (req.get('origin') && new URL(req.get('origin')).host !== req.get('host')) return res.status(403).send('Create codes from the admin page.');

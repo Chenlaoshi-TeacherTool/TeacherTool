@@ -17,6 +17,8 @@ Part of the Azure SQL migration described in `docs/azure-architecture-migration.
   (`teacher_private_libraries`, `teacher_library_access`). Not exposed through DAB.
 - `add-teacher-membership.sql` — run after the private library file: adds the 3-day trial marker
   and `teacher_activation_codes` (hashes only). Codes are created at `/admin/memberships`.
+- `add-activation-code-revocation.sql` — adds `revoked_at` / `revoked_by` to activation codes so an
+  admin can deactivate a code (refunds) at `/admin/memberships`. Run before deploying that feature.
 - `add-teacher-activities.sql` — `teacher_activities`: which shared games and books belong to which
   teacher account, so My activities works on any device. Content stays in Blob storage.
 - `dab-config.json` — Data API Builder configuration exposing all of the above tables as a

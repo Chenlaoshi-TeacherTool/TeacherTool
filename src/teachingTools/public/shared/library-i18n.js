@@ -375,6 +375,7 @@
   "This cloud library exceeds 5 MB.": "云端资料超过 5 MB。",
   "The cloud library is not valid JSON.": "云端资料不是有效的 JSON。",
   "Have an activation code?": "有激活码？",
+  "No code yet? See membership plans": "还没有激活码？查看会员方案",
   "Activate": "激活",
   "Cloud saving is not active on this account. Enter an activation code to turn it on.": "此账号还没有开通云端保存，输入激活码即可开通。",
   "Cloud saving ended on ": "云端保存已于 ",

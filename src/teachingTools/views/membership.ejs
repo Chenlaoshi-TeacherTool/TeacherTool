@@ -15,6 +15,19 @@
   <main>
     <section class="content-section"><div class="content-shell">
       <% if (!paymentsOpen) { %><p class="plan-notice" role="note"><%= t('membership.notice') %></p><% } %>
+      <% if (paymentsOpen) { %>
+        <section class="plan-buy" id="buy" aria-labelledby="buyTitle">
+          <h2 id="buyTitle"><%= t('membership.buyTitle') %></h2>
+          <% if (foundingEndsAt) { %><p class="plan-buy-founding"><%= t('membership.foundingUntil') %><%= new Date(foundingEndsAt + 'T00:00:00').toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p><% } %>
+          <ol>
+            <li><%= t('membership.buy1') %></li>
+            <li><%= t('membership.buy2') %></li>
+            <li><%= t('membership.buy3') %></li>
+            <li><%= t('membership.buy4') %></li>
+          </ol>
+          <p class="plan-buy-refund"><%= t('membership.refundBefore') %><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a><%= t('membership.a7After') %></p>
+        </section>
+      <% } %>
       <%
         // Each row: feature label, then what the free plan and the paid plans get.
         // true = included, false = not included, a string = translation key for a short note.
@@ -68,7 +81,7 @@
             <tr>
               <td></td>
               <td></td>
-              <% plans.forEach(function (plan) { %><td<%- plan.recommended ? ' class="plan-featured"' : '' %>><button class="btn plan-button" type="button" disabled><%= t('membership.comingSoon') %></button></td><% }) %>
+              <% plans.forEach(function (plan) { %><td<%- plan.recommended ? ' class="plan-featured"' : '' %>><% if (paymentsOpen) { %><a class="btn plan-button" href="<%= paypalMe %>/<%= plan.founding %>USD" target="_blank" rel="noopener"><%= t('membership.buyWithPaypal') %> $<%= plan.founding %></a><% } else { %><button class="btn plan-button" type="button" disabled><%= t('membership.comingSoon') %></button><% } %></td><% }) %>
             </tr>
           </tfoot>
         </table>
@@ -84,6 +97,7 @@
       </article>
       <article>
         <h3><%= t('membership.q4') %></h3><p><%= t('membership.a4') %></p>
+        <h3><%= t('membership.q7') %></h3><p><%= t('membership.a7Before') %><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a><%= t('membership.a7After') %></p>
         <h3><%= t('membership.q5') %></h3><p><%= t('membership.a5Before') %><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a><%= t('membership.a5After') %></p>
       </article>
     </div></section>

@@ -42,7 +42,8 @@
   var redeemButton = button('Activate', 'cloudRedeem', true); redeemButton.type = 'submit'; redeemButton.disabled = false;
   var redeemStatus = element('p', '', 'cloud-library-exchange'); redeemStatus.setAttribute('role', 'status'); redeemStatus.setAttribute('aria-live', 'polite');
   var redeemRow = element('div', '', 'cloud-library-actions'); redeemRow.append(codeInput, redeemButton);
-  redeemForm.append(codeLabel, redeemRow, redeemStatus);
+  var buyLink = element('a', t('No code yet? See membership plans'), 'cloud-library-buy'); buyLink.href = '/membership';
+  redeemForm.append(codeLabel, redeemRow, buyLink, redeemStatus);
   var tools = element('div', '', 'cloud-library-actions'); tools.append(reload, download);
   var swap = element('div', '', 'cloud-library-actions'); swap.append(upload, restore);
   workspace.append(planLine, redeemForm, tools, collections, element('p', t('Nothing uploads or replaces your materials automatically. Preview first, then confirm. On a shared computer, browser materials may not belong to this account.'), 'cloud-library-note'), swap, exchange, confirmLabel, apply);
