@@ -9,8 +9,8 @@
 <body>
   <header class="content-hero"><div class="content-shell">
     <p class="content-kicker"><%= t('membership.kicker') %></p>
-    <h1><%= t('membership.title') %></h1>
-    <p><%= t('membership.intro') %></p>
+    <h1><%= t(paymentsOpen ? 'membership.titleOpen' : 'membership.title') %></h1>
+    <p><%= t(paymentsOpen ? 'membership.introOpen' : 'membership.intro') %></p>
   </div></header>
   <main>
     <section class="content-section"><div class="content-shell">
@@ -90,7 +90,7 @@
     </div></section>
     <section class="content-section content-section--soft"><div class="content-shell prose-grid">
       <article><h2><%= t('membership.faqTitle') %></h2>
-        <h3><%= t('membership.q1') %></h3><p><%= t('membership.a1') %></p>
+        <% if (!paymentsOpen) { %><h3><%= t('membership.q1') %></h3><p><%= t('membership.a1') %></p><% } %>
         <h3><%= t('membership.q2') %></h3><p><%= t('membership.a2') %></p>
         <h3><%= t('membership.q3') %></h3><p><%= t('membership.a3') %></p>
         <h3><%= t('membership.q6') %></h3><p><%= t('membership.a6') %></p>

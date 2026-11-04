@@ -138,7 +138,7 @@
             <span>Quiz: no hints while working. Submit all sentences to see the total score.<br>测验版：做题时不提示对错，全部提交后显示答对题数。</span>
           </label>
           <label>Password<input name="sharePassword" type="password" minlength="4" maxlength="64" autocomplete="new-password" required></label>
-          <p class="game-share-dialog-note">Students open the link and enter this password. The link expires after 90 days.</p>
+          <p class="game-share-dialog-note">Students open the link and enter this password. Free links stay open for 7 days; <a href="/membership" target="_blank" rel="noopener">members’</a> links for 180 days.</p>
           <p class="game-share-dialog-error" data-share-error role="alert" hidden></p>
           <button class="game-share-dialog-submit" type="button" data-share-submit>Create link</button>
         </div>
@@ -154,6 +154,7 @@
             <button type="button" data-copy-link>Copy link + password</button>
             <a data-open-link target="_blank" rel="noopener">Open student view</a>
           </div>
+          <p data-share-expiry></p>
           <p>Send students both the link and the password you chose.</p>
         </div>
       </form>`;
@@ -341,6 +342,7 @@
         });
         urlInput.value = published.absoluteUrl;
         passwordResultInput.value = passwordInput.value;
+        dialog.querySelector('[data-share-expiry]').textContent = published.expiresAt ? 'Link open until ' + formatDate(published.expiresAt) + ' / 链接有效至 ' + formatDate(published.expiresAt) : '';
         dialog.querySelector('.game-share-dialog-success').textContent = options.gameType === 'sentence-reorder'
           ? (modeInput.value === 'assessment' ? '✓ Quiz link created / 测验版链接已创建' : '✓ Practice link created / 练习版链接已创建')
           : '✓ Student link created';

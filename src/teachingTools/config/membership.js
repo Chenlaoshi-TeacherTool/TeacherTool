@@ -22,11 +22,11 @@ var DAY_MS = 24 * 60 * 60 * 1000;
 // opening. When opening sales, set `paymentsOpen: true` and `foundingEndsAt` to
 // that date plus three months (e.g. '2027-02-15') so the page can show it.
 module.exports = {
-  paymentsOpen: false,
+  paymentsOpen: true,
   limitsEnabled: process.env.MEMBERSHIP_LIMITS_ENABLED === 'true',
   paypalMe: 'https://paypal.me/chenlaoshitoolkit',
   foundingMonths: 3,
-  foundingEndsAt: null,
+  foundingEndsAt: '2027-02-03',
   graceDays: 30,
   refundDays: 3,
   plans: [
