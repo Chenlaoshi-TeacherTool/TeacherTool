@@ -15,3 +15,16 @@ button.lib-picker-choice[aria-pressed="true"]{border-color:#2f5233;background:#2
 .lib-picker-actions{margin-top:11px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .lib-picker-note{color:#6b7a63;font-size:12px;font-weight:600}
 @media(max-width:700px){.lib-picker-head{flex-direction:column}.lib-picker-library-link{align-self:flex-start}.lib-picker-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Opt-in collapsible mode (options.collapsible). */
+.lib-picker-collapsible .lib-picker-head>div{flex:1;min-width:0}
+.lib-picker-toggle{width:100%;padding:0;display:flex;align-items:center;gap:10px;border:0;background:none;box-shadow:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.lib-picker-toggle h3{flex:1}
+.lib-picker-toggle-text{flex:0 0 auto;color:#3d6b43;font-size:12px;font-weight:800}
+.lib-picker-chevron{width:9px;height:9px;flex:0 0 auto;border-right:2px solid #3d6b43;border-bottom:2px solid #3d6b43;transform:translateY(-3px) rotate(45deg);transition:transform .2s cubic-bezier(.23,1,.32,1)}
+.lib-picker-collapsible.is-open .lib-picker-chevron{transform:translateY(2px) rotate(-135deg)}
+.lib-picker-collapsible:not(.is-open) .hint{display:none}
+.lib-picker-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s cubic-bezier(.23,1,.32,1)}
+.lib-picker-collapsible.is-open .lib-picker-body{grid-template-rows:1fr}
+.lib-picker-body-inner{min-height:0;overflow:hidden}
+.lib-picker-collapsible .lib-picker-library-link{display:inline-block;margin-top:10px}
+@media(prefers-reduced-motion:reduce){.lib-picker-body,.lib-picker-chevron{transition:none}}

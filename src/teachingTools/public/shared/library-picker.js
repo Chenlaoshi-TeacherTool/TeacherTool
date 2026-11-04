@@ -158,6 +158,19 @@
       head.appendChild(link);
     }
 
+    // options.collapsible: the header becomes a toggle and the topic grid
+    // folds away (starting folded unless options.collapsed === false).
+    var collapsible = !!options.collapsible;
+    var toggle = null;
+    if (collapsible) {
+      root.className += ' lib-picker-collapsible';
+      toggle = el('button', 'lib-picker-toggle');
+      toggle.type = 'button';
+      toggle.innerHTML = '<span class="lib-picker-toggle-text"></span><span class="lib-picker-chevron" aria-hidden="true"></span>';
+      headText.replaceChild(toggle, title);
+      toggle.insertBefore(title, toggle.firstChild);
+    }
+
     var status = el('p', 'lib-picker-status');
     status.setAttribute('aria-live', 'polite');
     status.textContent = 'Loading ' + config.noun + 's…';
@@ -175,9 +188,28 @@
     actions.appendChild(importButton); actions.appendChild(note);
 
     root.appendChild(head);
-    root.appendChild(status);
-    root.appendChild(choices);
-    root.appendChild(actions);
+    var bodyParent = root;
+    if (collapsible) {
+      var body = el('div', 'lib-picker-body');
+      bodyParent = el('div', 'lib-picker-body-inner');
+      body.appendChild(bodyParent);
+      root.appendChild(body);
+      if (link) bodyParent.appendChild(link);
+    }
+    bodyParent.appendChild(status);
+    bodyParent.appendChild(choices);
+    bodyParent.appendChild(actions);
+
+    function setOpen(open) {
+      root.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.querySelector('.lib-picker-toggle-text').textContent = open ? 'Hide topics' : 'Show topics';
+      body.inert = !open;
+    }
+    if (collapsible) {
+      setOpen(options.collapsed === false);
+      toggle.addEventListener('click', function () { setOpen(!root.classList.contains('is-open')); });
+    }
 
     function selectedItems() {
       return selectedIds.map(function (id) {

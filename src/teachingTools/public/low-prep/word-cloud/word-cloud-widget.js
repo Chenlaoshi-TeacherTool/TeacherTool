@@ -175,6 +175,7 @@
       root: els.libraryPicker,
       source: 'wordlists',
       min: 1,
+      collapsible: true,
       title: 'Add words from the library',
       hint: 'Choose one or more vocabulary topics to add their terms to your word cloud.',
       importLabel: 'Add words from selected topics',
