@@ -4,7 +4,7 @@ var db = require('./sqlClient');
 
 // One row per shared game or book a teacher account owns (dbo.teacher_activities).
 // Games also keep their content (payload) so a new link can be made after the
-// old one expires; see database/add-teacher-activity-payload.sql.
+// old one expires; see database/migrations/0006_add-teacher-activity-payload.sql.
 
 async function list(owner) {
   var pool = await db.getPool();

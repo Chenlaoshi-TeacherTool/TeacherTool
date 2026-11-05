@@ -1,38 +1,77 @@
-# Database migration files
+# Database
 
 Part of the Azure SQL migration described in `docs/azure-architecture-migration.md`.
 
-- `schema.sql` — full table definitions for the Azure SQL database.
-- `backfill-word-lists.sql`, `backfill-question-banks.sql`, `backfill-site-content.sql` — the
-  INSERT statements used to migrate the original hardcoded `data/*.js` modules into SQL. Kept as
-  a historical record; the generator scripts that produced them (and the `data/*.js` modules
-  themselves) have been deleted now that the DAB-backed path has run stable in production —
-  `routes/api.js`, `services/siteContentStore.js`, and the admin CMS have no fallback to
-  hardcoded data anymore, so `DAB_BASE_URL` and a reachable DAB instance are required for the
-  site to serve word lists, question banks, tool guides, or articles.
-- `add-textbook-lessons.sql` — adds the textbook companion tables (`textbook_lessons`,
-  `textbook_lesson_items`) to an existing database. Run it once, then redeploy DAB. Lesson data is
-  loaded from Excel at `/admin/textbooks/import`.
-- `add-teacher-private-library.sql` — private cloud library per teacher account
+## Changing the database: numbered migrations
+
+Every change to tables after the original `schema.sql` is a file in `migrations/`, named
+`NNNN_short-name.sql` and run in number order, once per database. `dbo.schema_migrations` records
+which ones have run.
+
+**Adding a change**
+
+1. Create the next file, e.g. `migrations/0009_add-something.sql`. Make it safe to run twice
+   (`IF OBJECT_ID(...) IS NULL`, `IF COL_LENGTH(...) IS NULL`), and wrap it in a transaction.
+2. End it with the line that records it (copy from any other migration, with its own id):
+   ```sql
+   IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE id = N'0009_add-something')
+       INSERT INTO dbo.schema_migrations (id) VALUES (N'0009_add-something');
+   ```
+3. Set `requiredMigration` in `src/teachingTools/config/database.js` to the new id. The tests fail
+   until the numbering, the record line and this setting all agree.
+4. Run it on the database **before** pushing the code that needs it.
+
+**Running migrations** (from `src/teachingTools`)
+
+```
+npm run db:status                      # applied and pending migrations
+npm run db:migrate                     # runs the pending ones in order
+npm run db:migrate -- --azure-settings # uses the web app's SQL_CONNECTION_STRING via the Azure CLI
+```
+
+The scripts use `DB_MIGRATION_CONNECTION_STRING` (or `SQL_CONNECTION_STRING`). The login needs
+permission to change tables, and the database firewall must allow your computer. Running a file by
+hand in the Azure Portal query editor works too: each file records itself.
+
+If the database is missing a migration the deployed code needs, every `/admin` page shows a red
+warning and the app logs one at start-up.
+
+**Migrations so far**
+
+- `0000_schema-migrations.sql` — creates `schema_migrations`. On a database that had the earlier
+  files run by hand, it also records 0001–0008 for each change it finds already in place.
+- `0001_add-textbook-lessons.sql` — textbook companion tables (`textbook_lessons`,
+  `textbook_lesson_items`). Redeploy DAB afterwards. Lesson data is loaded from Excel at
+  `/admin/textbooks/import`.
+- `0002_add-teacher-private-library.sql` — private cloud library per teacher account
   (`teacher_private_libraries`, `teacher_library_access`). Not exposed through DAB.
-- `add-teacher-membership.sql` — run after the private library file: adds the 3-day trial marker
-  and `teacher_activation_codes` (hashes only). Codes are created at `/admin/memberships`.
-- `add-activation-code-revocation.sql` — adds `revoked_at` / `revoked_by` to activation codes so an
-  admin can deactivate a code (refunds) at `/admin/memberships`. Run before deploying that feature.
-- `add-teacher-activities.sql` — `teacher_activities`: which shared games and books belong to which
-  teacher account, so My activities works on any device. Content stays in Blob storage.
-- `add-teacher-activity-payload.sql` — adds `payload`, `game_version` and `expires_at` to
+- `0003_add-teacher-membership.sql` — the 3-day trial marker and `teacher_activation_codes` (hashes
+  only). Codes are created at `/admin/memberships`.
+- `0004_add-teacher-activities.sql` — `teacher_activities`: which shared games and books belong to
+  which teacher account, so My activities works on any device. Content stays in Blob storage.
+- `0005_add-activation-code-revocation.sql` — `revoked_at` / `revoked_by` on activation codes, so an
+  admin can deactivate a code (refunds).
+- `0006_add-teacher-activity-payload.sql` — `payload`, `game_version` and `expires_at` on
   `teacher_activities`, so a game stays in the account after its link expires and My activities can
-  make a new link. Run before deploying that feature (the app writes these columns).
-- `add-teacher-accounts.sql` — `teacher_accounts`: email, name, sign-up and last-seen dates per
-  teacher account (same `owner_key`), filled in on sign-in. Used by the "Find a teacher" search at
-  `/admin/memberships`. Not exposed through DAB. Run before deploying that feature.
-- `add-membership-events.sql` — `membership_events`: an add-only history of every change to a
+  make a new link.
+- `0007_add-teacher-accounts.sql` — `teacher_accounts`: email, name, sign-up and last-seen dates per
+  teacher account, filled in on sign-in. Used by "Find a teacher" at `/admin/memberships`.
+- `0008_add-membership-events.sql` — `membership_events`: an add-only history of every change to a
   teacher's cloud-saving end date (trial, activation code, refund), with the end date before and
-  after. Backfills past trials, codes and refunds from the existing tables. **Run before deploying**:
-  sign-in (trial), code redemption and refunds write to it inside their transactions and fail without it.
-- `dab-config.json` — Data API Builder configuration exposing all of the above tables as a
-  read-only REST API for the public site, alongside direct-SQL writes from the admin CMS.
+  after. Sign-in, code redemption and refunds write to it inside their transactions.
+
+## Other files
+
+- `schema.sql` — the original table definitions. For a new, empty database run it first, then every
+  file in `migrations/` in order.
+- `backfill-word-lists.sql`, `backfill-question-banks.sql`, `backfill-site-content.sql`,
+  `backfill-recommendation-products.sql` — the INSERT statements used to move the original
+  hardcoded `data/*.js` content into SQL. Kept as a historical record; the generator scripts and
+  `data/*.js` modules are deleted, so `DAB_BASE_URL` and a reachable DAB instance are required for
+  the site to serve word lists, question banks, tool guides, or articles.
+- `dab-config.json` — Data API Builder configuration exposing the content tables as a read-only
+  REST API for the public site, alongside direct-SQL writes from the admin CMS. Teacher and
+  membership tables are not exposed.
 
 Note: DAB is a separate runtime (a .NET-based CLI/container), not something the existing Express
 app runs in-process.

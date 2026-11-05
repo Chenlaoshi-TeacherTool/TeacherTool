@@ -1,5 +1,5 @@
 -- Teacher membership: 3-day trial on first sign-in and one-time activation codes.
--- Requires add-teacher-private-library.sql (dbo.teacher_library_access).
+-- Requires 0002_add-teacher-private-library.sql (dbo.teacher_library_access).
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
 
@@ -25,3 +25,7 @@ BEGIN
 END;
 
 COMMIT;
+
+-- Record this migration (see database/README.md).
+IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE id = N'0003_add-teacher-membership')
+    INSERT INTO dbo.schema_migrations (id) VALUES (N'0003_add-teacher-membership');

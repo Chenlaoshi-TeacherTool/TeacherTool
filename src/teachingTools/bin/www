@@ -32,6 +32,9 @@ server.on('listening', onListening);
 // Daily removal of expired shared games and books (see services/expiredShareCleanup.js).
 require('../services/expiredShareCleanup').schedule();
 
+// Logs a warning if the database is missing a migration this code needs.
+require('../services/databaseVersion').warnIfBehind();
+
 /**
  * Normalize a port into a number, string, or false.
  */

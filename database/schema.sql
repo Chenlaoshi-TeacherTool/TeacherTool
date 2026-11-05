@@ -1,5 +1,7 @@
 -- TeacherTool content database schema (Azure SQL)
 -- See docs/azure-architecture-migration.md for the migration plan this supports.
+-- Later changes are numbered files in database/migrations (see database/README.md):
+-- on a new, empty database run this file first, then every migration in order.
 
 -- ===== Lookup tables (replace hardcoded dictionaries in routes/api.js) =====
 

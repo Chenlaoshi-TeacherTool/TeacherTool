@@ -21,7 +21,7 @@
 - 用户流程 “Teachers sign up and sign in”：邮箱 + 密码注册，收集姓名。邮箱验证与找回密码使用租户默认的邮箱验证码，尚待真实注册验证。
 - App Service 认证已加入自定义 OIDC 提供方 `teachers`；管理员 `aad` 与匿名访问未改动。`/.auth/login/teachers` 已跳转到租户登录页。
 - Google 联合登录尚未配置，需要先在 Google Cloud 建 OAuth 客户端。
-- 会员：账号首次登录自动获得 `TEACHER_TRIAL_DAYS`（默认 3）天云端保存，每账号一次；激活码（30/90/180/365 天）在 `/admin/memberships` 生成，只存哈希，老师在“我的资料”兑换后从当前到期日顺延。需要先执行 `database/add-teacher-membership.sql`。
+- 会员：账号首次登录自动获得 `TEACHER_TRIAL_DAYS`（默认 3）天云端保存，每账号一次；激活码（30/90/180/365 天）在 `/admin/memberships` 生成，只存哈希，老师在“我的资料”兑换后从当前到期日顺延。需要先执行 `database/migrations/0003_add-teacher-membership.sql`。
 
 - 会员限制（`config/membership.js`）：浏览器里运行的工具免费；占用服务器存储的功能归会员。开启 `MEMBERSHIP_LIMITS_ENABLED=true` 后，非会员新建的游戏和绘本链接 7 天过期，会员 180 天；绘本朗读和背景音乐只限会员。未开启时一律保持原来的 90 天。开启前须先开放老师账号，并同步更新隐私政策里“链接 90 天后过期”的说明。学生打开链接始终不需要账号。
 
@@ -36,7 +36,7 @@
 
 ## 生产或预发布启用步骤（本次不自动执行）
 
-1. 先备份 SQL 数据库，在预发布库执行 `database/add-teacher-private-library.sql`。验证应用身份仅有这两张表所需 SELECT/INSERT/UPDATE 权限，不为 DAB 匿名角色增加权限；已有 DAB 配置保持不变。
+1. 先备份 SQL 数据库，在预发布库执行 `database/migrations/0002_add-teacher-private-library.sql`。验证应用身份仅有这两张表所需 SELECT/INSERT/UPDATE 权限，不为 DAB 匿名角色增加权限；已有 DAB 配置保持不变。
 2. 保持现有管理员 `aad` 提供方及其单组织应用不变。创建独立的客户身份租户/应用及注册登录用户流程，启用邮箱密码、邮箱验证和自助密码重置；在该流程配置 Google 联合登录。用 App Service 自定义 OIDC 名称 `teachers` 接入，回调为 `https://clsteachingtools.com/.auth/login/teachers/callback`。保留公共工具匿名访问，检查正式域名与 Azure 域名回调。新增租户、OAuth 应用、密钥或修改认证配置前须取得明确授权。
 3. 配置 `SITE_URL=https://clsteachingtools.com`、现有 `SQL_CONNECTION_STRING`、`AZURE_AUTH_ENABLED=true`、`TEACHER_ACCOUNT_PROVIDER=teachers`。真实身份流程验收后设置 `TEACHER_ACCOUNTS_ENABLED=true`，Google 实测通过才设置 `TEACHER_GOOGLE_ENABLED=true`。云库迁移和隔离验证通过后再启用 `LIBRARY_CLOUD_ENABLED=true`。不在日志、Git 或聊天中输出连接字符串或客户端密钥。
 4. 由两位老师分别完成真实注册与登录。管理员通过受控的当前用户会话接口取得 owner_key，核实本人身份后，用参数化 SQL 为试用账号设置明确到期时间：向 dbo.teacher_library_access 写入对应 owner_key 和 write_until。此操作代表试用授权，不是已付费证明；浏览器传来的 paid 或 ownerId 不参与授权。

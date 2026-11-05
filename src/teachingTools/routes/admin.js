@@ -13,6 +13,7 @@ var textbooks = require('../config/textbooks');
 var textbookImport = require('../services/textbookImport');
 var teacherLibraryRepository = require('../services/teacherLibraryRepository');
 var teacherAccountsRepository = require('../services/teacherAccountsRepository');
+var databaseVersion = require('../services/databaseVersion');
 var activationCodes = require('../services/activationCodes');
 var sql = sqlClient.sql;
 
@@ -23,6 +24,13 @@ router.use(requireAdmin);
 // Admin nav and dashboard follow the public site structure in config/siteMap.js.
 router.use(function (req, res, next) {
   res.locals.adminNav = siteMap.adminNav();
+  next();
+});
+
+// Warns on every admin page when the database is missing a migration this code needs.
+router.use(async function (req, res, next) {
+  if (req.method !== 'GET') return next();
+  try { res.locals.dbStatus = await databaseVersion.check(); } catch (error) { res.locals.dbStatus = null; }
   next();
 });
 

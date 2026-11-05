@@ -35,3 +35,7 @@ BEGIN
     );
     CREATE INDEX IX_textbook_lesson_items_lesson_id ON textbook_lesson_items(lesson_id);
 END;
+
+-- Record this migration (see database/README.md).
+IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE id = N'0001_add-textbook-lessons')
+    INSERT INTO dbo.schema_migrations (id) VALUES (N'0001_add-textbook-lessons');

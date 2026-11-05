@@ -2,7 +2,7 @@
 -- the automatic trial, activation codes, and refunds (deactivated codes).
 -- teacher_library_access keeps only the current end date; this table says how
 -- it got there. Rows are only ever added, never changed.
--- Requires add-teacher-membership.sql and add-activation-code-revocation.sql.
+-- Requires 0003_add-teacher-membership.sql and 0005_add-activation-code-revocation.sql.
 -- Safe to run twice; the backfill only runs while the table is empty.
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
@@ -50,3 +50,7 @@ BEGIN
 END;
 
 COMMIT;
+
+-- Record this migration (see database/README.md).
+IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE id = N'0008_add-membership-events')
+    INSERT INTO dbo.schema_migrations (id) VALUES (N'0008_add-membership-events');

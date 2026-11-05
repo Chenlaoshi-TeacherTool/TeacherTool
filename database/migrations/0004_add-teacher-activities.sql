@@ -1,7 +1,7 @@
 -- Index of the shared games and books each teacher account created, so
 -- My activities can list them on any device. Content stays in Blob storage;
 -- this table only records which items belong to which account.
--- Requires add-teacher-private-library.sql (same owner_key scheme).
+-- Requires 0002_add-teacher-private-library.sql (same owner_key scheme).
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
 
@@ -21,3 +21,7 @@ BEGIN
 END;
 
 COMMIT;
+
+-- Record this migration (see database/README.md).
+IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE id = N'0004_add-teacher-activities')
+    INSERT INTO dbo.schema_migrations (id) VALUES (N'0004_add-teacher-activities');

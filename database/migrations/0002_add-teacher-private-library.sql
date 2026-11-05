@@ -23,3 +23,7 @@ BEGIN
 END;
 
 COMMIT;
+
+-- Record this migration (see database/README.md).
+IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE id = N'0002_add-teacher-private-library')
+    INSERT INTO dbo.schema_migrations (id) VALUES (N'0002_add-teacher-private-library');

@@ -20,3 +20,7 @@ BEGIN
 END;
 
 COMMIT;
+
+-- Record this migration (see database/README.md).
+IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE id = N'0007_add-teacher-accounts')
+    INSERT INTO dbo.schema_migrations (id) VALUES (N'0007_add-teacher-accounts');
