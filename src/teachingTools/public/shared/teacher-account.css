@@ -5,6 +5,7 @@
 .site-nav-tools { display: flex; flex-shrink: 0; align-items: center; gap: 8px; min-width: 0; }
 .site-nav-tools #teacherAccountBar { flex-wrap: nowrap; gap: 6px; padding: 0; }
 .site-nav-tools #teacherAccountBar a, .site-nav-tools #teacherAccountBar button { padding: 5px 11px; border-color: #d7e3c7; border-radius: 999px; font-size: .78rem; font-weight: 800; white-space: nowrap; }
+#teacherAccountBar a.teacher-account-membership { border-color: #e7c768; background: #fff3c4; color: #6b4a00; }
 @media (max-width: 1600px) { .site-nav-tools { grid-area: language; } }
 .teacher-account-header { padding: 10px 24px; background: #edf5df; }
 #teacherAccountDialog { width: min(460px, calc(100% - 32px)); padding: 28px; border: 1px solid #d8e5c7; border-radius: 20px; box-sizing: border-box; color: #194f45; background: #fffdf7; }
@@ -16,4 +17,6 @@
 #teacherAccountDialog .teacher-account-close:hover { background: #dcebc8; }
 @media print { #teacherAccountBar, #teacherAccountDialog { display: none !important; } }
 /* Phones: the account buttons fill the header row, so show just the logo instead of a clipped site name. */
-@media (max-width: 640px) { .site-nav-tools #teacherAccountBar span { max-width: 72px; } .site-main-nav-inner:has(#teacherAccountBar:not([hidden])) .site-main-nav-brand span { display: none; } }
+@media (max-width: 640px) { .site-nav-tools #teacherAccountBar span { max-width: 72px; } .site-main-nav-inner:has(#teacherAccountBar:not([hidden])) .site-main-nav-brand span { display: none; } .site-nav-tools, .site-nav-tools #teacherAccountBar { gap: 4px; } .site-nav-tools #teacherAccountBar a, .site-nav-tools #teacherAccountBar button { padding: 5px 8px; } }
+/* Narrow phones: the buttons need the whole row; the main menu still links Home. */
+@media (max-width: 430px) { .site-main-nav-inner:has(#teacherAccountBar:not([hidden])) .site-main-nav-brand { display: none; } .site-main-nav-inner:has(#teacherAccountBar:not([hidden])) { grid-template-areas: "language language" "links links"; } .site-nav-tools { width: 100%; justify-content: flex-end; } .site-nav-tools #teacherAccountBar { flex: 0 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; } .site-nav-tools #teacherAccountBar::-webkit-scrollbar { display: none; } .site-nav-tools .site-lang-switch { flex-shrink: 0; } .site-nav-tools #teacherAccountBar .teacher-account-membership { order: -1; } }
