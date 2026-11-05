@@ -151,7 +151,8 @@
 .wg-vocab .wg-num { width: 2em; text-align: center; }
 
 /* matching */
-.wg-match { display: grid; gap: 10px; }
+/* Lines can't be drawn across a page break, so keep the whole matching block together. */
+.wg-match { display: grid; gap: 10px; break-inside: avoid; page-break-inside: avoid; }
 .wg-match-row { display: grid; grid-template-columns: minmax(0, 1fr) 10px 28mm 10px minmax(0, 1fr); align-items: center; gap: 6px; }
 .wg-match-right { padding-left: 4px; }
 .wg-dot { width: 9px; height: 9px; border-radius: 50%; background: #111; }

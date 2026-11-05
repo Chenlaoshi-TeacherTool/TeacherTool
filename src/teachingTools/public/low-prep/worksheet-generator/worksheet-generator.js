@@ -556,7 +556,7 @@
         html += '<div class="wg-match-row wg-item">' +
           '<span class="wg-match-left"><span class="wg-num">' + (i + 1) + '.</span> ' + rubyWord(it.hz, it.py, ctx.pinyin) +
           (ctx.answers ? ' <span class="wg-answer">→ ' + ansLetter + '</span>' : '') + '</span>' +
-          '<span class="wg-dot"></span><span class="wg-match-gap"></span><span class="wg-dot"></span>' +
+          '<span></span><span class="wg-match-gap"></span><span class="wg-dot"></span>' +
           '<span class="wg-match-right"><span class="wg-num">' + LETTERS[i] + '.</span> ' + esc(target.mean || target.py) + '</span>' +
           '</div>';
       });
