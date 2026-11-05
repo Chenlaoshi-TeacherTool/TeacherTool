@@ -29,6 +29,9 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+// Daily removal of expired shared games and books (see services/expiredShareCleanup.js).
+require('../services/expiredShareCleanup').schedule();
+
 /**
  * Normalize a port into a number, string, or false.
  */

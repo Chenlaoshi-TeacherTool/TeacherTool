@@ -154,8 +154,15 @@ async function deleteBook(bookId) {
   }
 }
 
+// Every book folder (published or draft), for the expired-link cleanup.
+async function listBooks() {
+  var folders = require('./shareFolders');
+  return isAzureConfigured() ? folders.fromContainer(getContainerClient()) : folders.fromDirectory(LOCAL_ROOT);
+}
+
 module.exports = {
   isAzureConfigured: isAzureConfigured,
+  listBooks: listBooks,
   uploadAsset: uploadAsset,
   saveManifest: saveManifest,
   getManifest: getManifest,

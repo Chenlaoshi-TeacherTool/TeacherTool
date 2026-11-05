@@ -170,8 +170,15 @@ async function listSubmissions(shareId, limit) {
     .sort(function (left, right) { return String(right.submittedAt || '').localeCompare(String(left.submittedAt || '')); });
 }
 
+// Every share folder, for the expired-link cleanup.
+async function listShares() {
+  var folders = require('./shareFolders');
+  return isAzureConfigured() ? folders.fromContainer(getContainerClient()) : folders.fromDirectory(LOCAL_ROOT);
+}
+
 module.exports = {
   isAzureConfigured: isAzureConfigured,
+  listShares: listShares,
   validShareId: validShareId,
   saveManifest: saveManifest,
   getManifest: getManifest,

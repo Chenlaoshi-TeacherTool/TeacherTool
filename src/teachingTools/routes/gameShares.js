@@ -68,6 +68,7 @@ async function loadManifest(req, res, next) {
     if (!manifest) return next('route');
     if (isExpired(manifest)) {
       await storage.deleteShare(req.params.id);
+      if (manifest.ownerKey) await teacherActivities.forget('game', req.params.id);
       return res.status(410).render('game-share/expired', { title: 'Game Link Expired' });
     }
     req.gameShareManifest = manifest;

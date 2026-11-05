@@ -348,6 +348,31 @@ test('a share made while signed in is managed by its owner from any device, with
   }
 });
 
+test('opening an expired owned link deletes it and drops it from the owner’s activities', async function () {
+  var teacherActivities = require('../services/teacherActivities');
+  var storage = require('../services/gameShareStorage');
+  var original = { ownerKeyFor: teacherActivities.ownerKeyFor, repository: teacherActivities.repository };
+  var rows = [];
+  teacherActivities.ownerKeyFor = function (req) { return req.get('test-owner') || null; };
+  teacherActivities.repository = { add: async function (owner, item) { rows.push(Object.assign({ owner: owner }, item)); }, removeItem: async function (kind, id) { rows = rows.filter(function (row) { return row.id !== id; }); } };
+  try {
+    var published = await (await fetch(baseUrl + '/api/game-shares', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'test-owner': 'owner-a' },
+      body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, title: 'Old quiz', password: 'old-pw', data: validSentenceReorderData() })
+    })).json();
+    assert.equal(rows.length, 1);
+    var manifest = await storage.getManifest(published.shareId);
+    manifest.expiresAt = new Date(Date.now() - 1000).toISOString();
+    await storage.saveManifest(published.shareId, manifest);
+    assert.equal((await fetch(baseUrl + '/play/' + published.shareId)).status, 410);
+    assert.equal(await storage.getManifest(published.shareId), null);
+    assert.deepEqual(rows, []);
+  } finally {
+    teacherActivities.ownerKeyFor = original.ownerKeyFor;
+    teacherActivities.repository = original.repository;
+  }
+});
+
 test('free teachers get a membership notice instead of activity status or class results once limits are on', async function () {
   var membershipLimits = require('../services/membershipLimits');
   var original = { activities: membershipLimits.canUseMyActivities, results: membershipLimits.canViewQuizResults };

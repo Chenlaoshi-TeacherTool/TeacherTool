@@ -231,6 +231,7 @@ router.get('/book/:id', async function (req, res, next) {
 
     if (isExpired(manifest)) {
       await bookStorage.deleteBook(bookId);
+      if (manifest.ownerKey) await teacherActivities.forget('book', bookId);
       return res.status(410).render('book-generator/expired', { title: 'Book Expired' });
     }
 
@@ -267,6 +268,7 @@ router.post('/book/:id/unlock', async function (req, res, next) {
 
     if (isExpired(manifest)) {
       await bookStorage.deleteBook(bookId);
+      if (manifest.ownerKey) await teacherActivities.forget('book', bookId);
       return res.status(410).render('book-generator/expired', { title: 'Book Expired' });
     }
 
