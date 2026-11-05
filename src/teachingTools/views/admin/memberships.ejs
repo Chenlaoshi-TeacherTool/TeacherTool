@@ -52,6 +52,33 @@
             <td><%= teacher.codesUsed %></td>
             <td><%= teacher.activities %></td>
           </tr>
+          <tr>
+            <td colspan="8" style="background:#f8fafc;">
+              <% var events = teacher.events || []; %>
+              <% if (!events.length) { %>
+                <span style="color:#64748b;">No membership changes recorded.</span>
+              <% } else { %>
+                <details<%= lookup.teachers.length === 1 ? ' open' : '' %>>
+                  <summary>Membership history (<%= events.length %>)</summary>
+                  <table style="margin-top:8px;">
+                    <thead><tr><th>When (UTC)</th><th>Change</th><th>Days</th><th>Until before</th><th>Until after</th><th>By</th></tr></thead>
+                    <tbody>
+                      <% events.forEach(function (event) { %>
+                        <tr>
+                          <td><%= new Date(event.createdAt).toISOString().slice(0, 16).replace('T', ' ') %></td>
+                          <td><%= event.kind === 'trial' ? 'Free trial' : event.kind === 'code' ? 'Activation code' : event.kind === 'refund' ? 'Refund (code deactivated)' : event.kind %><%= event.batchLabel ? ' · ' + event.batchLabel : '' %></td>
+                          <td><%= event.days > 0 ? '+' + event.days : event.days %></td>
+                          <td><%= event.untilBefore ? day(event.untilBefore) : '—' %></td>
+                          <td><%= event.untilAfter ? day(event.untilAfter) : '—' %></td>
+                          <td><%= event.actor || (event.kind === 'refund' ? 'admin' : 'teacher / site') %></td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </details>
+              <% } %>
+            </td>
+          </tr>
         <% }) %>
       </tbody>
     </table>

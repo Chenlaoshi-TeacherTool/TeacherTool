@@ -49,10 +49,29 @@ async function save(owner, revision, content) {
 async function ensureTrial(owner, days) {
   var pool = await db.getPool();
   await pool.request().input('owner', db.sql.Char(64), owner).input('days', db.sql.Int, days).query(
-    'SET NOCOUNT ON; INSERT INTO dbo.teacher_library_access (owner_key, write_until, trial_started_at) ' +
+    'SET NOCOUNT ON; SET XACT_ABORT ON; BEGIN TRANSACTION; ' +
+    'INSERT INTO dbo.teacher_library_access (owner_key, write_until, trial_started_at) ' +
     'SELECT @owner, DATEADD(DAY, @days, SYSUTCDATETIME()), SYSUTCDATETIME() ' +
-    'WHERE NOT EXISTS (SELECT 1 FROM dbo.teacher_library_access WITH (UPDLOCK, HOLDLOCK) WHERE owner_key = @owner);'
+    'WHERE NOT EXISTS (SELECT 1 FROM dbo.teacher_library_access WITH (UPDLOCK, HOLDLOCK) WHERE owner_key = @owner); ' +
+    "IF @@ROWCOUNT = 1 INSERT INTO dbo.membership_events (owner_key, kind, days, until_after) SELECT @owner, 'trial', @days, write_until FROM dbo.teacher_library_access WHERE owner_key = @owner; " +
+    'COMMIT;'
   );
+}
+
+// Every recorded change to the end dates of these accounts, newest first (dbo.membership_events).
+async function listEvents(owners) {
+  if (!owners.length) return [];
+  var pool = await db.getPool();
+  var request = pool.request();
+  var names = owners.slice(0, 50).map(function (owner, index) { request.input('o' + index, db.sql.Char(64), owner); return '@o' + index; });
+  var result = await request.query(
+    'SELECT TOP 500 e.owner_key, e.kind, e.days, e.until_before, e.until_after, e.actor, e.created_at, c.batch_label ' +
+    'FROM dbo.membership_events e LEFT JOIN dbo.teacher_activation_codes c ON c.code_hash = e.code_hash ' +
+    'WHERE e.owner_key IN (' + names.join(', ') + ') ORDER BY e.created_at DESC, e.id DESC;'
+  );
+  return result.recordset.map(function (row) {
+    return { ownerKey: row.owner_key, kind: row.kind, days: row.days, untilBefore: row.until_before, untilAfter: row.until_after, actor: row.actor, createdAt: row.created_at, batchLabel: row.batch_label };
+  });
 }
 
 // Marks the code used and extends access from whichever is later: now or the current end date.
@@ -65,9 +84,11 @@ async function redeem(owner, codeHash) {
     'WHERE code_hash = @code AND redeemed_by IS NULL AND revoked_at IS NULL; ' +
     "IF NOT EXISTS (SELECT 1 FROM @used) BEGIN ROLLBACK; SELECT 'invalid' AS outcome; RETURN; END; " +
     'DECLARE @days INT = (SELECT TOP 1 days FROM @used); ' +
-    'IF EXISTS (SELECT 1 FROM dbo.teacher_library_access WITH (UPDLOCK, HOLDLOCK) WHERE owner_key = @owner) ' +
+    'DECLARE @before DATETIME2 = (SELECT write_until FROM dbo.teacher_library_access WITH (UPDLOCK, HOLDLOCK) WHERE owner_key = @owner); ' +
+    'IF @before IS NOT NULL ' +
     '  UPDATE dbo.teacher_library_access SET write_until = DATEADD(DAY, @days, CASE WHEN write_until > SYSUTCDATETIME() THEN write_until ELSE SYSUTCDATETIME() END) WHERE owner_key = @owner; ' +
     'ELSE INSERT INTO dbo.teacher_library_access (owner_key, write_until) VALUES (@owner, DATEADD(DAY, @days, SYSUTCDATETIME())); ' +
+    "INSERT INTO dbo.membership_events (owner_key, kind, days, until_before, until_after, code_hash) SELECT @owner, 'code', @days, @before, write_until, @code FROM dbo.teacher_library_access WHERE owner_key = @owner; " +
     "COMMIT; SELECT 'redeemed' AS outcome, @days AS days, write_until FROM dbo.teacher_library_access WHERE owner_key = @owner;"
   );
   var row = result.recordset[0];
@@ -108,7 +129,12 @@ async function revokeCode(codeHash, revokedBy) {
     "IF @days IS NULL BEGIN ROLLBACK; SELECT 'not-found' AS outcome; RETURN; END; " +
     "IF @revoked IS NOT NULL BEGIN ROLLBACK; SELECT 'already' AS outcome; RETURN; END; " +
     'UPDATE dbo.teacher_activation_codes SET revoked_at = SYSUTCDATETIME(), revoked_by = @by WHERE code_hash = @code; ' +
-    'IF @owner IS NOT NULL UPDATE dbo.teacher_library_access SET write_until = DATEADD(DAY, -@days, write_until) WHERE owner_key = @owner; ' +
+    'IF @owner IS NOT NULL ' +
+    'BEGIN ' +
+    '  DECLARE @before DATETIME2 = (SELECT write_until FROM dbo.teacher_library_access WITH (UPDLOCK, HOLDLOCK) WHERE owner_key = @owner); ' +
+    '  UPDATE dbo.teacher_library_access SET write_until = DATEADD(DAY, -@days, write_until) WHERE owner_key = @owner; ' +
+    "  INSERT INTO dbo.membership_events (owner_key, kind, days, until_before, until_after, code_hash, actor) SELECT @owner, 'refund', -@days, @before, write_until, @code, @by FROM dbo.teacher_library_access WHERE owner_key = @owner; " +
+    'END; ' +
     "COMMIT; SELECT 'revoked' AS outcome, @days AS days, CASE WHEN @owner IS NULL THEN 0 ELSE 1 END AS was_used, " +
     '(SELECT write_until FROM dbo.teacher_library_access WHERE owner_key = @owner) AS write_until;'
   );
@@ -116,4 +142,4 @@ async function revokeCode(codeHash, revokedBy) {
   return row.outcome === 'revoked' ? { outcome: 'revoked', days: row.days, wasUsed: Boolean(row.was_used), writeUntil: row.write_until } : { outcome: row.outcome };
 }
 
-module.exports = { revokeCode: revokeCode, load: load, hasActiveAccess: hasActiveAccess, save: save, ensureTrial: ensureTrial, redeem: redeem, createCodes: createCodes, listCodeBatches: listCodeBatches };
+module.exports = { listEvents: listEvents, revokeCode: revokeCode, load: load, hasActiveAccess: hasActiveAccess, save: save, ensureTrial: ensureTrial, redeem: redeem, createCodes: createCodes, listCodeBatches: listCodeBatches };

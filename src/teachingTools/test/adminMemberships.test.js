@@ -32,3 +32,19 @@ test('the memberships page finds teachers by email and shows their membership', 
   assert.match(await render({ search: { email: 'nobody', teachers: [] } }), /No account matches/);
   assert.doesNotMatch(await render({}), /No account matches/);
 });
+
+test('each teacher found shows their membership history', async function () {
+  var page = await render({ search: { email: 'lin', teachers: [
+    { email: 'lin@school.example', name: 'Ms Lin', createdAt: new Date(), lastSeenAt: new Date(), writeUntil: new Date('2027-11-04T00:00:00Z'), trialStartedAt: null, codesUsed: 1, activities: 0, events: [
+      { kind: 'refund', days: -365, untilBefore: new Date('2027-11-04T00:00:00Z'), untilAfter: new Date('2026-11-04T00:00:00Z'), actor: 'Admin Chen', createdAt: new Date('2026-11-06T00:00:00Z'), batchLabel: 'paypal 123' },
+      { kind: 'code', days: 365, untilBefore: new Date('2026-11-04T00:00:00Z'), untilAfter: new Date('2027-11-04T00:00:00Z'), actor: null, createdAt: new Date('2026-11-05T00:00:00Z'), batchLabel: 'paypal 123' },
+      { kind: 'trial', days: 3, untilBefore: null, untilAfter: null, actor: null, createdAt: new Date('2026-11-01T00:00:00Z') }
+    ] },
+    { email: 'lin2@school.example', name: '', createdAt: new Date(), lastSeenAt: new Date(), writeUntil: null, trialStartedAt: null, codesUsed: 0, activities: 0, events: [] }
+  ] } });
+  assert.match(page, /Membership history \(3\)/);
+  assert.match(page, /Refund \(code deactivated\) · paypal 123<\/td>\s*<td>-365<\/td>\s*<td>2027-11-04<\/td>\s*<td>2026-11-04<\/td>\s*<td>Admin Chen/);
+  assert.match(page, /Activation code · paypal 123<\/td>\s*<td>\+365/);
+  assert.match(page, /Free trial<\/td>\s*<td>\+3<\/td>\s*<td>—<\/td>\s*<td>—<\/td>\s*<td>teacher \/ site/);
+  assert.match(page, /No membership changes recorded/);
+});

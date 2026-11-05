@@ -1152,6 +1152,10 @@ router.get('/memberships', async function (req, res, next) {
   try {
     var email = String(req.query.email || '').trim().slice(0, 320);
     var teachers = email ? await teacherAccountsRepository.search(email) : null;
+    if (teachers && teachers.length) {
+      var events = await teacherLibraryRepository.listEvents(teachers.map(function (teacher) { return teacher.ownerKey; }));
+      teachers.forEach(function (teacher) { teacher.events = events.filter(function (event) { return event.ownerKey === teacher.ownerKey; }); });
+    }
     res.set('Cache-Control', 'private, no-store');
     res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser,
       search: { email: email, teachers: teachers } });

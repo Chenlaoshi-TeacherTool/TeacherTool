@@ -27,6 +27,10 @@ Part of the Azure SQL migration described in `docs/azure-architecture-migration.
 - `add-teacher-accounts.sql` — `teacher_accounts`: email, name, sign-up and last-seen dates per
   teacher account (same `owner_key`), filled in on sign-in. Used by the "Find a teacher" search at
   `/admin/memberships`. Not exposed through DAB. Run before deploying that feature.
+- `add-membership-events.sql` — `membership_events`: an add-only history of every change to a
+  teacher's cloud-saving end date (trial, activation code, refund), with the end date before and
+  after. Backfills past trials, codes and refunds from the existing tables. **Run before deploying**:
+  sign-in (trial), code redemption and refunds write to it inside their transactions and fail without it.
 - `dab-config.json` — Data API Builder configuration exposing all of the above tables as a
   read-only REST API for the public site, alongside direct-SQL writes from the admin CMS.
 
