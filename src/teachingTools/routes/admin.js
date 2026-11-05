@@ -12,6 +12,7 @@ var siteMap = require('../config/siteMap');
 var textbooks = require('../config/textbooks');
 var textbookImport = require('../services/textbookImport');
 var teacherLibraryRepository = require('../services/teacherLibraryRepository');
+var teacherAccountsRepository = require('../services/teacherAccountsRepository');
 var activationCodes = require('../services/activationCodes');
 var sql = sqlClient.sql;
 
@@ -1149,7 +1150,11 @@ router.post('/textbooks/lessons/:id/items/:itemId/delete', async function (req, 
 // Activation codes: shown once at creation, only their hashes are stored.
 router.get('/memberships', async function (req, res, next) {
   try {
-    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser });
+    var email = String(req.query.email || '').trim().slice(0, 320);
+    var teachers = email ? await teacherAccountsRepository.search(email) : null;
+    res.set('Cache-Control', 'private, no-store');
+    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser,
+      search: { email: email, teachers: teachers } });
   } catch (err) { next(err); }
 });
 

@@ -326,3 +326,45 @@ test('a saved game whose link expired gets a new link with the caller’s link l
     assert.equal(rows[0].id, '55555555-5555-4555-8555-555555555555');
   } finally { temporary.close(); }
 });
+
+test('signing in records the account with its email for admin lookups, without exposing the email', async function () {
+  var touched = [];
+  var app = express();
+  app.use(service.create({ accountsEnabled: function () { return true; }, enabled: function () { return false; },
+    getUser: function () { return { id: 'teacher', provider: 'teachers', name: 'Ms Lin', email: 'lin@school.example' }; },
+    accounts: { touch: async function (key, account) { touched.push([key, account]); } }, repository: repository }));
+  var temporary = app.listen(0, '127.0.0.1');
+  await new Promise(function (resolve) { temporary.once('listening', resolve); });
+  try {
+    var result = await (await fetch('http://127.0.0.1:' + temporary.address().port + '/session')).json();
+    assert.equal(result.signedIn, true);
+    assert.deepEqual(touched, [[owner('teacher', 'teachers'), { provider: 'teachers', email: 'lin@school.example', name: 'Ms Lin' }]]);
+    assert.equal(JSON.stringify(result).indexOf('lin@school.example'), -1);
+  } finally { temporary.close(); }
+});
+
+test('a failing account record does not block sign-in', async function () {
+  var app = express();
+  var originalError = console.error;
+  console.error = function () {};
+  app.use(service.create({ accountsEnabled: function () { return true; }, enabled: function () { return false; },
+    getUser: function () { return { id: 'teacher', provider: 'teachers', name: 'T' }; },
+    accounts: { touch: async function () { throw new Error('sql down'); } }, repository: repository }));
+  var temporary = app.listen(0, '127.0.0.1');
+  await new Promise(function (resolve) { temporary.once('listening', resolve); });
+  try {
+    var result = await (await fetch('http://127.0.0.1:' + temporary.address().port + '/session')).json();
+    assert.equal(result.signedIn, true);
+  } finally { temporary.close(); console.error = originalError; }
+});
+
+test('the sign-in email comes from Easy Auth claims, or from the principal name when it is an email', function () {
+  var auth = require('../services/authUser');
+  function request(headers) { return { get: function (name) { return headers[name]; } }; }
+  function principal(claims) { return Buffer.from(JSON.stringify({ auth_typ: 'teachers', claims: claims })).toString('base64'); }
+  assert.equal(auth.emailFrom(request({ 'x-ms-client-principal': principal([{ typ: 'name', val: 'Ms Lin' }, { typ: 'email', val: 'Lin@School.example' }]) })), 'lin@school.example');
+  assert.equal(auth.emailFrom(request({ 'x-ms-client-principal': principal([{ typ: 'preferred_username', val: 'a@b.example' }]) })), 'a@b.example');
+  assert.equal(auth.emailFrom(request({ 'x-ms-client-principal-name': 'C@D.example' })), 'c@d.example');
+  assert.equal(auth.emailFrom(request({ 'x-ms-client-principal-name': 'Ms Lin', 'x-ms-client-principal': 'not base64 json' })), null);
+  assert.equal(auth.emailFrom(request({ 'x-ms-client-principal': principal([{ typ: 'email', val: 'not-an-email' }]) })), null);
+});

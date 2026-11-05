@@ -24,6 +24,9 @@ Part of the Azure SQL migration described in `docs/azure-architecture-migration.
 - `add-teacher-activity-payload.sql` — adds `payload`, `game_version` and `expires_at` to
   `teacher_activities`, so a game stays in the account after its link expires and My activities can
   make a new link. Run before deploying that feature (the app writes these columns).
+- `add-teacher-accounts.sql` — `teacher_accounts`: email, name, sign-up and last-seen dates per
+  teacher account (same `owner_key`), filled in on sign-in. Used by the "Find a teacher" search at
+  `/admin/memberships`. Not exposed through DAB. Run before deploying that feature.
 - `dab-config.json` — Data API Builder configuration exposing all of the above tables as a
   read-only REST API for the public site, alongside direct-SQL writes from the admin CMS.
 

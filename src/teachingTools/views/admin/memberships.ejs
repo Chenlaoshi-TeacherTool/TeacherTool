@@ -25,7 +25,40 @@
   </div>
 <% } %>
 
-<h2 style="font-size:1.1rem;">Create codes</h2>
+<% var lookup = typeof search !== 'undefined' && search ? search : { email: '', teachers: null }; %>
+<h2 style="font-size:1.1rem;">Find a teacher</h2>
+<p>Search by the email the teacher signed up with (for example the one in their PayPal note). Accounts appear here after the teacher signs in once.</p>
+<form method="GET" action="/admin/memberships">
+  <label for="teacherEmail">Email (or part of it)</label>
+  <input id="teacherEmail" name="email" type="search" maxlength="320" value="<%= lookup.email %>" autocomplete="off" required>
+  <div class="actions"><button type="submit">Search</button></div>
+</form>
+<% if (lookup.teachers) { %>
+  <% if (!lookup.teachers.length) { %>
+    <p>No account matches “<%= lookup.email %>”. The teacher may not have signed in yet, or signed up with a different email.</p>
+  <% } else { %>
+    <% var day = function (value) { return value ? new Date(value).toISOString().slice(0, 10) : '—'; }; %>
+    <table>
+      <thead><tr><th>Email</th><th>Name</th><th>Signed up</th><th>Last seen</th><th>Cloud saving until</th><th>Trial</th><th>Codes used</th><th>Activities</th></tr></thead>
+      <tbody>
+        <% lookup.teachers.forEach(function (teacher) { var active = teacher.writeUntil && new Date(teacher.writeUntil) > new Date(); %>
+          <tr>
+            <td><%= teacher.email || '(none)' %></td>
+            <td><%= teacher.name || '' %></td>
+            <td><%= day(teacher.createdAt) %></td>
+            <td><%= day(teacher.lastSeenAt) %></td>
+            <td><strong style="color:<%= active ? '#15803d' : '#b91c1c' %>"><%= day(teacher.writeUntil) %><%= teacher.writeUntil ? (active ? ' (active)' : ' (ended)') : '' %></strong></td>
+            <td><%= teacher.trialStartedAt ? day(teacher.trialStartedAt) : '—' %></td>
+            <td><%= teacher.codesUsed %></td>
+            <td><%= teacher.activities %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+<% } %>
+
+<h2 style="font-size:1.1rem;margin-top:28px;">Create codes</h2>
 <form method="POST" action="/admin/memberships/codes">
   <label for="days">Plan</label>
   <select id="days" name="days" required>

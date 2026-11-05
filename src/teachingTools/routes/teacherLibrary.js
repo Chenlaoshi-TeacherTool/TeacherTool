@@ -30,6 +30,7 @@ function ownerKey(user) {
 function create(options) {
   options = options || {};
   var store = options.repository || repository;
+  var accounts = options.accounts || require('../services/teacherAccountsRepository');
   var getUser = options.getUser || trustedUser;
   var accountsEnabled = options.accountsEnabled || options.enabled || function () { return process.env.TEACHER_ACCOUNTS_ENABLED === 'true' && Boolean(process.env.WEBSITE_INSTANCE_ID) && auth.azureAuthEnabled(); };
   var enabled = options.enabled || function () { return accountsEnabled() && process.env.LIBRARY_CLOUD_ENABLED === 'true'; };
@@ -49,6 +50,11 @@ function create(options) {
     var user = available ? getUser(req) : null;
     var saved = null;
     var cloudAvailable = enabled();
+    // Best effort: remembers who this account is (email, name) for admin lookups.
+    if (user && (options.accounts || process.env.SQL_CONNECTION_STRING)) {
+      try { await accounts.touch(ownerKey(user), { provider: user.provider, email: user.email, name: user.name }); }
+      catch (error) { console.error('teacher account record error:', error.message); }
+    }
     try {
       if (user && cloudAvailable) {
         await store.ensureTrial(ownerKey(user), trialDays);
