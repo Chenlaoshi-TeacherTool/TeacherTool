@@ -122,6 +122,7 @@ function create(options) {
   var activities = options.activities || require('../services/teacherActivitiesRepository');
   var stores = options.stores || { game: require('../services/gameShareStorage'), book: require('../services/bookGeneratorStorage') };
   var limits = options.limits || require('../services/membershipLimits');
+  var publisher = options.publisher || require('../services/gameSharePublisher');
   async function membersOnly(req, res) {
     if (await limits.canUseMyActivities(req)) return false;
     res.status(403).json({ error: 'My activities is part of the teacher membership.', membersOnly: true });
@@ -134,10 +135,39 @@ function create(options) {
     return a.length > 0 && a.length === b.length && crypto.timingSafeEqual(a, b);
   }
 
+  // Every account sees its own list, so teachers whose membership ended keep
+  // their activities. Link status, class results and claiming stay members-only.
   router.get('/activities', async function (req, res) {
-    if (await membersOnly(req, res)) return;
-    try { res.json({ activities: await activities.list(req.libraryOwner) }); }
-    catch (error) { res.status(503).json({ error: 'Your activities could not be loaded right now.' }); }
+    try {
+      var member = await limits.canUseMyActivities(req);
+      res.json({ activities: await activities.list(req.libraryOwner), member: Boolean(member) });
+    } catch (error) { res.status(503).json({ error: 'Your activities could not be loaded right now.' }); }
+  });
+
+  // A new link for a saved game whose link expired. Non-members get the free link lifetime.
+  router.post('/activities/game/:id/relink', express.json({ limit: '2kb' }), async function (req, res) {
+    if (!activityRequest(req)) return res.status(403).json({ error: 'Requests must come from this website.' });
+    if (!/^[a-zA-Z0-9-]{1,64}$/.test(req.params.id)) return res.status(400).json({ error: 'Unknown activity.' });
+    var password = req.body && req.body.password;
+    try { publisher.checkPassword(password); }
+    catch (error) { return res.status(400).json({ error: error.message }); }
+    try {
+      var saved = await activities.getGame(req.libraryOwner, req.params.id);
+      if (!saved) return res.status(404).json({ error: 'This activity has no saved content. Create it again from the tool.' });
+      var current = stores.game.validShareId(req.params.id) ? await stores.game.getManifest(req.params.id) : null;
+      if (current && !expired(current)) return res.status(409).json({ error: 'This link still works. Copy it instead of making a new one.' });
+      var manifest = await publisher.publish({ gameType: saved.gameType, version: saved.version, title: saved.title, data: saved.payload, password: password,
+        owner: req.libraryOwner, lifetimeMs: await limits.shareLifetimeMs(req) });
+      if (current) await stores.game.deleteShare(req.params.id);
+      if (!(await activities.relink(req.libraryOwner, req.params.id, manifest.shareId, manifest.expiresAt))) {
+        await stores.game.deleteShare(manifest.shareId);
+        return res.status(404).json({ error: 'This activity was removed.' });
+      }
+      res.status(201).json({ id: manifest.shareId, url: '/play/' + manifest.shareId, deleteToken: manifest.deleteToken, expiresAt: manifest.expiresAt, createdAt: manifest.createdAt });
+    } catch (error) {
+      if (error.status === 400 || error.status === 413) return res.status(400).json({ error: 'This saved activity can no longer be shared. Create it again from the tool.' });
+      res.status(503).json({ error: 'A new link could not be created right now. Please try again.' });
+    }
   });
 
   // Adds activities this browser created (proved by their delete tokens) to the signed-in account.
@@ -157,7 +187,8 @@ function create(options) {
           manifest.ownerKey = req.libraryOwner;
           await stores[kind].saveManifest(id, manifest);
         }
-        await activities.add(req.libraryOwner, { kind: kind, id: id, gameType: kind === 'book' ? 'book' : manifest.gameType, title: manifest.title, createdAt: manifest.createdAt });
+        await activities.add(req.libraryOwner, { kind: kind, id: id, gameType: kind === 'book' ? 'book' : manifest.gameType, title: manifest.title, createdAt: manifest.createdAt,
+          expiresAt: manifest.expiresAt, version: kind === 'game' ? manifest.version : null, payload: kind === 'game' ? manifest.payload : null });
         added += 1;
       }
       res.json({ added: added, skipped: skipped });

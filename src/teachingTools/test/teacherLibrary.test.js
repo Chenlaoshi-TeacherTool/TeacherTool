@@ -255,19 +255,74 @@ test('signed-in teachers list, claim, and remove their shared activities; tokens
   } finally { temporary.close(); }
 });
 
-test('the account activity list and claim are members-only when limits say so', async function () {
+test('accounts without membership still see their own list, but claiming stays members-only', async function () {
   var app = express();
   app.use(service.create({ repository: repository, enabled: function () { return true; }, origin: 'https://teachers.example', providers: ['aad'],
-    activities: { list: async function () { return []; }, add: async function () {} }, limits: { canUseMyActivities: async function () { return false; } },
+    activities: { list: async function () { return [{ kind: 'game', id: 'x', title: 'Kept' }]; }, add: async function () {} }, limits: { canUseMyActivities: async function () { return false; } },
     getUser: function () { return { id: 'free', name: 'free', provider: 'aad' }; } }));
   var temporary = app.listen(0, '127.0.0.1');
   await new Promise(function (resolve) { temporary.once('listening', resolve); });
   var url = 'http://127.0.0.1:' + temporary.address().port;
   try {
     var list = await fetch(url + '/activities');
-    assert.equal(list.status, 403);
-    assert.equal((await list.json()).membersOnly, true);
+    assert.equal(list.status, 200);
+    var body = await list.json();
+    assert.equal(body.member, false);
+    assert.deepEqual(body.activities.map(function (row) { return row.title; }), ['Kept']);
     var claim = await fetch(url + '/activities/claim', { method: 'POST', headers: { 'Content-Type': 'application/json', origin: 'https://teachers.example', 'x-library-request': 'activities' }, body: JSON.stringify({ items: [] }) });
     assert.equal(claim.status, 403);
+  } finally { temporary.close(); }
+});
+
+test('a saved game whose link expired gets a new link with the caller’s link lifetime', async function () {
+  var OLD = '33333333-3333-4333-8333-333333333333';
+  var LIVE = '44444444-4444-4444-8444-444444444444';
+  var rows = [
+    { owner: owner('alice'), kind: 'game', id: OLD, gameType: 'sentence-reorder', version: 1, title: 'Old quiz', payload: { sentences: [] } },
+    { owner: owner('alice'), kind: 'game', id: LIVE, gameType: 'sentence-reorder', version: 1, title: 'Live quiz', payload: { sentences: [] } },
+    { owner: owner('alice'), kind: 'game', id: 'legacy-no-content', gameType: 'word-sudoku', title: 'Legacy' }
+  ];
+  var manifests = {};
+  manifests[OLD] = { expiresAt: '2000-01-01T00:00:00.000Z' };
+  manifests[LIVE] = { expiresAt: '2099-01-01T00:00:00.000Z' };
+  var deleted = [];
+  var published = [];
+  var activityRepo = {
+    list: async function () { return rows; },
+    getGame: async function (key, id) { var row = rows.find(function (entry) { return entry.owner === key && entry.id === id && entry.payload; }); return row ? { gameType: row.gameType, version: row.version, title: row.title, payload: row.payload } : null; },
+    relink: async function (key, oldId, newId, expiresAt) { var row = rows.find(function (entry) { return entry.owner === key && entry.id === oldId; }); if (!row) return false; row.id = newId; row.expiresAt = expiresAt; return true; }
+  };
+  var app = express();
+  app.use(service.create({ repository: repository, enabled: function () { return true; }, origin: 'https://teachers.example', providers: ['aad'], activities: activityRepo,
+    stores: { game: { validShareId: function (id) { return /^[0-9a-f-]{36}$/.test(id); }, getManifest: async function (id) { return manifests[id] || null; }, deleteShare: async function (id) { deleted.push(id); delete manifests[id]; } } },
+    limits: { canUseMyActivities: async function () { return false; }, shareLifetimeMs: async function () { return 7 * 86400000; } },
+    publisher: {
+      checkPassword: function (password) { if (typeof password !== 'string' || password.length < 4) { var error = new Error('Password must be between 4 and 64 characters.'); error.status = 400; throw error; } },
+      publish: async function (options) { published.push(options); return { shareId: '55555555-5555-4555-8555-555555555555', deleteToken: 'new-token', createdAt: '2026-11-05T00:00:00.000Z', expiresAt: new Date(Date.now() + options.lifetimeMs).toISOString() }; }
+    },
+    getUser: function (req) { return req.get('test-user') ? { id: req.get('test-user'), name: req.get('test-user'), provider: 'aad' } : null; } }));
+  var temporary = app.listen(0, '127.0.0.1');
+  await new Promise(function (resolve) { temporary.once('listening', resolve); });
+  var url = 'http://127.0.0.1:' + temporary.address().port;
+  function relink(id, user, body, extra) {
+    return fetch(url + '/activities/game/' + id + '/relink', { method: 'POST', headers: Object.assign({ 'test-user': user, 'Content-Type': 'application/json', origin: 'https://teachers.example', 'x-library-request': 'activities' }, extra), body: JSON.stringify(body) });
+  }
+  try {
+    assert.equal((await relink(OLD, 'alice', { password: 'new-pw' }, { origin: 'https://evil.example' })).status, 403);
+    assert.equal((await relink(OLD, 'alice', { password: 'x' })).status, 400);
+    assert.equal((await relink(OLD, 'bob', { password: 'new-pw' })).status, 404, 'another account cannot reuse it');
+    assert.equal((await relink('legacy-no-content', 'alice', { password: 'new-pw' })).status, 404);
+    assert.equal((await relink(LIVE, 'alice', { password: 'new-pw' })).status, 409);
+    var response = await relink(OLD, 'alice', { password: 'new-pw' });
+    assert.equal(response.status, 201);
+    var result = await response.json();
+    assert.equal(result.url, '/play/55555555-5555-4555-8555-555555555555');
+    assert.equal(published.length, 1);
+    assert.equal(published[0].owner, owner('alice'));
+    assert.equal(published[0].lifetimeMs, 7 * 86400000);
+    assert.deepEqual(published[0].data, { sentences: [] });
+    assert.equal(published[0].title, 'Old quiz');
+    assert.deepEqual(deleted, [OLD], 'the expired link’s leftovers are removed');
+    assert.equal(rows[0].id, '55555555-5555-4555-8555-555555555555');
   } finally { temporary.close(); }
 });

@@ -32,9 +32,16 @@ var api = {
     catch (error) { console.error('teacher activity record error:', error.message); }
   },
 
+  // The link was deleted on purpose: the activity goes too.
   forget: async function (kind, id) {
     try { await api.repository.removeItem(kind, id); }
     catch (error) { console.error('teacher activity forget error:', error.message); }
+  },
+
+  // The link expired: games with saved content stay so a new link can be made.
+  linkExpired: async function (kind, id) {
+    try { await api.repository.linkExpired(kind, id); }
+    catch (error) { console.error('teacher activity expiry error:', error.message); }
   }
 };
 

@@ -9,7 +9,8 @@
 .activities-status { min-height: 1.4em; margin: 16px 0 0; color: var(--muted); font-size: 13px; }
 .activity-list { display: grid; gap: 12px; margin: 12px 0 0; padding: 0; list-style: none; }
 .activity-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 16px 18px; border: 1px solid #e5ddc9; border-radius: 16px; background: #fffdf7; }
-.activity-card.is-gone { opacity: .7; background: #f6f4ee; }
+.activity-card.is-gone { background: #f6f4ee; }
+.activity-card.is-gone > :not(.activity-actions) { opacity: .7; }
 .activity-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: #edf5df; font-size: 26px; }
 .activity-body h3 { margin: 0; color: #194f45; font-size: 17px; overflow-wrap: anywhere; }
 .activity-meta { margin: 4px 0 0; color: var(--muted); font-size: 13px; }

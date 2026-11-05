@@ -46,7 +46,7 @@ test('removes expired shares and stale drafts, keeps live ones, and forgets owne
   var summary = await cleanup.run({
     now: NOW,
     kinds: [games, books],
-    activities: { forget: async function (kind, id) { forgotten.push(kind + ':' + id); } }
+    activities: { linkExpired: async function (kind, id) { forgotten.push(kind + ':' + id); } }
   });
 
   assert.deepEqual(games.removed, ['expired-owned', 'expired-anon']);
@@ -67,7 +67,7 @@ test('one failing item does not stop the rest', async function () {
   var originalError = console.error;
   console.error = function () {};
   try {
-    var summary = await cleanup.run({ now: NOW, kinds: [games], activities: { forget: async function () {} } });
+    var summary = await cleanup.run({ now: NOW, kinds: [games], activities: { linkExpired: async function () {} } });
     assert.deepEqual(games.removed, ['expired']);
     assert.equal(summary.failed, 1);
   } finally { console.error = originalError; }

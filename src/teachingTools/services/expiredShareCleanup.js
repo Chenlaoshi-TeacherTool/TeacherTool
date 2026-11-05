@@ -1,7 +1,8 @@
 'use strict';
 
-// Deletes shared games and books whose links have expired, and drops them from
-// the owners' My activities list. Links are also removed when someone opens an
+// Deletes shared games and books whose links have expired. Owned games keep
+// their My activities entry (with the saved content) so the teacher can make a
+// new link; books are dropped from the list. Links are also removed when someone opens an
 // expired one, but links nobody opens again would otherwise stay in storage forever.
 // Book folders without a manifest are unpublished drafts; they go once untouched
 // for DRAFT_MAX_AGE_MS.
@@ -45,7 +46,7 @@ async function run(options) {
         var manifest = await store.getManifest(folder.id);
         if (!manifest || !isExpired(manifest, now)) { summary.kept += 1; continue; }
         await store.remove(folder.id);
-        if (manifest.ownerKey) await activities.forget(store.kind, folder.id);
+        if (manifest.ownerKey) await activities.linkExpired(store.kind, folder.id);
         summary.deleted += 1;
       } catch (error) {
         summary.failed += 1;

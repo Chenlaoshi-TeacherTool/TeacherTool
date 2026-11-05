@@ -8,10 +8,10 @@ var storage = require('../services/gameShareStorage');
 var membershipLimits = require('../services/membershipLimits');
 var ExcelJS = require('exceljs');
 var teacherActivities = require('../services/teacherActivities');
+var publisher = require('../services/gameSharePublisher');
 
 var router = express.Router();
 var AUTH_COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
-var MAX_GAME_DATA_BYTES = 64 * 1024;
 var ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
 var MAX_ATTEMPTS = 10;
 var attempts = new Map();
@@ -22,16 +22,6 @@ function isExpired(manifest) {
 
 function cookieName(shareId) {
   return 'game_auth_' + shareId;
-}
-
-function cleanTitle(value) {
-  var title = typeof value === 'string' ? value.trim() : '';
-  if (title.length > 120) {
-    var error = new Error('Title must be 120 characters or fewer.');
-    error.status = 400;
-    throw error;
-  }
-  return title || 'Shared Classroom Game';
 }
 
 function safeEqual(left, right) {
@@ -68,7 +58,7 @@ async function loadManifest(req, res, next) {
     if (!manifest) return next('route');
     if (isExpired(manifest)) {
       await storage.deleteShare(req.params.id);
-      if (manifest.ownerKey) await teacherActivities.forget('game', req.params.id);
+      if (manifest.ownerKey) await teacherActivities.linkExpired('game', req.params.id);
       return res.status(410).render('game-share/expired', { title: 'Game Link Expired' });
     }
     req.gameShareManifest = manifest;
@@ -81,44 +71,21 @@ async function loadManifest(req, res, next) {
 router.post('/api/game-shares', async function (req, res) {
   try {
     var body = req.body || {};
-    var password = typeof body.password === 'string' ? body.password : '';
-    if (password.length < 4 || password.length > 64) {
-      return res.status(400).json({ error: 'Password must be between 4 and 64 characters.' });
-    }
-
-    var adapter = registry.get(body.gameType, body.version);
-    if (!adapter) return res.status(400).json({ error: 'This game type or version is not supported.' });
-    if (Buffer.byteLength(JSON.stringify(body.data || null), 'utf8') > MAX_GAME_DATA_BYTES) {
-      return res.status(413).json({ error: 'Game data is too large to share.' });
-    }
-
-    var payload = adapter.sanitize(body.data);
-    var now = new Date();
-    var shareId = crypto.randomUUID();
     var owner = teacherActivities.ownerKeyFor(req);
-    var manifest = {
-      shareId: shareId,
-      gameType: adapter.type,
-      version: adapter.version,
-      title: cleanTitle(body.title || payload.title),
-      passwordHash: await bcrypt.hash(password, 10),
-      deleteToken: crypto.randomUUID(),
-      createdAt: now.toISOString(),
-      expiresAt: new Date(now.getTime() + await membershipLimits.shareLifetimeMs(req)).toISOString(),
-      payload: payload
-    };
-    if (owner) manifest.ownerKey = owner;
-
-    await storage.saveManifest(shareId, manifest);
-    await teacherActivities.record(owner, { kind: 'game', id: shareId, gameType: adapter.type, title: manifest.title, createdAt: manifest.createdAt });
+    var manifest = await publisher.publish({
+      gameType: body.gameType, version: body.version, title: body.title, data: body.data, password: body.password,
+      owner: owner, lifetimeMs: await membershipLimits.shareLifetimeMs(req)
+    });
+    await teacherActivities.record(owner, { kind: 'game', id: manifest.shareId, gameType: manifest.gameType, version: manifest.version, title: manifest.title,
+      createdAt: manifest.createdAt, expiresAt: manifest.expiresAt, payload: manifest.payload });
     res.status(201).json({
-      shareId: shareId,
-      url: '/play/' + shareId,
+      shareId: manifest.shareId,
+      url: '/play/' + manifest.shareId,
       deleteToken: manifest.deleteToken,
       expiresAt: manifest.expiresAt
     });
   } catch (error) {
-    if (error.status === 400) return res.status(400).json({ error: error.message });
+    if (error.status === 400 || error.status === 413) return res.status(error.status).json({ error: error.message });
     console.error('game-share publish error:', error);
     res.status(500).json({ error: 'Could not create the game link.' });
   }

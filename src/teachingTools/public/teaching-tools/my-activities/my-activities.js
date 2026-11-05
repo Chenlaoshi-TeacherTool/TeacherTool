@@ -19,6 +19,9 @@
   var activities = [];
   var accountReady = false;
   var membersOnlyView = false;
+  // Signed in without an active membership: the account's own list only, with
+  // link dates from the account and new links instead of status checks.
+  var basicView = false;
 
   // Free accounts (once membership limits are on): explain instead of listing.
   function showMembersOnly() {
@@ -77,6 +80,41 @@
     var input = document.createElement('textarea'); input.value = text; document.body.appendChild(input); input.select(); document.execCommand('copy'); input.remove();
   }
 
+  // A new link for a saved game whose link expired (any signed-in account).
+  async function relink(item, trigger) {
+    var password = window.prompt(t('Choose a password for the new link (4–64 characters). Students type it to open the game.'));
+    if (password === null) return;
+    if (password.length < 4 || password.length > 64) { find('activitiesStatus').textContent = t('The password must be 4–64 characters.'); return; }
+    trigger.disabled = true;
+    try {
+      var response = await fetch('/api/teacher-library/activities/game/' + encodeURIComponent(item.id) + '/relink', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Library-Request': 'activities' }, body: JSON.stringify({ password: password })
+      });
+      if (!response.ok) throw new Error(response.status === 409 ? 'live' : response.status === 400 ? 'invalid' : 'failed');
+      var result = await response.json();
+      var oldId = item.id;
+      item.id = result.id;
+      item.url = location.origin + result.url;
+      item.token = result.deleteToken;
+      item.createdAt = result.createdAt;
+      item.expiresAt = result.expiresAt;
+      item.status = { exists: true, expiresAt: result.expiresAt };
+      write(SHARES_KEY, read(SHARES_KEY).filter(function (entry) { return entry.shareId !== oldId; }).concat([{
+        shareId: result.id, gameType: item.type, title: item.title, url: item.url, deleteToken: result.deleteToken, createdAt: result.createdAt, expiresAt: result.expiresAt
+      }]));
+      activities.sort(function (left, right) { return String(right.createdAt || '').localeCompare(String(left.createdAt || '')); });
+      var copied = true;
+      try { await copy(item.url); } catch (error) { copied = false; }
+      render();
+      find('activitiesStatus').textContent = copied ? t('New link created and copied.') : t('New link created.');
+    } catch (error) {
+      trigger.disabled = false;
+      find('activitiesStatus').textContent = error.message === 'live' ? t('This link still works. Reload the page to copy it.')
+        : error.message === 'invalid' ? t('This saved activity can no longer be shared. Create it again from the tool.')
+        : t('A new link could not be created right now. Please try again.');
+    }
+  }
+
   function forget(item) {
     if (item.inAccount) fetch('/api/teacher-library/activities/' + item.kind + '/' + encodeURIComponent(item.id), { method: 'DELETE', headers: { 'X-Library-Request': 'activities' } }).catch(function () {});
     if (item.kind === 'game') write(SHARES_KEY, read(SHARES_KEY).filter(function (entry) { return entry.shareId !== item.id; }));
@@ -121,6 +159,11 @@
 
     var actions = element('div', '', 'activity-actions');
     if (gone) {
+      if (item.canRelink) {
+        var again = button(t('Create new link'), 'small-button is-primary');
+        again.addEventListener('click', function () { relink(item, again); });
+        actions.appendChild(again);
+      }
       var clear = button(t('Remove from list'), 'small-button');
       clear.addEventListener('click', function () { forget(item); });
       actions.appendChild(clear);
@@ -176,14 +219,25 @@
     var response = await fetch('/api/teacher-library/activities', { credentials: 'same-origin', cache: 'no-store' });
     if (response.status === 403 && (await response.json().catch(function () { return {}; })).membersOnly) { membersOnlyView = true; return; }
     if (!response.ok) return;
+    var account = await response.json();
+    // Not a member: only the account's own list (browser-only links need membership).
+    if (account.member === false) { basicView = true; activities = []; }
     var byId = Object.create(null);
     activities.forEach(function (item) { byId[item.kind + ':' + item.id] = item; });
-    (await response.json()).activities.forEach(function (row) {
+    account.activities.forEach(function (row) {
       var key = row.kind + ':' + row.id;
-      if (byId[key]) { byId[key].inAccount = true; return; }
+      if (byId[key]) { byId[key].inAccount = true; byId[key].canRelink = Boolean(row.canRelink); return; }
       var type = row.kind === 'book' ? 'book' : (TYPES[row.gameType] ? row.gameType : 'sentence-reorder');
-      activities.push({ kind: row.kind, id: row.id, type: type, title: row.title, url: location.origin + (row.kind === 'book' ? '/book/' : '/play/') + row.id, token: null, createdAt: row.createdAt, expiresAt: null, inAccount: true });
+      activities.push({ kind: row.kind, id: row.id, type: type, title: row.title, url: location.origin + (row.kind === 'book' ? '/book/' : '/play/') + row.id, token: null, createdAt: row.createdAt,
+        expiresAt: row.expiresAt || null, inAccount: true, canRelink: Boolean(row.canRelink) });
     });
+    if (basicView) {
+      if (!activities.length) { membersOnlyView = true; return; }
+      // Link dates come from the account; an unknown date is shown without a badge.
+      activities.forEach(function (item) { item.status = { exists: !item.expiresAt || new Date(item.expiresAt).getTime() > Date.now(), expiresAt: item.expiresAt }; });
+      showBanner(t('Your membership has ended. Your activities are kept, and you can make a new 7-day link for any game. Members also get 180-day links, link status, and class quiz results.'),
+        t('See membership plans'), function () { location.href = '/membership'; });
+    }
     activities.sort(function (left, right) { return String(right.createdAt || '').localeCompare(String(left.createdAt || '')); });
     accountReady = true;
   }
@@ -224,6 +278,7 @@
     if (membersOnlyView) return showMembersOnly();
     render();
     if (!activities.length) { find('activitiesStatus').textContent = ''; return; }
+    if (basicView) { find('activitiesStatus').textContent = activities.length + t(' activities.'); return; }
     try {
       await loadStatus(activities);
       find('activitiesStatus').textContent = activities.length + (accountReady ? t(' activities.') : t(' activities shared from this browser.'));

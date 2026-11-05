@@ -348,25 +348,40 @@ test('a share made while signed in is managed by its owner from any device, with
   }
 });
 
-test('opening an expired owned link deletes it and drops it from the owner’s activities', async function () {
+test('an expired owned link is deleted but its saved game stays in the account and can be shared again', async function () {
   var teacherActivities = require('../services/teacherActivities');
   var storage = require('../services/gameShareStorage');
+  var publisher = require('../services/gameSharePublisher');
   var original = { ownerKeyFor: teacherActivities.ownerKeyFor, repository: teacherActivities.repository };
   var rows = [];
   teacherActivities.ownerKeyFor = function (req) { return req.get('test-owner') || null; };
-  teacherActivities.repository = { add: async function (owner, item) { rows.push(Object.assign({ owner: owner }, item)); }, removeItem: async function (kind, id) { rows = rows.filter(function (row) { return row.id !== id; }); } };
+  teacherActivities.repository = {
+    add: async function (owner, item) { rows.push(Object.assign({ owner: owner }, item)); },
+    removeItem: async function (kind, id) { rows = rows.filter(function (row) { return row.id !== id; }); },
+    linkExpired: async function (kind, id) { rows = rows.filter(function (row) { return row.id !== id || row.payload; }); }
+  };
   try {
     var published = await (await fetch(baseUrl + '/api/game-shares', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'test-owner': 'owner-a' },
       body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, title: 'Old quiz', password: 'old-pw', data: validSentenceReorderData() })
     })).json();
     assert.equal(rows.length, 1);
+    assert.equal(rows[0].version, 1);
+    assert.ok(rows[0].expiresAt);
     var manifest = await storage.getManifest(published.shareId);
     manifest.expiresAt = new Date(Date.now() - 1000).toISOString();
     await storage.saveManifest(published.shareId, manifest);
     assert.equal((await fetch(baseUrl + '/play/' + published.shareId)).status, 410);
     assert.equal(await storage.getManifest(published.shareId), null);
-    assert.deepEqual(rows, []);
+    assert.equal(rows.length, 1, 'the activity and its content stay in the account');
+
+    // The saved (already cleaned) content passes validation again for a new link.
+    var again = await publisher.publish({ gameType: rows[0].gameType, version: rows[0].version, title: rows[0].title, data: rows[0].payload, password: 'new-pw', owner: 'owner-a', lifetimeMs: 7 * 86400000 });
+    assert.deepEqual(again.payload, rows[0].payload);
+    assert.equal((await fetch(baseUrl + '/play/' + again.shareId)).status, 200);
+    var sudoku = await publisher.publish({ gameType: 'word-sudoku', version: 1, data: validGameData(), password: 'pw-1234', lifetimeMs: 1000 });
+    var sudokuAgain = await publisher.publish({ gameType: 'word-sudoku', version: 1, data: sudoku.payload, password: 'pw-1234', lifetimeMs: 1000 });
+    assert.deepEqual(sudokuAgain.payload, sudoku.payload);
   } finally {
     teacherActivities.ownerKeyFor = original.ownerKeyFor;
     teacherActivities.repository = original.repository;
