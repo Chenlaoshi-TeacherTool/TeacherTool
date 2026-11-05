@@ -29,8 +29,10 @@
       var entry = session.login[0].url;
       if (entry.indexOf('/.auth/login/') !== 0) return;
       entry = returnHere(entry, 'post_login_redirect_uri');
-      // Sign up opens the sign-up page directly instead of the sign-in page.
-      if (mode === 'register') { var signup = new URL(entry, location.origin); signup.searchParams.set('prompt', 'create'); entry = signup.pathname + signup.search; }
+      // Sign up opens the sign-up page directly. Log in always asks for the email, skipping Microsoft's
+      // remembered-account picker, which loops forever on an account that was deleted; an email with no
+      // account then gets Microsoft's "No account? Create one" link.
+      var start = new URL(entry, location.origin); start.searchParams.set('prompt', mode === 'register' ? 'create' : 'login'); entry = start.pathname + start.search;
       dialog.appendChild(link(labels.email, entry));
       // Google sign-up is on hold (External ID fails to create Google accounts); shown only if re-enabled.
       if ((session.methods || []).includes('google')) dialog.append(link(labels.google, entry), node('p', labels.googleHelp), node('p', labels.sameEmail));
