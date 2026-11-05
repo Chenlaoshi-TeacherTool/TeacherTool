@@ -109,7 +109,6 @@
         var path = link.getAttribute('href');
         var active = path === '/' ? currentPath === '/' : currentPath === path || currentPath.indexOf(path + '/') === 0;
         if (libraryPage && path === '/teaching-tools') active = false;
-        if (path === '/teaching-tools/word-list-library/word-list-library.html') active = libraryPage;
         if (active) link.setAttribute('aria-current', 'page');
       });
       document.body.prepend(nav);

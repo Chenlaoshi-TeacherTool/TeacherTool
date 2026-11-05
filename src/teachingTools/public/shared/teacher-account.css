@@ -15,5 +15,5 @@
 #teacherAccountDialog .teacher-account-close { position: absolute; top: 16px; right: 16px; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid #c9d8c1; border-radius: 50%; background: #edf5df; color: #194f45; font-size: 22px; line-height: 1; cursor: pointer; }
 #teacherAccountDialog .teacher-account-close:hover { background: #dcebc8; }
 @media print { #teacherAccountBar, #teacherAccountDialog { display: none !important; } }
-/* Phones: the main menu already links My materials, and the header needs room for the site name. */
-@media (max-width: 640px) { .site-nav-tools .teacher-account-materials { display: none; } .site-nav-tools #teacherAccountBar span { max-width: 72px; } }
+/* Phones: the account buttons fill the header row, so show just the logo instead of a clipped site name. */
+@media (max-width: 640px) { .site-nav-tools #teacherAccountBar span { max-width: 72px; } .site-main-nav-inner:has(#teacherAccountBar:not([hidden])) .site-main-nav-brand span { display: none; } }
