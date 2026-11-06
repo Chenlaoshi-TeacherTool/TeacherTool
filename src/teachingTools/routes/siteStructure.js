@@ -98,31 +98,31 @@ router.get('/theme-activities/halloween/printables', function(req, res) {
   });
 });
 
+// Textbooks with companion materials on the way. Give one an href (and drop
+// comingSoon) once its pages exist.
+var companionTextbooks = [
+  { en: 'Jinan University “中文” · Book 1', zh: '暨南大学《中文》第一册', descEn: 'Lesson vocabulary, homework, and classroom activities for Book 1.', descZh: '第一册的生词、作业和课堂活动。' },
+  { en: 'Jinan University “中文” · Book 2', zh: '暨南大学《中文》第二册', descEn: 'Lesson vocabulary, homework, and classroom activities for Book 2.', descZh: '第二册的生词、作业和课堂活动。' },
+  { en: 'PEP Chinese (人教版部编教材)', zh: '人教版部编教材', descEn: 'Companion materials for the PEP (部编版) Chinese textbooks.', descZh: '人教版部编语文教材的配套材料。' },
+  { en: 'HSK Standard Course', zh: 'HSK 教材', descEn: 'Vocabulary and practice organized by HSK level.', descZh: '按 HSK 等级整理的词汇和练习。' },
+  { en: 'Chinese Made Easy', zh: 'Chinese Made Easy《轻松学汉语》', descEn: 'Companion materials for the Chinese Made Easy series.', descZh: 'Chinese Made Easy 系列的配套材料。' }
+];
+
 router.get('/textbook-companion', function(req, res) {
   var textbook = section('textbook');
   renderPage(req, res, {
     heading: text(req, textbook.en, textbook.zh),
-    intro: text(req, 'Resources for the Jinan University “中文” textbook, organized by level.', '暨南大学《中文》教材配套资源，按级别整理。'),
-    cards: textbook.children.map(function(level) {
-      return { heading: text(req, level.en, level.zh), description: text(req, 'Homework packets, projects, vocabulary cards, and lesson agendas.', '作业包、项目活动、词汇卡和课程安排。'), href: level.href, label: text(req, 'Browse level', '查看资源') };
+    intro: text(req, 'Companion materials for popular Chinese textbooks. The first ones are on the way.', '常用中文教材的配套资源，正在陆续准备中。'),
+    cards: companionTextbooks.map(function(book) {
+      return { heading: text(req, book.en, book.zh), description: text(req, book.descEn, book.descZh), comingSoon: text(req, 'Coming soon', '即将推出') };
     })
   });
 });
 
+// The old placeholder level pages had no content; send old links to the list.
 router.get('/textbook-companion/:level', function(req, res, next) {
-  var level = child('textbook', req.params.level);
-  if (!level) return next();
-  renderPage(req, res, {
-    heading: text(req, 'Jinan University “中文” · ' + level.en, '暨南大学《中文》' + level.zh),
-    intro: text(req, 'Level-specific materials have not been added yet.', '此级别的配套材料尚未添加。'),
-    parent: parentLink(req, 'textbook'),
-    cards: [
-      { heading: text(req, 'Homework packets', '作业包'), description: text(req, 'No homework packets added yet.', '尚未添加作业包。') },
-      { heading: text(req, 'Projects', '项目活动'), description: text(req, 'No projects added yet.', '尚未添加项目活动。') },
-      { heading: text(req, 'Vocabulary cards', '词汇卡'), description: text(req, 'No level-specific vocabulary cards added yet.', '尚未添加此级别的词汇卡。') },
-      { heading: text(req, 'Lesson agendas', '课程安排'), description: text(req, 'No lesson agendas added yet.', '尚未添加课程安排。') }
-    ]
-  });
+  if (!/^level-\d+$/.test(req.params.level)) return next();
+  res.redirect(301, '/textbook-companion');
 });
 
 var shopCardCopy = {

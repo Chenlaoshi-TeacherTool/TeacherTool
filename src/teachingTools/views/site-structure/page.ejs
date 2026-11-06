@@ -18,10 +18,11 @@
   <main class="content-section">
     <div class="content-shell resource-grid">
       <% page.cards.forEach(function(card) { %>
-      <section class="resource-card">
+      <section class="resource-card<%= card.comingSoon ? ' is-coming-soon' : '' %>"<%- card.comingSoon ? ' aria-disabled="true"' : '' %>>
+        <% if (card.comingSoon) { %><p class="resource-card__soon"><%= card.comingSoon %></p><% } %>
         <h2><%= card.heading %></h2>
         <p><%= card.description %></p>
-        <% if (card.href) { %><a class="resource-card__link" href="<%= card.href %>"><%= card.label %> →</a><% } %>
+        <% if (card.href && !card.comingSoon) { %><a class="resource-card__link" href="<%= card.href %>"><%= card.label %> →</a><% } %>
       </section>
       <% }) %>
     </div>

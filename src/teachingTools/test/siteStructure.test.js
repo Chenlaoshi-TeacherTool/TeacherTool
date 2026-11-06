@@ -22,10 +22,7 @@ test('new section pages render in both languages with the required categories', 
   var pages = {
     '/shop': ['Printable packs', 'Physical products'],
     '/shop/printable-packs': ['No printable packs are listed for sale yet.'],
-    '/textbook-companion': ['Level 1', 'Level 2', 'Level 3'],
-    '/textbook-companion/level-1': ['Homework packets', 'Projects', 'Vocabulary cards', 'Lesson agendas'],
-    '/textbook-companion/level-2': ['Level 2'],
-    '/textbook-companion/level-3': ['Level 3'],
+    '/textbook-companion': ['Jinan University “中文” · Book 1', 'Book 2', 'PEP Chinese', 'HSK Standard Course', 'Chinese Made Easy', 'Coming soon', 'is-coming-soon'],
     '/theme-activities/self-introduction': ['Who Am I? 我是谁？阅读卡片', '/printables/self-introduction/who-am-i-reading-cards.pdf', '/printables/self-introduction/who-am-i-reading-cards.docx'],
     '/theme-activities/halloween': ['Vocabulary', 'Games', 'Printables', '/theme-activities/halloween/printables'],
     '/theme-activities/halloween/printables': ['万圣节方位词_Gallery_Walk', 'halloween-position-words-gallery-walk.pdf', 'halloween-position-words-gallery-walk.docx'],
@@ -78,11 +75,11 @@ test('product detail pages preserve published content and fallback; unknown page
     assert.ok(listing.includes('/classroom-finds/test-cart'));
     var detail = await (await fetch(base + '/classroom-finds/test-cart')).text();
     for (var expected of ['Published description', 'Published reason', '/labels.pdf', 'https://amzn.to/example', 'sponsored nofollow']) assert.ok(detail.includes(expected));
-    for (var path of ['/classroom-finds/missing', '/classroom-finds/15-drawer-rolling-cart', '/textbook-companion/level-4', '/theme-activities/missing', '/shop/missing']) {
+    for (var path of ['/classroom-finds/missing', '/classroom-finds/15-drawer-rolling-cart', '/textbook-companion/missing', '/theme-activities/missing', '/shop/missing']) {
       assert.equal((await fetch(base + path)).status, 404, path);
     }
     var sitemap = await (await fetch(base + '/sitemap.xml')).text();
-    for (var path of ['/theme-activities/self-introduction', '/shop', '/textbook-companion/level-3', '/theme-activities/animals', '/classroom-finds/test-cart']) assert.ok(sitemap.includes(base + path));
+    for (var path of ['/theme-activities/self-introduction', '/shop', '/textbook-companion', '/theme-activities/animals', '/classroom-finds/test-cart']) assert.ok(sitemap.includes(base + path));
   } finally { products = []; }
 });
 

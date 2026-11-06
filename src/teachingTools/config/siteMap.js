@@ -47,12 +47,7 @@ var SECTIONS = [
       { key: 'animals', href: '/theme-activities/animals', en: 'Animals', zh: '动物', template: 'theme' }
     ]
   },
-  {
-    key: 'textbook', href: '/textbook-companion', en: 'Textbook Companion', zh: '教材配套', nav: true, admin: ['textbooks'],
-    children: [1, 2, 3].map(function(level) {
-      return { key: 'level-' + level, href: '/textbook-companion/level-' + level, en: 'Level ' + level, zh: '第' + level + '册', level: level };
-    })
-  },
+  { key: 'textbook', href: '/textbook-companion', en: 'Textbook Companion', zh: '教材配套', nav: true, admin: ['textbooks'] },
   { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, admin: ['community'] },
   { key: 'finds', href: '/classroom-finds', en: 'Classroom Finds', zh: '教室好物', nav: true, admin: ['recommendations'] },
   {

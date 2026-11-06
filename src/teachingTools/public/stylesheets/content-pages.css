@@ -21,6 +21,9 @@ body { margin: 0; }
 .resource-card h2 a:hover { color: var(--coral); }
 .resource-card p { color: var(--muted); }
 .resource-card__link { color: var(--leaf); font-weight: 900; }
+.resource-card.is-coming-soon { background: #f3f1ea; box-shadow: none; filter: grayscale(1); opacity: .72; cursor: default; }
+.resource-card.is-coming-soon h2 { color: #6b6b66; }
+.resource-card__soon { display: inline-block; margin: 0 0 12px; padding: 3px 12px; border-radius: 999px; background: #dedbd2; color: #55554f !important; font-size: .8rem; font-weight: 900; letter-spacing: .04em; }
 .article-hero { padding-bottom: 62px; }
 .article-hero h1 { font-size: clamp(2.55rem, 5.4vw, 4.8rem); }
 .article-byline { margin-top: 24px !important; color: #ffe9a8 !important; font-size: .9rem !important; font-weight: 800; }
