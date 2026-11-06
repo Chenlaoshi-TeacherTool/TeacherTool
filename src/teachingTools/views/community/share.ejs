@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
+  <meta name="robots" content="noindex">
+  <title><%= t('community.shareTitle') %> - Chen Laoshi's Teaching Toolkit</title>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
+  <link rel="stylesheet" href="/community/community.css">
+</head>
+<body class="community-page">
+  <main class="content-section community-share"><div class="content-shell">
+    <p><a class="community-back" href="/community">← <%= t('community.backToList') %></a></p>
+    <h1><%= t('community.shareTitle') %></h1>
+    <p class="community-share-intro"><%= t('community.shareIntro') %></p>
+
+    <p class="community-status" id="shareLoading"><%= t('community.checkingSignIn') %></p>
+
+    <div class="community-signin" id="shareClosed" hidden>
+      <p><%= t('community.accountsClosed') %></p>
+    </div>
+
+    <div class="community-signin" id="shareSignIn" hidden>
+      <p><%= t('community.signInToShare') %></p>
+      <a class="btn" id="shareSignInLink" href="#"><%= t('community.signIn') %></a>
+    </div>
+
+    <form class="community-form" id="shareForm" hidden novalidate>
+      <fieldset id="shareGame" hidden>
+        <legend><%= t('community.sharingGame') %></legend>
+        <p class="community-share-game" id="shareGameName"></p>
+      </fieldset>
+
+      <fieldset id="shareWords">
+        <legend><%= t('community.wordsLegend') %></legend>
+        <p class="hint"><%= t('community.wordsHint') %></p>
+        <label class="visually-hidden" for="shareWordsText"><%= t('community.wordsLegend') %></label>
+        <textarea id="shareWordsText" rows="10" placeholder="猫 | māo | cat&#10;狗 | gǒu | dog&#10;小鸟"></textarea>
+        <p class="hint" id="shareWordCount"></p>
+      </fieldset>
+
+      <fieldset>
+        <legend><%= t('community.aboutLegend') %></legend>
+        <label for="shareTitleInput"><%= t('community.fieldTitle') %></label>
+        <input id="shareTitleInput" maxlength="120" required placeholder="<%= t('community.fieldTitlePlaceholder') %>">
+        <label for="shareDescription"><%= t('community.fieldDescription') %></label>
+        <textarea id="shareDescription" rows="3" maxlength="500" placeholder="<%= t('community.fieldDescriptionPlaceholder') %>"></textarea>
+
+        <p class="community-form-label"><%= t('community.filterStage') %></p>
+        <div class="community-checks">
+          <% community.STAGES.forEach(function (stage) { %>
+            <label class="chip-check"><input type="checkbox" name="stages" value="<%= stage.key %>"> <%= stageLabel(stage.key) %></label>
+          <% }) %>
+        </div>
+
+        <label for="shareTextbook"><%= t('community.filterTextbook') %></label>
+        <select id="shareTextbook">
+          <option value=""><%= t('community.noTextbook') %></option>
+          <% community.TEXTBOOKS.forEach(function (book) { %><option value="<%= book.key %>"><%= textbookLabel(book.key) %></option><% }) %>
+        </select>
+
+        <label for="shareAuthor"><%= t('community.fieldAuthor') %></label>
+        <input id="shareAuthor" maxlength="40" required placeholder="<%= t('community.fieldAuthorPlaceholder') %>">
+        <p class="hint"><%= t('community.authorHint') %></p>
+      </fieldset>
+
+      <p class="community-rules"><%= t('community.rules') %></p>
+      <p class="community-error" id="shareError" role="alert" hidden></p>
+      <button class="btn" type="submit" id="shareSubmit"><%= t('community.publish') %></button>
+    </form>
+  </div></main>
+  <script>
+    window.COMMUNITY_TEXT = <%- JSON.stringify({
+      words: t('community.jsWords'), tooMany: t('community.jsTooMany'), noWords: t('community.jsNoWords'), needTitle: t('community.jsNeedTitle'),
+      needAuthor: t('community.jsNeedAuthor'), publishing: t('community.jsPublishing'), publish: t('community.publish'), failed: t('community.jsFailed'),
+      maxWords: community.MAX_WORDS
+    }).replace(/</g, '\\u003c') %>;
+  </script>
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="/community/share.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

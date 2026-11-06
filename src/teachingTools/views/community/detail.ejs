@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
+  <title><%= post.title %> - <%= t('community.pageTitle') %></title>
+  <%- include('../partials/seo', { pageDescription: (post.description || post.title) + ' · Shared by a teacher in the Chen Laoshi teacher community.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
+  <link rel="stylesheet" href="/community/community.css">
+  <% if (game) { %><link rel="stylesheet" href="/shared/game-sharing.css"><% } %>
+</head>
+<body class="community-page">
+  <main class="content-section community-detail"><div class="content-shell">
+    <p><a class="community-back" href="/community">← <%= t('community.backToList') %></a></p>
+
+    <article class="community-post" id="communityPost" data-id="<%= post.id %>" data-kind="<%= post.kind %>"
+      data-title="<%= post.title %>" data-game-type="<%= post.gameType || '' %>" data-game-version="<%= post.gameVersion || '' %>">
+      <% if (post.status !== 'live') { %><p class="community-hidden-note"><%= t('community.hiddenNote') %></p><% } %>
+      <span class="community-card-type <%= game ? 'is-game' : 'is-list' %>">
+        <span aria-hidden="true"><%= game ? game.icon : '📝' %></span> <%= game ? gameLabel(post.gameType) : t('community.wordList') %>
+      </span>
+      <h1><%= post.title %></h1>
+      <p class="community-post-meta">👩‍🏫 <%= post.authorName %> · <%= String(post.createdAt).slice(0, 10) %> · <%= post.itemCount %> <%= game ? t('community.itemsUnit') : t('community.wordsUnit') %><% if (post.useCount) { %> · <%= post.useCount %> <%= t('community.usesUnit') %><% } %></p>
+      <% if (post.description) { %><p class="community-post-desc"><%= post.description %></p><% } %>
+      <p class="community-tags">
+        <% post.stages.forEach(function (key) { %><span class="community-tag"><%= stageLabel(key) %></span><% }) %>
+        <% if (post.textbook) { %><span class="community-tag is-book"><%= textbookLabel(post.textbook) %></span><% } %>
+      </p>
+
+      <% if (post.kind === 'wordlist') { %>
+        <section class="community-use">
+          <h2><%= t('community.useTitle') %></h2>
+          <div class="community-actions">
+            <button class="btn" type="button" data-action="save"><%= t('community.saveToMine') %></button>
+            <button class="btn btn-secondary" type="button" data-action="copy"><%= t('community.copyWords') %></button>
+            <button class="btn btn-secondary" type="button" data-action="booklet"><%= t('community.makeBooklet') %></button>
+          </div>
+          <p class="community-use-help"><%= t('community.useHelp') %> <a href="/teaching-tools/word-list-library/word-list-library.html"><%= t('community.myWordLists') %></a></p>
+          <p class="community-status" id="communityStatus" role="status" aria-live="polite"></p>
+        </section>
+        <textarea id="communityWordsText" hidden readonly><%= wordsText %></textarea>
+        <script type="application/json" id="communityWords"><%- JSON.stringify(post.payload).replace(/</g, '\\u003c') %></script>
+        <table class="community-words">
+          <thead><tr><th>#</th><th><%= t('community.colWord') %></th><th><%= t('community.colPinyin') %></th><th><%= t('community.colEnglish') %></th></tr></thead>
+          <tbody>
+            <% post.payload.forEach(function (word, index) { %>
+              <tr><td><%= index + 1 %></td><td lang="zh"><%= word.zh %></td><td><%= word.py || '—' %></td><td><%= word.en || '—' %></td></tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else if (game) { %>
+        <section class="community-use">
+          <h2><%= t('community.useTitle') %></h2>
+          <div class="community-actions">
+            <button class="btn" type="button" data-action="link"><%= t('community.makeStudentLink') %></button>
+            <a class="btn btn-secondary" href="<%= game.tool %>"><%= t('community.openTool') %></a>
+          </div>
+          <p class="community-use-help"><%= t('community.gameHelp') %></p>
+          <p class="community-status" id="communityStatus" role="status" aria-live="polite"></p>
+        </section>
+        <script type="application/json" id="communityGame"><%- JSON.stringify(post.payload).replace(/</g, '\\u003c') %></script>
+      <% } %>
+
+      <footer class="community-post-foot">
+        <% if (mine) { %>
+          <button class="text-button danger" type="button" data-action="delete"><%= t('community.deleteMine') %></button>
+        <% } %>
+        <button class="text-button" type="button" data-action="report"><%= t('community.report') %></button>
+      </footer>
+    </article>
+  </div></main>
+  <script>
+    window.COMMUNITY_TEXT = <%- JSON.stringify({
+      saved: t('community.jsSaved'), saveFailed: t('community.jsSaveFailed'), copied: t('community.jsCopied'), copyFailed: t('community.jsCopyFailed'),
+      reportPrompt: t('community.jsReportPrompt'), reported: t('community.jsReported'), deleteConfirm: t('community.jsDeleteConfirm'),
+      deleteFailed: t('community.jsDeleteFailed'), failed: t('community.jsFailed')
+    }).replace(/</g, '\\u003c') %>;
+  </script>
+  <% if (game) { %><script src="/shared/game-sharing.js"></script><% } else { %><script src="/shared/wordlist-core.js"></script><% } %>
+  <script src="/community/detail.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

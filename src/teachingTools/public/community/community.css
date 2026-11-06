@@ -1,0 +1,88 @@
+/* Teacher community: /community, /community/:id, /community/share */
+.community-page .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 20px; text-decoration: none !important; font-size: .95rem; line-height: 1.2; cursor: pointer; }
+.community-page .btn-secondary { background: var(--paper) !important; color: var(--chalk) !important; border-color: var(--line) !important; box-shadow: 0 4px 0 var(--line); }
+.community-page .text-button { padding: 6px 2px; border: 0; background: none; color: var(--muted); font: inherit; font-size: .9rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.community-page .text-button.danger { color: var(--coral); }
+.community-page .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.community-page .hint { margin: 4px 0 0; color: var(--muted); font-size: .88rem; }
+
+.community-hero { padding: 64px 0 48px; }
+.community-hero h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
+.community-share-cta { margin-top: 24px; }
+.community-main { padding-top: 36px; }
+
+.community-search { display: flex; gap: 10px; margin-bottom: 18px; }
+.community-search input { flex: 1; min-width: 0; min-height: 46px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit; }
+.community-search input:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+.community-filters { display: grid; gap: 10px; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
+.community-filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.community-filter-label { min-width: 4.5em; color: var(--chalk); font-size: .88rem; font-weight: 900; }
+.chip { display: inline-flex; align-items: center; min-height: 32px; padding: 4px 13px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font-size: .88rem; font-weight: 700; text-decoration: none; }
+.chip:hover { border-color: var(--leaf-light); }
+.chip.is-on { border-color: var(--chalk); background: var(--chalk); color: #fffdf7; }
+
+.community-list-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin: 34px 0 16px; }
+.community-list-head h2 { margin: 0; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.7rem; font-weight: 400; }
+.community-list-head span { color: var(--muted); font-size: .9rem; }
+.community-list-head a { color: var(--leaf); font-size: .9rem; font-weight: 800; }
+
+.community-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; margin: 0; padding: 0; list-style: none; }
+.community-card a { display: flex; flex-direction: column; height: 100%; box-sizing: border-box; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); box-shadow: var(--shadow); color: var(--ink); text-decoration: none; transition: transform 160ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .community-card a:hover { transform: translateY(-3px); } }
+.community-card a:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+.community-card-type { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: .78rem; font-weight: 900; }
+.community-card-type.is-list { background: #e5f1dc; color: #2d5e3e; }
+.community-card-type.is-game { background: #fdf0d2; color: #8a5a0e; }
+.community-card h3 { margin: 10px 0 6px; color: var(--chalk); font-size: 1.08rem; line-height: 1.35; }
+.community-card-desc { display: -webkit-box; margin: 0 0 10px; overflow: hidden; color: var(--muted); font-size: .9rem; line-height: 1.5; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.community-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.community-tags .community-tag { padding: 2px 9px; border-radius: 999px; background: #eef5df; color: #356e57; font-size: .78rem; font-weight: 800; }
+.community-tags .community-tag.is-book { background: #fff2c5; color: #805512; }
+.community-card-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; margin: auto 0 0; padding-top: 10px; border-top: 1px dashed var(--line); color: var(--muted); font-size: .82rem; }
+
+.community-empty { padding: 36px 20px; border: 1px dashed var(--line); border-radius: 18px; background: var(--paper); color: var(--muted); text-align: center; }
+.community-pages { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 30px; font-weight: 800; }
+.community-pages a { color: var(--leaf); }
+
+.community-back { color: var(--leaf); font-weight: 800; }
+.community-detail { padding-top: 32px; }
+.community-post h1, .community-share h1 { margin: 10px 0 8px; color: var(--chalk); font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 400; line-height: 1.12; }
+.community-post-meta { margin: 0 0 12px; color: var(--muted); }
+.community-post-desc { max-width: 760px; margin: 0 0 12px; color: var(--ink); line-height: 1.7; }
+.community-hidden-note { padding: 10px 14px; border-radius: 12px; background: #fdecea; color: #9d392f; font-weight: 800; }
+.community-use { margin: 22px 0; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
+.community-use h2 { margin: 0 0 12px; color: var(--chalk); font-size: 1.15rem; }
+.community-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.community-use-help { margin: 12px 0 0; color: var(--muted); font-size: .9rem; }
+.community-use-help a { color: var(--leaf); font-weight: 800; }
+.community-status { min-height: 1.4em; margin: 8px 0 0; color: var(--leaf); font-weight: 800; }
+.community-words { width: 100%; border-collapse: collapse; background: var(--paper); border-radius: 14px; overflow: hidden; }
+.community-words th, .community-words td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+.community-words th { background: #eef5df; color: var(--chalk); font-size: .85rem; }
+.community-words td:first-child { width: 3em; color: var(--muted); }
+.community-words td[lang="zh"] { font-size: 1.15rem; font-weight: 700; }
+.community-post-foot { display: flex; gap: 18px; justify-content: flex-end; margin-top: 22px; }
+
+.community-share { padding-top: 32px; }
+.community-share .content-shell { max-width: 760px; }
+.community-share-intro { color: var(--muted); line-height: 1.7; }
+.community-signin { padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
+.community-form fieldset { margin: 0 0 18px; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
+.community-form legend { padding: 0 6px; color: var(--chalk); font-weight: 900; }
+.community-form label, .community-form-label { display: block; margin: 14px 0 6px; color: var(--chalk); font-weight: 800; }
+.community-form input:not([type="checkbox"]), .community-form textarea, .community-form select { box-sizing: border-box; width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); font: inherit; }
+.community-form textarea { resize: vertical; }
+.community-checks { display: flex; flex-wrap: wrap; gap: 8px; }
+.community-form .chip-check { display: inline-flex; align-items: center; gap: 6px; margin: 0; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-weight: 700; cursor: pointer; }
+.community-share-game { margin: 0; font-size: 1.1rem; font-weight: 800; }
+.community-rules { color: var(--muted); font-size: .88rem; line-height: 1.6; }
+.community-error { padding: 10px 14px; border-radius: 12px; background: #fdecea; color: #9d392f; font-weight: 800; }
+
+@media (max-width: 640px) {
+  .community-hero { padding: 44px 0 36px; }
+  .community-search .btn { padding: 10px 16px; }
+  .community-filter-label { width: 100%; }
+  .community-actions .btn { flex: 1 1 100%; }
+}
+@media print { .community-actions, .community-post-foot, .community-back { display: none; } }

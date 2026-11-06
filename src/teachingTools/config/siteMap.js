@@ -53,6 +53,7 @@ var SECTIONS = [
       return { key: 'level-' + level, href: '/textbook-companion/level-' + level, en: 'Level ' + level, zh: '第' + level + '册', level: level };
     })
   },
+  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, admin: ['community'] },
   { key: 'finds', href: '/classroom-finds', en: 'Classroom Finds', zh: '教室好物', nav: true, admin: ['recommendations'] },
   {
     key: 'shop', href: '/shop', en: 'Chen Laoshi’s Shop', zh: '陈老师的商店', navEn: 'Shop', navZh: '商店', nav: true, admin: [],
@@ -86,6 +87,7 @@ var ADMIN_EDITORS = {
   textbooks: { href: '/admin/textbooks', label: 'Textbooks', description: 'Textbook lessons: words, sentence patterns, and activities, plus Excel import' },
   recommendations: { href: '/admin/recommendations', label: 'Classroom Finds', description: 'Product pages, affiliate links, and printable labels' },
   articles: { href: '/admin/articles', label: 'Articles', description: 'Existing /resources/:slug articles' },
+  community: { href: '/admin/community', label: 'Community', description: 'Teacher posts: reported first; hide, restore, or delete' },
   memberships: { href: '/admin/memberships', label: 'Memberships', description: 'Activation codes that extend teacher cloud saving' }
 };
 

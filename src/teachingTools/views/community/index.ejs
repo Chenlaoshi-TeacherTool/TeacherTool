@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
+  <title><%= t('community.pageTitle') %> - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Word lists and classroom games shared by Chinese teachers. Search by learner, grade, and textbook, then use them in your own class.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
+  <link rel="stylesheet" href="/community/community.css">
+</head>
+<body class="community-page">
+<%
+  function link(change) {
+    var params = { q: result.q, kind: result.kind, stage: result.stage, textbook: result.textbook, page: '' };
+    Object.keys(change).forEach(function (key) { params[key] = change[key]; });
+    var query = Object.keys(params).filter(function (key) { return params[key]; })
+      .map(function (key) { return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]); }).join('&');
+    return '/community' + (query ? '?' + query : '');
+  }
+  var filtered = result.q || result.kind || result.stage || result.textbook;
+%>
+  <header class="content-hero community-hero"><div class="content-shell">
+    <p class="content-kicker"><%= t('community.kicker') %></p>
+    <h1><%= t('community.title') %></h1>
+    <p><%= t('community.intro') %></p>
+    <a class="btn community-share-cta" href="/community/share"><%= t('community.shareCta') %></a>
+  </div></header>
+
+  <main class="content-section community-main"><div class="content-shell">
+    <form class="community-search" method="get" action="/community" role="search">
+      <label class="visually-hidden" for="communityQ"><%= t('community.searchLabel') %></label>
+      <input id="communityQ" name="q" type="search" maxlength="60" value="<%= result.q %>" placeholder="<%= t('community.searchPlaceholder') %>">
+      <% ['kind', 'stage', 'textbook'].forEach(function (key) { if (result[key]) { %><input type="hidden" name="<%= key %>" value="<%= result[key] %>"><% } }) %>
+      <button class="btn" type="submit"><%= t('community.searchButton') %></button>
+    </form>
+
+    <div class="community-filters">
+      <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterType') %></span>
+        <a class="chip<%= !result.kind ? ' is-on' : '' %>" href="<%- link({ kind: '' }) %>"><%= t('community.all') %></a>
+        <a class="chip<%= result.kind === 'wordlist' ? ' is-on' : '' %>" href="<%- link({ kind: 'wordlist' }) %>"><%= t('community.wordLists') %></a>
+        <a class="chip<%= result.kind === 'game' ? ' is-on' : '' %>" href="<%- link({ kind: 'game' }) %>"><%= t('community.games') %></a>
+      </div>
+      <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterStage') %></span>
+        <a class="chip<%= !result.stage ? ' is-on' : '' %>" href="<%- link({ stage: '' }) %>"><%= t('community.all') %></a>
+        <% community.STAGES.forEach(function (stage) { %>
+          <a class="chip<%= result.stage === stage.key ? ' is-on' : '' %>" href="<%- link({ stage: stage.key }) %>"><%= stageLabel(stage.key) %></a>
+        <% }) %>
+      </div>
+      <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterTextbook') %></span>
+        <a class="chip<%= !result.textbook ? ' is-on' : '' %>" href="<%- link({ textbook: '' }) %>"><%= t('community.all') %></a>
+        <% community.TEXTBOOKS.forEach(function (book) { %>
+          <a class="chip<%= result.textbook === book.key ? ' is-on' : '' %>" href="<%- link({ textbook: book.key }) %>"><%= textbookLabel(book.key) %></a>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="community-list-head">
+      <h2><%= filtered ? t('community.results') : t('community.latest') %></h2>
+      <span><%= result.total %> <%= t('community.postsCount') %></span>
+      <% if (filtered) { %><a href="/community"><%= t('community.clearFilters') %></a><% } %>
+    </div>
+
+    <% if (result.unavailable) { %>
+      <p class="community-empty"><%= t('community.unavailable') %></p>
+    <% } else if (!result.posts.length) { %>
+      <div class="community-empty">
+        <p><%= filtered ? t('community.noMatches') : t('community.noPosts') %></p>
+        <a class="btn" href="/community/share"><%= t('community.shareFirst') %></a>
+      </div>
+    <% } else { %>
+      <ul class="community-grid">
+        <% result.posts.forEach(function (post) { var game = post.kind === 'game' ? community.GAME_TYPES[post.gameType] : null; %>
+        <li class="community-card">
+          <a href="/community/<%= post.id %>">
+            <span class="community-card-type <%= post.kind === 'game' ? 'is-game' : 'is-list' %>">
+              <span aria-hidden="true"><%= game ? game.icon : '📝' %></span>
+              <%= game ? gameLabel(post.gameType) : t('community.wordList') %>
+            </span>
+            <h3><%= post.title %></h3>
+            <% if (post.description) { %><p class="community-card-desc"><%= post.description %></p><% } %>
+            <p class="community-tags">
+              <% post.stages.forEach(function (key) { %><span class="community-tag"><%= stageLabel(key) %></span><% }) %>
+              <% if (post.textbook) { %><span class="community-tag is-book"><%= textbookLabel(post.textbook) %></span><% } %>
+            </p>
+            <p class="community-card-foot">
+              <span>👩‍🏫 <%= post.authorName %></span>
+              <span><%= post.itemCount %> <%= post.kind === 'game' ? t('community.itemsUnit') : t('community.wordsUnit') %><% if (post.useCount) { %> · <%= post.useCount %> <%= t('community.usesUnit') %><% } %></span>
+            </p>
+          </a>
+        </li>
+        <% }) %>
+      </ul>
+      <% if (result.pages > 1) { %>
+      <nav class="community-pages" aria-label="<%= t('community.pagesLabel') %>">
+        <% if (result.page > 1) { %><a href="<%- link({ page: result.page - 1 }) %>">← <%= t('community.prev') %></a><% } %>
+        <span><%= result.page %> / <%= result.pages %></span>
+        <% if (result.page < result.pages) { %><a href="<%- link({ page: result.page + 1 }) %>"><%= t('community.next') %> →</a><% } %>
+      </nav>
+      <% } %>
+    <% } %>
+  </div></main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

@@ -59,6 +59,9 @@ warning and the app logs one at start-up.
 - `0008_add-membership-events.sql` — `membership_events`: an add-only history of every change to a
   teacher's cloud-saving end date (trial, activation code, refund), with the end date before and
   after. Sign-in, code redemption and refunds write to it inside their transactions.
+- `0009_add-community-posts.sql` — `community_posts` and `community_reports`: word lists and games
+  teachers publish at `/community`, plus the reports other teachers send. Hidden or deleted at
+  `/admin/community`.
 
 ## Other files
 

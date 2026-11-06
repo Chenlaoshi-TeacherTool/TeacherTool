@@ -20,6 +20,7 @@
     els.downloadButton = document.getElementById('downloadButton');
     els.printButton = document.getElementById('printButton');
     els.bookletButton = document.getElementById('bookletButton');
+    els.communityButton = document.getElementById('communityButton');
     els.printListTitle = document.getElementById('printListTitle');
     els.printListMeta = document.getElementById('printListMeta');
     els.savedLists = document.getElementById('savedLists');
@@ -36,6 +37,7 @@
     els.downloadButton.addEventListener('click', downloadCurrentList);
     els.printButton.addEventListener('click', printCurrentList);
     els.bookletButton.addEventListener('click', openBooklet);
+    els.communityButton.addEventListener('click', shareWithTeachers);
     els.savedLists.addEventListener('click', handleSavedListAction);
     els.presetLists.addEventListener('click', handlePresetAction);
     els.storageNote.textContent = window.ChenWordlist.hasStorage
@@ -61,6 +63,7 @@
     els.downloadButton.disabled = !currentList.items.length;
     els.printButton.disabled = !currentList.items.length;
     els.bookletButton.disabled = !currentList.items.length;
+    els.communityButton.disabled = !currentList.items.length;
     setStatus(currentList.items.length
       ? currentList.items.length + window.LibraryI18n.t(' terms are ready for classroom activities.')
       : window.LibraryI18n.t('Add at least one vocabulary item to build a list.'));
@@ -128,6 +131,14 @@
     } catch (error) {
       setStatus(window.LibraryI18n.t('This browser could not pass the list to the booklet tool. Save the list in this browser first, then open the booklet generator.'));
     }
+  }
+
+  // Hands the list to the teacher community share page (/community/share).
+  function shareWithTeachers() {
+    if (!currentList || !currentList.items.length) return;
+    try { sessionStorage.setItem('chenlaoshi-community-draft', JSON.stringify({ name: currentList.name, items: currentList.items })); }
+    catch (error) { /* the share page still lets the teacher paste the words */ }
+    window.location.href = '/community/share';
   }
 
   function renderSavedLists() {
@@ -213,6 +224,7 @@
         els.downloadButton.disabled = !currentList.items.length;
         els.printButton.disabled = !currentList.items.length;
         els.bookletButton.disabled = !currentList.items.length;
+        els.communityButton.disabled = !currentList.items.length;
         setStatus(window.LibraryI18n.t('Loaded “') + list.name + window.LibraryI18n.t('”. You can adapt it, then save your own copy.'));
         document.getElementById('builderTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
       })
@@ -255,6 +267,7 @@
     els.downloadButton.disabled = !list.items.length;
     els.printButton.disabled = !list.items.length;
     els.bookletButton.disabled = !list.items.length;
+    els.communityButton.disabled = !list.items.length;
     setStatus(window.LibraryI18n.t('Loaded “') + list.name + '”.');
   }
 

@@ -13,6 +13,7 @@ var apiRouter = require('./routes/api');
 var adminRouter = require('./routes/admin');
 var bookGeneratorRouter = require('./routes/bookGenerator');
 var gameSharesRouter = require('./routes/gameShares');
+var communityRouter = require('./routes/community');
 
 var app = express();
 
@@ -90,6 +91,7 @@ app.use('/', siteStructureRouter);
 app.use('/', indexRouter);
 app.use('/', bookGeneratorRouter);
 app.use('/', gameSharesRouter);
+app.use('/', communityRouter);
 app.use('/api', apiRouter);
 app.use('/admin', adminRouter);
 

@@ -40,6 +40,8 @@
   "Preview your reusable data": "预览词汇表",
   "Future-tool ready": "可供其他工具使用",
   "Create booklet": "制作词汇小册",
+  "Share with teachers": "分享给其他老师",
+  "Share to community": "分享到分享区",
   "Print / Save PDF": "打印／保存 PDF",
   "Chen Laoshi's Teaching Toolkit": "陈老师教学工具包",
   "My classroom vocabulary": "我的课堂词汇",

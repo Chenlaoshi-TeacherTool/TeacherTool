@@ -134,6 +134,13 @@
     } catch (error) { find('activitiesStatus').textContent = t('This activity could not be deleted. Please try again.'); }
   }
 
+  // Games saved in the account can be shared with other teachers (/community/share).
+  function shareLink(item) {
+    var link = element('a', t('Share to community'), 'small-button');
+    link.href = '/community/share?game=' + encodeURIComponent(item.id) + '&title=' + encodeURIComponent(item.title || '');
+    return link;
+  }
+
   function card(item) {
     var type = TYPES[item.type];
     var status = item.status;
@@ -181,6 +188,7 @@
         results.href = '/teaching-tools/my-activities/quiz-results.html?id=' + encodeURIComponent(item.id);
         actions.appendChild(results);
       }
+      if (item.kind === 'game' && item.inAccount && item.canRelink) actions.appendChild(shareLink(item));
       var del = button(t('Delete'), 'small-button danger');
       del.addEventListener('click', function () { remove(item); });
       actions.appendChild(del);
