@@ -18,6 +18,8 @@ var activationCodes = require('../services/activationCodes');
 var communityRepository = require('../services/communityRepository');
 var textbookRepository = require('../services/textbookRepository');
 var textbookFileStorage = require('../services/textbookFileStorage');
+var toolVideos = require('../services/toolVideos');
+var toolCatalog = require('../services/toolCatalog');
 var communityService = require('../services/community');
 var sql = sqlClient.sql;
 
@@ -1260,6 +1262,38 @@ router.post('/community/:id/:action', async function (req, res, next) {
     else return res.status(404).send('Unknown action.');
     require('./community').invalidate();
     res.redirect(303, '/admin/community?done=' + action);
+  } catch (err) { next(err); }
+});
+
+// Tutorial videos: one Chinese and one English YouTube link per tool. Tools come
+// from the /teaching-tools catalog; a saved link shows a "Watch how" button on that tool.
+router.get('/toolvideos', async function (req, res, next) {
+  try {
+    var saved = {};
+    var loadError = '';
+    try { saved = await toolVideos.listAll(); } catch (error) { loadError = error.message; }
+    var tools = toolCatalog.list().map(function (tool) {
+      var row = saved[tool.path] || { zh: '', en: '' };
+      return Object.assign({}, tool, { zh: row.zh, en: row.en, title: tool.zh, titleEn: tool.en,
+        zhOk: !row.zh || Boolean(toolVideos.parseYouTube(row.zh)), enOk: !row.en || Boolean(toolVideos.parseYouTube(row.en)) });
+    });
+    res.set('Cache-Control', 'private, no-store');
+    res.render('admin/toolvideos', { title: 'Tool Videos', tools: tools, loadError: loadError, saved: req.query.saved || '', error: req.query.error || '', adminUser: req.adminUser });
+  } catch (err) { next(err); }
+});
+
+router.post('/toolvideos', async function (req, res, next) {
+  try {
+    if (req.get('origin') && new URL(req.get('origin')).host !== req.get('host')) return res.status(403).send('Save videos from the admin page.');
+    var key = toolVideos.normalizePath(req.body.path);
+    if (!toolCatalog.list().some(function (tool) { return tool.path === key; })) return res.status(400).send('Unknown tool.');
+    var zh = String(req.body.zh || '').trim();
+    var en = String(req.body.en || '').trim();
+    if ((zh && !toolVideos.parseYouTube(zh)) || (en && !toolVideos.parseYouTube(en))) {
+      return res.redirect(303, '/admin/toolvideos?error=' + encodeURIComponent(key) + '#' + encodeURIComponent(key));
+    }
+    await toolVideos.save(key, zh, en);
+    res.redirect(303, '/admin/toolvideos?saved=' + encodeURIComponent(key) + '#' + encodeURIComponent(key));
   } catch (err) { next(err); }
 });
 

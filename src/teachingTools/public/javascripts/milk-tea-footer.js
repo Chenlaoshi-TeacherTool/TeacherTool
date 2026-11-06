@@ -223,6 +223,14 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', createFooter);
   else createFooter();
+  // Tutorial video button (set at /admin/toolvideos).
+  if (!document.getElementById('toolVideoScript')) {
+    var videoScript = document.createElement('script');
+    videoScript.id = 'toolVideoScript';
+    videoScript.src = '/javascripts/tool-video.js';
+    videoScript.defer = true;
+    document.head.appendChild(videoScript);
+  }
   if (!document.getElementById('teacherAccountScript')) {
     var accountScript = document.createElement('script');
     accountScript.id = 'teacherAccountScript';

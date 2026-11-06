@@ -27,7 +27,7 @@ var SECTIONS = [
   { key: 'home', href: '/', en: 'Home', zh: '首页', nav: true, admin: [] },
   {
     key: 'tools', href: '/teaching-tools', en: 'Teaching Tools', zh: '教学工具', nav: true,
-    admin: ['toolguides', 'wordlists', 'questionbanks']
+    admin: ['toolguides', 'toolvideos', 'wordlists', 'questionbanks']
   },
   { key: 'library', href: '/teaching-tools/word-list-library/word-list-library.html', en: 'My materials', zh: '我的资料', sitemap: false, admin: [] },
   { key: 'chinese', href: '/chinese-teaching', en: 'Chinese Teaching', zh: '中文教学专区', admin: [] },
@@ -88,6 +88,7 @@ var UNLISTED = [
 // Admin editors. `href` must match a GET route in routes/admin.js.
 var ADMIN_EDITORS = {
   toolguides: { href: '/admin/toolguides', label: 'Tool Guides', description: 'How-to guides shown on individual tool pages' },
+  toolvideos: { href: '/admin/toolvideos', label: 'Tool Videos', description: 'YouTube tutorial for each tool (Chinese and English); shows a Watch how button on the tool' },
   wordlists: { href: '/admin/wordlists', label: 'Word Lists', description: 'Lists and terms used by the word list library and tools' },
   questionbanks: { href: '/admin/questionbanks', label: 'Question Banks', description: 'Banks and questions, plus Excel bulk import' },
   textbooks: { href: '/admin/textbooks', label: 'Textbooks', description: 'Textbook lessons: words, sentence patterns, and activities, plus Excel import' },

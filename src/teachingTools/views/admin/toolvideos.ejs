@@ -1,0 +1,35 @@
+<%- include('layout-head') %>
+<% var done = tools.filter(function (tool) { return tool.zh || tool.en; }).length; %>
+<h1>Tool Videos</h1>
+<p>Paste a YouTube link for a tool and click <strong>Save</strong>. The tool then shows a <strong>▶ 看教程 / Watch how</strong> button that plays the video in a pop-up.
+  Chinese visitors get the Chinese link and English visitors the English one; if a tool has only one, everyone gets that one.
+  Normal links, youtu.be links and Shorts all work. Clear both boxes and save to remove the video.</p>
+<p><strong><%= done %> of <%= tools.length %></strong> tools have a video. The list follows the cards on <a href="/teaching-tools" target="_blank" rel="noopener">/teaching-tools</a>.</p>
+<% if (loadError) { %><p style="border:2px solid #dc2626;border-radius:6px;padding:10px 14px;">Saved videos could not be loaded (<%= loadError %>). Run migration 0011_add-tool-videos on the database.</p><% } %>
+
+<table>
+  <thead><tr><th style="width:26%;">Tool</th><th>中文视频 (YouTube link)</th><th>English video (YouTube link)</th><th></th></tr></thead>
+  <tbody>
+    <% tools.forEach(function (tool) { var formId = 'tv-' + tool.path.replace(/[^A-Za-z0-9]/g, '-'); %>
+    <tr id="<%= tool.path %>"<%- saved === tool.path ? ' style="background:#f0fdf4;"' : error === tool.path ? ' style="background:#fef2f2;"' : '' %>>
+      <td>
+        <%= (tool.zh || tool.en) ? '✅' : '⬜' %> <a href="<%= tool.href %>" target="_blank" rel="noopener"><%= tool.title %></a>
+        <div style="color:#666;font-size:.8rem;"><%= tool.titleEn %></div>
+        <% if (saved === tool.path) { %><div style="color:#15803d;font-size:.85rem;">Saved.</div><% } %>
+        <% if (error === tool.path) { %><div style="color:#b91c1c;font-size:.85rem;">That is not a YouTube video link. Nothing was saved.</div><% } %>
+        <form id="<%= formId %>" method="POST" action="/admin/toolvideos"><input type="hidden" name="path" value="<%= tool.path %>"></form>
+      </td>
+      <td>
+        <input form="<%= formId %>" type="url" name="zh" value="<%= tool.zh %>" placeholder="https://youtu.be/…">
+        <% if (!tool.zhOk) { %><div style="color:#b91c1c;font-size:.8rem;">Not a YouTube video link</div><% } %>
+      </td>
+      <td>
+        <input form="<%= formId %>" type="url" name="en" value="<%= tool.en %>" placeholder="https://youtu.be/…">
+        <% if (!tool.enOk) { %><div style="color:#b91c1c;font-size:.8rem;">Not a YouTube video link</div><% } %>
+      </td>
+      <td><button form="<%= formId %>" type="submit">Save</button></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('layout-foot') %>

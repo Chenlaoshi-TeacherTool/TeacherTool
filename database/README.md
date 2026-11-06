@@ -66,6 +66,8 @@ warning and the app logs one at start-up.
   textbook lesson. The files are in the private `textbook-materials` blob container; members download
   them through `/textbook-companion/files/:id`. Also adds `textbook_lessons.games` ("name | link" per
   line) and the 12 lessons of Jinan “中文” Book 1 (第一课–第十二课), to be renamed at `/admin/textbooks`.
+- `0011_add-tool-videos.sql` — `tool_videos`: a Chinese and an English YouTube tutorial link per tool page,
+  set at `/admin/toolvideos`. Tool pages show a "Watch how" button when their path has a video.
 
 ## Other files
 

@@ -8,6 +8,18 @@ var wordTranslator = require('../services/wordTranslator');
 var router = express.Router();
 router.use('/teacher-library', require('./teacherLibrary'));
 
+// Tutorial videos per tool page, read by milk-tea-footer.js on every page.
+router.get('/tool-videos', async function (req, res) {
+  try {
+    res.set('Cache-Control', 'public, max-age=120');
+    res.json({ videos: await require('../services/toolVideos').forPages() });
+  } catch (error) {
+    console.error('tool videos error:', error.message);
+    res.set('Cache-Control', 'no-store');
+    res.json({ videos: {} });
+  }
+});
+
 var azureAuthEnabled = authUser.azureAuthEnabled;
 var currentUser = authUser.currentUser;
 
