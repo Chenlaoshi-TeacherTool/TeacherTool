@@ -16,10 +16,13 @@ var teacherAccountsRepository = require('../services/teacherAccountsRepository')
 var databaseVersion = require('../services/databaseVersion');
 var activationCodes = require('../services/activationCodes');
 var communityRepository = require('../services/communityRepository');
+var textbookRepository = require('../services/textbookRepository');
+var textbookFileStorage = require('../services/textbookFileStorage');
 var communityService = require('../services/community');
 var sql = sqlClient.sql;
 
 var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
+var uploadMaterial = multer({ storage: multer.memoryStorage(), limits: { fileSize: textbookFileStorage.MAX_BYTES } });
 
 router.use(requireAdmin);
 
@@ -986,6 +989,7 @@ function lessonInputs(request, body) {
     .input('title', sql.NVarChar, String(body.title || '').trim())
     .input('patterns', sql.NVarChar, String(body.sentence_patterns || '').trim() || null)
     .input('activities', sql.NVarChar, String(body.activities || '').trim() || null)
+    .input('games', sql.NVarChar, String(body.games || '').trim() || null)
     .input('isPublished', sql.Bit, body.is_published === 'on');
 }
 
@@ -1072,8 +1076,8 @@ router.post('/textbooks/lessons/new', async function (req, res, next) {
     if (!textbooks.findSeries(req.body.series)) return res.status(400).send('Unknown textbook series.');
     var pool = await sqlClient.getPool();
     var result = await lessonInputs(pool.request(), req.body).query(
-      'INSERT INTO textbook_lessons (slug, series, book_slug, book_name, sort_order, lesson_no, title, sentence_patterns, activities, is_published) ' +
-      'OUTPUT INSERTED.id VALUES (@slug, @series, @bookSlug, @bookName, @sortOrder, @lessonNo, @title, @patterns, @activities, @isPublished)'
+      'INSERT INTO textbook_lessons (slug, series, book_slug, book_name, sort_order, lesson_no, title, sentence_patterns, activities, games, is_published) ' +
+      'OUTPUT INSERTED.id VALUES (@slug, @series, @bookSlug, @bookName, @sortOrder, @lessonNo, @title, @patterns, @activities, @games, @isPublished)'
     );
     res.redirect('/admin/textbooks/lessons/' + result.recordset[0].id + '/edit');
   } catch (err) { next(err); }
@@ -1087,9 +1091,11 @@ router.get('/textbooks/lessons/:id/edit', async function (req, res, next) {
     if (!lesson) return res.status(404).send('Lesson not found.');
     var itemsResult = await pool.request().input('lessonId', sql.Int, lesson.id)
       .query('SELECT * FROM textbook_lesson_items WHERE lesson_id = @lessonId ORDER BY sort_order, id');
+    var files = [];
+    try { files = await textbookRepository.listFiles(lesson.id); } catch (error) { files = null; }
     res.render('admin/textbooks-lesson-edit', {
       title: 'Edit ' + lesson.title, seriesList: textbooks.SERIES, lesson: lesson, defaults: lesson,
-      items: itemsResult.recordset, bookPath: bookPath, adminUser: req.adminUser
+      items: itemsResult.recordset, files: files, fileError: req.query.fileError || '', bookPath: bookPath, adminUser: req.adminUser
     });
   } catch (err) { next(err); }
 });
@@ -1100,7 +1106,7 @@ router.post('/textbooks/lessons/:id', async function (req, res, next) {
     var pool = await sqlClient.getPool();
     await lessonInputs(pool.request(), req.body).input('id', sql.Int, req.params.id).query(
       'UPDATE textbook_lessons SET slug=@slug, series=@series, book_slug=@bookSlug, book_name=@bookName, sort_order=@sortOrder, lesson_no=@lessonNo, ' +
-      'title=@title, sentence_patterns=@patterns, activities=@activities, is_published=@isPublished, updated_at=SYSUTCDATETIME() WHERE id=@id'
+      'title=@title, sentence_patterns=@patterns, activities=@activities, games=@games, is_published=@isPublished, updated_at=SYSUTCDATETIME() WHERE id=@id'
     );
     res.redirect('/admin/textbooks/lessons/' + req.params.id + '/edit');
   } catch (err) { next(err); }
@@ -1109,10 +1115,43 @@ router.post('/textbooks/lessons/:id', async function (req, res, next) {
 router.post('/textbooks/lessons/:id/delete', async function (req, res, next) {
   try {
     var pool = await sqlClient.getPool();
+    var lessonFiles = [];
+    try { lessonFiles = await textbookRepository.listFiles(Number(req.params.id)); } catch (error) { lessonFiles = []; }
     var result = await pool.request().input('id', sql.Int, req.params.id)
       .query('DELETE FROM textbook_lessons OUTPUT DELETED.series, DELETED.book_slug WHERE id = @id');
     var deleted = result.recordset[0];
+    if (deleted) for (var file of lessonFiles) { try { await textbookFileStorage.remove(file.blobName); } catch (error) { console.error('textbook file remove error:', error.message); } }
     res.redirect(deleted ? bookPath(deleted.series, deleted.book_slug) : '/admin/textbooks');
+  } catch (err) { next(err); }
+});
+
+// Lesson files (PDF, Word, PowerPoint...). Members download them from the lesson page.
+router.post('/textbooks/lessons/:id/files', function (req, res, next) {
+  uploadMaterial.single('file')(req, res, function (error) {
+    if (error) return res.redirect(303, '/admin/textbooks/lessons/' + encodeURIComponent(req.params.id) + '/edit?fileError=' + encodeURIComponent(error.code === 'LIMIT_FILE_SIZE' ? 'Files can be at most 30 MB.' : error.message) + '#files');
+    next();
+  });
+}, async function (req, res, next) {
+  var back = '/admin/textbooks/lessons/' + encodeURIComponent(req.params.id) + '/edit';
+  try {
+    if (!/^\d+$/.test(req.params.id)) return res.status(404).send('Lesson not found.');
+    try { textbookFileStorage.check(req.file); }
+    catch (error) { return res.redirect(303, back + '?fileError=' + encodeURIComponent(error.message) + '#files'); }
+    var fileName = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
+    var title = String(req.body.title || '').trim().slice(0, 200) || fileName.replace(/\.[^.]+$/, '');
+    var stored = await textbookFileStorage.save(req.file);
+    try {
+      await textbookRepository.addFile(Number(req.params.id), { title: title, fileName: fileName.slice(0, 200), blobName: stored.blobName, contentType: stored.contentType, size: stored.size });
+    } catch (error) { await textbookFileStorage.remove(stored.blobName); throw error; }
+    res.redirect(303, back + '#files');
+  } catch (err) { next(err); }
+});
+
+router.post('/textbooks/lessons/:id/files/:fileId/delete', async function (req, res, next) {
+  try {
+    var blobName = await textbookRepository.deleteFile(Number(req.params.id), Number(req.params.fileId));
+    if (blobName) await textbookFileStorage.remove(blobName);
+    res.redirect(303, '/admin/textbooks/lessons/' + encodeURIComponent(req.params.id) + '/edit#files');
   } catch (err) { next(err); }
 });
 

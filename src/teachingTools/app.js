@@ -14,6 +14,7 @@ var adminRouter = require('./routes/admin');
 var bookGeneratorRouter = require('./routes/bookGenerator');
 var gameSharesRouter = require('./routes/gameShares');
 var communityRouter = require('./routes/community');
+var textbookCompanionRouter = require('./routes/textbookCompanion');
 
 var app = express();
 
@@ -87,6 +88,7 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(path.join(__dirname, 'public'), { redirect: false }));
 
+app.use('/', textbookCompanionRouter);
 app.use('/', siteStructureRouter);
 app.use('/', indexRouter);
 app.use('/', bookGeneratorRouter);

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; %>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Companion materials for Chinese textbooks: lesson vocabulary, sentence patterns, activities and printable files, starting with the Jinan University “中文” textbook.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/textbook-companion/textbook-companion.css">
+</head>
+<body>
+  <header class="content-hero"><div class="content-shell">
+    <h1><%= title %></h1>
+    <p><%= L('Companion materials for popular Chinese textbooks: vocabulary, sentence patterns, activities and printable files for each lesson.', '常用中文教材的配套资源：每一课的生词、句型、课堂活动和可打印材料。') %></p>
+  </div></header>
+  <main class="content-section"><div class="content-shell resource-grid">
+    <% available.forEach(function (card) { %>
+    <section class="resource-card tc-card">
+      <% if (card.membersOnly) { %><p class="tc-badge"><%= L('Members', '会员专享') %></p><% } %>
+      <h2><a href="<%= card.href %>"><%= card.heading %></a></h2>
+      <p><%= card.description %></p>
+      <a class="resource-card__link" href="<%= card.href %>"><%= L('Open', '进入') %> →</a>
+    </section>
+    <% }) %>
+    <% comingSoon.forEach(function (card) { %>
+    <section class="resource-card is-coming-soon" aria-disabled="true">
+      <p class="resource-card__soon"><%= L('Coming soon', '即将推出') %></p>
+      <h2><%= card.heading %></h2>
+      <p><%= card.description %></p>
+    </section>
+    <% }) %>
+  </div></main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

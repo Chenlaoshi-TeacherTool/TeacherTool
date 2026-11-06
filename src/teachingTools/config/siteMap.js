@@ -47,7 +47,18 @@ var SECTIONS = [
       { key: 'animals', href: '/theme-activities/animals', en: 'Animals', zh: '动物', template: 'theme' }
     ]
   },
-  { key: 'textbook', href: '/textbook-companion', en: 'Textbook Companion', zh: '教材配套', nav: true, admin: ['textbooks'] },
+  {
+    key: 'textbook', href: '/textbook-companion', en: 'Textbook Companion', zh: '教材配套', nav: true, admin: ['textbooks'],
+    // Series with books in config/textbooks.js have public pages (routes/textbookCompanion.js).
+    children: require('./textbooks').SERIES.filter(function(series) { return series.books; }).map(function(series) {
+      return {
+        key: series.key, href: '/textbook-companion/' + series.key, en: series.en, zh: series.zh,
+        children: series.books.map(function(book) {
+          return { key: series.key + '-' + book.slug, href: '/textbook-companion/' + series.key + '/' + book.slug, en: series.en + ' ' + book.en, zh: series.zh + book.zh };
+        })
+      };
+    })
+  },
   { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, admin: ['community'] },
   { key: 'finds', href: '/classroom-finds', en: 'Classroom Finds', zh: '教室好物', nav: true, admin: ['recommendations'] },
   {

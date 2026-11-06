@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; %>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: title + ': vocabulary, sentence patterns, classroom activities and printable files.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/textbook-companion/textbook-companion.css">
+</head>
+<body>
+  <header class="content-hero tc-lesson-hero"><div class="content-shell">
+    <a class="text-link" href="<%= bookHref %>">← <%= seriesName %> <%= bookName %></a>
+    <h1><% if (lesson.lessonNo != null && !/^第.+课$/.test(lesson.title)) { %><span class="tc-hero-no"><%= L('Lesson ' + lesson.lessonNo, '第' + lesson.lessonNo + '课') %></span><% } %><%= lesson.title %></h1>
+  </div></header>
+  <main class="content-section"><div class="content-shell tc-lesson" id="tcLesson" data-title="<%= seriesName %> <%= bookName %> <%= lesson.title %>">
+
+  <% if (!access.unlocked) { %>
+    <%- include('members-note', { access: access, L: L }) %>
+    <section class="tc-block is-locked">
+      <h2><%= L('In this lesson', '这一课包括') %></h2>
+      <ul class="tc-locked-list">
+        <% if (lesson.wordCount) { %><li>🔒 <%= L(lesson.wordCount + ' vocabulary words with pinyin and English', lesson.wordCount + ' 个生词（含拼音和英文）') %></li><% } %>
+        <% if (lesson.patternCount) { %><li>🔒 <%= L(lesson.patternCount + ' sentence patterns', lesson.patternCount + ' 个句型') %></li><% } %>
+        <% if (lesson.gameCount) { %><li>🔒 <%= L(lesson.gameCount + ' games', lesson.gameCount + ' 个游戏') %></li><% } %>
+        <% if (lesson.activityCount) { %><li>🔒 <%= L(lesson.activityCount + ' classroom activities', lesson.activityCount + ' 个课堂活动') %></li><% } %>
+        <% lesson.files.forEach(function (file) { %><li>🔒 <%= file.title %> <span class="tc-file-name"><%= file.fileName %></span></li><% }) %>
+        <% if (!lesson.wordCount && !lesson.patternCount && !lesson.activityCount && !lesson.gameCount && !lesson.files.length) { %><li><%= L('Materials are being added.', '材料正在陆续添加中。') %></li><% } %>
+      </ul>
+    </section>
+  <% } else { %>
+    <% if (lesson.files.length) { %>
+    <section class="tc-block">
+      <h2><%= L('Printable files', '可打印材料') %></h2>
+      <ul class="tc-files">
+        <% lesson.files.forEach(function (file) { %>
+        <li><a href="/textbook-companion/files/<%= file.id %>"><span class="tc-file-icon" aria-hidden="true">📄</span><span><strong><%= file.title %></strong><span class="tc-file-name"><%= file.fileName %> · <%= Math.max(1, Math.round(file.size / 1024)) %> KB</span></span><span class="tc-file-get"><%= L('Download', '下载') %></span></a></li>
+        <% }) %>
+      </ul>
+    </section>
+    <% } %>
+
+    <% if (lesson.words.length) { %>
+    <section class="tc-block">
+      <div class="tc-block-head">
+        <h2><%= L('Vocabulary', '生词') %> <span class="tc-count"><%= lesson.words.length %></span></h2>
+        <div class="tc-actions">
+          <button class="tc-button" type="button" data-action="save"><%= L('Save to my word lists', '保存到我的词表') %></button>
+          <button class="tc-button is-secondary" type="button" data-action="copy"><%= L('Copy the words', '复制词语') %></button>
+        </div>
+      </div>
+      <p class="tc-status" id="tcStatus" role="status" aria-live="polite"></p>
+      <script type="application/json" id="tcWords"><%- JSON.stringify(lesson.words).replace(/</g, '\\u003c') %></script>
+      <table class="tc-words">
+        <thead><tr><th><%= L('Word', '词语') %></th><th><%= L('Pinyin', '拼音') %></th><th><%= L('English', '英文') %></th><th><%= L('Type', '类别') %></th></tr></thead>
+        <tbody>
+          <% lesson.words.forEach(function (word) { %>
+          <tr><td lang="zh"><%= word.zh %></td><td><%= word.py %></td><td><%= word.en || '—' %></td><td><%= word.kind || '' %></td></tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </section>
+    <% } %>
+
+    <% if (lesson.patterns.length) { %>
+    <section class="tc-block">
+      <h2><%= L('Sentence patterns', '句型') %></h2>
+      <ul class="tc-list"><% lesson.patterns.forEach(function (line) { %><li lang="zh"><%= line %></li><% }) %></ul>
+    </section>
+    <% } %>
+
+    <% if (lesson.games.length) { %>
+    <section class="tc-block">
+      <h2><%= L('Games', '游戏') %></h2>
+      <ul class="tc-links">
+        <% lesson.games.forEach(function (item) { %>
+        <li><% if (item.href) { %><a href="<%= item.href %>"<%- /^https:/i.test(item.href) ? ' target="_blank" rel="noopener"' : '' %>><span aria-hidden="true">🎮</span> <%= item.text %> <span class="tc-go">→</span></a><% } else { %><span>🎮 <%= item.text %></span><% } %></li>
+        <% }) %>
+      </ul>
+    </section>
+    <% } %>
+
+    <% if (lesson.activities.length) { %>
+    <section class="tc-block">
+      <h2><%= L('Classroom activities', '课堂活动') %></h2>
+      <ul class="tc-list"><% lesson.activities.forEach(function (item) { %><li><% if (item.href) { %><a href="<%= item.href %>"<%- /^https:/i.test(item.href) ? ' target="_blank" rel="noopener"' : '' %>><%= item.text %></a><% } else { %><%= item.text %><% } %></li><% }) %></ul>
+    </section>
+    <% } %>
+
+    <% if (!lesson.files.length && !lesson.words.length && !lesson.patterns.length && !lesson.activities.length && !lesson.games.length) { %>
+      <p class="tc-empty"><%= L('Materials for this lesson are being added.', '这一课的材料正在陆续添加中。') %></p>
+    <% } %>
+  <% } %>
+  </div></main>
+  <% if (access.unlocked && lesson.words && lesson.words.length) { %>
+  <script>
+    window.TC_TEXT = <%- JSON.stringify({ saved: L('Saved to your word lists in this browser.', '已保存到这个浏览器的词表里。'), saveFailed: L('This list could not be saved in this browser. Try copying the words instead.', '这个浏览器无法保存词表，请改用复制词语。'), copied: L('Copied! Paste the words into any tool.', '已复制！粘贴到任何工具里就能用。'), copyFailed: L('Copying did not work. Select the words in the table and copy them.', '复制失败。请在表格里选中词语再复制。') }).replace(/</g, '\\u003c') %>;
+  </script>
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="/textbook-companion/lesson.js"></script>
+  <% } %>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

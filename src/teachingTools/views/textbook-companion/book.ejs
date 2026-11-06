@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; %>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: title + ': lesson vocabulary, sentence patterns, activities and printable files.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/textbook-companion/textbook-companion.css">
+</head>
+<body>
+  <header class="content-hero"><div class="content-shell">
+    <a class="text-link" href="/textbook-companion/<%= series.key %>">← <%= seriesName %></a>
+    <h1><%= seriesName %> <%= bookName %></h1>
+    <p><%= L('Every lesson’s vocabulary, sentence patterns, activities and printable files.', '每一课的生词、句型、课堂活动和可打印材料。') %></p>
+  </div></header>
+  <main class="content-section"><div class="content-shell">
+    <% if (series.membersOnly && !access.unlocked) { %><%- include('members-note', { access: access, L: L }) %><% } %>
+
+    <% if (unavailable) { %>
+      <p class="tc-empty"><%= L('The lessons could not be loaded right now. Please try again later.', '课文暂时无法加载，请稍后再试。') %></p>
+    <% } else if (!lessons.length) { %>
+      <p class="tc-empty"><%= L('Materials for this book are being added. Check back soon!', '这一册的材料正在陆续添加中，敬请期待！') %></p>
+    <% } else { %>
+      <ol class="tc-lessons">
+        <% lessons.forEach(function (lesson) { %>
+        <li>
+          <a href="<%= base %>/<%= lesson.slug %>">
+            <span class="tc-lesson-no"><%= lesson.lessonNo != null ? L('Lesson ' + lesson.lessonNo, '第' + lesson.lessonNo + '课') : '' %></span>
+            <span class="tc-lesson-title"><%= lesson.title %></span>
+            <span class="tc-lesson-meta">
+              <% if (lesson.wordCount) { %><%= L(lesson.wordCount + ' words', lesson.wordCount + ' 个生词') %><% } %>
+              <% if (lesson.fileCount) { %> · <%= L(lesson.fileCount + ' files', lesson.fileCount + ' 份材料') %><% } %>
+              <% if (series.membersOnly && !access.unlocked) { %> · 🔒<% } %>
+            </span>
+          </a>
+        </li>
+        <% }) %>
+      </ol>
+    <% } %>
+  </div></main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

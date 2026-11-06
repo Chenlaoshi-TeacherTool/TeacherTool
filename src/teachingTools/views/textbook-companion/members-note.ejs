@@ -1,0 +1,11 @@
+<section class="tc-members" id="members">
+  <p class="tc-members-title">🔒 <%= L('Member materials', '会员专享材料') %></p>
+  <% if (access.signedIn) { %>
+    <p><%= L('Your account does not have an active membership. Become a member to open the words, sentence patterns, activities and files for every lesson.', '你的账号目前没有有效的会员。成为会员后，可以打开每一课的生词、句型、活动并下载材料。') %></p>
+    <a class="tc-button" href="/membership"><%= L('Become a member', '成为会员') %></a>
+  <% } else { %>
+    <p><%= L('Members can open the words, sentence patterns, activities and files for every lesson. Already a member? Sign in.', '会员可以打开每一课的生词、句型、活动并下载材料。已经是会员？请先登录。') %></p>
+    <% if (access.loginUrl) { %><a class="tc-button" href="<%= access.loginUrl %>"><%= L('Sign in', '登录') %></a><% } %>
+    <a class="tc-button is-secondary" href="/membership"><%= L('About membership', '了解会员') %></a>
+  <% } %>
+</section>

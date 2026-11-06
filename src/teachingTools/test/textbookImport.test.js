@@ -129,9 +129,12 @@ test('admin textbook pages render', async function () {
   var lesson = { id: 5, slug: 'bubian-1a-01', series: 'bubian', book_slug: '1a', book_name: '一年级上册', sort_order: 1, lesson_no: null, title: '第1课《天地人》', sentence_patterns: '“我是……”', activities: '', is_published: true };
   var edit = await ejs.renderFile(path.join(views, 'textbooks-lesson-edit.ejs'), Object.assign({
     title: 'Edit', seriesList: textbooks.SERIES, lesson: lesson, defaults: lesson, bookPath: bookPath,
-    items: [{ id: 1, zh: '天', py: 'tiān', en: 'sky', kind: '识字' }]
+    items: [{ id: 1, zh: '天', py: 'tiān', en: 'sky', kind: '识字' }],
+    files: [{ id: 9, title: '第1课 作业单', fileName: 'hw.pdf', size: 4096 }], fileError: ''
   }, common));
   assert.ok(edit.includes('action="/admin/textbooks/lessons/5/items/1"'));
+  assert.ok(edit.includes('action="/admin/textbooks/lessons/5/files/9/delete"'));
+  assert.ok(edit.includes('enctype="multipart/form-data"'));
   var created = await ejs.renderFile(path.join(views, 'textbooks-lesson-edit.ejs'), Object.assign({
     title: 'New', seriesList: textbooks.SERIES, lesson: null, items: [], bookPath: bookPath,
     defaults: { series: 'nihao', book_slug: 'book-2', book_name: '第二册' }

@@ -31,6 +31,10 @@ function create(options) {
     // The My activities dashboard (all shared items, their status, account sync).
     canUseMyActivities: async function (req) {
       return !enabled() || isMember(req);
+    },
+    // Members-only textbook companion material (words, patterns, activities, files).
+    canUseTextbookMaterials: async function (req) {
+      return !enabled() || isMember(req);
     }
   };
 }

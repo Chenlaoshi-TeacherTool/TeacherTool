@@ -62,6 +62,10 @@ warning and the app logs one at start-up.
 - `0009_add-community-posts.sql` — `community_posts` and `community_reports`: word lists and games
   teachers publish at `/community`, plus the reports other teachers send. Hidden or deleted at
   `/admin/community`.
+- `0010_add-textbook-lesson-files.sql` — `textbook_lesson_files`: PDF/Word/PowerPoint files attached to a
+  textbook lesson. The files are in the private `textbook-materials` blob container; members download
+  them through `/textbook-companion/files/:id`. Also adds `textbook_lessons.games` ("name | link" per
+  line) and the 12 lessons of Jinan “中文” Book 1 (第一课–第十二课), to be renamed at `/admin/textbooks`.
 
 ## Other files
 

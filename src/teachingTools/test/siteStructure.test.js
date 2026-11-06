@@ -22,7 +22,8 @@ test('new section pages render in both languages with the required categories', 
   var pages = {
     '/shop': ['Printable packs', 'Physical products'],
     '/shop/printable-packs': ['No printable packs are listed for sale yet.'],
-    '/textbook-companion': ['Jinan University “中文” · Book 1', 'Book 2', 'PEP Chinese', 'HSK Standard Course', 'Chinese Made Easy', 'Coming soon', 'is-coming-soon'],
+    '/textbook-companion': ['/textbook-companion/jinan', 'Members', 'PEP Chinese', 'HSK Standard Course', 'Chinese Made Easy', 'Coming soon', 'is-coming-soon'],
+    '/textbook-companion/jinan': ['/textbook-companion/jinan/book-1', '/textbook-companion/jinan/book-2', 'Book 1', 'Book 2'],
     '/theme-activities/self-introduction': ['Who Am I? 我是谁？阅读卡片', '/printables/self-introduction/who-am-i-reading-cards.pdf', '/printables/self-introduction/who-am-i-reading-cards.docx'],
     '/theme-activities/halloween': ['Vocabulary', 'Games', 'Printables', '/theme-activities/halloween/printables'],
     '/theme-activities/halloween/printables': ['万圣节方位词_Gallery_Walk', 'halloween-position-words-gallery-walk.pdf', 'halloween-position-words-gallery-walk.docx'],
@@ -75,7 +76,7 @@ test('product detail pages preserve published content and fallback; unknown page
     assert.ok(listing.includes('/classroom-finds/test-cart'));
     var detail = await (await fetch(base + '/classroom-finds/test-cart')).text();
     for (var expected of ['Published description', 'Published reason', '/labels.pdf', 'https://amzn.to/example', 'sponsored nofollow']) assert.ok(detail.includes(expected));
-    for (var path of ['/classroom-finds/missing', '/classroom-finds/15-drawer-rolling-cart', '/textbook-companion/missing', '/theme-activities/missing', '/shop/missing']) {
+    for (var path of ['/classroom-finds/missing', '/classroom-finds/15-drawer-rolling-cart', '/textbook-companion/missing', '/textbook-companion/jinan/book-9', '/theme-activities/missing', '/shop/missing']) {
       assert.equal((await fetch(base + path)).status, 404, path);
     }
     var sitemap = await (await fetch(base + '/sitemap.xml')).text();

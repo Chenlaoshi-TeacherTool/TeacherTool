@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; %>
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: seriesName + ' companion materials: lesson vocabulary, sentence patterns, activities and printable files for each book.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/textbook-companion/textbook-companion.css">
+</head>
+<body>
+  <header class="content-hero"><div class="content-shell">
+    <a class="text-link" href="/textbook-companion">← <%= L('Textbook Companion', '教材配套') %></a>
+    <h1><%= seriesName %></h1>
+    <p><%= series.membersOnly
+      ? L('Choose a book to see its lessons. Everyone can see what each lesson includes; members open the words, patterns, activities and files.', '选择一册查看课文。所有人都能看到每课有哪些内容；会员可以打开生词、句型、活动并下载材料。')
+      : L('Choose a book to see its lessons.', '选择一册查看课文。') %></p>
+  </div></header>
+  <main class="content-section"><div class="content-shell resource-grid">
+    <% books.forEach(function (book) { %>
+    <section class="resource-card tc-card">
+      <% if (series.membersOnly) { %><p class="tc-badge"><%= L('Members', '会员专享') %></p><% } %>
+      <h2><a href="<%= book.href %>"><%= book.name %></a></h2>
+      <p><%= book.lessons ? L(book.lessons + ' lessons', '共 ' + book.lessons + ' 课') : L('Materials are being added.', '材料正在陆续添加中。') %></p>
+      <a class="resource-card__link" href="<%= book.href %>"><%= L('Open book', '查看课文') %> →</a>
+    </section>
+    <% }) %>
+  </div></main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

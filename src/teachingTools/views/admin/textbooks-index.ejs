@@ -7,7 +7,11 @@
 <p style="font-size:0.9rem;color:#444;">Lessons for the textbook companion pages. Export, edit in Excel, and import again to change many lessons at once, or open a book to edit one lesson.</p>
 
 <% groups.forEach(function (group) { %>
-<h2><%= group.series.zh %> <span style="font-weight:400;color:#666;font-size:0.9rem;"><%= group.series.en %> · <code><%= group.series.key %></code></span></h2>
+<h2><%= group.series.zh %> <span style="font-weight:400;color:#666;font-size:0.9rem;"><%= group.series.en %> · <code><%= group.series.key %></code><%= group.series.membersOnly ? ' · members only' : '' %></span></h2>
+<% if (group.series.books) { %>
+  <p style="font-size:0.9rem;color:#444;">Public pages: <a href="/textbook-companion/<%= group.series.key %>" target="_blank" rel="noopener">/textbook-companion/<%= group.series.key %></a>. Lessons must use these book slugs:
+    <% group.series.books.forEach(function (book) { %><code><%= book.slug %></code> (<%= book.zh %>) <a href="/admin/textbooks/lessons/new?series=<%= group.series.key %>&book=<%= book.slug %>&book_name=<%= encodeURIComponent(book.zh) %>">+ lesson</a> &nbsp; <% }) %></p>
+<% } %>
 <% if (!group.books.length) { %>
   <p style="color:#666;">No lessons yet. <a href="/admin/textbooks/lessons/new?series=<%= group.series.key %>">Add one</a> or import from Excel.</p>
 <% } else { %>
