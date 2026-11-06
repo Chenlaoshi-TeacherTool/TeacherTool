@@ -61,14 +61,13 @@ var SECTIONS = [
       { key: 'physical-products', href: '/shop/physical-products', en: 'Physical products', zh: '实体产品', redirect: 'https://www.ebay.com/usr/clsteachingtools' }
     ]
   },
-  { key: 'about', href: '/about', en: 'About', zh: '关于', nav: true, admin: [] },
-  { key: 'contact', href: '/contact', en: 'Contact', zh: '联系', nav: true, admin: [] },
+  { key: 'about', href: '/about', en: 'About and Contact', zh: '关于与联系', navEn: 'About', navZh: '关于', nav: true, admin: [] },
   { key: 'membership', href: '/membership', en: 'Membership', zh: '会员', admin: ['memberships'] },
   { key: 'privacy', href: '/privacy', en: 'Privacy Policy', zh: '隐私政策', admin: [] }
 ];
 
 // Legal footer links, in display order.
-var FOOTER = ['about', 'finds', 'membership', 'contact', 'privacy'];
+var FOOTER = ['about', 'finds', 'membership', 'privacy'];
 
 // Content that still has public pages but no section in the navigation.
 var UNLISTED = [

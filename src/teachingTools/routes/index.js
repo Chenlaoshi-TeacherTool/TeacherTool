@@ -44,8 +44,9 @@ router.get('/about', function(req, res, next) {
   res.render('about', { title: 'About Chen Laoshi' });
 });
 
+// Contact now lives on the About page.
 router.get('/contact', function(req, res, next) {
-  res.render('contact', { title: 'Contact Chen Laoshi' });
+  res.redirect(301, '/about#contact');
 });
 
 router.get('/feedback', function(req, res, next) {

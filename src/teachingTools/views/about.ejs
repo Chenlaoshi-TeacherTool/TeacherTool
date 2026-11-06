@@ -2,8 +2,8 @@
 <html lang="<%= lang %>">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
-  <title>About Chen Laoshi and This Site - Chen Laoshi's Teaching Toolkit</title>
-  <%- include('partials/seo', { pageDescription: 'Meet Chen Laoshi and learn how this site supports teachers across subjects with practical classroom tools, activities, and thoughtful teaching guidance.' }) %>
+  <title>About and Contact Chen Laoshi - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('partials/seo', { pageDescription: 'Meet Chen Laoshi and learn how this site supports teachers across subjects with practical classroom tools, activities, and thoughtful teaching guidance, or get in touch by email.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
 </head>
 <body>
@@ -14,6 +14,16 @@
       <article><h2><%= t('about.whyTitle') %></h2><p><%= t('about.whyP1') %></p><p><%= t('about.whyP2') %></p></article>
       <article><h2><%= t('about.principlesTitle') %></h2><ul><li><%= t('about.principle1') %></li><li><%= t('about.principle2') %></li><li><%= t('about.principle3') %></li><li><%= t('about.principle4') %></li><li><%= t('about.principle5') %></li></ul></article>
       <article><h2><%= t('about.noteTitle') %></h2><p><%= t('about.noteP1') %></p></article>
+    </div></section>
+    <section class="content-section about-contact" id="contact" aria-labelledby="contact-heading"><div class="content-shell">
+      <p class="content-kicker"><%= t('contact.kicker') %></p>
+      <h2 id="contact-heading"><%= t('contact.title') %></h2>
+      <p><%= t('contact.intro') %></p>
+      <div class="contact-grid">
+        <section class="contact-card"><h3><%= t('contact.emailTitle') %></h3><p><a href="mailto:clsteachingtools@gmail.com">clsteachingtools@gmail.com</a></p><p><%= t('contact.emailHelp') %></p><a class="btn" href="mailto:clsteachingtools@gmail.com?subject=Chen%20Laoshi%20Teaching%20Toolkit%20feedback"><%= t('contact.emailCta') %></a></section>
+        <section class="contact-card"><h3><%= t('contact.reasonsTitle') %></h3><ul><li><%= t('contact.reason1') %></li><li><%= t('contact.reason2') %></li><li><%= t('contact.reason3') %></li><li><%= t('contact.reason4') %></li></ul></section>
+        <section class="contact-card contact-card--wide"><h3><%= t('contact.privacyTitle') %></h3><p><%= t('contact.privacyP1') %></p><p><%= t('contact.privacyP2Prefix') %><a href="/privacy"><%= t('contact.privacyP2Link') %></a><%= t('contact.privacyP2Suffix') %></p></section>
+      </div>
     </div></section>
   </main>
   <script src="/javascripts/milk-tea-footer.js"></script>
