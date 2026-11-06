@@ -16,7 +16,10 @@
       milkTeaHeading: 'Buy me a milk tea 🧋',
       milkTeaBody: 'A small, optional treat helps support new classroom resources. Thank you—there is never any pressure.',
       milkTeaClose: 'Close support options',
-      milkTeaChoose: 'Choose an amount'
+      milkTeaChoose: 'Choose an amount',
+      followUs: 'Follow Chen Laoshi',
+      xhsTitle: 'Copy the Xiaohongshu ID, then search it in the app',
+      xhsCopied: 'Copied!'
     },
     zh: {
       brand: '陈老师教学工具包',
@@ -28,9 +31,47 @@
       milkTeaHeading: '请我喝奶茶 🧋',
       milkTeaBody: '一点小小的、完全自愿的心意可以帮助支持新的教室资源。谢谢您——完全没有压力。',
       milkTeaClose: '关闭支持选项',
-      milkTeaChoose: '自选金额'
+      milkTeaChoose: '自选金额',
+      followUs: '关注陈老师',
+      xhsTitle: '复制小红书号，到小红书 App 里搜索',
+      xhsCopied: '已复制！'
     }
   };
+
+  var SOCIAL_LINKS = [
+    { name: 'YouTube', href: 'https://www.youtube.com/@clsteachingtools' },
+    { name: 'Instagram', href: 'https://www.instagram.com/clsteachingtools/' },
+    { name: 'TikTok', href: 'https://www.tiktok.com/@clsteachingtools' },
+    { name: 'Facebook', href: 'https://www.facebook.com/people/clsteachingtools/61594210325100/' }
+  ];
+  var XHS_ID = 'clsteachingtool';
+
+  function buildSocialHtml(t) {
+    return '<div class="site-social-links"><span class="site-social-label">' + t.followUs + '</span>' +
+      SOCIAL_LINKS.map(function(item) {
+        return '<a href="' + item.href + '" target="_blank" rel="noopener noreferrer">' + item.name + '</a>';
+      }).join('') +
+      '<button type="button" class="site-social-xhs" data-xhs-id="' + XHS_ID + '" title="' + t.xhsTitle + '">小红书号 ' + XHS_ID + '</button>' +
+      '</div>';
+  }
+
+  function wireXhsCopy(root, t) {
+    var button = root.querySelector('.site-social-xhs');
+    if (!button) return;
+    var original = button.textContent;
+    button.addEventListener('click', function () {
+      var id = button.getAttribute('data-xhs-id');
+      var done = function () {
+        button.textContent = t.xhsCopied;
+        setTimeout(function () { button.textContent = original; }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(id).then(done, function () { window.prompt(t.xhsTitle, id); });
+      } else {
+        window.prompt(t.xhsTitle, id);
+      }
+    });
+  }
 
   function getLang() {
     var match = document.cookie.match(/(?:^|; )lang=([^;]+)/);
@@ -61,6 +102,11 @@
       '.site-legal-footer-inner { width: min(1140px, calc(100% - 40px)); margin: 0 auto; }',
       '.site-legal-footer p { margin: 0; color: inherit; font-size: .92rem; line-height: 1.6; }',
       '.site-legal-footer a { color: #fff2c5; font-weight: 900; text-underline-offset: 3px; }',
+      '.site-social-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }',
+      '.site-social-label { margin-right: 4px; font-size: .92rem; font-weight: 900; }',
+      '.site-social-links a, .site-social-xhs { display: inline-flex; align-items: center; min-height: 34px; padding: 6px 13px; border: 1px solid rgba(255, 242, 197, .45); border-radius: 999px; background: rgba(255, 255, 255, .08); color: #fff2c5; font: inherit; font-size: .88rem; font-weight: 900; text-decoration: none; cursor: pointer; }',
+      '.site-social-links a:hover, .site-social-xhs:hover { background: rgba(255, 242, 197, .18); }',
+      '.site-social-links a:focus-visible, .site-social-xhs:focus-visible { outline: 3px solid #fff2c5; outline-offset: 2px; }',
       '.milk-tea-site-footer { margin: 0; padding: 30px 20px; background: #eef5df; border-top: 1px solid #d4e1c1; color: #194f45; }',
       '.milk-tea-site-footer * { box-sizing: border-box; }',
       '.milk-tea-footer-inner { width: min(1140px, calc(100% - 40px)); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 22px; }',
@@ -121,10 +167,12 @@
     legalFooter.setAttribute('aria-label', 'Site information');
     legalFooter.innerHTML = [
       '<div class="site-legal-footer-inner">',
+      '  ' + buildSocialHtml(t),
       '  <p>' + [t.copyright].concat(SITE_NAV.footer.map(function(item) { return linkHtml(item, lang); })).join(' &middot; ') + '</p>',
       '</div>'
     ].join('');
     if (legalFooter.parentElement !== document.body) document.body.appendChild(legalFooter);
+    wireXhsCopy(legalFooter, t);
 
     var footer = document.createElement('aside');
     footer.id = 'milkTeaFooter';
