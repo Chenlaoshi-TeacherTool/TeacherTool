@@ -445,6 +445,9 @@
     return shuffle(items, rng).slice(0, Math.min(n, items.length));
   }
 
+  // Pinyin text in the school-style font (single-storey a).
+  function pyHtml(py) { return py ? '<span class="wg-py">' + esc(py) + '</span>' : ''; }
+
   // Word with pinyin above each character (or above the whole word if the
   // syllable count doesn't line up).
   function rubyWord(hz, py, show) {
@@ -534,7 +537,7 @@
     vocab: function (ctx) {
       var rows = ctx.items.map(function (it, i) {
         return '<tr><td class="wg-num">' + (i + 1) + '</td><td class="wg-cell-hz">' + esc(it.hz) +
-          '</td><td>' + esc(it.py) + '</td>' + ctx.langs.map(function (c) {
+          '</td><td class="wg-py">' + esc(it.py) + '</td>' + ctx.langs.map(function (c) {
             return '<td lang="' + c + '">' + esc(meaning(it, c)) + '</td>';
           }).join('') + '</tr>';
       }).join('');
@@ -557,7 +560,7 @@
           '<span class="wg-match-left"><span class="wg-num">' + (i + 1) + '.</span> ' + rubyWord(it.hz, it.py, ctx.pinyin) +
           (ctx.answers ? ' <span class="wg-answer">→ ' + ansLetter + '</span>' : '') + '</span>' +
           '<span></span><span class="wg-match-gap"></span><span class="wg-dot"></span>' +
-          '<span class="wg-match-right"><span class="wg-num">' + LETTERS[i] + '.</span> ' + esc(target.mean || target.py) + '</span>' +
+          '<span class="wg-match-right"><span class="wg-num">' + LETTERS[i] + '.</span> ' + (target.mean ? esc(target.mean) : pyHtml(target.py)) + '</span>' +
           '</div>';
       });
       return html + '</div>';
@@ -568,7 +571,7 @@
       return '<ol class="wg-list">' + qs.map(function (it) {
         var others = shuffle(ctx.items.filter(function (o) { return o !== it; }), ctx.rng).slice(0, 3);
         var options = shuffle(others.concat([it]), ctx.rng);
-        return '<li class="wg-item"><div class="wg-q">' + esc(it.mean || it.py) + '</div><div class="wg-options">' +
+        return '<li class="wg-item"><div class="wg-q">' + (it.mean ? esc(it.mean) : pyHtml(it.py)) + '</div><div class="wg-options">' +
           options.map(function (o, i) {
             var correct = ctx.answers && o === it;
             return '<span class="wg-option' + (correct ? ' is-correct' : '') + '"><b>' + LETTERS[i] + '.</b> ' +
@@ -591,7 +594,7 @@
     pinyin: function (ctx) {
       var qs = pick(ctx.items, ctx.count, ctx.rng);
       return '<ol class="wg-list wg-cols-3">' + qs.map(function (it) {
-        return '<li class="wg-item wg-py-item"><div class="wg-py-label">' + esc(it.py) + '</div>' + tzgWord(it.hz, ctx.answers) + '</li>';
+        return '<li class="wg-item wg-py-item"><div class="wg-py-label wg-py">' + esc(it.py) + '</div>' + tzgWord(it.hz, ctx.answers) + '</li>';
       }).join('') + '</ol>';
     },
 
@@ -689,7 +692,7 @@
         }).join('') + '</tr>';
       });
       html += '</tbody></table><ul class="wg-ws-words">' + puzzle.placed.map(function (it) {
-        return '<li><span class="wg-ws-box"></span>' + esc(ctx.pinyin ? it.py : '') + (ctx.pinyin && it.mean ? ' · ' : '') + esc(it.mean) +
+        return '<li><span class="wg-ws-box"></span>' + (ctx.pinyin ? pyHtml(it.py) : '') + (ctx.pinyin && it.mean ? ' · ' : '') + esc(it.mean) +
           (ctx.answers || (!it.mean && !ctx.pinyin) ? ' <span class="wg-answer">' + esc(it.hz) + '</span>' : '') + '</li>';
       }).join('') + '</ul></div>';
       return html;
@@ -713,7 +716,7 @@
         var boxes = [tzg(ch.c, 'model')];
         for (var i = 0; i < 3; i++) boxes.push(tzg(ch.c, 'trace'));
         while (boxes.length < perRow) boxes.push(tzg('', ''));
-        return '<div class="wg-trace-row wg-item">' + (ctx.pinyin ? '<span class="wg-trace-py">' + esc(ch.py) + '</span>' : '') +
+        return '<div class="wg-trace-row wg-item">' + (ctx.pinyin ? '<span class="wg-trace-py wg-py">' + esc(ch.py) + '</span>' : '') +
           '<div class="wg-trace-boxes">' + boxes.join('') + '</div></div>';
       }).join('') + '</div>';
     }

@@ -102,7 +102,9 @@
   font-family: var(--hz-font);
 }
 .wg-hz, .wg-sentence, .wg-chunk, .wg-cell-hz { font-size: var(--hz); }
-.wg-sheet rt { font-family: "Segoe UI", Arial, sans-serif; font-size: .5em; color: #333; }
+/* Pinyin: Andika (and Century Gothic as a local fallback) draw a as the single-storey ɑ, like school textbooks. */
+.wg-sheet rt, .wg-sheet .wg-py { font-family: "Andika", "Century Gothic", "Segoe UI", Arial, sans-serif; }
+.wg-sheet rt { font-size: .5em; color: #333; }
 
 .wg-sheet-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 2px solid #111; padding-bottom: 6px; }
 .wg-sheet-head h2 { margin: 0; font-family: var(--hz-font); font-size: 26px; line-height: 1.3; color: #111; }
