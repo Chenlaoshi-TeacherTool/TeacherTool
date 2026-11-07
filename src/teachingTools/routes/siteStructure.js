@@ -49,6 +49,15 @@ router.get('/theme-activities/self-introduction', function(req, res) {
   });
 });
 
+router.get('/theme-activities/five-elements', function(req, res) {
+  res.render('theme-activities/five-elements', {
+    title: text(req, 'Five Elements', '五行'),
+    parent: parentLink(req, 'activities'),
+    pdf: PRINTABLES_BASE + 'five-elements/planet-treasure-hunt-pencil-a4.pdf',
+    docx: PRINTABLES_BASE + 'five-elements/planet-treasure-hunt-pencil-a4.docx'
+  });
+});
+
 router.get('/theme-activities/:theme', function(req, res, next) {
   var theme = child('activities', req.params.theme);
   if (!theme || theme.template !== 'theme') return next();
