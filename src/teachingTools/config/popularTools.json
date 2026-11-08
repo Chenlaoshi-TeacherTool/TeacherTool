@@ -120,6 +120,12 @@
     "descKey": "teachingToolsIndex.jeopardyDesc"
   },
   {
+    "href": "/teaching-tools/character-race",
+    "icon": "🏁",
+    "titleKey": "teachingToolsIndex.termRaceTitle",
+    "descKey": "teachingToolsIndex.termRaceDesc"
+  },
+  {
     "href": "/teaching-tools/maze-generator",
     "icon": "🧭",
     "titleKey": "teachingToolsIndex.mazeTitle",
