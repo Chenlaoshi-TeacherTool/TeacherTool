@@ -86,7 +86,7 @@ async function translateWords(words, to, fetchImpl) {
     missingWords.forEach(function (w, i) {
       var entry = data[i] && data[i].translations;
       (entry || []).forEach(function (t) {
-        if (!LANGUAGES[t.to]) return;
+        if (t.to !== 'en' && !LANGUAGES[t.to]) return;
         result[w][t.to] = t.text;
         remember(t.to + '|' + w, t.text);
       });

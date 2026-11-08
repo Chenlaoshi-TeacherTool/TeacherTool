@@ -1,0 +1,22 @@
+<section id="lessonWordInput" data-lesson-id="<%= lessonId %>" style="border:1px solid #ddd;border-radius:8px;padding:16px;margin:16px 0">
+  <h3 style="margin-top:0">输入中文，自动生成拼音和英文 / Generate vocabulary</h3>
+  <form id="generateWordsForm">
+    <label for="chineseWords">中文词语 / Chinese words</label>
+    <textarea id="chineseWords" name="text" rows="5" maxlength="5000" required placeholder="你好&#10;老师&#10;学生"></textarea>
+    <p id="wordInputHint">每行一个词，也可以用逗号分隔，最多60个。生成后可修改拼音、英文和分类，确认后再添加到本课。 / One word per line or separated by commas, up to 60. Review and edit before adding.</p>
+    <button type="submit" id="generateWords">生成拼音和英文 / Generate</button>
+  </form>
+  <p id="wordGenerationStatus" role="status" aria-live="polite" hidden></p>
+  <p id="wordGenerationError" role="alert" hidden style="color:#b91c1c"></p>
+  <form id="wordPreviewForm" hidden>
+    <p>请核对多音字和英文词义；同样的中文词语已在本课中存在时会跳过。 / Check contextual readings and English meanings. Existing Chinese words are skipped.</p>
+    <div id="wordPreviewRows"></div>
+    <div class="actions"><button type="submit" id="saveGeneratedWords">确认添加到本课 / Add to this lesson</button></div>
+  </form>
+</section>
+<style>
+  .lesson-word-row { display:grid; grid-template-columns:1fr 1fr 2fr 100px auto; gap:8px; align-items:end; border-bottom:1px solid #ddd; padding:8px 0 12px; }
+  .lesson-word-row > label { min-width:0; }
+  @media (max-width:640px) { .lesson-word-row { grid-template-columns:1fr 1fr; } }
+</style>
+<script src="/admin-textbook-words.js" defer></script>

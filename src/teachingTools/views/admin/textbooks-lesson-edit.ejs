@@ -48,7 +48,9 @@
 </form>
 
 <% if (lesson) { %>
-<h2 style="margin-top:24px;">Words (<%= items.length %>)</h2>
+<h2 id="words" style="margin-top:24px;">Words (<%= items.length %>)</h2>
+<% if (locals.wordsSaved) { %><p role="status">已添加 <%= wordsSaved.added %> 个词语，跳过 <%= wordsSaved.skipped %> 个重复词语。 / Added <%= wordsSaved.added %>; skipped <%= wordsSaved.skipped %> duplicates.</p><% } %>
+<%- include('textbook-word-input', { lessonId: lesson.id }) %>
 <div class="items-grid" style="grid-template-columns: 1fr 1fr 2fr 90px auto auto;">
   <div class="grid-header">Chinese</div>
   <div class="grid-header">Pinyin</div>

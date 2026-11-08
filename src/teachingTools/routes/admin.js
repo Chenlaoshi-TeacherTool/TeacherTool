@@ -55,6 +55,7 @@ router.get('/materials', function (req, res, next) {
   materialAdminRouter(req, res, next);
 });
 router.use(materialAdminRouter);
+router.use(require('./textbookWords'));
 
 router.get('/wordlists', async function (req, res, next) {
   try {
@@ -1109,6 +1110,7 @@ router.get('/textbooks/lessons/:id/edit', async function (req, res, next) {
     try { files = await textbookRepository.listFiles(lesson.id); } catch (error) { files = null; }
     res.render('admin/textbooks-lesson-edit', {
       title: 'Edit ' + lesson.title, seriesList: req.textbooks.SERIES, lesson: lesson, defaults: lesson,
+      wordsSaved: /^\d{1,2}$/.test(req.query.wordsAdded || '') && /^\d{1,2}$/.test(req.query.wordsSkipped || '') ? { added: Number(req.query.wordsAdded), skipped: Number(req.query.wordsSkipped) } : null,
       items: itemsResult.recordset, files: files, fileError: req.query.fileError || '', bookPath: bookPath, adminUser: req.adminUser
     });
   } catch (err) { next(err); }

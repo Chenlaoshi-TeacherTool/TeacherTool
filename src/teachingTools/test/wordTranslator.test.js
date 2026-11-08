@@ -63,6 +63,15 @@ test('translateWords serves repeats from the cache', async function () {
   assert.deepEqual(calls[1].body, [{ Text: '哥哥' }]);
 });
 
+test('admin vocabulary generation can request English without adding it to the public language picker', async function () {
+  var calls = [];
+  var out = await wordTranslator.translateWords(['银行'], ['en'], fakeAzure(calls));
+  assert.equal(out.translations['银行'].en, 'en:银行');
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].url, /to=en$/);
+  assert.ok(wordTranslator.cleanRequest({ words: ['银行'], to: ['en'] }).error);
+});
+
 test('translateWords surfaces Azure errors', async function () {
   var failing = async function () { return { ok: false, status: 401, json: async function () { return {}; } }; };
   await assert.rejects(wordTranslator.translateWords(['爸爸'], ['th'], failing), /HTTP 401/);
