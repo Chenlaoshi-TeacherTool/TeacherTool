@@ -596,31 +596,48 @@
       '</svg>';
   }
 
+  // Cut-sheet slots: rows of alternating up/down triangles that share edges, so
+  // pieces are as large as the page allows and one cut separates two pieces.
+  // Even rows start with an up triangle, odd rows with a down one, so the bases
+  // of one row are the tops of the next. Every slot is listed clockwise, like
+  // the board pieces, so labels keep their cyclic order.
+  function cutSlots(size) {
+    var perRow = size === 3 ? 3 : 4;
+    var rows = Math.ceil((size * size) / perRow);
+    var side = size === 3 ? 296 : 234;
+    var h = side * Math.sqrt(3) / 2;
+    var x0 = (PAGE_WIDTH - (perRow + 1) / 2 * side) / 2;
+    var y0 = 146;
+    var slots = [];
+    for (var row = 0; row < rows; row++) {
+      var y = y0 + row * h;
+      for (var i = 0; i < perRow; i++) {
+        var up = (i + row) % 2 === 0;
+        var left = x0 + i * side / 2;
+        slots.push(up
+          ? [{ x: left + side / 2, y: y }, { x: left + side, y: y + h }, { x: left, y: y + h }]
+          : [{ x: left, y: y }, { x: left + side, y: y }, { x: left + side / 2, y: y + h }]);
+      }
+    }
+    return { side: side, slots: slots.slice(0, size * size) };
+  }
+
   function renderCutPage(board, assetMap) {
     var count = board.pieces.length;
-    var columns = board.size === 3 ? 3 : 4;
-    var side = board.size === 3 ? 190 : 150;
-    var triangleHeight = side * Math.sqrt(3) / 2;
-    var marginX = board.size === 3 ? 50 : 42;
-    var gapX = (PAGE_WIDTH - marginX * 2 - side * columns) / Math.max(1, columns - 1);
-    var gapY = board.size === 3 ? 66 : 45;
-    var startY = board.size === 3 ? 174 : 155;
+    var layout = cutSlots(board.size);
     var body = '<text x="52" y="127" fill="#17352d" font-family="Arial, sans-serif" font-size="12" font-weight="700">Cut out every triangle, mix the pieces, then match the edges to rebuild one large triangle.</text>';
 
     board.cutOrder.forEach(function (entry, index) {
-      var row = Math.floor(index / columns);
-      var col = index % columns;
-      var x = marginX + col * (side + gapX);
-      var y = startY + row * (triangleHeight + gapY);
-      var vertices = [{ x: x + side / 2, y: y }, { x: x + side, y: y + triangleHeight }, { x: x, y: y + triangleHeight }];
+      var vertices = layout.slots[index];
       var rotatedLabels = [0, 1, 2].map(function (edge) { return entry.piece.labels[(edge + entry.rotation) % 3]; });
       body += renderPiece(vertices, rotatedLabels, assetMap, {
         fill: index % 2 ? '#fffdf8' : '#ffffff',
         strokeWidth: 2,
-        textBase: board.size === 3 ? 13 : 11.5,
-        inset: board.size === 3 ? 21 : 17
+        textRatio: .088
       });
-      body += '<text x="' + (x + side / 2).toFixed(1) + '" y="' + (y + triangleHeight * .63).toFixed(1) + '" text-anchor="middle" fill="#b5c2ba" font-family="Arial, sans-serif" font-size="8">' + (index + 1) + '</text>';
+      var cx = (vertices[0].x + vertices[1].x + vertices[2].x) / 3;
+      var cy = (vertices[0].y + vertices[1].y + vertices[2].y) / 3;
+      body += '<text x="' + cx.toFixed(1) + '" y="' + cy.toFixed(1) + '" text-anchor="middle" dominant-baseline="middle" fill="#b5c2ba" font-family="Arial, sans-serif" font-size="' + (layout.side * .05).toFixed(1) + '">' + (index + 1) + '</text>';
     });
 
     return pageFrame(state.title, 'STUDENT CUT SHEET · ' + count + ' pieces / ' + requiredPairCount() + ' matches', body,
@@ -628,7 +645,7 @@
   }
 
   function renderAnswerPage(board, assetMap) {
-    var side = board.size === 3 ? 218 : 168;
+    var side = board.size === 3 ? 236 : 178;
     var totalWidth = side * board.size;
     var xOffset = (PAGE_WIDTH - totalWidth) / 2;
     var yOffset = board.size === 3 ? 190 : 180;
@@ -641,8 +658,7 @@
       body += renderPiece(vertices, piece.labels, assetMap, {
         fill: index % 2 ? '#fbf7ea' : '#eef5ef',
         strokeWidth: 2.4,
-        textBase: board.size === 3 ? 14 : 12.5,
-        inset: board.size === 3 ? 24 : 19
+        textRatio: .088
       });
     });
     body += '<path d="M' + (xOffset + totalWidth / 2).toFixed(1) + ' ' + yOffset.toFixed(1) + ' L' + xOffset.toFixed(1) + ' ' + (yOffset + board.size * side * Math.sqrt(3) / 2).toFixed(1) + ' L' + (xOffset + totalWidth).toFixed(1) + ' ' + (yOffset + board.size * side * Math.sqrt(3) / 2).toFixed(1) + ' Z" fill="none" stroke="#17352d" stroke-width="3.2"/>';
@@ -670,12 +686,19 @@
     var inwardX = centroid.x - midpoint.x;
     var inwardY = centroid.y - midpoint.y;
     var inwardLength = Math.sqrt(inwardX * inwardX + inwardY * inwardY) || 1;
-    var x = midpoint.x + inwardX / inwardLength * options.inset;
-    var y = midpoint.y + inwardY / inwardLength * options.inset;
     var edgeLength = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+    function placeAt(inset) {
+      return {
+        x: midpoint.x + inwardX / inwardLength * inset,
+        y: midpoint.y + inwardY / inwardLength * inset
+      };
+    }
 
     if (content.kind === 'emoji') {
-      var emojiSize = Math.min(31, edgeLength * .2);
+      var emojiSize = edgeLength * .21;
+      var emojiPoint = placeAt(edgeLength * .035 + emojiSize / 2);
+      var x = emojiPoint.x;
+      var y = emojiPoint.y;
       var asset = assetMap && assetMap[content.value] ? assetMap[content.value] : twemojiUrl(content.value);
       if (asset) {
         return '<image x="' + (x - emojiSize / 2).toFixed(1) + '" y="' + (y - emojiSize / 2).toFixed(1) + '" width="' + emojiSize.toFixed(1) + '" height="' + emojiSize.toFixed(1) + '" href="' + escapeAttribute(asset) + '" xlink:href="' + escapeAttribute(asset) + '" preserveAspectRatio="xMidYMid meet"/>';
@@ -684,46 +707,85 @@
     }
 
     var text = content.value.trim();
-    var textLength = Array.from(text).length;
-    var fontSize = options.textBase;
-    if (textLength > 20) fontSize *= .86;
-    if (textLength > 34) fontSize *= .78;
-    if (textLength > 52) fontSize *= .72;
-    fontSize = Math.max(7.2, fontSize);
-    var maxChars = Math.max(9, Math.floor(edgeLength * .72 / (fontSize * .56)));
-    var lines = wrapLabel(text, maxChars, 2);
+    var fit = fitLabel(text, edgeLength, options.textRatio || .088);
+    var fontSize = fit.fontSize;
+    var lines = fit.lines;
+    var lineHeight = fontSize * 1.12;
+    var point = placeAt(fit.pad + lines.length * lineHeight / 2);
     var angle = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
     if (angle > 90 || angle < -90) angle += 180;
-    var lineHeight = fontSize * 1.03;
-    var firstY = lines.length === 1 ? 0 : -lineHeight * .43;
     var tspans = lines.map(function (line, index) {
-      return '<tspan x="0" y="' + (firstY + index * lineHeight).toFixed(1) + '">' + escapeXml(line) + '</tspan>';
+      return '<tspan x="0" y="' + ((index - (lines.length - 1) / 2) * lineHeight).toFixed(1) + '">' + escapeXml(line) + '</tspan>';
     }).join('');
-    return '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ') rotate(' + angle.toFixed(2) + ')"><text text-anchor="middle" dominant-baseline="middle" fill="#101b17" font-family="Arial, Noto Sans SC, Microsoft YaHei, sans-serif" font-size="' + fontSize.toFixed(1) + '" font-weight="650">' + tspans + '</text></g>';
+    return '<g transform="translate(' + point.x.toFixed(1) + ' ' + point.y.toFixed(1) + ') rotate(' + angle.toFixed(2) + ')"><text text-anchor="middle" dominant-baseline="middle" fill="#101b17" font-family="Arial, Noto Sans SC, Microsoft YaHei, sans-serif" font-size="' + fontSize.toFixed(1) + '" font-weight="650">' + tspans + '</text></g>';
   }
 
-  function wrapLabel(text, maxChars, maxLines) {
-    var characters = Array.from(text);
-    if (characters.length <= maxChars) return [text];
-    var words = text.split(/\s+/).filter(Boolean);
+  var CJK_PATTERN = /[⺀-鿿豈-﫿＀-￯]/;
+
+  // Approximate rendered width of bold Arial / CJK text at a given font size.
+  function measureLabel(text, fontSize) {
+    return Array.from(text).reduce(function (width, character) {
+      if (CJK_PATTERN.test(character)) return width + 1;
+      if (character === ' ') return width + .3;
+      if (/[A-Z0-9mwMW@%]/.test(character)) return width + .7;
+      if (/[iljtf.,;:'!|]/.test(character)) return width + .32;
+      return width + .58;
+    }, 0) * fontSize;
+  }
+
+  // Split text into n lines with the narrowest widest line.
+  function splitLabel(text, count, fontSize) {
+    var spaced = /\s/.test(text);
+    var tokens = spaced ? text.split(/\s+/).filter(Boolean) : Array.from(text);
+    var joiner = spaced ? ' ' : '';
+    if (count <= 1 || tokens.length < 2) return [text];
+    if (count === 2) {
+      var best = null;
+      for (var i = 1; i < tokens.length; i++) {
+        var pair = [tokens.slice(0, i).join(joiner), tokens.slice(i).join(joiner)];
+        var widest = Math.max(measureLabel(pair[0], fontSize), measureLabel(pair[1], fontSize));
+        if (!best || widest < best.widest) best = { lines: pair, widest: widest };
+      }
+      return best.lines;
+    }
+    var target = measureLabel(text, fontSize) / count;
     var lines = [];
-    if (words.length > 1) {
-      var current = '';
-      words.forEach(function (word) {
-        var candidate = current ? current + ' ' + word : word;
-        if (Array.from(candidate).length <= maxChars || !current) current = candidate;
-        else { lines.push(current); current = word; }
-      });
-      if (current) lines.push(current);
-    } else {
-      for (var index = 0; index < characters.length; index += maxChars) lines.push(characters.slice(index, index + maxChars).join(''));
-    }
-    if (lines.length > maxLines) {
-      lines = lines.slice(0, maxLines);
-      var last = Array.from(lines[maxLines - 1]);
-      lines[maxLines - 1] = last.slice(0, Math.max(1, maxChars - 1)).join('') + '…';
-    }
+    var current = '';
+    tokens.forEach(function (token) {
+      var candidate = current ? current + joiner + token : token;
+      if (current && measureLabel(candidate, fontSize) > target * 1.12 && lines.length < count - 1) {
+        lines.push(current);
+        current = token;
+      } else current = candidate;
+    });
+    if (current) lines.push(current);
     return lines;
+  }
+
+  // Largest font (up to edge × ratio) whose lines fit in this edge's own third
+  // of the piece: the triangle between the edge and the centroid. Its width at
+  // distance d from the edge is edge × (1 − d / H), H = edge / (2√3), so labels
+  // on neighbouring edges can never run into each other in the corners.
+  function fitLabel(text, edgeLength, ratio) {
+    var base = edgeLength * ratio * (CJK_PATTERN.test(text) ? 1.12 : 1);
+    var minimum = Math.max(7, edgeLength * .04);
+    var apex = edgeLength / (2 * Math.sqrt(3));
+    function attempt(fontSize, lineCount) {
+      var pad = fontSize * .4;
+      var lines = splitLabel(text, lineCount, fontSize);
+      var depth = pad + lines.length * fontSize * 1.12;
+      var room = edgeLength * (1 - depth / apex) * .94;
+      var widest = Math.max.apply(null, lines.map(function (line) { return measureLabel(line, fontSize); }));
+      return { fontSize: fontSize, lines: lines, pad: pad, fits: depth < apex * .9 && widest <= room };
+    }
+    for (var fontSize = base; fontSize >= minimum; fontSize *= .94) {
+      var one = attempt(fontSize, 1);
+      if (one.fits) return one;
+      var two = attempt(fontSize, 2);
+      if (two.fits) return two;
+    }
+    var three = attempt(minimum, 3);
+    return three.fits ? three : attempt(minimum, 2);
   }
 
   function loadSample() {
