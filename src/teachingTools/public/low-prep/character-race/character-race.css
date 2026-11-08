@@ -63,3 +63,4 @@
 }
 .cr-page #printArea{display:none}
 @media(max-width:700px){.cr-page .cr-header .fl{display:none}.cr-page .cr-wrap{padding:14px 10px 60px}}
+.cr-page .hint.warn{color:#B4472F;font-weight:600}

@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#35604C">
 <title>Term Race - Chen Laoshi's Teaching Toolkit</title>
-<%- include('../partials/seo', { pageDescription: 'Arrange subject terms in a sunflower wheel and grid for a fast partner clue-and-find game.' }) %>
+<%- include('../partials/seo', { pageDescription: 'Arrange subject terms on a word track and grid for a fast partner clue-and-find game.' }) %>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
 <link rel="stylesheet" href="/stylesheets/site-theme.css">
 <link rel="stylesheet" href="/shared/library-picker.css">
 <link rel="stylesheet" href="/low-prep/character-race/character-race.css">
@@ -51,9 +52,19 @@
         <select id="optTargetLanguage" aria-label="Support line">
           <option value="english" selected><%= t('characterRace.definitionOption') %></option>
           <option value="pinyin"><%= t('characterRace.pinyinOption') %></option>
+          <option value="none"><%= t('characterRace.noneOption') %></option>
         </select>
       </span>
-      <label class="check"><input type="checkbox" id="optFlower" checked> <%= t('characterRace.sunflowerStyleLabel') %></label>
+      <span class="field"><%= t('characterRace.trackShapeLabel') %>
+        <select id="optShape">
+          <option value="circle" selected><%= t('characterRace.shapeCircle') %></option>
+          <option value="oval"><%= t('characterRace.shapeOval') %></option>
+          <option value="square"><%= t('characterRace.shapeSquare') %></option>
+          <option value="heart"><%= t('characterRace.shapeHeart') %></option>
+          <option value="cloud"><%= t('characterRace.shapeCloud') %></option>
+          <option value="butterfly"><%= t('characterRace.shapeButterfly') %></option>
+        </select>
+      </span>
       <span class="field"><%= t('characterRace.ringsLabel') %>
         <select id="optRings"><option value="auto"><%= t('characterRace.autoOption') %></option><option value="1"><%= t('characterRace.oneOption') %></option><option value="2"><%= t('characterRace.twoOption') %></option><option value="3"><%= t('characterRace.threeOption') %></option></select>
       </span>
@@ -70,6 +81,7 @@
   <section>
     <h2><span class="num">3</span><%= t('characterRace.previewHeading') %></h2>
     <div id="preview"></div>
+    <p class="hint" id="printSizeHint" aria-live="polite" style="margin:8px 0 0" data-ok="<%= t('characterRace.printSizeOk') %>" data-warn="<%= t('characterRace.printSizeWarn') %>"></p>
   </section>
 
   <section>

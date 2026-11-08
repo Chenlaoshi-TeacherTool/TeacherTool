@@ -5,7 +5,7 @@ var S = {
   chars: [],
   order: [],
   terms: {},
-  opts: { targetLanguage: 'english', rings: 'auto', size: 'auto', grid: 20, flower: true },
+  opts: { targetLanguage: 'english', rings: 'auto', size: 'auto', grid: 20, shape: 'circle' },
   title: ''
 };
 var $ = function (s) { return document.querySelector(s); };
@@ -18,6 +18,7 @@ function pinyinOf(t) { return CW ? CW.toPinyin(t, { spaced: (t || '').length >= 
 function englishOf(t) { return CW && typeof CW.toEnglish === 'function' ? CW.toEnglish(t) : ''; }
 
 function targetText(t) {
+  if (S.opts.targetLanguage === 'none') return '';
   var term = S.terms[t] || {};
   return S.opts.targetLanguage === 'english'
     ? (term.en || englishOf(t))
@@ -31,6 +32,7 @@ function targetLanguageName() {
 function updateTargetLanguageHint() {
   var hint = $('#targetLanguageHint');
   if (!hint) return;
+  if (S.opts.targetLanguage === 'none') { hint.textContent = 'Each tile shows only the term.'; return; }
   var missing = S.order.filter(function (term) { return !targetText(term); }).length;
   hint.textContent = 'Each tile shows the term with its optional ' + targetLanguageName() + ' underneath.' +
     (missing ? ' ' + missing + ' term' + (missing === 1 ? '' : 's') + ' do not have that support line yet.' : '');
@@ -141,12 +143,105 @@ function initLibraryPicker() {
   });
 }
 
-/* ---------- circle layout ---------- */
-function layout() {
+/* ---------- track shapes ---------- */
+// Every shape is one closed line; extra rings are smaller copies of it around the same centre.
+// Terms are spaced evenly along the line, then the font size is solved so no two tiles overlap.
+var TF = 0.46;            // support-line size relative to the term size
+var SHEET_W = 746, SHEET_H = 672;   // wheel area on the A4 sheet (794px wide = 96 dpi)
+function sgnPow(v, p) { return (v < 0 ? -1 : 1) * Math.pow(Math.abs(v), p); }
+var SHAPES = {
+  circle: { pt: function (a) { return [Math.cos(a), Math.sin(a)]; } },
+  oval: { pt: function (a) { return [Math.cos(a), Math.sin(a)]; }, fit: true },
+  square: { pt: function (a) { return [sgnPow(Math.cos(a), 0.3), sgnPow(Math.sin(a), 0.3)]; } },
+  heart: { pt: function (a) {
+    // classic heart curve blended with a circle so the point and dip stay soft (room for words)
+    var t = a + Math.PI / 2, s = Math.sin(t);
+    var hx = 16 * s * s * s / 16, hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16;
+    return [hx * 0.7 + Math.cos(a) * 0.3, hy * 0.7 + Math.sin(a) * 0.3];
+  } },
+  cloud: { pt: function (a) {
+    // round puffs along the top and sides, a flatter base
+    var sn = Math.sin(a), base = Math.max(0, sn);
+    var r = 0.74 + 0.26 * Math.pow(Math.abs(Math.sin(5 * a)), 0.55) * (1 - 0.9 * base);
+    return [r * Math.cos(a) * 1.45, r * sn * (1 - 0.25 * base)];
+  } },
+  butterfly: { antennae: true, offs: [0.5], pt: function (a) {
+    var c = Math.cos(a), s = Math.sin(a);
+    var r = (0.55 + 0.45 * Math.pow(Math.abs(Math.sin(2 * a)), 0.8) + 0.1 * c * c) * (1 - 0.14 * s);
+    return [r * c * 1.15, r * s];
+  } }
+};
+var SHAPE_CACHE = {};
+function shapeInfo(name) {
+  if (!SHAPES[name]) name = 'circle';
+  if (SHAPE_CACHE[name]) return SHAPE_CACHE[name];
+  var def = SHAPES[name], N = 600, raw = [], i;
+  var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (i = 0; i < N; i++) {
+    var p = def.pt(-Math.PI / 2 + 2 * Math.PI * i / N);
+    raw.push(p);
+    x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]);
+  }
+  var mx = (x0 + x1) / 2, my = (y0 + y1) / 2, hx = (x1 - x0) / 2, hy = (y1 - y0) / 2;
+  SHAPE_CACHE[name] = {
+    name: name, fit: !!def.fit, offs: def.offs || [0, 0.5], antennae: !!def.antennae,
+    aspect: hx / hy,
+    unit: raw.map(function (p) { return [(p[0] - mx) / hx, (p[1] - my) / hy]; })
+  };
+  return SHAPE_CACHE[name];
+}
+
+// Approximate text width in em: CJK = 1, Latin ≈ 0.56 (bold sans).
+function emW(s) {
+  var w = 0, i, c;
+  s = String(s || '');
+  for (i = 0; i < s.length; i++) {
+    c = s.charCodeAt(i);
+    if (c >= 0x2E80 && c <= 0x9FFF || c >= 0xF900 && c <= 0xFAFF || c >= 0xFF00 && c <= 0xFFEF) w += 1;
+    else if (c === 32) w += 0.3;
+    else if (c >= 65 && c <= 90) w += 0.68;
+    else w += 0.56;
+  }
+  return w;
+}
+function clipLine(l, maxEm) {
+  if (emW(l) <= maxEm) return l;
+  while (l.length > 1 && emW(l + '…') > maxEm) l = l.slice(0, -1);
+  return l.replace(/\s+$/, '') + '…';
+}
+// Up to two lines for a support line, so long definitions stay readable instead of shrinking.
+function wrapLines(text, maxEm) {
+  text = String(text || '').trim();
+  if (!text) return [];
+  if (emW(text) <= maxEm) return [text];
+  var spaced = /\s/.test(text), sep = spaced ? ' ' : '';
+  var parts = spaced ? text.split(/\s+/) : text.split('');
+  var lines = [], cur = '';
+  parts.forEach(function (p) {
+    var nx = cur ? cur + sep + p : p;
+    if (cur && emW(nx) > maxEm) { lines.push(cur); cur = p; } else cur = nx;
+  });
+  if (cur) lines.push(cur);
+  if (lines.length > 2) lines = [lines[0], lines.slice(1).join(sep)];
+  return lines.map(function (l) { return clipLine(l, maxEm); });
+}
+// Tile size in units of the term font size.
+function termMetrics() {
+  var M = {};
+  S.order.forEach(function (tk) {
+    var pw = Math.max(1.5, emW(tk) + 0.78);
+    var lines = wrapLines(targetText(tk), Math.max(pw, 5.2) / TF);
+    var tw = 0;
+    lines.forEach(function (l) { tw = Math.max(tw, emW(l) * TF); });
+    M[tk] = { pw: pw, lines: lines, W: Math.max(pw, tw) / 2 + 0.14, th: lines.length ? 0.12 + lines.length * TF * 1.18 : 0 };
+  });
+  return M;
+}
+
+function ringSplit(count) {
   var n = S.order.length;
-  var want = S.opts.rings === 'auto' ? (n > 30 ? 3 : n > 16 ? 2 : 1) : +S.opts.rings;
-  if (want === 1 || n < 8) return [{ chars: S.order, r: 1 }];
-  var radii = want >= 3 ? [1, 0.68, 0.40] : [1, 0.52];
+  if (count <= 1 || n < 8) return [{ chars: S.order, r: 1 }];
+  var radii = count >= 3 ? [1, 0.7, 0.42] : [1, 0.56];
   var total = radii.reduce(function (a, b) { return a + b; }, 0);
   var out = [], used = 0;
   radii.forEach(function (r, i) {
@@ -157,121 +252,160 @@ function layout() {
   });
   return out.filter(function (ring) { return ring.chars.length; });
 }
-// Font size is chosen from the chord length between adjacent terms so tiles never overlap.
-function fitFontSize(R, rings, centerR, withTarget) {
-  var maxLen = 1;
-  S.order.forEach(function (t) { if (t.length > maxLen) maxLen = t.length; });
-  var padW = 0.9;
-  var hFactor = 1.55 + (withTarget ? 0.52 : 0);
-  var chordFactor = 0.9, radialFactor = 0.92;
-  var best = 1e9, i;
-  rings.forEach(function (ring) {
-    var m = Math.max(ring.chars.length, 1);
-    var rr = R * ring.r;
-    var chord = m === 1 ? rr * 1.6 : 2 * rr * Math.sin(Math.PI / m);
-    best = Math.min(best, chord * chordFactor / (maxLen + padW));
-  });
-  for (i = 0; i + 1 < rings.length; i++) {
-    var radial = R * rings[i].r - R * rings[i + 1].r;
-    best = Math.min(best, radial * radialFactor / hFactor);
+function placeAlong(pts, m, off) {
+  var n = pts.length, L = [0], i;
+  for (i = 1; i <= n; i++) {
+    var a = pts[i - 1], b = pts[i % n];
+    L.push(L[i - 1] + Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])));
   }
-  if (rings.length > 1) {
-    var innermost = (R * rings[rings.length - 1].r - centerR - 8) * 2;
-    best = Math.min(best, innermost / hFactor);
+  var total = L[n], out = [], j = 0;
+  for (var k = 0; k < m; k++) {
+    var d = ((k + off) / m) * total;
+    while (j < n - 1 && L[j + 1] < d) j++;
+    var seg = L[j + 1] - L[j] || 1, f = (d - L[j]) / seg;
+    var p = pts[j], q = pts[(j + 1) % n];
+    out.push([p[0] + (q[0] - p[0]) * f, p[1] + (q[1] - p[1]) * f]);
   }
-  return Math.max(11, Math.min(best, R * 0.155));
+  return out;
 }
-// Sunflower: petals + seed head (matches the site's logo language)
-function sunflowerG(cx, cy, rOut, rSeed, petals) {
-  var g = '', i;
-  for (i = 0; i < petals; i++) {
-    var a = (i / petals) * 360;
-    var pl = (rOut - rSeed * 0.9);
-    var ry = pl / 2, rx = Math.max(6, (2 * Math.PI * rOut / petals) * 0.30);
-    var cyP = cy - (rSeed * 0.9 + ry);
-    g += '<ellipse cx="' + cx + '" cy="' + cyP + '" rx="' + rx + '" ry="' + ry + '" fill="#F6C43C" stroke="#1B2A47" stroke-width="' + Math.max(2, rx * 0.14) + '" transform="rotate(' + a + ' ' + cx + ' ' + cy + ')"/>';
-  }
-  g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + rSeed + '" fill="#4A3520" stroke="#1B2A47" stroke-width="' + Math.max(3, rSeed * 0.09) + '"/>';
-  var dots = Math.min(14, Math.max(6, Math.round(rSeed / 7)));
-  for (i = 0; i < dots; i++) {
-    var ang = i * 2.39996, rad = rSeed * 0.62 * Math.sqrt((i + 1) / dots);
-    g += '<circle cx="' + (cx + rad * Math.cos(ang)) + '" cy="' + (cy + rad * Math.sin(ang)) + '" r="' + Math.max(1.6, rSeed * 0.05) + '" fill="#6B4E30"/>';
-  }
+function geometry(w, h, rings, shp, s, off0) {
+  var cx = w / 2, cy = h / 2, hw = w / 2 * s, hh = h / 2 * s, sx, sy;
+  if (shp.fit) { sx = hw; sy = hh; } else { sx = Math.min(hw, hh * shp.aspect); sy = sx / shp.aspect; }
+  var g = { cx: cx, cy: cy, sx: sx, sy: sy, cr0: Math.max(34, Math.min(sx, sy) * 0.16), items: [], curves: [] };
+  rings.forEach(function (ring, ri) {
+    var pts = shp.unit.map(function (p) { return [cx + p[0] * sx * ring.r, cy + p[1] * sy * ring.r]; });
+    g.curves.push(pts);
+    var off = (off0 + (ri % 2) * 0.5) % 1;
+    placeAlong(pts, ring.chars.length, off).forEach(function (p, i) {
+      g.items.push({ tk: ring.chars[i], x: p[0], y: p[1] });
+    });
+  });
   return g;
 }
-function leafG(cx, cy, len, rot) {
-  return '<g transform="rotate(' + rot + ' ' + cx + ' ' + cy + ')">' +
-    '<path d="M' + cx + ' ' + cy + ' q' + (len * 0.5) + ' -' + (len * 0.5) + ' ' + len + ' 0 q-' + (len * 0.5) + ' ' + (len * 0.5) + ' -' + len + ' 0z" ' +
-    'fill="#5A9E4B" stroke="#1B2A47" stroke-width="' + Math.max(2, len * 0.07) + '" stroke-linejoin="round"/></g>';
+// Largest term size where no tiles overlap each other, the centre badge, or the page edge.
+function fitFs(w, h, g, M) {
+  var fs = Math.min(w, h) * 0.085, it = g.items, n = it.length, i, j, edge = 6;
+  it.forEach(function (p) {
+    var m = M[p.tk], below = p.y >= g.cy;
+    p.W = m.W; p.below = below;
+    p.up = 0.8 + (below ? 0 : m.th); p.dn = 0.8 + (below ? m.th : 0);
+  });
+  for (i = 0; i < n; i++) {
+    var a = it[i];
+    fs = Math.min(fs, (a.x - edge) / a.W, (w - edge - a.x) / a.W, (a.y - edge) / a.up, (h - edge - a.y) / a.dn);
+    var cfx = (Math.abs(a.x - g.cx) - g.cr0) / a.W;
+    var cfy = a.y >= g.cy ? (a.y - g.cy - g.cr0) / a.up : (g.cy - a.y - g.cr0) / a.dn;
+    fs = Math.min(fs, Math.max(cfx, cfy));
+    for (j = i + 1; j < n; j++) {
+      var b = it[j];
+      var fx = Math.abs(a.x - b.x) / (a.W + b.W);
+      var fy = a.y <= b.y ? (b.y - a.y) / (a.dn + b.up) : (a.y - b.y) / (b.dn + a.up);
+      fs = Math.min(fs, Math.max(fx, fy));
+    }
+  }
+  return Math.max(fs, 1);
+}
+function solveLayout(w, h, rings, M, shp) {
+  var best = null;
+  // Try both symmetric starting points (a term at the top, or two either side of it).
+  shp.offs.forEach(function (off0) {
+    for (var s = 0.94; s >= 0.5; s -= 0.02) {
+      var g = geometry(w, h, rings, shp, s, off0);
+      g.fs = fitFs(w, h, g, M);
+      if (!best || g.fs > best.fs * 1.001) best = g;
+    }
+  });
+  return best;
+}
+// Ring count is decided on the printed sheet so preview, game and print all match.
+var RING_MEMO = { key: '', count: 1 };
+function ringCount(M, shp) {
+  var n = S.order.length;
+  if (n < 8) return 1;
+  if (S.opts.rings !== 'auto') return +S.opts.rings;
+  var key = shp.name + '|' + S.opts.targetLanguage + '|' + S.order.join('\u0001');
+  if (RING_MEMO.key === key) return RING_MEMO.count;
+  // Fewest rings that still print comfortably (about 20pt); otherwise whichever prints largest.
+  var COMFY = 27, bestC = 1, bestFs = solveLayout(SHEET_W, SHEET_H, ringSplit(1), M, shp).fs;
+  [2, 3].forEach(function (c) {
+    if (bestFs >= COMFY || n < (c === 2 ? 14 : 26)) return;   // a few words never need inner rings
+    var fs = solveLayout(SHEET_W, SHEET_H, ringSplit(c), M, shp).fs;
+    if (fs > bestFs * 1.08) { bestFs = fs; bestC = c; }
+  });
+  RING_MEMO = { key: key, count: bestC };
+  return bestC;
+}
+function trackLayout(w, h) {
+  var shp = shapeInfo(S.opts.shape), M = termMetrics();
+  var g = solveLayout(w, h, ringSplit(ringCount(M, shp)), M, shp);
+  g.M = M; g.shp = shp;
+  return g;
+}
+// Printed term size in points (sheet is 96 dpi, so px × 0.75).
+function printPt() {
+  if (!S.order.length) return 0;
+  return Math.round(trackLayout(SHEET_W, SHEET_H).fs * 0.75);
+}
+// Chinese terms print in Kaiti (the handwriting style students learn); Latin terms stay in bold sans.
+var KAI = "'KaiTi', 'STKaiti', 'Kaiti SC', 'BiauKai', '楷体', serif";
+function termFontAttr(t) {
+  return /[㐀-鿿]/.test(t) ? ' font-family="' + KAI + '" font-weight="400"' : ' font-weight="700"';
+}
+// Pinyin uses Andika: every a is the single-storey ɑ, like school textbooks (SimSun mixes both shapes).
+var PY_FONT = "'Andika', 'Century Gothic', 'Segoe UI', Arial, sans-serif";
+function supportFontAttr() {
+  return S.opts.targetLanguage === 'pinyin' ? ' font-family="' + PY_FONT + '"' : '';
+}
+function pathD(pts) {
+  return 'M' + pts.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('L') + 'Z';
 }
 
 function circleSVG(w, h, opt) {
   opt = opt || {};
-  var cx = w / 2, cy = h / 2;
-  var rings = layout();
-  var basePad = opt.pad || 70;
-  var R = Math.min(w, h) / 2 - basePad;
-  var cr0 = Math.max(42, R * 0.16);
-  var fs = fitFontSize(R, rings, cr0, true);
-  var need = fs * 1.32 + 10;
-  if (need > basePad) {
-    R = Math.min(w, h) / 2 - need;
-    cr0 = Math.max(38, R * 0.16);
-    fs = fitFontSize(R, rings, cr0, true);
-  }
+  var L = trackLayout(w, h), cx = L.cx, cy = L.cy, cr0 = L.cr0, fs = L.fs;
   if (S.opts.size !== 'auto') fs = Math.min(+S.opts.size, fs * 1.3);
-  var pillH = fs * 1.5;
-  var flower = S.opts.flower !== false;
+  var pillH = fs * 1.5, tf = fs * TF, lh = tf * 1.18;
+  var lineW = Math.max(2.5, Math.min(w, h) * 0.005);
 
-  var g = '';
-  g += '<rect width="' + w + '" height="' + h + '" fill="#FBF6E9"/>';
-
-  var innerR = R * rings[rings.length - 1].r;
-  var petalOuter = innerR - pillH * 0.62 - 8;
-
-  if (flower && petalOuter > cr0 * 1.3) {
-    g += leafG(cx - petalOuter * 0.86, cy + petalOuter * 0.68, petalOuter * 0.52, 28);
-    g += leafG(cx + petalOuter * 0.34, cy + petalOuter * 0.68, petalOuter * 0.52, -28);
-    var petals = Math.max(10, Math.min(18, rings[rings.length - 1].chars.length));
-    g += sunflowerG(cx, cy, petalOuter, cr0, petals);
-  } else {
-    rings.forEach(function (ring) {
-      g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (R * ring.r) + '" fill="none" stroke="#D6E2CE" stroke-width="3" stroke-dasharray="10 10"/>';
+  var g = '<rect width="' + w + '" height="' + h + '" fill="#FBF6E9"/>';
+  L.curves.forEach(function (pts) {
+    g += '<path d="' + pathD(pts) + '" fill="none" stroke="#9FBCA9" stroke-width="' + lineW + '" stroke-linejoin="round"/>';
+  });
+  if (L.shp.antennae) {
+    var top = L.curves[0][0], tipY = cy - L.sy * 0.96;
+    [-1, 1].forEach(function (d) {
+      var tx = cx + d * L.sx * 0.2;
+      g += '<path d="M' + top[0] + ' ' + top[1] + ' Q' + (cx + d * L.sx * 0.04) + ' ' + tipY + ' ' + tx + ' ' + tipY + '" fill="none" stroke="#9FBCA9" stroke-width="' + lineW + '" stroke-linecap="round"/>';
+      g += '<circle cx="' + tx + '" cy="' + tipY + '" r="' + lineW * 2 + '" fill="#9FBCA9"/>';
     });
-    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + cr0 + '" fill="#35604C" stroke="#1B2A47" stroke-width="6"/>';
   }
 
   if (opt.centerChar) {
-    var centerText = opt.centerTarget ? (targetText(opt.centerChar) || opt.centerChar) : opt.centerChar;
+    // With no support line on the tiles, the game clue still uses the definition (or pinyin).
+    var ct = S.terms[opt.centerChar] || {};
+    var centerText = opt.centerTarget ? (targetText(opt.centerChar) || ct.en || ct.py || opt.centerChar) : opt.centerChar;
     var centerFont = Math.max(13, Math.min(cr0 * 0.9, cr0 * 3.2 / Math.max(1, centerText.length)));
     g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (cr0 * 0.98) + '" fill="#35604C" stroke="#1B2A47" stroke-width="5"/>';
-    g += '<text x="' + cx + '" y="' + (cy + centerFont * 0.34) + '" font-size="' + centerFont + '" font-weight="700" fill="#F6C43C" text-anchor="middle">' + esc(centerText) + '</text>';
-  } else if (!flower || petalOuter <= cr0 * 1.3) {
+    g += '<text x="' + cx + '" y="' + (cy + centerFont * 0.34) + '" font-size="' + centerFont + '"' + termFontAttr(centerText) + ' fill="#F6C43C" text-anchor="middle">' + esc(centerText) + '</text>';
+  } else {
+    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + cr0 + '" fill="#35604C" stroke="#1B2A47" stroke-width="5"/>';
     g += '<text x="' + cx + '" y="' + (cy - 2) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">TERM</text>';
     g += '<text x="' + cx + '" y="' + (cy + cr0 * 0.45) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">RACE</text>';
   }
 
-  var idx = 0;
-  rings.forEach(function (ring, ri) {
-    var m = ring.chars.length;
-    ring.chars.forEach(function (tk, i) {
-      var a = (i / m) * Math.PI * 2 - Math.PI / 2 + (ri ? Math.PI / m : 0);
-      var rr = R * ring.r;
-      var x = cx + rr * Math.cos(a), y = cy + rr * Math.sin(a);
-      var pw = Math.max(pillH, tk.length * fs + fs * 0.78);
-      g += '<g class="hz" data-ch="' + esc(tk) + '" data-i="' + idx + '">';
-      g += '<rect x="' + (x - pw / 2) + '" y="' + (y - pillH / 2) + '" width="' + pw + '" height="' + pillH + '" rx="' + (pillH / 2) + '" fill="#fff" stroke="#1B2A47" stroke-width="' + Math.max(2.5, fs * 0.09) + '"/>';
-      g += '<text x="' + x + '" y="' + (y + fs * 0.35) + '" font-size="' + fs + '" font-weight="700" fill="#1B2A47" text-anchor="middle">' + esc(tk) + '</text>';
-      var target = targetText(tk);
-      if (target) {
-          var targetFont = Math.max(8, Math.min(fs * 0.34, fs * 2.7 / Math.max(1, target.length)));
-          var outward = (y >= cy) ? 1 : -1;
-          var targetY = outward > 0 ? (y + pillH / 2 + fs * 0.38) : (y - pillH / 2 - fs * 0.14);
-          g += '<text x="' + x + '" y="' + targetY + '" font-size="' + targetFont + '" fill="#3E6E58" text-anchor="middle">' + esc(target) + '</text>';
-      }
-      g += '</g>';
-      idx++;
+  L.items.forEach(function (p, idx) {
+    var m = L.M[p.tk], x = p.x, y = p.y, pw = m.pw * fs;
+    g += '<g class="hz" data-ch="' + esc(p.tk) + '" data-i="' + idx + '">';
+    g += '<rect x="' + (x - pw / 2) + '" y="' + (y - pillH / 2) + '" width="' + pw + '" height="' + pillH + '" rx="' + (pillH / 2) + '" fill="#fff" stroke="#1B2A47" stroke-width="' + Math.max(2.5, fs * 0.09) + '"/>';
+    g += '<text x="' + x + '" y="' + (y + fs * 0.35) + '" font-size="' + fs + '"' + termFontAttr(p.tk) + ' fill="#1B2A47" text-anchor="middle">' + esc(p.tk) + '</text>';
+    var k = m.lines.length;
+    m.lines.forEach(function (line, li) {
+      var ty = p.below
+        ? y + pillH / 2 + tf * 0.98 + li * lh
+        : y - pillH / 2 - tf * 0.3 - (k - 1 - li) * lh;
+      g += '<text x="' + x + '" y="' + ty + '" font-size="' + tf + '"' + supportFontAttr() + ' font-weight="600" fill="#2F5A47" text-anchor="middle">' + esc(line) + '</text>';
     });
+    g += '</g>';
   });
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif">' + g + '</svg>';
 }
@@ -301,15 +435,26 @@ function sheetSVG() {
   g += '<text x="' + (W / 2) + '" y="60" font-size="28" font-weight="700" fill="#F2F6EF" text-anchor="middle">Term Race · ' + esc(S.title || '') + '</text>';
   g += '<text x="30" y="102" font-size="15" fill="#1B2A47">Name ＿＿＿＿＿＿＿＿　Partner ＿＿＿＿＿＿＿＿　Date ＿＿＿＿＿＿</text>';
   var cW = W - 48, cH = 672;
-  g += '<g transform="translate(24,116)">' + circleSVG(cW, cH, { pad: 46 }).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + '</g>';
+  g += '<g transform="translate(24,116)">' + circleSVG(cW, cH).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + '</g>';
   g += '<g transform="translate(24,800)">' + gridSVG(cW, 262, S.opts.grid, 'Grid').replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + '</g>';
   g += '<text x="' + (W / 2) + '" y="1092" font-size="14" fill="#5A6B57" text-anchor="middle">One partner gives a clue while the other finds the term on the wheel. Mark an X on the grid each round, then switch.</text>';
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif">' + g + '</svg>';
 }
 
+// Tell the teacher how big the words will be on paper; 14pt+ reads comfortably from a desk.
+function updatePrintSizeHint() {
+  var hint = $('#printSizeHint');
+  if (!hint) return;
+  var pt = printPt();
+  if (!pt) { hint.textContent = ''; hint.className = 'hint'; return; }
+  var warn = pt < 14;
+  hint.textContent = (warn ? hint.getAttribute('data-warn') : hint.getAttribute('data-ok')).replace('{pt}', pt);
+  hint.className = 'hint' + (warn ? ' warn' : '');
+}
 function renderPreview() {
   $('#preview').innerHTML = S.order.length ? circleSVG(900, 640) :
     '<div style="padding:50px;text-align:center;color:#9AA79E">No terms yet</div>';
+  updatePrintSizeHint();
 }
 
 /* ---------- game ---------- */
@@ -387,9 +532,38 @@ function startTimer() {
 function stopTimer() { G.running = false; clearInterval(G.timer); }
 
 /* ---------- export ---------- */
+// An SVG drawn as an image can't see the page's web fonts, so embed the pinyin glyphs as a data-URL font.
+var PY_EMBED = { key: '', css: '' };
+function bufToB64(buf) {
+  var bytes = new Uint8Array(buf), s = '', i;
+  for (i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+function embedPinyinFont(svg) {
+  if (S.opts.targetLanguage !== 'pinyin') return Promise.resolve(svg);
+  var chars = {};
+  S.order.forEach(function (t) { String(targetText(t)).split('').forEach(function (c) { chars[c] = 1; }); });
+  var text = Object.keys(chars).sort().join('') + '…';
+  var inject = function (css) { return css ? svg.replace(/(<svg[^>]*>)/, '$1<defs><style>' + css + '</style></defs>') : svg; };
+  if (PY_EMBED.key === text) return Promise.resolve(inject(PY_EMBED.css));
+  return fetch('https://fonts.googleapis.com/css2?family=Andika:wght@700&text=' + encodeURIComponent(text))
+    .then(function (r) { return r.text(); })
+    .then(function (css) {
+      var m = css.match(/url\((https:[^)]+)\)/);
+      if (!m) throw new Error('no font url');
+      return fetch(m[1]).then(function (r) { return r.arrayBuffer(); });
+    })
+    .then(function (buf) {
+      PY_EMBED = { key: text, css: "@font-face{font-family:'Andika';font-weight:400 700;src:url(data:font/woff2;base64," + bufToB64(buf) + ")}" };
+      return inject(PY_EMBED.css);
+    })
+    .catch(function () { return svg; });   // offline: falls back to Century Gothic / system sans
+}
 function svgToJpegLocal(svg, w, h, cb) {
   if (!DE) { toast('Missing deck-export.js'); return; }
-  DE.svgToJpeg(svg, w, h, 2).then(cb).catch(function () { toast('Export failed'); });
+  embedPinyinFont(svg)
+    .then(function (s) { return DE.svgToJpeg(s, w, h, 2); })
+    .then(cb).catch(function () { toast('Export failed'); });
 }
 function exportPNG() {
   if (!S.order.length) { toast('Add some terms first'); return; }
@@ -423,7 +597,8 @@ function doPrint(copies) {
     d.innerHTML = sheetSVG();
     area.appendChild(d);
   }
-  setTimeout(function () { window.print(); }, 150);
+  var ready = document.fonts && document.fonts.load ? document.fonts.load('600 16px Andika') : Promise.resolve();
+  ready.catch(function () {}).then(function () { setTimeout(function () { window.print(); }, 150); });
 }
 
 /* ---------- boot ---------- */
@@ -471,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function () {
     S.opts.targetLanguage = this.value;
     renderChips(); renderPreview(); updateTargetLanguageHint();
   });
-  $('#optFlower').addEventListener('change', function () { S.opts.flower = this.checked; renderPreview(); });
+  $('#optShape').addEventListener('change', function () { S.opts.shape = this.value; renderPreview(); });
   $('#optRings').addEventListener('change', function () { S.opts.rings = this.value; renderPreview(); });
   $('#optSize').addEventListener('change', function () { S.opts.size = this.value; renderPreview(); });
   $('#optGrid').addEventListener('change', function () { S.opts.grid = +this.value; });
