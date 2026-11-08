@@ -88,6 +88,7 @@
     <h2><span class="num">4</span><%= t('characterRace.playExportHeading') %></h2>
     <div class="row">
       <button id="btnGame" class="dark">▶ <%= t('characterRace.btnGame') %></button>
+      <button id="btnBattle" class="dark">⚔ <%= t('characterRace.btnBattle') %></button>
       <button id="btnPrint1" class="primary"><%= t('characterRace.btnPrint1') %></button>
       <button id="btnPrint4"><%= t('characterRace.btnPrint4') %></button>
       <button id="btnPPTX"><%= t('characterRace.btnPPTX') %></button>
@@ -122,6 +123,49 @@
     <button id="gStop" class="mini"><%= t('characterRace.gPause') %></button>
     <button id="gAgain" class="mini"><%= t('characterRace.gReset') %></button>
     <button id="gExit"><%= t('characterRace.gExit') %></button>
+  </div>
+</div>
+
+<div id="battle" data-text="<%= JSON.stringify({ listen: t('characterRace.bListen'), pressNext: t('characterRace.bPressNext'), scored: t('characterRace.bScored'), winner: t('characterRace.bWinner'), judgeTip: t('characterRace.bJudgeTip'), tooMany: t('characterRace.bTooMany'), allUsed: t('characterRace.bAllUsed') }) %>">
+  <div id="bbar">
+    <button id="bNext" class="primary"><%= t('characterRace.bNext') %></button>
+    <button id="bSay" class="mini"><%= t('characterRace.bSay') %></button>
+    <button id="bPeek" class="mini"><%= t('characterRace.bPeek') %></button>
+    <button id="bShuffle" class="mini"><%= t('characterRace.bShuffle') %></button>
+    <label class="check"><input type="checkbox" id="bSpeak" checked> <%= t('characterRace.bSpeak') %></label>
+    <label class="check"><input type="checkbox" id="bHint"> <%= t('characterRace.bHint') %></label>
+    <label class="check"><input type="checkbox" id="bSame"> <%= t('characterRace.bSame') %></label>
+    <label class="check"><input type="checkbox" id="bReshuffle"> <%= t('characterRace.bReshuffle') %></label>
+    <label class="check"><input type="checkbox" id="bJudge"> <%= t('characterRace.bJudge') %></label>
+    <span class="field"><%= t('characterRace.bGoal') %>
+      <select id="bGoal"><option value="0"><%= t('characterRace.bGoalNone') %></option><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option></select>
+    </span>
+    <button id="bSwap" class="mini"><%= t('characterRace.bSwap') %></button>
+    <button id="bReset" class="mini"><%= t('characterRace.bReset') %></button>
+    <button id="bExit"><%= t('characterRace.bExit') %></button>
+  </div>
+  <div id="bstatus" role="status" aria-live="polite"></div>
+  <div class="bteams">
+    <section class="bteam" data-side="0" style="--team:#127c83" data-wait="<%= t('characterRace.bWait') %>">
+      <div class="bteam-head">
+        <input type="text" class="bname" aria-label="Team name" value="<%= t('characterRace.teamA') %>">
+        <input type="color" class="bcolor" aria-label="Team color" value="#127c83">
+        <button type="button" class="bminus" aria-label="-1">−1</button>
+        <output class="bscore" aria-live="polite">0</output>
+        <button type="button" class="bplus" aria-label="+1">+1</button>
+      </div>
+      <div class="bstage"></div>
+    </section>
+    <section class="bteam" data-side="1" style="--team:#b25435" data-wait="<%= t('characterRace.bWait') %>">
+      <div class="bteam-head">
+        <input type="text" class="bname" aria-label="Team name" value="<%= t('characterRace.teamB') %>">
+        <input type="color" class="bcolor" aria-label="Team color" value="#b25435">
+        <button type="button" class="bminus" aria-label="-1">−1</button>
+        <output class="bscore" aria-live="polite">0</output>
+        <button type="button" class="bplus" aria-label="+1">+1</button>
+      </div>
+      <div class="bstage"></div>
+    </section>
   </div>
 </div>
 

@@ -360,8 +360,15 @@ function pathD(pts) {
   return 'M' + pts.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('L') + 'Z';
 }
 
+// opt.order draws the track with its own word order (each battle side is shuffled separately).
 function circleSVG(w, h, opt) {
   opt = opt || {};
+  if (!opt.order) return trackSVG(w, h, opt);
+  var keep = S.order;
+  S.order = opt.order;
+  try { return trackSVG(w, h, opt); } finally { S.order = keep; }
+}
+function trackSVG(w, h, opt) {
   var L = trackLayout(w, h), cx = L.cx, cy = L.cy, cr0 = L.cr0, fs = L.fs;
   if (S.opts.size !== 'auto') fs = Math.min(+S.opts.size, fs * 1.3);
   var pillH = fs * 1.5, tf = fs * TF, lh = tf * 1.18;
@@ -387,6 +394,11 @@ function circleSVG(w, h, opt) {
     var centerFont = Math.max(13, Math.min(cr0 * 0.9, cr0 * 3.2 / Math.max(1, centerText.length)));
     g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (cr0 * 0.98) + '" fill="#35604C" stroke="#1B2A47" stroke-width="5"/>';
     g += '<text x="' + cx + '" y="' + (cy + centerFont * 0.34) + '" font-size="' + centerFont + '"' + termFontAttr(centerText) + ' fill="#F6C43C" text-anchor="middle">' + esc(centerText) + '</text>';
+  } else if (opt.centerLabel != null) {
+    var lab = String(opt.centerLabel);
+    var labFont = Math.max(12, Math.min(cr0 * 0.8, cr0 * 1.7 / Math.max(1, emW(lab))));
+    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + cr0 + '" fill="' + (opt.centerFill || '#35604C') + '" stroke="#1B2A47" stroke-width="5"/>';
+    g += '<text x="' + cx + '" y="' + (cy + labFont * 0.34) + '" font-size="' + labFont + '"' + termFontAttr(lab) + ' fill="#F6C43C" text-anchor="middle">' + esc(lab) + '</text>';
   } else {
     g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + cr0 + '" fill="#35604C" stroke="#1B2A47" stroke-width="5"/>';
     g += '<text x="' + cx + '" y="' + (cy - 2) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">TERM</text>';
@@ -459,8 +471,8 @@ function renderPreview() {
 
 /* ---------- game ---------- */
 var G = { target: '', score: 0, miss: 0, left: 60, timer: null, running: false };
-function speak(ch) {
-  if (!$('#optSpeak').checked) return;
+function speak(ch, on) {
+  if (!(on === undefined ? $('#optSpeak').checked : on)) return;
   try {
     if (!window.speechSynthesis) return;
     var u = new SpeechSynthesisUtterance(ch);
@@ -530,6 +542,247 @@ function startTimer() {
   }, 1000);
 }
 function stopTimer() { G.running = false; clearInterval(G.timer); }
+
+/* ---------- two-team whiteboard battle ---------- */
+// One student per team at the board. The teacher (or text-to-speech) says a word;
+// the first correct tap scores for that team. A wrong tap locks that side briefly.
+var B = {
+  target: '', resolved: true, used: {}, orders: [[], []], locked: [false, false], lockT: [0, 0],
+  scores: [0, 0], round: 0, over: false, text: {}
+};
+function bText(key, vars) {
+  var s = B.text[key] || '';
+  Object.keys(vars || {}).forEach(function (k) { s = s.replace('{' + k + '}', vars[k]); });
+  return s;
+}
+function bTeam(side) { return document.querySelector('#battle .bteam[data-side="' + side + '"]'); }
+function bName(side) { return bTeam(side).querySelector('.bname').value.trim() || ('Team ' + (side ? 'B' : 'A')); }
+function bColor(side) { return bTeam(side).querySelector('.bcolor').value; }
+function shuffled(list) {
+  var a = list.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function bShuffle() {
+  var a = shuffled(S.order), b = a;
+  if (!$('#bSame').checked) {
+    b = shuffled(S.order);
+    for (var k = 0; k < 5 && b.join('|') === a.join('|'); k++) b = shuffled(S.order);
+  }
+  B.orders = [a, b];
+}
+function bClue() {
+  if (!B.target || !$('#bHint').checked) return null;
+  var t = S.terms[B.target] || {};
+  return targetText(B.target) || t.en || t.py || null;
+}
+function bRenderSide(side) {
+  var stage = bTeam(side).querySelector('.bstage');
+  var w = Math.max(200, stage.clientWidth), h = Math.max(200, stage.clientHeight);
+  var clue = bClue();
+  // With a clue on screen, tiles show the term only, so the clue can't be matched to a tile's support line.
+  var keepLang = S.opts.targetLanguage;
+  if ($('#bHint').checked) S.opts.targetLanguage = 'none';
+  try {
+    stage.innerHTML = circleSVG(w, h, {
+      order: B.orders[side],
+      // Short clues also sit in the centre; long ones only in the status line above.
+      centerLabel: clue != null && emW(clue) <= 7 ? clue : (B.target && !B.resolved ? '?' : '★'),
+      centerFill: B.resolved && B.winSide === side ? bColor(side) : '#35604C'
+    });
+  } finally { S.opts.targetLanguage = keepLang; }
+  // Re-apply tile colours after a redraw (e.g. window resize mid-round).
+  if (B.resolved && B.target && B.winSide != null) bMarkCorrect(side, B.winSide === side);
+}
+function bRender() { bRenderSide(0); bRenderSide(1); }
+function bTile(side, ch) {
+  var nodes = bTeam(side).querySelectorAll('.bstage .hz');
+  for (var i = 0; i < nodes.length; i++) if (nodes[i].getAttribute('data-ch') === ch) return nodes[i];
+  return null;
+}
+function bPaint(node, fill, ink) {
+  if (!node) return;
+  var r = node.querySelector('rect');
+  if (r) r.setAttribute('fill', fill);
+  var tx = node.querySelector('text');
+  if (tx && ink) tx.setAttribute('fill', ink);
+}
+// Winner's side: the tile fills with the team colour. Other side: the right tile gets a thick outline.
+function bMarkCorrect(side, won) {
+  var node = bTile(side, B.target);
+  if (!node) return;
+  if (won) bPaint(node, bColor(side), '#fff');
+  else {
+    var r = node.querySelector('rect');
+    if (r) { r.setAttribute('stroke', bColor(B.winSide)); r.setAttribute('stroke-width', '7'); }
+  }
+}
+function bStatus(html) { $('#bstatus').innerHTML = html; }
+function bScoreView() {
+  [0, 1].forEach(function (side) {
+    bTeam(side).querySelector('.bscore').textContent = B.scores[side];
+    bTeam(side).style.setProperty('--team', bColor(side));
+  });
+}
+function bCheckWin() {
+  var goal = +$('#bGoal').value;
+  if (!goal) return false;
+  for (var side = 0; side < 2; side++) {
+    if (B.scores[side] >= goal) {
+      B.over = true;
+      bStatus('<span class="bwho" style="--who:' + bColor(side) + '">' + esc(bText('winner', { team: bName(side) })) + '</span>');
+      $('#bNext').disabled = true;
+      return true;
+    }
+  }
+  return false;
+}
+function bAward(side) {
+  if (B.over) return;
+  B.scores[side]++;
+  bScoreView();
+  var hadRound = B.target && !B.resolved;
+  if (hadRound) {
+    B.resolved = true;
+    B.winSide = side;
+    bUnlock();
+    bTeam(side).classList.add('won');
+    bRender();
+  }
+  if (bCheckWin()) return;
+  if (hadRound) {
+    bStatus('<span class="bwho" style="--who:' + bColor(side) + '">' + esc(bText('scored', { team: bName(side) })) + '</span>' +
+      '<span class="bword">' + esc(B.target) + '</span>');
+  }
+}
+function bUnlock() {
+  [0, 1].forEach(function (side) {
+    clearTimeout(B.lockT[side]);
+    B.locked[side] = false;
+    bTeam(side).classList.remove('locked');
+  });
+}
+function bLock(side) {
+  B.locked[side] = true;
+  bTeam(side).classList.add('locked');
+  clearTimeout(B.lockT[side]);
+  B.lockT[side] = setTimeout(function () {
+    B.locked[side] = false;
+    bTeam(side).classList.remove('locked');
+  }, 1500);
+}
+function bTap(side, node) {
+  if (B.over || !B.target || B.resolved || B.locked[side]) return;
+  var ch = node.getAttribute('data-ch');
+  if ($('#bJudge').checked) {
+    // Teacher judges: just show what this student picked; the teacher presses +1.
+    Array.prototype.forEach.call(bTeam(side).querySelectorAll('.bstage .hz rect'), function (r) { r.setAttribute('fill', '#fff'); });
+    bPaint(node, ch === B.target ? '#DCEBD5' : '#F7C9C4');
+    return;
+  }
+  if (ch === B.target) { bAward(side); return; }
+  bPaint(node, '#F7C9C4');
+  setTimeout(function () { if (!B.resolved) bPaint(node, '#fff'); }, 450);
+  bLock(side);
+}
+function bNext() {
+  if (B.over) return;
+  var pool = S.order.filter(function (t) { return !B.used[t]; });
+  if (!pool.length) { B.used = {}; pool = S.order.slice(); toast(bText('allUsed')); }
+  if (B.target && pool.length > 1) pool = pool.filter(function (t) { return t !== B.target; });
+  B.target = pool[Math.floor(Math.random() * pool.length)];
+  B.used[B.target] = true;
+  B.resolved = false;
+  B.winSide = null;
+  B.round++;
+  bUnlock();
+  [0, 1].forEach(function (side) { bTeam(side).classList.remove('won'); });
+  if ($('#bReshuffle').checked) bShuffle();
+  bRender();
+  var clue = bClue();
+  bStatus(clue != null ? esc(clue) : ($('#bJudge').checked ? esc(bText('judgeTip')) : esc(bText('listen'))));
+  speak(B.target, $('#bSpeak').checked);
+}
+function bReset() {
+  B.scores = [0, 0]; B.target = ''; B.resolved = true; B.winSide = null; B.used = {}; B.round = 0; B.over = false;
+  $('#bNext').disabled = false;
+  bUnlock();
+  [0, 1].forEach(function (side) { bTeam(side).classList.remove('won'); });
+  bShuffle();
+  bScoreView();
+  bRender();
+  bStatus(esc(bText('pressNext')));
+}
+function openBattle() {
+  if (S.order.length < 4) { toast('Add at least 4 terms'); return; }
+  $('#battle').classList.add('open');
+  if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
+  // Wait for layout so the stages have their real size before drawing.
+  setTimeout(function () {
+    bReset();
+    if (S.order.length > 16) toast(bText('tooMany'));
+  }, 30);
+}
+function closeBattle() {
+  bUnlock();
+  $('#battle').classList.remove('open');
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+}
+function initBattle() {
+  var root = $('#battle');
+  try { B.text = JSON.parse(root.getAttribute('data-text') || '{}'); } catch (e) { B.text = {}; }
+  $('#btnBattle').addEventListener('click', openBattle);
+  $('#bExit').addEventListener('click', closeBattle);
+  $('#bNext').addEventListener('click', bNext);
+  $('#bSay').addEventListener('click', function () { if (B.target) speak(B.target, true); });
+  $('#bShuffle').addEventListener('click', function () { bShuffle(); bRender(); });
+  $('#bReset').addEventListener('click', bReset);
+  $('#bSwap').addEventListener('click', function () { root.querySelector('.bteams').classList.toggle('swapped'); bRender(); });
+  $('#bSame').addEventListener('change', function () { bShuffle(); bRender(); });
+  $('#bHint').addEventListener('change', function () {
+    bRender();
+    if (B.target && !B.resolved) { var c = bClue(); bStatus(esc(c != null ? c : bText('listen'))); }
+  });
+  $('#bGoal').addEventListener('change', function () { if (!B.over) bCheckWin(); });
+  // Teacher peek: hold to see the word (for when read-aloud is off and the teacher says it).
+  var peek = $('#bPeek'), peekLabel = peek.textContent;
+  var showPeek = function (e) { e.preventDefault(); if (B.target) peek.textContent = B.target; };
+  var hidePeek = function () { peek.textContent = peekLabel; };
+  peek.addEventListener('pointerdown', showPeek);
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { peek.addEventListener(ev, hidePeek); });
+
+  [0, 1].forEach(function (side) {
+    var team = bTeam(side);
+    team.querySelector('.bplus').addEventListener('click', function () { bAward(side); });
+    team.querySelector('.bminus').addEventListener('click', function () {
+      B.scores[side] = Math.max(0, B.scores[side] - 1);
+      bScoreView();
+      if (B.over && !bCheckWin()) { B.over = false; $('#bNext').disabled = false; bStatus(esc(bText('pressNext'))); }
+    });
+    team.querySelector('.bcolor').addEventListener('input', function () { bScoreView(); if (B.resolved) bRender(); });
+    // pointerdown (not click) so two students touching at once are both seen on multi-touch boards.
+    team.querySelector('.bstage').addEventListener('pointerdown', function (e) {
+      var node = e.target.closest && e.target.closest('.hz');
+      if (!node) return;
+      e.preventDefault();
+      bTap(side, node);
+    });
+  });
+  var rt = 0;
+  window.addEventListener('resize', function () {
+    if (!root.classList.contains('open')) return;
+    clearTimeout(rt); rt = setTimeout(bRender, 150);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (!root.classList.contains('open')) return;
+    if (e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'checkbox') return;
+    if (e.key === 'Escape') closeBattle();
+    else if (e.key === ' ') { e.preventDefault(); bNext(); }
+  });
+}
 
 /* ---------- export ---------- */
 // An SVG drawn as an image can't see the page's web fonts, so embed the pinyin glyphs as a data-URL font.
@@ -672,5 +925,6 @@ document.addEventListener('DOMContentLoaded', function () {
     else if (e.key === ' ') { e.preventDefault(); nextTarget(); }
   });
 
+  initBattle();
   renderChips(); renderPreview(); updateTargetLanguageHint();
 });
