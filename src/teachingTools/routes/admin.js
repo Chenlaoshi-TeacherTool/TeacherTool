@@ -9,7 +9,6 @@ var sqlClient = require('../services/sqlClient');
 var siteContentStore = require('../services/siteContentStore');
 var blobStorage = require('../services/blobStorage');
 var siteMap = require('../config/siteMap');
-var textbooks = require('../config/textbooks');
 var textbookImport = require('../services/textbookImport');
 var teacherLibraryRepository = require('../services/teacherLibraryRepository');
 var teacherAccountsRepository = require('../services/teacherAccountsRepository');
@@ -28,6 +27,10 @@ var uploadMaterial = multer({ storage: multer.memoryStorage(), limits: { fileSiz
 var materialAdminRouter = require('./materials').create({ adminMode: true });
 
 router.use(requireAdmin);
+router.use('/textbooks', async function (req, res, next) {
+  try { req.textbooks = (await require('../services/contentCatalog').load()).textbooks; next(); }
+  catch (error) { next(error); }
+});
 
 // Admin nav and dashboard follow the public site structure in config/siteMap.js.
 router.use(function (req, res, next) {
@@ -41,6 +44,8 @@ router.use(async function (req, res, next) {
   try { res.locals.dbStatus = await databaseVersion.check(); } catch (error) { res.locals.dbStatus = null; }
   next();
 });
+
+router.use(require('./contentCatalog'));
 
 router.get('/', function (req, res) {
   res.render('admin/dashboard', { title: 'Admin', adminUser: req.adminUser, groups: siteMap.adminGroups() });
@@ -1009,7 +1014,7 @@ router.get('/textbooks', async function (req, res, next) {
       'FROM textbook_lessons tl LEFT JOIN textbook_lesson_items tli ON tli.lesson_id = tl.id ' +
       'GROUP BY tl.series, tl.book_slug ORDER BY tl.series, tl.book_slug'
     );
-    var groups = textbooks.SERIES.map(function (series) {
+    var groups = req.textbooks.SERIES.map(function (series) {
       return { series: series, books: result.recordset.filter(function (book) { return book.series === series.key; }) };
     });
     res.render('admin/textbooks-index', { title: 'Textbooks', groups: groups, bookPath: bookPath, adminUser: req.adminUser });
@@ -1029,7 +1034,7 @@ router.post('/textbooks/import', upload.single('file'), async function (req, res
     var workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(req.file.buffer);
     var pool = await sqlClient.getPool();
-    var parsed = textbookImport.readWorkbook(workbook, await textbookImport.existingLessonIds(pool));
+    var parsed = textbookImport.readWorkbook(workbook, await textbookImport.existingLessonIds(pool), req.textbooks);
     if (parsed.errors.length) return render({ errors: parsed.errors });
     render({ counts: await textbookImport.applyImport(pool, sql, parsed) });
   } catch (err) { next(err); }
@@ -1050,7 +1055,7 @@ router.get('/textbooks/export', async function (req, res, next) {
 
 router.get('/textbooks/books/:series/:book', async function (req, res, next) {
   try {
-    var series = textbooks.findSeries(req.params.series);
+    var series = req.textbooks.findSeries(req.params.series);
     if (!series) return res.status(404).send('Textbook series not found.');
     var pool = await sqlClient.getPool();
     var result = await pool.request()
@@ -1062,7 +1067,8 @@ router.get('/textbooks/books/:series/:book', async function (req, res, next) {
         'WHERE tl.series = @series AND tl.book_slug = @bookSlug ' +
         'GROUP BY tl.id, tl.slug, tl.book_name, tl.sort_order, tl.lesson_no, tl.title, tl.is_published ORDER BY tl.sort_order, tl.id'
       );
-    var bookName = result.recordset[0] ? result.recordset[0].book_name : req.params.book;
+    var configuredBook = req.textbooks.findBook(series, req.params.book);
+    var bookName = configuredBook ? configuredBook.zh : result.recordset[0] ? result.recordset[0].book_name : req.params.book;
     res.render('admin/textbooks-book', {
       title: series.zh + ' ' + bookName, series: series, bookSlug: req.params.book, bookName: bookName,
       lessons: result.recordset, adminUser: req.adminUser
@@ -1071,9 +1077,9 @@ router.get('/textbooks/books/:series/:book', async function (req, res, next) {
 });
 
 router.get('/textbooks/lessons/new', function (req, res) {
-  var series = textbooks.findSeries(req.query.series) || textbooks.SERIES[0];
+  var series = req.textbooks.findSeries(req.query.series) || req.textbooks.SERIES[0];
   res.render('admin/textbooks-lesson-edit', {
-    title: 'New lesson', seriesList: textbooks.SERIES, items: [], bookPath: bookPath,
+    title: 'New lesson', seriesList: req.textbooks.SERIES, items: [], bookPath: bookPath,
     lesson: null, defaults: { series: series.key, book_slug: req.query.book || '', book_name: req.query.book_name || '' },
     adminUser: req.adminUser
   });
@@ -1081,7 +1087,7 @@ router.get('/textbooks/lessons/new', function (req, res) {
 
 router.post('/textbooks/lessons/new', async function (req, res, next) {
   try {
-    if (!textbooks.findSeries(req.body.series)) return res.status(400).send('Unknown textbook series.');
+    if (!req.textbooks.findSeries(req.body.series)) return res.status(400).send('Unknown textbook series.');
     var pool = await sqlClient.getPool();
     var result = await lessonInputs(pool.request(), req.body).query(
       'INSERT INTO textbook_lessons (slug, series, book_slug, book_name, sort_order, lesson_no, title, sentence_patterns, activities, games, is_published) ' +
@@ -1102,7 +1108,7 @@ router.get('/textbooks/lessons/:id/edit', async function (req, res, next) {
     var files = [];
     try { files = await textbookRepository.listFiles(lesson.id); } catch (error) { files = null; }
     res.render('admin/textbooks-lesson-edit', {
-      title: 'Edit ' + lesson.title, seriesList: textbooks.SERIES, lesson: lesson, defaults: lesson,
+      title: 'Edit ' + lesson.title, seriesList: req.textbooks.SERIES, lesson: lesson, defaults: lesson,
       items: itemsResult.recordset, files: files, fileError: req.query.fileError || '', bookPath: bookPath, adminUser: req.adminUser
     });
   } catch (err) { next(err); }
@@ -1110,7 +1116,7 @@ router.get('/textbooks/lessons/:id/edit', async function (req, res, next) {
 
 router.post('/textbooks/lessons/:id', async function (req, res, next) {
   try {
-    if (!textbooks.findSeries(req.body.series)) return res.status(400).send('Unknown textbook series.');
+    if (!req.textbooks.findSeries(req.body.series)) return res.status(400).send('Unknown textbook series.');
     var pool = await sqlClient.getPool();
     await lessonInputs(pool.request(), req.body).input('id', sql.Int, req.params.id).query(
       'UPDATE textbook_lessons SET slug=@slug, series=@series, book_slug=@bookSlug, book_name=@bookName, sort_order=@sortOrder, lesson_no=@lessonNo, ' +

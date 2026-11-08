@@ -1,6 +1,7 @@
 <%- include('layout-head') %>
 <h1>Textbooks</h1>
 <p>
+  <a class="button" href="/admin/textbooks/new">+ 新增教材 / New textbook</a>
   <a class="button" href="/admin/textbooks/import">+ Import from Excel</a>
   <a class="button secondary" href="/admin/textbooks/export">Export all to Excel</a>
 </p>
@@ -8,9 +9,10 @@
 
 <% groups.forEach(function (group) { %>
 <h2><%= group.series.zh %> <span style="font-weight:400;color:#666;font-size:0.9rem;"><%= group.series.en %> · <code><%= group.series.key %></code><%= group.series.membersOnly ? ' · members only' : '' %></span></h2>
+<p><a class="button" href="/admin/textbooks/<%= group.series.key %>/books/new">+ 新增册数 / New book</a></p>
 <% if (group.series.books) { %>
   <p style="font-size:0.9rem;color:#444;">Public pages: <a href="/textbook-companion/<%= group.series.key %>" target="_blank" rel="noopener">/textbook-companion/<%= group.series.key %></a>. Lessons must use these book slugs:
-    <% group.series.books.forEach(function (book) { %><code><%= book.slug %></code> (<%= book.zh %>) <a href="/admin/textbooks/lessons/new?series=<%= group.series.key %>&book=<%= book.slug %>&book_name=<%= encodeURIComponent(book.zh) %>">+ lesson</a> &nbsp; <% }) %></p>
+    <% group.series.books.forEach(function (book) { %><a href="<%= bookPath(group.series.key, book.slug) %>"><%= book.zh %></a> <code><%= book.slug %></code> <a href="/admin/textbooks/lessons/new?series=<%= group.series.key %>&book=<%= book.slug %>&book_name=<%= encodeURIComponent(book.zh) %>">+ 新增课次 / lesson</a> &nbsp; <% }) %></p>
 <% } %>
 <% if (!group.books.length) { %>
   <p style="color:#666;">No lessons yet. <a href="/admin/textbooks/lessons/new?series=<%= group.series.key %>">Add one</a> or import from Excel.</p>

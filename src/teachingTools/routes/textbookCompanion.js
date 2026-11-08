@@ -28,13 +28,17 @@ function create(options) {
   };
   var loginProvider = options.loginProvider || function () { return require('./teacherLibrary').accountProvider(); };
   var router = express.Router();
+  var contentCatalog = options.contentCatalog || require('../services/contentCatalog');
+  router.use('/textbook-companion', async function (req, res, next) {
+    try { req.textbooks = (await contentCatalog.load()).textbooks; next(); } catch (error) { next(error); }
+  });
 
   function zh(res) { return res.locals.lang === 'zh'; }
   function pick(res, en, zhText) { return zh(res) ? zhText : en; }
   function name(res, item) { return zh(res) ? item.zh : item.en; }
 
-  function seriesWithBooks(key) {
-    var series = textbooks.findSeries(key);
+  function seriesWithBooks(req, key) {
+    var series = req.textbooks.findSeries(key);
     return series && series.books ? series : null;
   }
 
@@ -50,7 +54,7 @@ function create(options) {
   }
 
   router.get('/textbook-companion', async function (req, res) {
-    var available = textbooks.SERIES.filter(function (series) { return series.books; }).map(function (series) {
+    var available = req.textbooks.SERIES.filter(function (series) { return series.books; }).map(function (series) {
       return { heading: name(res, series), href: '/textbook-companion/' + series.key, membersOnly: Boolean(series.membersOnly),
         description: pick(res, series.books.map(function (book) { return book.en; }).join(' · ') + ' — vocabulary, patterns, activities and printable files for every lesson.',
           series.books.map(function (book) { return book.zh; }).join('、') + '：每一课的生词、句型、活动和可打印材料。') };
@@ -65,7 +69,7 @@ function create(options) {
   // The old placeholder level pages had no content; send old links to the list.
   router.get('/textbook-companion/:series', async function (req, res, next) {
     if (/^level-\d+$/.test(req.params.series)) return res.redirect(301, '/textbook-companion');
-    var series = seriesWithBooks(req.params.series);
+    var series = seriesWithBooks(req, req.params.series);
     if (!series) return next();
     var counts = {};
     try { counts = await repository.countLessons(series.key); } catch (error) { console.error('textbook count error:', error.message); }
@@ -78,7 +82,7 @@ function create(options) {
   });
 
   router.get('/textbook-companion/:series/:book', async function (req, res, next) {
-    var series = seriesWithBooks(req.params.series);
+    var series = seriesWithBooks(req, req.params.series);
     var book = textbooks.findBook(series, req.params.book);
     if (!book) return next();
     var lessons = [];
@@ -93,7 +97,7 @@ function create(options) {
   });
 
   router.get('/textbook-companion/:series/:book/:lesson', async function (req, res, next) {
-    var series = seriesWithBooks(req.params.series);
+    var series = seriesWithBooks(req, req.params.series);
     var book = textbooks.findBook(series, req.params.book);
     if (!book || !/^[A-Za-z0-9_-]{1,100}$/.test(req.params.lesson)) return next();
     try {
@@ -119,7 +123,7 @@ function create(options) {
     if (!/^\d{1,9}$/.test(req.params.id)) return next();
     try {
       var file = await repository.getFile(Number(req.params.id));
-      var series = file && file.published ? seriesWithBooks(file.series) : null;
+      var series = file && file.published ? seriesWithBooks(req, file.series) : null;
       if (!series) return next();
       var lessonPage = '/textbook-companion/' + series.key + '/' + file.book + '/' + file.lessonSlug;
       if (!(await canOpen(req, series))) return res.redirect(303, lessonPage + '#members');

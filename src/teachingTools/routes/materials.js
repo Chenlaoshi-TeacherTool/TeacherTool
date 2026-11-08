@@ -3,8 +3,6 @@
 var express = require('express');
 var crypto = require('crypto');
 var multer = require('multer');
-var textbooks = require('../config/textbooks');
-var siteMap = require('../config/siteMap');
 
 function create(options) {
   options = options || {};
@@ -22,7 +20,11 @@ function create(options) {
   };
   var origin = new URL(options.origin || process.env.SITE_URL || 'https://clsteachingtools.com').origin;
   var router = express.Router();
-  var themes = siteMap.children('activities');
+  var contentCatalog = options.contentCatalog || require('../services/contentCatalog');
+  router.use(async function (req, res, next) {
+    if (!/^\/(?:materials|theme-activities)(?:\/|$)/.test(req.path)) return next();
+    try { req.contentCatalog = await contentCatalog.load(); next(); } catch (error) { next(error); }
+  });
   var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: files.MAX_BYTES, files: 7, fields: 40, fieldSize: 10000 } })
     .fields([{ name: 'attachments', maxCount: 6 }, { name: 'preview', maxCount: 1 }]);
   var validId = function (id) { return /^[a-zA-Z0-9_-]{1,64}$/.test(id); };
@@ -42,13 +44,17 @@ function create(options) {
     if (!user || !user.admin) return res.status(403).send('Administrator access required. / 仅管理员可访问。');
     next();
   });
+  if (adminMode) router.get('/materials/catalog', async function (req, res, next) {
+    try { res.set('Cache-Control', 'private, no-store').json({ series: req.contentCatalog.textbooks.SERIES, catalog: await repository.catalog() }); }
+    catch (error) { next(error); }
+  });
   router.get('/theme-activities/:theme', async function (req, res, next) {
     try { res.locals.activityMaterials = await repository.list({ theme: req.params.theme }); next(); }
     catch (error) { next(error); }
   });
   router.use('/materials', function (req, res, next) { res.set('Cache-Control', 'private, no-store'); next(); });
   router.get('/materials', async function (req, res, next) {
-    try { res.render(adminMode ? 'admin/materials' : 'materials/index', { title: 'Activity materials', items: await repository.list(), themes: themes, textbooks: textbooks, user: getUser(req), adminUser: req.adminUser }); }
+    try { res.render(adminMode ? 'admin/materials' : 'materials/index', { title: 'Activity materials', items: await repository.list(), themes: req.contentCatalog.themes, textbooks: req.contentCatalog.textbooks, user: getUser(req), adminUser: req.adminUser }); }
     catch (error) { next(error); }
   });
   async function editor(req, res, next) {
@@ -58,8 +64,9 @@ function create(options) {
       var item = req.params.id ? await repository.get(req.params.id) : null;
       if (req.params.id && !item) return next();
       if (item && !canEdit(user, item)) return res.status(403).send('Only the uploader or an administrator can edit this material. / 仅上传者或管理员可编辑。');
-      res.render('materials/edit', { title: item ? item.title : 'Upload material', item: item, themes: themes,
-        catalog: await repository.catalog(), textbooks: textbooks, admin: user.admin,
+      res.render('materials/edit', { title: item ? item.title : 'Upload material', item: item, themes: req.contentCatalog.themes,
+        selectedTheme: !item && req.contentCatalog.themes.some(function (theme) { return theme.key === req.query.theme; }) ? req.query.theme : '',
+        catalog: await repository.catalog(), textbooks: req.contentCatalog.textbooks, admin: user.admin,
         adminMode: adminMode, basePath: basePath, adminUser: req.adminUser });
     } catch (error) { next(error); }
   }
@@ -70,7 +77,7 @@ function create(options) {
     try {
       var item = await repository.get(req.params.id);
       if (!item) return next();
-      res.render('materials/detail', { title: item.title, item: item, textbooks: textbooks, canEdit: canEdit(getUser(req), item) });
+      res.render('materials/detail', { title: item.title, item: item, textbooks: req.contentCatalog.textbooks, canEdit: canEdit(getUser(req), item) });
     } catch (error) { next(error); }
   });
   router.get('/materials/:id/files/:index', async function (req, res, next) {
@@ -120,7 +127,7 @@ function create(options) {
       var revision = Number(body.revision || 0);
       if (!Number.isInteger(revision) || revision !== (old ? old.revision : 0)) { var stale = new Error('Material changed. Reload before saving. / 材料已更新，请刷新后再保存。'); stale.status = 409; throw stale; }
       var selectedThemes = Array.from(new Set(array(body.themes == null ? body.theme : body.themes)));
-      if (!selectedThemes.length || selectedThemes.some(function (key) { return !themes.some(function (theme) { return theme.key === key; }); })) fail('Choose at least one valid theme. / 请至少选择一个有效主题。');
+      if (!selectedThemes.length || selectedThemes.some(function (key) { return !req.contentCatalog.themes.some(function (theme) { return theme.key === key; }); })) fail('Choose at least one valid theme. / 请至少选择一个有效主题。');
       var ids = Array.from(new Set(array(body.lessons).map(Number)));
       var catalog = await repository.catalog();
       if (ids.length > 100 || ids.some(function (id) { return !Number.isInteger(id) || !catalog.some(function (lesson) { return lesson.id === id; }); })) fail('Choose an available lesson. / 请选择有效课次。');

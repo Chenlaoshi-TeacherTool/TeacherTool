@@ -57,14 +57,14 @@ router.get('/theme-activities/five-elements', function(req, res) {
 });
 
 router.get('/theme-activities/:theme', function(req, res, next) {
-  var theme = child('activities', req.params.theme);
+  var theme = ((req.contentCatalog && req.contentCatalog.themes) || siteMap.children('activities')).find(function (item) { return item.key === req.params.theme; });
   if (!theme || theme.template !== 'theme') return next();
   var heading = text(req, theme.en, theme.zh);
   renderPage(req, res, {
     heading: heading,
     intro: text(req, 'Chinese language activities organized around ' + theme.en + '.', '围绕“' + theme.zh + '”整理中文课堂活动。'),
     parent: parentLink(req, 'activities'),
-    cards: [
+    cards: theme.custom ? [] : [
       { heading: text(req, 'Vocabulary', '词汇'), description: text(req, 'Theme vocabulary has not been added yet.', '此主题的词汇尚未添加。') },
       { heading: text(req, 'Games', '游戏'), description: text(req, 'Use your own theme words with the existing classroom games.', '把自己的主题词汇用于现有课堂游戏。'), href: theme.key === 'halloween' ? '/teaching-tools/witchs-poison' : '/teaching-tools/bingo-generator', label: text(req, 'Open game', '打开游戏') },
       theme.key === 'halloween'

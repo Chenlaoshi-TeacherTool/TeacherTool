@@ -1,6 +1,7 @@
 <%- include('layout-head', { title: title, adminUser: adminUser }) %>
 <% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; %>
 <h1><%= L('Activity materials', '活动材料管理') %></h1>
+<p><a class="button" href="/admin/themes/new"><%= L('+ New theme', '＋新增主题') %></a></p>
 <p><%= L('Upload once, then choose the theme pages and textbook lessons where this material appears.', '上传一份材料，选择展示的主题页和教材课次。以后编辑一次，所有入口一起更新。') %></p>
 <p><a class="button" href="/admin/materials/new"><%= L('Upload material', '上传材料') %></a></p>
 <div style="overflow-x:auto">

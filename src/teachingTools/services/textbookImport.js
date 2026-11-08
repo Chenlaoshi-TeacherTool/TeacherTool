@@ -88,7 +88,8 @@ function toInt(value) {
 
 // Reads a workbook into { lessons, itemsBySlug, errors }. existingSlugs lets
 // the 生词 sheet refer to lessons that are already in the database.
-function readWorkbook(workbook, existingSlugs) {
+function readWorkbook(workbook, existingSlugs, catalog) {
+  catalog = catalog || textbooks;
   var errors = [];
   var lessons = [];
   var itemsBySlug = {};
@@ -115,7 +116,7 @@ function readWorkbook(workbook, existingSlugs) {
       };
       if (!lesson.slug) return errors.push(where + 'slug is empty.');
       if (seen[lesson.slug]) return errors.push(where + 'slug ' + lesson.slug + ' appears twice.');
-      if (!textbooks.findSeries(lesson.series)) return errors.push(where + 'unknown series "' + lesson.series + '".');
+      if (!catalog.findSeries(lesson.series)) return errors.push(where + 'unknown series "' + lesson.series + '".');
       if (!lesson.book_slug || !lesson.book_name) return errors.push(where + 'book_slug and book name are required.');
       if (!lesson.title) return errors.push(where + 'title is empty.');
       if (Number.isNaN(lesson.sort_order) || Number.isNaN(lesson.lesson_no)) return errors.push(where + 'sort_order and lesson_no must be whole numbers.');

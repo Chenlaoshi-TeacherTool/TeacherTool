@@ -96,6 +96,23 @@ app runs in-process.
 
 ## Deployed instance
 
+Admin-created themes and textbook series/books are stored in `dbo.content_catalog`.
+Run `0014_add-content-catalog` with `npm run db:migrate` from `src/teachingTools`
+before deploying the catalog editors. Existing themes and textbooks remain defined
+in `config/siteMap.js` and `config/textbooks.js`; the site merges both sources on
+each request, so additions appear without a restart. This table uses direct SQL
+and does not need a DAB configuration change.
+
+Use **Activity Materials → New theme**, or the **New theme** dialog inside the
+material editor. Use **Textbooks → New textbook → New book → New lesson** for
+textbook content. Publish a lesson to make it available for material associations.
+After adding lessons in another tab, use **Refresh textbook list** in the material
+editor to update its selectors without losing the current draft.
+
+Without `SQL_CONNECTION_STRING`, catalog metadata uses
+`src/teachingTools/tmp/content-catalog.json` (override with
+`CONTENT_CATALOG_LOCAL_FILE`) for local development. Lesson editing still uses SQL.
+
 DAB is now running as an Azure Container App:
 
 - Resource group: `rg-xchen` (West US 2)

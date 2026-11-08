@@ -1,0 +1,7 @@
+<label for="catalogZh">中文名称 / Chinese name</label>
+<input type="text" id="catalogZh" name="zh" maxlength="120" required value="<%= values.zh || '' %>">
+<label for="catalogEn">英文名称 / English name</label>
+<input type="text" id="catalogEn" name="en" maxlength="120" required value="<%= values.en || '' %>">
+<label for="catalogKey">页面地址名称 / URL name</label>
+<input type="text" id="catalogKey" name="key" maxlength="40" pattern="[a-z0-9]+(-[a-z0-9]+)*" required aria-describedby="catalogKeyHint" value="<%= values.key || '' %>">
+<p id="catalogKeyHint">使用小写英文字母、数字或连字符，例如 mid-autumn、hsk 或 book-1。 / Lowercase letters, numbers and hyphens, e.g. mid-autumn, hsk or book-1.</p>

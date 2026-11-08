@@ -281,7 +281,7 @@ router.get('/low-prep-activities', function(req, res) {
 
 // Theme Activities Routes
 router.get('/theme-activities', function(req, res, next) {
-  res.render('theme-activities/index', { title: 'Theme Activities' });
+  res.render('theme-activities/index', { title: 'Theme Activities', customThemes: req.contentCatalog ? req.contentCatalog.themes.filter(function (theme) { return theme.custom; }) : [] });
 });
 
 router.get('/theme-activities/weather', function(req, res, next) {
@@ -297,7 +297,11 @@ router.get('/robots.txt', function(req, res) {
   res.type('text/plain').send('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\nSitemap: ' + baseUrl + '/sitemap.xml\n');
 });
 
-router.get('/sitemap.xml', function(req, res) {
+router.get('/sitemap.xml', async function(req, res, next) {
+  try { req.contentCatalog = await require('../services/contentCatalog').load(); next(); }
+  catch (error) { next(error); }
+}, function(req, res) {
+  var catalog = req.contentCatalog;
   var baseUrl = res.locals.siteUrl.replace(/\/$/, '');
   // Section pages come from config/siteMap.js; individual tool pages are listed here.
   var paths = siteMap.allPaths().concat([
@@ -320,6 +324,12 @@ router.get('/sitemap.xml', function(req, res) {
     '/teaching-tools/hanzi-batch/index.html'
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
+  paths = paths.concat(catalog.themes.map(function (theme) { return theme.href; }));
+  catalog.textbooks.SERIES.filter(function (series) { return series.books; }).forEach(function (series) {
+    var base = '/textbook-companion/' + series.key;
+    paths.push(base);
+    series.books.forEach(function (book) { paths.push(base + '/' + book.slug); });
+  });
   paths = paths.concat(products.length ? products.map(function(product) { return '/classroom-finds/' + product.slug; }) : ['/classroom-finds/15-drawer-rolling-cart']);
   var privatePaths = ['/teaching-tools/word-list-library/word-list-library.html', '/teaching-tools/question-bank-library/question-bank-library.html'];
   var urls = paths.filter(function(path, index) {

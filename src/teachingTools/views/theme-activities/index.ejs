@@ -147,6 +147,13 @@
     </div>
 
     <section class="tools-grid">
+        <% (typeof customThemes === 'undefined' ? [] : customThemes).forEach(function (theme) { %>
+        <div class="tool-card" data-tags="<%= theme.key %> <%= theme.en %> <%= theme.zh %>">
+            <h3><%= lang === 'zh' ? theme.zh : theme.en %></h3>
+            <p><%= lang === 'zh' ? '主题课堂活动与可打印材料。' : 'Themed classroom activities and printable materials.' %></p>
+            <a href="<%= theme.href %>" class="btn"><%= t('themeActivities.openTheme') %></a>
+        </div>
+        <% }) %>
 
         <div class="tool-card" data-tags="materials upload 活动材料 上传 教材关联">
             <h3>📄 <%= lang === 'zh' ? '活动材料' : 'Activity materials' %></h3>

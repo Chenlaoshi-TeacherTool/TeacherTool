@@ -1,0 +1,13 @@
+<%- include('layout-head') %>
+<h1><%= title %></h1>
+<p><a href="<%= kind === 'theme' ? '/admin/materials' : '/admin/textbooks' %>">← 返回 / Back</a></p>
+<% if (error) { %><p role="alert"><%= error %></p><% } %>
+<form method="post">
+  <%- include('catalog-fields', { values: values }) %>
+  <% if (kind === 'series') { %>
+  <label><input type="checkbox" name="membersOnly"<%= values.membersOnly === 'on' ? ' checked' : '' %>> 仅会员可查看课次内容 / Members only lesson content</label>
+  <p>保存后添加册数，再添加课次。 / After saving, add books and then lessons.</p>
+  <% } %>
+  <div class="actions"><button type="submit">保存 / Save</button></div>
+</form>
+<%- include('layout-foot') %>

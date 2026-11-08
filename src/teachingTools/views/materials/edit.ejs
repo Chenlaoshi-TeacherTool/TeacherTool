@@ -19,7 +19,8 @@
       <input type="hidden" name="id" value="<%= value.id || '' %>">
       <input type="hidden" name="revision" value="<%= value.revision || 0 %>">
       <fieldset><legend><%= L('Show on theme pages (choose one or more)', '显示在哪些主题页（可多选）') %></legend>
-        <% themes.forEach(function (theme) { %><label><input type="checkbox" name="themes" value="<%= theme.key %>"<%= (value.themes || [value.theme]).includes(theme.key) ? ' checked' : '' %>> <%= L(theme.en, theme.zh) %></label><% }) %>
+        <div id="themeChoices"><% themes.forEach(function (theme) { %><label><input type="checkbox" name="themes" value="<%= theme.key %>"<%= (value.themes || [value.theme || selectedTheme]).includes(theme.key) ? ' checked' : '' %>> <%= L(theme.en, theme.zh) %></label><% }) %></div>
+        <% if (adminMode) { %><button type="button" id="newTheme"><%= L('+ New theme', '＋新增主题') %></button><% } %>
       </fieldset>
       <label for="title"><%= L('Title', '标题') %></label><input id="title" name="title" maxlength="120" required value="<%= value.title || '' %>">
       <label for="description"><%= L('Description (Chinese)', '中文简介') %></label><textarea id="description" name="description" maxlength="2000" rows="5"><%= value.description || '' %></textarea>
@@ -35,6 +36,7 @@
         <label for="preview"><%= L('PNG or JPEG', 'PNG 或 JPEG 图片') %></label><input type="file" id="preview" name="preview" accept=".png,.jpg,.jpeg">
       </fieldset>
       <fieldset><legend><%= L('Applicable textbooks (optional)', '适用教材（可选）') %></legend>
+        <% if (adminMode) { %><p><a href="/admin/textbooks" target="_blank" rel="noopener"><%= L('Manage textbooks, books and lessons (opens in a new tab)', '管理教材、册数和课次（在新标签页打开）') %></a> <button type="button" id="refreshTextbooks"><%= L('Refresh textbook list', '刷新教材列表') %></button></p><% } %>
         <p><%= L('Choose a textbook, book and lesson, then add the link. You can add more than one lesson.', '依次选择教材、册数和课次，再添加关联。可关联多课或不同教材。') %></p>
         <label for="series"><%= L('Textbook', '教材') %></label><select id="series"></select>
         <label for="book"><%= L('Book', '册数') %></label><select id="book"></select>
@@ -47,6 +49,17 @@
       <button class="btn" type="submit" id="saveMaterial"><%= L('Save material', '保存材料') %></button>
     </form>
   </div></main>
+  <% if (adminMode) { %>
+  <dialog id="themeDialog" aria-labelledby="themeDialogTitle" style="max-width:480px;width:calc(100% - 48px);border:1px solid #ddd;border-radius:16px;padding:24px">
+    <h2 id="themeDialogTitle"><%= L('New theme', '新增主题') %></h2>
+    <form id="themeForm" class="community-form" action="/admin/themes/new" method="post">
+      <%- include('../admin/catalog-fields', { values: {} }) %>
+      <p role="alert" id="themeError" hidden></p>
+      <button type="submit" id="saveTheme"><%= L('Save theme', '保存主题') %></button>
+      <button type="button" id="cancelTheme"><%= L('Cancel', '取消') %></button>
+    </form>
+  </dialog>
+  <% } %>
   <script type="application/json" id="materialData"><%- JSON.stringify({ catalog: catalog, series: textbooks.SERIES, selected: (value.lessons || []).map(function (lesson) { return lesson.id; }), lang: lang }).replace(/</g, '\\u003c') %></script>
   <script src="/materials/edit.js"></script>
   <% if (!adminMode) { %><script src="/javascripts/milk-tea-footer.js"></script><% } %>

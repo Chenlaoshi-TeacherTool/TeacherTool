@@ -34,11 +34,41 @@
       li.append(input, remove); $('lessonLinks').append(li);
     });
   }
-  options($('series'), data.series.filter(function (s) { return data.catalog.some(function (l) { return l.series === s.key; }); }).map(function (s) { return { value: s.key, label: L(s.en, s.zh) }; }));
-  $('noLessons').hidden = data.catalog.length > 0;
+  function refreshSeries() {
+    options($('series'), data.series.filter(function (s) { return data.catalog.some(function (l) { return l.series === s.key; }); }).map(function (s) { return { value: s.key, label: L(s.en, s.zh) }; }));
+    $('noLessons').hidden = data.catalog.length > 0;
+    books(); links();
+  }
   $('series').addEventListener('change', books); $('book').addEventListener('change', lessons);
   $('addLesson').addEventListener('click', function () { if ($('lesson').value) selected.add(Number($('lesson').value)); links(); });
-  books(); links();
+  refreshSeries();
+  if ($('newTheme')) {
+    $('newTheme').addEventListener('click', function () { $('themeDialog').showModal(); });
+    $('cancelTheme').addEventListener('click', function () { $('themeDialog').close(); });
+    $('themeForm').addEventListener('submit', async function (event) {
+      event.preventDefault(); $('themeError').hidden = true; $('saveTheme').disabled = true;
+      try {
+        var response = await fetch(event.target.action, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(Object.fromEntries(new FormData(event.target))) });
+        var result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        var label = document.createElement('label');
+        var checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.name = 'themes'; checkbox.value = result.key; checkbox.checked = true;
+        label.append(checkbox, document.createTextNode(' ' + L(result.en, result.zh))); $('themeChoices').append(label);
+        $('themeDialog').close(); event.target.reset(); checkbox.focus();
+      } catch (error) { $('themeError').textContent = error.message || L('Save failed.', '保存失败。'); $('themeError').hidden = false; }
+      finally { $('saveTheme').disabled = false; }
+    });
+    $('refreshTextbooks').addEventListener('click', async function () {
+      $('refreshTextbooks').disabled = true;
+      try {
+        var response = await fetch('/admin/materials/catalog');
+        if (!response.ok) throw new Error(L('Refresh failed.', '刷新失败。'));
+        var result = await response.json(); data.series = result.series; data.catalog = result.catalog; refreshSeries();
+      } catch (error) { $('materialError').textContent = error.message; $('materialError').hidden = false; }
+      finally { $('refreshTextbooks').disabled = false; }
+    });
+  }
   $('materialForm').addEventListener('submit', async function (event) {
     event.preventDefault(); $('materialError').hidden = true; $('saveMaterial').disabled = true;
     try {
