@@ -20,6 +20,7 @@
     els.downloadButton = document.getElementById('downloadButton');
     els.printButton = document.getElementById('printButton');
     els.bookletButton = document.getElementById('bookletButton');
+    els.gamesButton = document.getElementById('gamesButton');
     els.communityButton = document.getElementById('communityButton');
     els.printListTitle = document.getElementById('printListTitle');
     els.printListMeta = document.getElementById('printListMeta');
@@ -37,6 +38,7 @@
     els.downloadButton.addEventListener('click', downloadCurrentList);
     els.printButton.addEventListener('click', printCurrentList);
     els.bookletButton.addEventListener('click', openBooklet);
+    els.gamesButton.addEventListener('click', openGames);
     els.communityButton.addEventListener('click', shareWithTeachers);
     els.savedLists.addEventListener('click', handleSavedListAction);
     els.presetLists.addEventListener('click', handlePresetAction);
@@ -63,6 +65,7 @@
     els.downloadButton.disabled = !currentList.items.length;
     els.printButton.disabled = !currentList.items.length;
     els.bookletButton.disabled = !currentList.items.length;
+    els.gamesButton.disabled = !currentList.items.length;
     els.communityButton.disabled = !currentList.items.length;
     setStatus(currentList.items.length
       ? currentList.items.length + window.LibraryI18n.t(' terms are ready for classroom activities.')
@@ -121,6 +124,16 @@
     if (!currentList || !currentList.items.length) return;
     setStatus(window.LibraryI18n.t('Your print dialog is ready. Choose "Save as PDF" to download a PDF copy.'));
     window.print();
+  }
+
+  // Opens the Vocab Game Switcher with this list (/teaching-tools/vocab-games).
+  function openGames() {
+    if (!currentList || !currentList.items.length || !window.ChenWordlistHandoff) return;
+    try {
+      window.ChenWordlistHandoff.openHub(currentList);
+    } catch (error) {
+      setStatus(window.LibraryI18n.t('This browser could not pass the list to the games. Save the list in this browser first, then open the Vocab Game Switcher.'));
+    }
   }
 
   function openBooklet() {
@@ -224,6 +237,7 @@
         els.downloadButton.disabled = !currentList.items.length;
         els.printButton.disabled = !currentList.items.length;
         els.bookletButton.disabled = !currentList.items.length;
+        els.gamesButton.disabled = !currentList.items.length;
         els.communityButton.disabled = !currentList.items.length;
         setStatus(window.LibraryI18n.t('Loaded “') + list.name + window.LibraryI18n.t('”. You can adapt it, then save your own copy.'));
         document.getElementById('builderTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -267,6 +281,7 @@
     els.downloadButton.disabled = !list.items.length;
     els.printButton.disabled = !list.items.length;
     els.bookletButton.disabled = !list.items.length;
+    els.gamesButton.disabled = !list.items.length;
     els.communityButton.disabled = !list.items.length;
     setStatus(window.LibraryI18n.t('Loaded “') + list.name + '”.');
   }

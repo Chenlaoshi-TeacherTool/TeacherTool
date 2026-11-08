@@ -48,6 +48,12 @@
       try { await copy(document.getElementById('communityWordsText').value); status(text.copied); used(); }
       catch (error) { status(text.copyFailed); }
     },
+    games: function () {
+      try {
+        used();
+        window.ChenWordlistHandoff.openHub(asList());
+      } catch (error) { status(text.failed); }
+    },
     booklet: function () {
       try {
         sessionStorage.setItem('chenlaoshi-wordlist-booklet-draft', JSON.stringify(asList()));

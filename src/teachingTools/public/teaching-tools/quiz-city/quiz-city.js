@@ -247,7 +247,25 @@
     if (['rolling', 'moving'].includes(state.phase) && now - lastAnimation >= (motion ? (state.phase === 'rolling' ? 650 : 230) : 30)) { engine.step(state); lastAnimation = now; update(); }
     else { if (now - lastSave >= 1000) { save(); lastSave = now; } if (state.closing !== closing) render(); }
   }, 100);
-  byId('questions').value = read(bankKey) || sample;
+  // Opened from the Vocab Game Switcher: turn the word list into a "what does it mean?"
+  // bank with 4 choices. The teacher still saves or starts the game themself.
+  function bankFromWordList(list) {
+    function field(value) { return String(value || '').replace(/[|;]/g, '/').replace(/\s+/g, ' ').trim(); }
+    var words = list.items.filter(function(item) { return field(item.zh) && field(item.en); });
+    var meanings = words.map(function(item) { return field(item.en); }).filter(function(value, index, all) { return all.indexOf(value) === index; });
+    function shuffled(values) { var copy = values.slice(); for (var i = copy.length - 1; i > 0; i -= 1) { var j = Math.floor(Math.random() * (i + 1)); var swap = copy[i]; copy[i] = copy[j]; copy[j] = swap; } return copy; }
+    return words.map(function(item) {
+      var word = field(item.zh) + (field(item.py) ? ' (' + field(item.py) + ')' : '');
+      var answer = field(item.en);
+      var line = text('What does ' + word + ' mean?', word + ' 是什么意思？') + ' | ' + answer;
+      var others = shuffled(meanings.filter(function(value) { return value !== answer; })).slice(0, 3);
+      return others.length === 3 ? line + ' | ' + shuffled(others.concat(answer)).join('; ') : line;
+    }).join('\n');
+  }
+  var handedList = window.ChenWordlistHandoff && window.ChenWordlistHandoff.active();
+  var handedBank = handedList ? bankFromWordList(handedList) : '';
+  byId('questions').value = handedBank || read(bankKey) || sample;
   state = engine.restore(read(storageKey));
-  names(); render(); if (!state) openSetup();
+  if (handedList) window.ChenWordlistHandoff.mountBar(handedList);
+  names(); render(); if (!state || handedBank) openSetup();
 })();

@@ -364,6 +364,14 @@
       root: document.querySelector("#bingoLibraryPicker"),
       source: "wordlists",
       min: 1,
+      // From the Vocab Game Switcher: use the 4×4 grid when the list can't fill 5×5.
+      onHandoff: function (lists, importLists) {
+        if ((lists[0].items || []).length < requiredTermCount(5, true) && gridSizeSelect.value !== "4") {
+          gridSizeSelect.value = "4";
+          gridSizeSelect.dispatchEvent(new Event("change"));
+        }
+        return importLists(lists);
+      },
       title: "Add terms from the library",
       hint: "Choose one or more vocabulary topics to add their terms to your bingo list.",
       importLabel: "Add terms from selected topics",

@@ -853,6 +853,19 @@
       onImport: function (lists) {
         addTermsFromWordLists(lists);
         wordListPicker.reset();
+      },
+      // From the Vocab Game Switcher: replace any saved draft, and use the 9-pair
+      // puzzle when the list is too short to fill the 18-pair one.
+      onHandoff: function (lists) {
+        var count = (lists[0].items || []).length;
+        var size = count < 18 ? 3 : 4;
+        if (state.mode !== 'vocabulary') setMode('vocabulary');
+        elements.vocabularyInput.value = '';
+        if (state.size !== size) {
+          elements.puzzleSize.value = String(size);
+          elements.puzzleSize.dispatchEvent(new Event('change'));
+        }
+        addTermsFromWordLists(lists);
       }
     });
     var questionBankPicker = ChenLibraryPicker.create({

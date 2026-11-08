@@ -32,6 +32,7 @@
           <div class="community-actions">
             <button class="btn" type="button" data-action="save"><%= t('community.saveToMine') %></button>
             <button class="btn btn-secondary" type="button" data-action="copy"><%= t('community.copyWords') %></button>
+            <button class="btn btn-secondary" type="button" data-action="games"><%= t('community.playGames') %></button>
             <button class="btn btn-secondary" type="button" data-action="booklet"><%= t('community.makeBooklet') %></button>
           </div>
           <p class="community-use-help"><%= t('community.useHelp') %> <a href="/teaching-tools/word-list-library/word-list-library.html"><%= t('community.myWordLists') %></a></p>
@@ -75,8 +76,8 @@
       deleteFailed: t('community.jsDeleteFailed'), failed: t('community.jsFailed')
     }).replace(/</g, '\\u003c') %>;
   </script>
-  <% if (game) { %><script src="/shared/game-sharing.js"></script><% } else { %><script src="/shared/wordlist-core.js"></script><% } %>
-  <script src="/community/detail.js"></script>
+  <% if (game) { %><script src="/shared/game-sharing.js"></script><% } else { %><script src="/shared/wordlist-core.js"></script><script src="/shared/wordlist-handoff.js?v=1"></script><% } %>
+  <script src="/community/detail.js?v=games1"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>

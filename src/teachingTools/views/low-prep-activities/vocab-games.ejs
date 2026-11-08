@@ -1,0 +1,77 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>一套词换着玩 · Vocab Game Switcher - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Pick one Chinese vocabulary list and switch between classroom games and printables: Term Race, Quiz City, Would You Rather, flash cards, bingo, Tarsia puzzles and sentence reorder.' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/vocab-games/vocab-games.css?v=1">
+</head>
+<body class="vgs-page">
+  <main class="vgs-wrap">
+    <header class="vgs-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="vgs-eyebrow"><%= L('One word list · many games', '一套词 · 多种玩法') %></p>
+      <h1>🎮 <%= L('Vocab Game Switcher', '一套词换着玩') %></h1>
+      <p><%= L('Choose a word list once, then switch between games. Every game opens with your words already filled in.', '选好一套词，就能在不同游戏之间切换。点开任何游戏，词语都已经自动填好。') %></p>
+    </header>
+
+    <div class="vgs-layout">
+      <section class="vgs-panel vgs-list" aria-labelledby="vgsListHeading">
+        <div id="vgsCurrent" hidden>
+          <p class="vgs-kicker"><%= L('Your word list', '当前词表') %></p>
+          <h2 id="vgsListHeading" class="vgs-list-name"></h2>
+          <p id="vgsListMeta" class="vgs-meta"></p>
+          <ul id="vgsWords" class="vgs-words" aria-label="<%= L('Words in this list', '词表里的词') %>"></ul>
+          <button id="vgsChange" class="vgs-btn vgs-btn-ghost" type="button"><%= L('Choose another list', '换一套词') %></button>
+        </div>
+
+        <div id="vgsChooser">
+          <p class="vgs-kicker"><%= L('Step 1', '第一步') %></p>
+          <h2><%= L('Choose a word list', '选择一套词') %></h2>
+
+          <div class="vgs-source">
+            <h3><%= L('Saved in this browser', '保存在这个浏览器里的词表') %></h3>
+            <div id="vgsSaved" class="vgs-choices"></div>
+          </div>
+
+          <div class="vgs-source">
+            <h3><%= L('Chen Laoshi topic lists', '陈老师主题词表') %></h3>
+            <div id="vgsPresets" class="vgs-choices"><p class="vgs-empty"><%= L('Loading…', '加载中…') %></p></div>
+          </div>
+
+          <div class="vgs-source">
+            <h3><label for="vgsPaste"><%= L('Or paste words', '或者直接粘贴词语') %></label></h3>
+            <p class="vgs-hint"><%= L('One word per line. Pinyin and English are filled in when missing, or type them yourself:', '每行一个词。拼音和英文没写会自动补上，也可以自己写：') %> <code>猫 | māo | cat</code></p>
+            <input id="vgsPasteName" class="vgs-input" type="text" maxlength="120" placeholder="<%= L('List name, e.g. Lesson 3 animals', '词表名称，比如：第三课 动物') %>">
+            <textarea id="vgsPaste" class="vgs-input" rows="6" spellcheck="false" placeholder="猫&#10;狗&#10;兔子&#10;熊猫"></textarea>
+            <button id="vgsUsePaste" class="vgs-btn" type="button"><%= L('Use these words', '用这些词') %></button>
+          </div>
+          <p id="vgsStatus" class="vgs-status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="vgs-panel vgs-games" aria-labelledby="vgsGamesHeading">
+        <p class="vgs-kicker"><%= L('Step 2', '第二步') %></p>
+        <h2 id="vgsGamesHeading"><%= L('Switch game', '换个游戏') %></h2>
+        <p id="vgsGamesHint" class="vgs-hint"><%= L('Choose a word list first.', '请先选择一套词。') %></p>
+        <h3 class="vgs-group"><%= L('🖥️ Play in class', '🖥️ 课堂上玩') %></h3>
+        <div id="vgsPlay" class="vgs-game-grid"></div>
+        <h3 class="vgs-group"><%= L('🖨️ Print', '🖨️ 打印') %></h3>
+        <div id="vgsPrint" class="vgs-game-grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/low-prep/vocab-games/vocab-games.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

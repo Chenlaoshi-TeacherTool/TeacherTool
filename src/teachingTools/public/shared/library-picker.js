@@ -116,6 +116,24 @@
   function itemId(item) { return item.id || item.slug; }
   function itemLabel(item) { return item.theme || item.name || 'Untitled topic'; }
 
+  // A page opened from the Vocab Game Switcher (?wordlist=handoff) imports the
+  // handed-over list once, through the first word-list picker on the page. It
+  // runs after the tool's own init so `picker` is assigned inside onImport.
+  // A tool can pass options.onHandoff(lists, onImport) to adjust its settings first
+  // (e.g. a smaller grid for a short list) or to replace a saved draft.
+  var handoffApplied = false;
+  function applyHandoff(options, onImport) {
+    if (handoffApplied || options.source !== 'wordlists' || !global.ChenWordlistHandoff) return;
+    var list = global.ChenWordlistHandoff.active();
+    if (!list) return;
+    handoffApplied = true;
+    global.setTimeout(function () {
+      global.ChenWordlistHandoff.mountBar(list);
+      if (options.onHandoff) options.onHandoff([list], onImport);
+      else onImport([list]);
+    }, 0);
+  }
+
   function create(options) {
     options = options || {};
     var config = SOURCE_CONFIG[options.source];
@@ -308,6 +326,7 @@
 
     importButton.addEventListener('click', importSelected);
     load();
+    applyHandoff(options, onImport);
 
     return {
       getSelected: selectedItems,

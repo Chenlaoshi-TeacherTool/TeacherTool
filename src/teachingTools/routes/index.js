@@ -263,6 +263,10 @@ router.get('/teaching-tools/stroke-order-worksheet', function(req, res, next) {
   res.render('low-prep-activities/stroke-order-worksheet', { title: '汉字笔顺练习纸 · Stroke Order Worksheet', toolGuide: siteContentStore.get().toolGuides['stroke-order-worksheet'] });
 });
 
+router.get('/teaching-tools/vocab-games', function(req, res, next) {
+  res.render('low-prep-activities/vocab-games', { title: '一套词换着玩 · Vocab Game Switcher', toolGuide: siteContentStore.get().toolGuides['vocab-games'] });
+});
+
 router.get('/low-prep-activities', function(req, res) {
   res.redirect(301, '/teaching-tools#low-prep-activities');
 });
@@ -272,7 +276,7 @@ router.get('/low-prep-activities', function(req, res) {
   'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle',
   'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary',
   'stroke-order-worksheet', 'vocab-puzzle', 'worksheet-generator', 'secret-message',
-  'character-unscrambler', 'measure-words'
+  'character-unscrambler', 'measure-words', 'vocab-games'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -320,7 +324,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
     '/teaching-tools/name-tent-generator', '/teaching-tools/flash-card-generator', '/teaching-tools/sentence-reorder', '/teaching-tools/witchs-poison',
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary',
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator', '/teaching-tools/secret-message',
-    '/teaching-tools/character-unscrambler', '/teaching-tools/measure-words',
+    '/teaching-tools/character-unscrambler', '/teaching-tools/measure-words', '/teaching-tools/vocab-games',
     '/teaching-tools/hanzi-batch/index.html'
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
