@@ -160,9 +160,9 @@ var SHAPES = {
     return [hx * 0.7 + Math.cos(a) * 0.3, hy * 0.7 + Math.sin(a) * 0.3];
   } },
   cloud: { pt: function (a) {
-    // round puffs along the top and sides, a flatter base
+    // round puffs along the top and sides (a puff, not a dent, at top and each side), a flatter base
     var sn = Math.sin(a), base = Math.max(0, sn);
-    var r = 0.74 + 0.26 * Math.pow(Math.abs(Math.sin(5 * a)), 0.55) * (1 - 0.9 * base);
+    var r = 0.78 + 0.22 * Math.pow(Math.abs(Math.cos(6 * a)), 0.55) * (1 - 0.9 * base);
     return [r * Math.cos(a) * 1.45, r * sn * (1 - 0.25 * base)];
   } },
   butterfly: { antennae: true, offs: [0.5], pt: function (a) {
