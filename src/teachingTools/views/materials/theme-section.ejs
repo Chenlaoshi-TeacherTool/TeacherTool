@@ -1,0 +1,6 @@
+<% if (typeof activityMaterials !== 'undefined' && activityMaterials.length) { %>
+<section class="content-section"><div class="content-shell">
+  <h2><%= lang === 'zh' ? '活动材料' : 'Activity materials' %></h2>
+  <div class="resource-grid"><%- include('cards', { items: activityMaterials }) %></div>
+</div></section>
+<% } %>

@@ -25,6 +25,7 @@ var sql = sqlClient.sql;
 
 var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 var uploadMaterial = multer({ storage: multer.memoryStorage(), limits: { fileSize: textbookFileStorage.MAX_BYTES } });
+var materialAdminRouter = require('./materials').create({ adminMode: true });
 
 router.use(requireAdmin);
 
@@ -44,6 +45,11 @@ router.use(async function (req, res, next) {
 router.get('/', function (req, res) {
   res.render('admin/dashboard', { title: 'Admin', adminUser: req.adminUser, groups: siteMap.adminGroups() });
 });
+
+router.get('/materials', function (req, res, next) {
+  materialAdminRouter(req, res, next);
+});
+router.use(materialAdminRouter);
 
 router.get('/wordlists', async function (req, res, next) {
   try {

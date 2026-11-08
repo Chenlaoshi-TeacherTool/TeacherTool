@@ -1,0 +1,54 @@
+<% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; var value = item || {}; %>
+<% if (adminMode) { %>
+<%- include('../admin/layout-head', { title: title, adminUser: adminUser }) %>
+<link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/community/community.css">
+<% } else { %>
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex">
+  <title><%= L('Edit activity material', '编辑活动材料') %></title>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/community/community.css">
+</head>
+<body class="community-page">
+<% } %>
+  <main class="content-section"><div class="content-shell community-share">
+    <a class="resource-card__link" href="<%= adminMode ? basePath : (item ? '/materials/' + item.id : '/materials') %>">← <%= L('Back', '返回') %></a>
+    <h1><%= item ? L('Edit material', '编辑材料') : L('Upload material', '上传材料') %></h1>
+    <form id="materialForm" class="community-form" action="<%= basePath %>/save" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="id" value="<%= value.id || '' %>">
+      <input type="hidden" name="revision" value="<%= value.revision || 0 %>">
+      <fieldset><legend><%= L('Show on theme pages (choose one or more)', '显示在哪些主题页（可多选）') %></legend>
+        <% themes.forEach(function (theme) { %><label><input type="checkbox" name="themes" value="<%= theme.key %>"<%= (value.themes || [value.theme]).includes(theme.key) ? ' checked' : '' %>> <%= L(theme.en, theme.zh) %></label><% }) %>
+      </fieldset>
+      <label for="title"><%= L('Title', '标题') %></label><input id="title" name="title" maxlength="120" required value="<%= value.title || '' %>">
+      <label for="description"><%= L('Description (Chinese)', '中文简介') %></label><textarea id="description" name="description" maxlength="2000" rows="5"><%= value.description || '' %></textarea>
+      <label for="descriptionEn"><%= L('Description (English, optional)', '英文简介（可选）') %></label><textarea id="descriptionEn" name="descriptionEn" maxlength="2000" rows="4"><%= value.descriptionEn || '' %></textarea>
+      <% if (admin) { %><label><input type="checkbox" name="limitedFree"<%= value.limitedFree ? ' checked' : '' %>> <%= L('Free for a limited time', '限时免费') %></label><% } %>
+      <fieldset><legend><%= L('Attachments', '附件') %></legend>
+        <% (value.files || []).forEach(function (file, index) { %><p><a href="/materials/<%= value.id %>/files/<%= index %>"><%= file.name %></a> <label><input type="checkbox" name="removeFiles" value="<%= index %>"> <%= L('Remove', '移除') %></label></p><% }) %>
+        <label for="attachments"><%= L('Add files (up to 6 total, 30 MB each)', '添加文件（合计最多6个，每个不超过30 MB）') %></label>
+        <input type="file" id="attachments" name="attachments" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.zip">
+      </fieldset>
+      <fieldset><legend><%= L('Preview image (optional)', '预览图（可选）') %></legend>
+        <% if (value.preview) { %><img src="/materials/<%= value.id %>/preview" alt="" style="max-width:240px"><label><input type="checkbox" name="removePreview"> <%= L('Remove preview', '移除预览图') %></label><% } %>
+        <label for="preview"><%= L('PNG or JPEG', 'PNG 或 JPEG 图片') %></label><input type="file" id="preview" name="preview" accept=".png,.jpg,.jpeg">
+      </fieldset>
+      <fieldset><legend><%= L('Applicable textbooks (optional)', '适用教材（可选）') %></legend>
+        <p><%= L('Choose a textbook, book and lesson, then add the link. You can add more than one lesson.', '依次选择教材、册数和课次，再添加关联。可关联多课或不同教材。') %></p>
+        <label for="series"><%= L('Textbook', '教材') %></label><select id="series"></select>
+        <label for="book"><%= L('Book', '册数') %></label><select id="book"></select>
+        <label for="lesson"><%= L('Lesson', '课次') %></label><select id="lesson"></select>
+        <button type="button" id="addLesson"><%= L('Add lesson link', '添加课次关联') %></button>
+        <p id="noLessons" hidden><%= L('No published lessons available.', '暂无可关联的已发布课次。') %></p>
+        <ul id="lessonLinks"></ul>
+      </fieldset>
+      <p id="materialError" role="alert" class="community-error" hidden></p>
+      <button class="btn" type="submit" id="saveMaterial"><%= L('Save material', '保存材料') %></button>
+    </form>
+  </div></main>
+  <script type="application/json" id="materialData"><%- JSON.stringify({ catalog: catalog, series: textbooks.SERIES, selected: (value.lessons || []).map(function (lesson) { return lesson.id; }), lang: lang }).replace(/</g, '\\u003c') %></script>
+  <script src="/materials/edit.js"></script>
+  <% if (!adminMode) { %><script src="/javascripts/milk-tea-footer.js"></script><% } %>
+</body>
+</html>

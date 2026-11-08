@@ -15,6 +15,12 @@
   </div></header>
   <main class="content-section"><div class="content-shell tc-lesson" id="tcLesson" data-title="<%= seriesName %> <%= bookName %> <%= lesson.title %>">
 
+  <% if (typeof relatedMaterials !== 'undefined' && relatedMaterials.length) { %>
+    <section class="tc-block">
+      <h2><%= L('Companion activities and materials', '配套活动与材料') %></h2>
+      <div class="resource-grid"><%- include('../materials/cards', { items: relatedMaterials }) %></div>
+    </section>
+  <% } %>
   <% if (!access.unlocked) { %>
     <%- include('members-note', { access: access, L: L }) %>
     <section class="tc-block is-locked">

@@ -32,7 +32,7 @@ var SECTIONS = [
   { key: 'library', href: '/teaching-tools/word-list-library/word-list-library.html', en: 'My materials', zh: '我的资料', sitemap: false, admin: [] },
   { key: 'chinese', href: '/chinese-teaching', en: 'Chinese Teaching', zh: '中文教学专区', admin: [] },
   {
-    key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: [],
+    key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: ['materials'],
     children: [
       { key: 'five-elements', href: '/theme-activities/five-elements', en: 'Five Elements', zh: '五行' },
       { key: 'self-introduction', href: '/theme-activities/self-introduction', en: 'Self-introduction', zh: '个人介绍' },
@@ -88,6 +88,7 @@ var UNLISTED = [
 
 // Admin editors. `href` must match a GET route in routes/admin.js.
 var ADMIN_EDITORS = {
+  materials: { href: '/admin/materials', label: 'Activity Materials', description: 'Upload and edit theme materials and textbook lesson links' },
   toolguides: { href: '/admin/toolguides', label: 'Tool Guides', description: 'How-to guides shown on individual tool pages' },
   toolvideos: { href: '/admin/toolvideos', label: 'Tool Videos', description: 'YouTube tutorial for each tool (Chinese and English); shows a Watch how button on the tool' },
   wordlists: { href: '/admin/wordlists', label: 'Word Lists', description: 'Lists and terms used by the word list library and tools' },

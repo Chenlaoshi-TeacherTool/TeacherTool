@@ -1,0 +1,9 @@
+<% items.forEach(function (item) { %>
+<a class="resource-card" href="/materials/<%= item.id %>" style="display:block;position:relative;text-decoration:none;color:inherit">
+  <% if (item.preview) { %><img src="/materials/<%= item.id %>/preview" alt="<%= item.title %>" loading="lazy" style="width:100%;max-height:220px;object-fit:contain"><% } %>
+  <% if (item.limitedFree) { %><span class="printable-badge"><%= lang === 'zh' ? '限时免费' : 'Free for a limited time' %></span><% } %>
+  <h3><%= item.title %></h3>
+  <p><%= lang === 'zh' ? item.description : (item.descriptionEn || item.description) %></p>
+  <span class="resource-card__link"><%= lang === 'zh' ? '查看材料' : 'View material' %> →</span>
+</a>
+<% }) %>

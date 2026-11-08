@@ -1,0 +1,19 @@
+<%- include('layout-head', { title: title, adminUser: adminUser }) %>
+<% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; %>
+<h1><%= L('Activity materials', '活动材料管理') %></h1>
+<p><%= L('Upload once, then choose the theme pages and textbook lessons where this material appears.', '上传一份材料，选择展示的主题页和教材课次。以后编辑一次，所有入口一起更新。') %></p>
+<p><a class="button" href="/admin/materials/new"><%= L('Upload material', '上传材料') %></a></p>
+<div style="overflow-x:auto">
+<table>
+  <thead><tr><th><%= L('Material', '材料') %></th><th><%= L('Theme pages', '主题页') %></th><th><%= L('Textbook lessons', '教材课次') %></th><th><%= L('Actions', '操作') %></th></tr></thead>
+  <tbody><% items.forEach(function (item) { %>
+    <tr><td><strong><%= item.title %></strong><br><%= item.files.length %> <%= L('attachments', '个附件') %><% if (item.limitedFree) { %><br><%= L('Free for a limited time', '限时免费') %><% } %></td>
+      <td><% (item.themes || [item.theme]).forEach(function (key) { var theme = themes.find(function (t) { return t.key === key; }); %><div><%= theme ? L(theme.en, theme.zh) : key %></div><% }) %></td>
+      <td><% item.lessons.forEach(function (lesson) { var series = textbooks.findSeries(lesson.series); var book = textbooks.findBook(series, lesson.book); %><div><%= series ? L(series.en, series.zh) : lesson.series %> · <%= book ? L(book.en, book.zh) : lesson.book %> · <%= L('Lesson ' + lesson.lessonNo, '第' + lesson.lessonNo + '课') %> <%= lesson.title %></div><% }) %></td>
+      <td><a href="/admin/materials/<%= item.id %>/edit"><%= L('Edit', '编辑') %></a> · <a href="/materials/<%= item.id %>"><%= L('View', '查看') %></a></td>
+    </tr>
+  <% }) %></tbody>
+</table>
+</div>
+<% if (!items.length) { %><p><%= L('No materials yet. Upload your first material.', '还没有材料，请上传第一份材料。') %></p><% } %>
+</body></html>

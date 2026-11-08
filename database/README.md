@@ -68,6 +68,15 @@ warning and the app logs one at start-up.
   line) and the 12 lessons of Jinan “中文” Book 1 (第一课–第十二课), to be renamed at `/admin/textbooks`.
 - `0011_add-tool-videos.sql` — `tool_videos`: a Chinese and an English YouTube tutorial link per tool page,
   set at `/admin/toolvideos`. Tool pages show a "Watch how" button when their path has a video.
+- `0012_add-activity-materials.sql` — one record per activity material, with an attachment list and
+  many-to-many textbook lesson links. Seeds the existing Five Elements planet activity using its
+  current Blob URLs and links it to Jinan Book 1 Lesson 4. No files are uploaded again. Upload and
+  edit at `/materials`; only the uploader or an administrator can edit. Local development uses
+  `tmp/activity-materials.json` and the existing local textbook-file storage. Apply this migration
+  before deploying the corresponding app code.
+- `0013_add-material-themes.sql` — preserves each existing theme and adds multiple theme-page
+  selections per material. Admins manage uploads, attachments, previews and lesson links directly
+  at `/admin/materials`, `/admin/materials/new` and `/admin/materials/:id/edit`.
 
 ## Other files
 

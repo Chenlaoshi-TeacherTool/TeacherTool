@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= lang === 'zh' ? '活动材料' : 'Activity materials' %> · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Chinese classroom activity materials, organized by theme and linked to textbook lessons.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+</head>
+<body>
+  <header class="content-hero"><div class="content-shell">
+    <a class="text-link" href="/theme-activities">← <%= lang === 'zh' ? '主题活动' : 'Theme activities' %></a>
+    <h1><%= lang === 'zh' ? '活动材料' : 'Activity materials' %></h1>
+    <a class="btn" href="/materials/new"><%= lang === 'zh' ? '上传材料' : 'Upload material' %></a>
+  </div></header>
+  <main class="content-section"><div class="content-shell">
+    <% themes.forEach(function (theme) { var themed = items.filter(function (item) { return (item.themes || [item.theme]).includes(theme.key); }); if (themed.length) { %>
+    <section><h2><%= lang === 'zh' ? theme.zh : theme.en %></h2>
+      <div class="resource-grid"><%- include('cards', { items: themed }) %></div>
+    </section>
+    <% } }) %>
+    <% if (!items.length) { %><p><%= lang === 'zh' ? '暂时没有材料。' : 'No materials yet.' %></p><% } %>
+  </div></main>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

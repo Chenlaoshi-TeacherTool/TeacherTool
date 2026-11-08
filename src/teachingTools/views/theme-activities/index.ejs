@@ -148,9 +148,15 @@
 
     <section class="tools-grid">
 
+        <div class="tool-card" data-tags="materials upload 活动材料 上传 教材关联">
+            <h3>📄 <%= lang === 'zh' ? '活动材料' : 'Activity materials' %></h3>
+            <p><%= lang === 'zh' ? '浏览、上传和编辑材料，手动关联适用教材课次。' : 'Browse, upload and edit materials, and link them to textbook lessons.' %></p>
+            <a href="/materials" class="btn"><%= lang === 'zh' ? '查看材料' : 'Browse materials' %></a>
+        </div>
+
         <div class="tool-card" data-tags="five-elements Five Elements 五行 五行星球 星球寻宝 金木水火土">
             <h3>🪐 <%= lang === 'zh' ? '五行' : 'Five Elements' %></h3>
-            <p><%= lang === 'zh' ? '五行星球活动：星球寻宝彩铅版，六张 A4 大图。限时免费，提供 PDF 和 Word。' : 'Planet treasure hunt with six A4 colored-pencil pictures. PDF and Word, free for a limited time.' %></p>
+            <p><%= lang === 'zh' ? '五行主题课堂活动、可打印材料与教材配套资源。' : 'Classroom activities, printable materials and textbook resources about the Five Elements.' %></p>
             <a href="/theme-activities/five-elements" class="btn"><%= t('themeActivities.openTheme') %></a>
         </div>
 

@@ -20,6 +20,7 @@ function create(options) {
   options = options || {};
   var repository = options.repository || require('../services/textbookRepository');
   var files = options.files || require('../services/textbookFileStorage');
+  var materials = options.materials || require('../services/materialRepository');
   var limits = options.limits || require('../services/membershipLimits');
   var signedIn = options.signedIn || function (req) {
     if (process.env.TEACHER_ACCOUNTS_ENABLED !== 'true') return false;
@@ -108,7 +109,8 @@ function create(options) {
       res.render('textbook-companion/lesson', {
         title: lesson.title + ' · ' + name(res, series) + ' ' + name(res, book), seriesName: name(res, series), bookName: name(res, book),
         seriesHref: '/textbook-companion/' + series.key, bookHref: '/textbook-companion/' + series.key + '/' + book.slug,
-        lesson: lesson, access: access(req, unlocked)
+        lesson: lesson, access: access(req, unlocked),
+        relatedMaterials: await materials.list({ lesson: { series: series.key, book: book.slug, slug: req.params.lesson } })
       });
     } catch (error) { next(error); }
   });
