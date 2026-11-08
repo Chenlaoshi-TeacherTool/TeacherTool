@@ -6,9 +6,10 @@
   <meta name="theme-color" content="#194f45">
   <title>Would You Rather Generator - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Build lively Would You Rather speaking cards from your own prompts, vocabulary, or saved word lists.' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
-  <link rel="stylesheet" href="/low-prep/would-you-rather/would-you-rather.css?v=vocabulary-library-3">
+  <link rel="stylesheet" href="/low-prep/would-you-rather/would-you-rather.css?v=openmoji-1">
 </head>
 <body class="wyr-page">
   <header class="header wyr-header">
@@ -57,6 +58,14 @@
               <button class="wyr-template" type="button" data-template="If you could choose only one, would you pick {A} or {B}?"><%= t('wouldYouRather.templateButton5') %></button>
               <button class="wyr-template" type="button" data-template="Which is more interesting: {A} or {B}?"><%= t('wouldYouRather.templateButton6') %></button>
               <button class="wyr-template" type="button" data-template="For this task, would you prefer {A} or {B}?"><%= t('wouldYouRather.templateButton7') %></button>
+            </div>
+            <p class="wyr-label wyr-label-zh"><%= t('wouldYouRather.zhTemplatesLabel') %></p>
+            <div class="wyr-template-grid wyr-template-grid-zh">
+              <button class="wyr-template" type="button" data-template="你喜欢{A}还是{B}？">你喜欢 A 还是 B？</button>
+              <button class="wyr-template" type="button" data-template="你想{A}还是{B}？">你想 A 还是 B？</button>
+              <button class="wyr-template" type="button" data-template="{A}和{B}，你选哪个？">A 和 B，你选哪个？</button>
+              <button class="wyr-template" type="button" data-template="哪个更有意思：{A}还是{B}？">哪个更有意思？</button>
+              <button class="wyr-template" type="button" data-template="如果只能选一个，你选{A}还是{B}？">如果只能选一个……</button>
             </div>
             <button class="wyr-secondary-btn wyr-apply-all" id="applyTemplate" type="button"><%= t('wouldYouRather.applyToAll') %></button>
           </div>
@@ -117,6 +126,7 @@ start with an example / start with a rule</textarea>
   <div id="presentation" class="wyr-presentation" hidden aria-modal="true" role="dialog" aria-label="Would You Rather presentation">
     <div class="wyr-presentation-bar">
       <span id="presentationCount">1 / 5</span>
+      <button id="resetVotes" type="button">♥ <%= t('wouldYouRather.resetVotes') %></button>
       <button id="closePresentation" type="button">× <%= t('wouldYouRather.close') %></button>
     </div>
     <div id="presentationSlide" class="wyr-presentation-slide"></div>
@@ -131,18 +141,19 @@ start with an example / start with a rule</textarea>
     <div class="wyr-picker-card">
       <div class="wyr-picker-heading"><div><p class="wyr-kicker"><%= t('wouldYouRather.artPickerKicker') %></p><h2 id="artPickerTitle"><%= t('wouldYouRather.chooseImage') %></h2></div><button id="closePicker" type="button" aria-label="Close image picker">×</button></div>
       <div class="wyr-picker-actions"><input id="iconSearch" type="search" placeholder="<%= t('wouldYouRather.iconSearchPlaceholder') %>"><label class="wyr-upload-label" for="imageUpload"><%= t('wouldYouRather.uploadPhotoLabel') %><input id="imageUpload" type="file" accept="image/*"></label></div>
+      <div class="wyr-picker-modes"><button id="autoPicture" type="button">✨ <%= t('wouldYouRather.autoPicture') %></button><button id="noPicture" type="button">⊘ <%= t('wouldYouRather.noPicture') %></button></div>
       <p class="wyr-small"><%= t('wouldYouRather.pickerHelp') %></p>
-      <div id="iconGrid" class="wyr-icon-grid" aria-label="Searchable icon choices"></div>
+      <div id="iconGrid" class="wyr-icon-grid" aria-label="OpenMoji"></div>
     </div>
   </div>
 
   <footer><p><%= t('wouldYouRather.footer') %></p></footer>
-  <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/wordlist-core.js?v=polyphone-2"></script>
+  <script src="/shared/emoji-core.js?v=ranking-1"></script>
   <script src="/shared/deck-export.js"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/library-picker.js?v=2"></script>
-  <script src="/low-prep/would-you-rather/material-symbols-catalog.js"></script>
-  <script src="/low-prep/would-you-rather/would-you-rather.js?v=vocabulary-library-3"></script>
+  <script src="/low-prep/would-you-rather/would-you-rather.js?v=openmoji-2"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

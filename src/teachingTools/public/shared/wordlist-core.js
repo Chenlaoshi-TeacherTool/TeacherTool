@@ -33,6 +33,24 @@
     var chunk = PY_GROUPS[py];
     for (var i = 0; i < chunk.length; i++) CHAR2PY[chunk[i]] = py;
   }
+  // 单字默认读音：多音字单独出现（或不在词组表里）时，用最常见的读音。
+  //   长：很长 / 太长了 → cháng（长大、校长 等读 zhǎng 的词在词组表里）
+  var DEFAULT_READINGS = { '长': 'cháng', '似': 'sì', '切': 'qiē', '尽': 'jìn' };
+  for (var dr in DEFAULT_READINGS) CHAR2PY[dr] = DEFAULT_READINGS[dr];
+  // 补充词组：和上面的默认读音配套（读 zhǎng 的「长」、读 qiè 的「切」、读 jǐn 的「尽」），再加几个常用儿化词。
+  var EXTRA_PHRASES = {
+    '长大': 'zhǎng dà', '长高': 'zhǎng gāo', '长胖': 'zhǎng pàng', '长出': 'zhǎng chū', '长满': 'zhǎng mǎn', '长得': 'zhǎng de',
+    '长相': 'zhǎng xiàng', '长辈': 'zhǎng bèi', '长子': 'zhǎng zǐ', '长官': 'zhǎng guān', '长老': 'zhǎng lǎo',
+    '成长': 'chéng zhǎng', '生长': 'shēng zhǎng', '增长': 'zēng zhǎng', '年长': 'nián zhǎng', '兄长': 'xiōng zhǎng',
+    '校长': 'xiào zhǎng', '家长': 'jiā zhǎng', '班长': 'bān zhǎng', '队长': 'duì zhǎng', '组长': 'zǔ zhǎng', '部长': 'bù zhǎng',
+    '市长': 'shì zhǎng', '院长': 'yuàn zhǎng', '村长': 'cūn zhǎng', '局长': 'jú zhǎng', '船长': 'chuán zhǎng', '师长': 'shī zhǎng',
+    '学长': 'xué zhǎng', '首长': 'shǒu zhǎng', '董事长': 'dǒng shì zhǎng',
+    '一切': 'yí qiè', '亲切': 'qīn qiè', '密切': 'mì qiè', '迫切': 'pò qiè', '急切': 'jí qiè', '确切': 'què qiè',
+    '关切': 'guān qiè', '恳切': 'kěn qiè', '贴切': 'tiē qiè', '切实': 'qiè shí',
+    '尽量': 'jǐn liàng', '尽管': 'jǐn guǎn', '尽快': 'jǐn kuài', '尽早': 'jǐn zǎo', '尽可能': 'jǐn kě néng',
+    '似的': 'shì de', '高高兴兴': 'gāo gāo xìng xìng', '哪儿': 'nǎ r', '这儿': 'zhè r', '那儿': 'nà r'
+  };
+  for (var ep in EXTRA_PHRASES) PY_PHRASES[ep] = EXTRA_PHRASES[ep];
 
   var MAX_PHRASE = 1;
   for (var p in PY_PHRASES) if (p.length > MAX_PHRASE) MAX_PHRASE = p.length;
@@ -84,24 +102,133 @@
     return syls;
   }
 
+  // ---------- 「地」「得」看语法位置 ----------
+  // 只改「按单字默认读音」得来的字；词组表 / 词典里的词（地方、得到、觉得）不动。
+  var DE_ADVERB_BEFORE = ['认真', '高兴', '努力', '仔细', '快乐', '开心', '大声', '小声', '安静', '耐心', '热情',
+    '紧张', '着急', '生气', '用力', '不停', '飞快', '很快', '偷偷', '悄悄', '轻轻', '静静', '默默', '渐渐', '不断',
+    '激动', '兴奋', '难过', '伤心', '小心', '勇敢', '友好', '礼貌', '清楚', '自然', '简单', '突然', '一步步', '一天天'];
+  var DEI_BEFORE = '我你他她它们咱就还也都总非须';
+  var DE_AFTER_END = '到了出分奖病意罪胜失逞一二三四五六七八九十百第';
+  // 「得」后面跟程度 / 评价词时是补语 de：跑得很快、写得好、说得对
+  var DE_COMPLEMENT_NEXT = '很太非真好快慢多少更最特挺极十那这怎清漂干对不满高远累哭笑';
+  // 不得不、取得、获得…… 这些「得」读 dé，不当补语
+  var DE_NOT_AFTER = '不取获赢求难值懂舍晓免';
+  // 「长」跟在单位 / 机构后面是首长的 zhǎng：区长、列车长、秘书长
+  var ZHANG_TITLE_BEFORE = '校院部局处科市省县州区镇乡村组班队团营连排师军舰船车站所厅司馆会社议家首族官总事书园亭社课室';
+
+  function applyParticles(chars, syls, single) {
+    for (var i = 0; i < chars.length; i++) {
+      if (!single[i]) continue;
+      var ch = chars[i];
+      var prev = chars[i - 1];
+      var next = chars[i + 1];
+      if (ch === '地' && prev) {
+        var before = chars.slice(Math.max(0, i - 4), i).join('');
+        var reduplicated = i >= 2 && chars[i - 1] === chars[i - 2];                 // 慢慢地、高高兴兴地
+        var adverb = DE_ADVERB_BEFORE.some(function (w) { return before.slice(-w.length) === w; });
+        if (reduplicated || adverb) syls[i] = 'de';
+      } else if (ch === '得') {
+        if (!prev || !next || DE_AFTER_END.indexOf(next) >= 0) continue;           // 得 dé：得了、得到
+        if (DEI_BEFORE.indexOf(prev) >= 0) syls[i] = 'děi';                         // 我得走、还得等
+        else if (DE_COMPLEMENT_NEXT.indexOf(next) >= 0 && DE_NOT_AFTER.indexOf(prev) < 0) syls[i] = 'de';  // 跑得快、写得好
+      } else if (ch === '长' && prev && ZHANG_TITLE_BEFORE.indexOf(prev) >= 0) {
+        syls[i] = 'zhǎng';                                                          // 区长、列车长
+      }
+    }
+    return syls;
+  }
+
+  // ---------- 老师改过的拼音：记住，下次同一个词自动用 ----------
+  var PY_CHOICE_KEY = 'teacherTool.pinyinChoices.v1';
+
+  function readPinyinChoices() {
+    try {
+      var stored = JSON.parse(global.localStorage.getItem(PY_CHOICE_KEY) || '{}');
+      return stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {};
+    } catch (_e) {
+      return {};
+    }
+  }
+
+  function pinyinKey(text) {
+    return String(text || '').replace(/\s+/g, '');
+  }
+
+  /** 记住老师给一个词改的拼音；pinyin 为空则删掉这条记录。返回是否保存成功。 */
+  function rememberPinyin(text, pinyin) {
+    var key = pinyinKey(text);
+    if (!key || !/[一-龥]/.test(key)) return false;
+    var value = String(pinyin || '').replace(/\s+/g, ' ').trim();
+    try {
+      var choices = readPinyinChoices();
+      if (value) choices[key] = value; else delete choices[key];
+      global.localStorage.setItem(PY_CHOICE_KEY, JSON.stringify(choices));
+      return true;
+    } catch (_e) {
+      return false;
+    }
+  }
+
+  /** 查老师改过的拼音，没有返回 '' */
+  function recallPinyin(text) {
+    var key = pinyinKey(text);
+    if (!key) return '';
+    var value = readPinyinChoices()[key];
+    return typeof value === 'string' ? value : '';
+  }
+
+  // CC-CEDICT 的词条读音（加载后作为词组表的兜底）。音节数必须和字数一致。
+  var CEDICT_MAX = 4;
+  function cedictPinyin(word) {
+    if (!CEDICT) return '';
+    var readings = CEDICT[word];
+    if (!readings || !readings.length) return '';
+    var chosen = '';
+    for (var r = 0; r < readings.length; r++) {
+      var py = readings[r] && typeof readings[r].py === 'string' ? readings[r].py.trim() : '';
+      if (!py) continue;
+      if (!/^[A-Z]/.test(py)) { chosen = py; break; }    // 普通读音优先（花 huā，不是姓 Huā）
+      if (!chosen) chosen = py;                           // 只有专有名词读音：长城 Cháng chéng
+    }
+    if (!chosen) return '';
+    chosen = chosen.toLowerCase().replace(/\s+/g, ' ');
+    var syls = chosen.split(' ');
+    if (syls.length !== word.length) return '';
+    for (var k = 0; k < syls.length; k++) if (!/^[a-züÀ-ǜ]+$/.test(syls[k])) return '';
+    return chosen;
+  }
+
   /**
    * 中文 → 拼音
    * @param {string} text
-   * @param {{spaced?:boolean, sandhi?:boolean}} [opts]
-   *        spaced=true 音节之间加空格；sandhi=false 关掉「一/不」变调
+   * @param {{spaced?:boolean, sandhi?:boolean, remembered?:boolean}} [opts]
+   *        spaced=true 音节之间加空格；sandhi=false 关掉「一/不」变调；remembered=false 不用老师改过的拼音
+   * 顺序：老师改过的拼音 → 内置词组表（长的优先）→ CC-CEDICT 词条（已加载时）→ 单字默认读音，
+   *      然后按语法位置改「地 / 得」，再做「一 / 不」变调。
    */
   function toPinyin(text, opts) {
     opts = opts || {};
+    text = String(text == null ? '' : text);
     var spaced = !!opts.spaced;
     var sandhi = opts.sandhi !== false;
+    var remembered = opts.remembered === false ? '' : recallPinyin(text);
+    if (remembered) return spaced ? remembered : remembered.replace(/ /g, '');
     var out = [];        // 输出片段
     var run = [];        // 当前中文连续段的音节
     var runChars = [];   // 与 run 一一对应的汉字
+    var runSingle = [];  // 这个字是不是按单字默认读音得来的
     function flushRun() {
       if (run.length) {
+        applyParticles(runChars, run, runSingle);
         if (sandhi) applySandhi(runChars, run);
-        out.push(spaced ? run.join(' ') : run.join(''));
-        run = []; runChars = [];
+        // 儿化：CC-CEDICT 把「儿」写成单独的 r，并到前一个音节上（哪儿 → nǎr）
+        var merged = [];
+        for (var m = 0; m < run.length; m++) {
+          if (run[m] === 'r' && merged.length) merged[merged.length - 1] += 'r';
+          else merged.push(run[m]);
+        }
+        out.push(spaced ? merged.join(' ') : merged.join(''));
+        run = []; runChars = []; runSingle = [];
       }
     }
     var i = 0;
@@ -119,13 +246,22 @@
         var seg = text.substr(i, L);
         if (PY_PHRASES[seg]) { hit = PY_PHRASES[seg]; hitLen = L; break; }
       }
+      if (!hit && CEDICT) {
+        for (var C = Math.min(CEDICT_MAX, text.length - i); C >= 2; C--) {
+          var word = text.substr(i, C);
+          if (!/^[一-龥]+$/.test(word)) continue;
+          var fromDict = cedictPinyin(word);
+          if (fromDict) { hit = fromDict; hitLen = C; break; }
+        }
+      }
       if (hit) {
         var syl = hit.split(' ');
-        for (var k = 0; k < syl.length; k++) { run.push(syl[k]); runChars.push(text[i + k]); }
+        for (var k = 0; k < syl.length; k++) { run.push(syl[k]); runChars.push(text[i + k]); runSingle.push(false); }
         i += hitLen;
       } else {
         run.push(CHAR2PY[ch] || ch);
         runChars.push(ch);
+        runSingle.push(true);
         i++;
       }
     }
@@ -165,7 +301,8 @@
     var defs = (reading && reading.d) || [];
     for (var i = 0; i < defs.length; i++) {
       var gloss = cleanGloss(defs[i]);
-      if (gloss && !/^surname\b/i.test(gloss)) return gloss;
+      // 跳过姓氏、异体字和交叉引用（船 → "variant of 船"，不是 "boat"）
+      if (gloss && !/^(surname|(old |archaic )?variant of|see |also written|used in|abbr\. for)\b/i.test(gloss)) return gloss;
     }
     return '';
   }
@@ -471,6 +608,8 @@
     hasStorage: HAS_STORE,
     STORAGE_PREFIX: PREFIX,
     toPinyin: toPinyin,
+    rememberPinyin: rememberPinyin,
+    recallPinyin: recallPinyin,
     toneOf: toneOf,
     toEnglish: toEnglish,
     englishSize: englishSize,

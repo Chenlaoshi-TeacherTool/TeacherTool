@@ -215,17 +215,46 @@
 
   // ---------- 搜索（给搜索框用，返回多个排序结果） ----------
   // 比 entryScore 更宽松：支持前缀 / 子串，方便边打字边搜。
+  // 整词命中（名称或标签）排在「前缀命中」前面：搜 sea 时，标着 sea 的 🌊🐚 应该排在 seal、seat 前面。
+  // 前缀 / 子串仍然保留，方便边打字边搜（ca → cat）。
   function searchScore(entry, query) {
     if (entry.normalizedAnnotation === query) return 1000;
     if (entry.annotationWords.indexOf(query) >= 0) return 850;
+    if (entry.tags.indexOf(query) >= 0) return 700 - Math.min(60, entry.annotationWords.length * 6);
+    if (entry.tagWords.indexOf(query) >= 0) return 600 - Math.min(60, entry.annotationWords.length * 6);
     var annStarts = entry.annotationWords.some(function (w) { return w.indexOf(query) === 0; });
-    if (annStarts) return 700;
-    if (entry.normalizedAnnotation.indexOf(query) >= 0) return 560;
-    if (entry.tags.indexOf(query) >= 0) return 480;
+    if (annStarts) return 500;
+    if (entry.normalizedAnnotation.indexOf(query) >= 0) return 420;
     var tagStarts = entry.tagWords.some(function (w) { return w.indexOf(query) === 0; });
-    if (tagStarts) return 360;
-    if (entry.tagWords.indexOf(query) >= 0) return 300;
+    if (tagStarts) return 300;
     return 0;
+  }
+
+  // 常见课堂词的首选图：OpenMoji 的名称里没有这个词，按标签匹配又容易配偏（sea → 美人鱼）。
+  // 键是 normalizeSearch 之后的英文，值是 OpenMoji 的 annotation。
+  var PREFERRED = {
+    sea: 'water wave', ocean: 'water wave', wave: 'water wave', water: 'droplet', rain: 'cloud with rain', snow: 'snowflake',
+    wind: 'wind face', tree: 'deciduous tree', home: 'house', friend: 'people holding hands', eat: 'fork and knife with plate',
+    drink: 'cup with straw', run: 'person running', walk: 'person walking', swim: 'person swimming', dance: 'woman dancing',
+    sleep: 'sleeping face', sing: 'microphone', doctor: 'health worker', summer: 'sun', winter: 'snowman', spring: 'cherry blossom',
+    autumn: 'fallen leaf', fall: 'fallen leaf', morning: 'sunrise', evening: 'night with stars', night: 'night with stars',
+    birthday: 'birthday cake', tea: 'teacup without handle', milk: 'glass of milk', moon: 'crescent moon', exercise: 'person lifting weights',
+    park: 'national park', river: 'water wave', lake: 'water wave', sky: 'sun behind cloud', grass: 'herb', fire: 'fire',
+    car: 'automobile', boat: 'sailboat', ship: 'ship', football: 'soccer ball', soccer: 'soccer ball', rice: 'cooked rice',
+    computer: 'laptop', phone: 'mobile phone', cell: 'mobile phone'
+  };
+  var preferredIndexCache = null;
+  function preferredEntry(query, index) {
+    if (!index || !query) return null;
+    if (!preferredIndexCache || preferredIndexCache.index !== index) {
+      var map = Object.create(null);
+      Object.keys(PREFERRED).forEach(function (key) {
+        var entry = index.byAnnotation[normalizeSearch(PREFERRED[key])];
+        if (entry) map[normalizeSearch(key)] = entry;
+      });
+      preferredIndexCache = { index: index, map: map };
+    }
+    return preferredIndexCache.map[query] || null;
   }
 
   /**
@@ -247,18 +276,27 @@
     if (/[一-鿿]/.test(raw)) {
       var CW = global.ChenWordlist;
       if (CW && typeof CW.toEnglish === 'function') {
-        var en = normalizeSearch(CW.toEnglish(raw));
-        if (en) queries.push(en);
+        // 释义可能有好几个义项（"sea; ocean"），前两个都拿来搜
+        String(CW.toEnglish(raw) || '').split(/[;,]/).slice(0, 2).forEach(function (sense) {
+          var en = normalizeSearch(sense);
+          if (en && queries.indexOf(en) < 0) queries.push(en);
+        });
       }
     }
     var normRaw = normalizeSearch(raw);
     if (normRaw && queries.indexOf(normRaw) < 0) queries.push(normRaw);
     if (!queries.length) return [];
 
+    var preferred = Object.create(null);
+    queries.forEach(function (query) {
+      var entry = preferredEntry(query, index);
+      if (entry) preferred[entry.hexcode] = true;
+    });
+
     var scored = [];
     for (var i = 0; i < index.entries.length; i++) {
       var entry = index.entries[i];
-      var best = 0;
+      var best = preferred[entry.hexcode] ? 1100 : 0;
       for (var q = 0; q < queries.length; q++) {
         var s = searchScore(entry, queries[q]);
         if (s > best) best = s;
@@ -319,6 +357,8 @@
     for (var q = 0; q < queries.length; q++) {
       var exactAnnotation = index.byAnnotation[queries[q]];
       if (exactAnnotation) return exactAnnotation;
+      var preferredHit = preferredEntry(queries[q], index);
+      if (preferredHit) return preferredHit;
       for (var i = 0; i < index.entries.length; i++) {
         var score = entryScore(index.entries[i], queries[q]);
         if (score > bestScore || (score === bestScore && best && index.entries[i].order < best.order)) {
