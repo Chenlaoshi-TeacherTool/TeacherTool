@@ -8,15 +8,17 @@ var sql = require('../services/sqlClient').sql;
 var stored, failLesson, commits, rollbacks;
 var lessonRows = [{ id: 1, series: 'jinan', book_slug: 'book-2', book_name: '第二册', slug: 'jinan-2-01', title: '第1课' }, { id: 2, series: 'jinan', book_slug: 'book-2', book_name: '第二册', slug: 'jinan-2-02', title: '第2课' }];
 function Transaction() {}
-Transaction.prototype.begin = async function () { this.items = structuredClone(stored); };
-Transaction.prototype.commit = async function () { stored = this.items; commits++; };
+Transaction.prototype.begin = async function () { this.items = structuredClone(stored); this.lessons = structuredClone(lessonRows); };
+Transaction.prototype.commit = async function () { stored = this.items; lessonRows = this.lessons; commits++; };
 Transaction.prototype.rollback = async function () { rollbacks++; };
 function Request(tx) { this.tx = tx; this.values = {}; }
 Request.prototype.input = function (name, type, value) { this.values[name] = value; return this; };
 Request.prototype.query = async function (query) {
   var rows = this.tx ? this.tx.items : stored; var v = this.values;
+  var lessons = this.tx ? this.tx.lessons : lessonRows;
+  if (query.startsWith('UPDATE textbook_lessons')) { lessons.find(function (l) { return l.id === v.id; }).title = v.title; return {}; }
   if (query.startsWith('DELETE')) { this.tx.items = rows.filter(function (r) { return r.lesson_id !== v.id; }); return {}; }
-  if (query.includes('FROM textbook_lessons')) return { recordset: lessonRows.filter(function (l) { return (!v.id || l.id === v.id) && l.series === v.series && l.book_slug === v.book; }).map(function (l) { return Object.assign({}, l); }) };
+  if (query.includes('FROM textbook_lessons')) return { recordset: lessons.filter(function (l) { return (!v.id || l.id === v.id) && l.series === v.series && l.book_slug === v.book; }).map(function (l) { return Object.assign({}, l); }) };
   return { recordset: rows.filter(function (r) { return v.id ? r.lesson_id === v.id : lessonRows.some(function (l) { return l.id === r.lesson_id && l.series === v.series && l.book_slug === v.book; }); }).sort(function (a, b) { return a.sort_order - b.sort_order || a.id - b.id; }) };
 };
 Request.prototype.bulk = async function (table) {
@@ -26,10 +28,11 @@ Request.prototype.bulk = async function (table) {
 var db = { sql: Object.assign({}, sql, { Transaction: Transaction, Request: Request }), getPool: async function () { return { request: function () { return new Request(); } }; } };
 var editor = service.create({ db: db });
 test.beforeEach(function () {
+  lessonRows.forEach(function (l) { l.title = '第' + l.id + '课'; });
   stored = [{ id: 11, lesson_id: 1, zh: '在', py: 'zài', en: '', kind: '识字', sort_order: 0 }, { id: 12, lesson_id: 2, zh: '桌', py: 'zhuō', en: 'desk', kind: '识字', sort_order: 0 }];
   commits = 0; rollbacks = 0; failLesson = 0;
 });
-function payload(lessons) { return lessons.map(function (l) { return { id: l.id, revision: l.revision, items: l.items.map(function (i) { return { zh: i.zh, py: i.py, en: i.en, kind: i.kind }; }) }; }); }
+function payload(lessons) { return lessons.map(function (l) { return { id: l.id, title: l.title, revision: l.revision, items: l.items.map(function (i) { return { zh: i.zh, py: i.py, en: i.en, kind: i.kind }; }) }; }); }
 
 test('loads book lessons with ordered vocabulary and saves only selected lessons', async function () {
   var lessons = await editor.load('jinan', 'book-2'); assert.equal(lessons.length, 2);
@@ -44,8 +47,28 @@ test('loads book lessons with ordered vocabulary and saves only selected lessons
 test('all-book write failure rolls back every changed lesson', async function () {
   var input = payload(await editor.load('jinan', 'book-2')); var original = structuredClone(stored);
   input[0].items[0].en = 'at'; failLesson = 2;
+  input[0].title = '不应保存的标题';
   await assert.rejects(editor.save('jinan', 'book-2', input), /bulk failed/);
   assert.deepEqual(stored, original); assert.equal(commits, 0); assert.equal(rollbacks, 1);
+  assert.equal(lessonRows[0].title, '第1课');
+});
+test('saves titles with words, permits title-only edits on empty lessons, and detects concurrent renames', async function () {
+  var input = payload(await editor.load('jinan', 'book-2'));
+  input[0].title = '  我的学校  '; input[0].items[0].en = 'at'; input[1].title = '教室'; input[1].items = [];
+  var result = await editor.save('jinan', 'book-2', input);
+  assert.deepEqual(result.lessons.map(function (l) { return l.title; }), ['我的学校', '教室']);
+  var loaded = await editor.load('jinan', 'book-2');
+  assert.equal(loaded[0].title, '我的学校'); assert.equal(loaded[0].items[0].en, 'at'); assert.equal(loaded[1].items.length, 0);
+  input = payload(loaded); lessonRows[1].title = '另一个窗口的课题';
+  await assert.rejects(editor.save('jinan', 'book-2', input), { status: 409 });
+  assert.equal(lessonRows[1].title, '另一个窗口的课题');
+});
+test('rejects blank, non-text and oversized titles before writing', async function () {
+  for (var title of ['', '   ', null, 3, '课'.repeat(201)]) {
+    var input = payload(await editor.load('jinan', 'book-2')); input[0].title = title;
+    await assert.rejects(editor.save('jinan', 'book-2', input), { status: 400 });
+  }
+  assert.equal(commits, 0); assert.equal(rollbacks, 0);
 });
 test('stale revisions, new concurrent words, and cross-book IDs cannot overwrite data', async function () {
   var input = payload(await editor.load('jinan', 'book-2'));

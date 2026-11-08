@@ -3,6 +3,7 @@
   var root = document.getElementById('bookEditor');
   if (!root) return;
   var lessons = JSON.parse(document.getElementById('bookData').textContent);
+  lessons.forEach(function (lesson) { lesson.savedWordCount = lesson.items.length; });
   var fields = ['zh', 'py', 'en', 'kind'];
   var labels = ['中文 / Chinese', '拼音 / Pinyin', '英文 / English', '类别 / Kind'];
   var selected = lessons.some(function (l) { return '#lesson-' + l.id === location.hash; }) ? Number(location.hash.slice(8)) : lessons[0].id;
@@ -49,8 +50,11 @@
     navigation(); var container = document.getElementById('bookLessons'); container.replaceChildren();
     lessons.filter(function (l) { return selected === null || l.id === selected; }).forEach(function (lesson) {
       var section = document.createElement('section'); section.className = 'book-lesson'; section.dataset.lessonId = lesson.id;
-      var heading = document.createElement('h2'); heading.textContent = lesson.title; section.append(heading);
-      var link = document.createElement('a'); link.href = '/admin/textbooks/lessons/' + lesson.id + '/edit'; link.textContent = '编辑课题、句型、活动与附件'; section.append(link);
+      var titleLabel = document.createElement('label'); titleLabel.textContent = '课题 / Lesson title';
+      var titleInput = document.createElement('input'); titleInput.type = 'text'; titleInput.value = lesson.title; titleInput.maxLength = 200; titleInput.required = true; titleInput.dataset.lessonTitle = lesson.id;
+      titleInput.addEventListener('input', function () { lesson.title = titleInput.value; dirty(lesson); });
+      titleLabel.append(titleInput); section.append(titleLabel);
+      var link = document.createElement('a'); link.href = '/admin/textbooks/lessons/' + lesson.id + '/edit'; link.textContent = '编辑句型、活动与附件'; section.append(link);
       var wrap = document.createElement('div'); wrap.className = 'book-table-wrap';
       var table = document.createElement('table'); var head = document.createElement('thead'); var hr = document.createElement('tr');
       labels.concat(['操作']).forEach(function (label) { var th = document.createElement('th'); th.textContent = label; hr.append(th); }); head.append(hr); table.append(head);
@@ -103,17 +107,21 @@
   async function save(scope) {
     var changed = targets(scope).filter(function (l) { return l.dirty; });
     if (!changed.length) return status('没有需要保存的修改。');
-    if (changed.some(function (l) { return !l.items.length; }) && !window.confirm('有课次的词汇已全部移除，保存后将清空该课词汇。继续吗？')) return;
+    if (changed.some(function (l) { return !l.title.trim() || l.title.trim().length > 200; })) return status('课题不能为空，且不能超过200字。', true);
+    if (changed.some(function (l) { return !l.items.length && l.savedWordCount > 0; }) && !window.confirm('有课次的词汇已全部移除，保存后将清空该课词汇。继续吗？')) return;
     status('正在保存……');
-    var result = await request('save', { lessons: changed.map(function (l) { return { id: l.id, revision: l.revision, items: l.items.map(function (item) {
+    var result = await request('save', { lessons: changed.map(function (l) { return { id: l.id, title: l.title, revision: l.revision, items: l.items.map(function (item) {
       var clean = {}; fields.forEach(function (f) { clean[f] = item[f]; }); return clean;
     }) }; }) });
-    result.lessons.forEach(function (saved) { var lesson = lessons.find(function (l) { return l.id === saved.id; }); lesson.items = saved.items; lesson.revision = saved.revision; lesson.dirty = false; });
+    result.lessons.forEach(function (saved) { var lesson = lessons.find(function (l) { return l.id === saved.id; }); lesson.title = saved.title; lesson.items = saved.items; lesson.savedWordCount = saved.items.length; lesson.revision = saved.revision; lesson.dirty = false; });
     render(); status('已保存 ' + result.lessons.length + ' 课的修改。');
   }
   function exportChanges() {
-    var rows = [['slug', 'zh', 'py', 'en', 'kind']];
-    lessons.forEach(function (l) { l.items.forEach(function (item) { rows.push([l.slug].concat(fields.map(function (f) { return item[f]; }))); }); });
+    var rows = [['slug', 'zh', 'py', 'en', 'kind', 'title']];
+    lessons.forEach(function (l) {
+      l.items.forEach(function (item) { rows.push([l.slug].concat(fields.map(function (f) { return item[f]; }), [l.title])); });
+      if (!l.items.length) rows.push([l.slug, '', '', '', '', l.title]);
+    });
     var csv = '\uFEFF' + rows.map(function (r) { return r.map(function (v) { var text = String(v || ''); if (/^[=+@-]/.test(text)) text = "'" + text; return '"' + text.replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
     var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); var a = document.createElement('a'); a.href = url; a.download = 'book-vocabulary-draft.csv'; a.click(); URL.revokeObjectURL(url);
     status('已导出当前词汇 CSV，供备份；后台导入仍需使用 Excel 格式。');
