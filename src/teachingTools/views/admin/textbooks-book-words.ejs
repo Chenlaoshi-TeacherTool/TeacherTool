@@ -1,0 +1,29 @@
+<%- include('layout-head') %>
+<link rel="stylesheet" href="/admin-textbook-book.css">
+<h1><%= series.zh %> · <%= bookName %> · 整册词汇编辑</h1>
+<p><a href="/admin/textbooks/books/<%= encodeURIComponent(series.key) %>/<%= encodeURIComponent(bookSlug) %>">← 返回本册 / Back to book</a></p>
+<p>生成只补全空白，保留已有内容。请核对多音字和英文词义，再统一保存。切换课次不会丢失修改。</p>
+<div id="bookEditor" data-base="/admin/textbooks/books/<%= encodeURIComponent(series.key) %>/<%= encodeURIComponent(bookSlug) %>/words">
+  <div class="book-toolbar">
+    <button type="button" data-command="english-book">补全整册英文</button>
+    <button type="button" data-command="pinyin-book">补全整册拼音</button>
+    <button type="button" data-command="save-book">保存整册修改</button>
+    <button type="button" data-command="export" class="secondary">导出当前修改 CSV</button>
+  </div>
+  <p id="bookStatus" role="status" aria-live="polite"></p>
+  <div class="book-workspace">
+    <aside><nav id="lessonNavigation" aria-label="课次"></nav></aside>
+    <main>
+      <div class="book-toolbar">
+        <button type="button" data-command="english-lesson">补全本课英文</button>
+        <button type="button" data-command="pinyin-lesson">补全本课拼音</button>
+        <button type="button" data-command="save-lesson">保存本课</button>
+      </div>
+      <div id="bookLessons"></div>
+    </main>
+  </div>
+</div>
+<script id="bookData" type="application/json"><%- JSON.stringify(lessons).replace(/</g, '\\u003c') %></script>
+<script src="/vendor/pinyin-pro.js" defer></script>
+<script src="/admin-textbook-book.js" defer></script>
+<%- include('layout-foot') %>

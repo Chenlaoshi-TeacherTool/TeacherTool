@@ -1,0 +1,24 @@
+body:has(#bookEditor) { max-width:1400px; }
+.book-toolbar { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.book-workspace { display:grid; grid-template-columns:230px minmax(0,1fr); gap:24px; align-items:start; }
+.book-workspace aside { position:sticky; top:12px; max-height:85vh; overflow:auto; }
+#lessonNavigation button { display:block; width:100%; margin:0 0 6px; text-align:left; background:#eef2f7; color:#1a1a1a; line-height:1.6; }
+#lessonNavigation button[aria-pressed=true] { background:#1d4ed8; color:white; }
+.book-lesson { margin-bottom:32px; }
+.book-table-wrap { overflow-x:auto; }
+.book-lesson table { min-width:650px; }
+.book-lesson th:nth-child(1) { width:18%; }
+.book-lesson th:nth-child(2) { width:23%; }
+.book-lesson th:nth-child(3) { width:34%; }
+.book-lesson th:nth-child(4) { width:16%; }
+.book-lesson input { min-width:0; }
+.book-lesson input[data-field=en]:placeholder-shown { background:#fffbeb; }
+#bookStatus { min-height:24px; }
+#bookStatus[data-error=true] { color:#b91c1c; }
+button:disabled { opacity:.55; cursor:wait; }
+@media(max-width:760px) {
+  .book-workspace { grid-template-columns:minmax(0,1fr); }
+  .book-workspace aside { position:static; max-height:200px; }
+  #lessonNavigation { display:flex; flex-wrap:wrap; gap:6px; }
+  #lessonNavigation button { width:auto; }
+}

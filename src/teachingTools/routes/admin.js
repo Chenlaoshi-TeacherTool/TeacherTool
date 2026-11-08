@@ -56,6 +56,7 @@ router.get('/materials', function (req, res, next) {
 });
 router.use(materialAdminRouter);
 router.use(require('./textbookWords'));
+router.use(require('./textbookBookEditor'));
 
 router.get('/wordlists', async function (req, res, next) {
   try {
@@ -1037,7 +1038,11 @@ router.post('/textbooks/import', upload.single('file'), async function (req, res
     var pool = await sqlClient.getPool();
     var parsed = textbookImport.readWorkbook(workbook, await textbookImport.existingLessonIds(pool), req.textbooks);
     if (parsed.errors.length) return render({ errors: parsed.errors });
-    render({ counts: await textbookImport.applyImport(pool, sql, parsed) });
+    var books = [];
+    parsed.lessons.forEach(function (lesson) {
+      if (!books.some(function (book) { return book.series === lesson.series && book.slug === lesson.book_slug; })) books.push({ series: lesson.series, slug: lesson.book_slug, name: lesson.book_name });
+    });
+    render({ counts: await textbookImport.applyImport(pool, sql, parsed), books: books });
   } catch (err) { next(err); }
 });
 

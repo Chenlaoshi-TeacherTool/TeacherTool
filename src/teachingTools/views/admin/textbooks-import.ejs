@@ -15,6 +15,9 @@
     Done: <%= result.counts.lessonsCreated %> lesson(s) created, <%= result.counts.lessonsUpdated %> updated;
     words replaced in <%= result.counts.lessonsWithWords %> lesson(s) (<%= result.counts.words %> words).
   </p>
+  <% (result.books || []).forEach(function (book) { %>
+    <p><a class="button" href="/admin/textbooks/books/<%= encodeURIComponent(book.series) %>/<%= encodeURIComponent(book.slug) %>/words">继续补全英文、编辑整册：<%= book.name %></a></p>
+  <% }) %>
 <% } %>
 
 <form method="POST" action="/admin/textbooks/import" enctype="multipart/form-data">
