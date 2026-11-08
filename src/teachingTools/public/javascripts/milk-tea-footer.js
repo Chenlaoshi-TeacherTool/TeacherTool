@@ -93,6 +93,34 @@
       '</div>';
   }
 
+  // Use the two-row header whenever the one-row header would not fit
+  // (below 1600px always; wider screens when, e.g., account buttons are added).
+  function watchNavFit(nav) {
+    if (!nav || nav.dataset.fitWatch) return;
+    nav.dataset.fitWatch = '1';
+    var inner = nav.querySelector('.site-main-nav-inner');
+    if (!inner) return;
+    var queued = false;
+    function fit() {
+      queued = false;
+      if (window.innerWidth <= 1600) { nav.classList.add('is-compact'); return; }
+      nav.classList.remove('is-compact');
+      var gap = parseFloat(getComputedStyle(inner).columnGap) || 0;
+      var needed = 0, count = 0;
+      Array.prototype.forEach.call(inner.children, function(child) {
+        if (child.offsetParent === null && getComputedStyle(child).position !== 'fixed') return;
+        needed += child.scrollWidth; count += 1;
+      });
+      needed += gap * Math.max(0, count - 1);
+      if (needed > inner.clientWidth || inner.scrollWidth > inner.clientWidth + 1) nav.classList.add('is-compact');
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(fit); } }
+    fit();
+    window.addEventListener('resize', queue);
+    if (window.MutationObserver) new MutationObserver(queue).observe(inner, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden'] });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
+  }
+
   function createFooter() {
     var lang = getLang();
     var t = LABELS[lang];
@@ -162,6 +190,7 @@
       });
       document.body.prepend(nav);
     }
+    watchNavFit(document.getElementById('siteMainNav'));
 
     var legalFooters = document.querySelectorAll('footer');
     var legalFooter = legalFooters.length ? legalFooters[legalFooters.length - 1] : document.createElement('footer');

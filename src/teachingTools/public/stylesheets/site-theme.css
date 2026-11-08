@@ -62,7 +62,8 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(1600px, calc(100% - 16px));
+  width: calc(100% - 16px);
+  max-width: 1880px;
   height: 100%;
   margin: 0 auto;
   gap: 22px;
@@ -71,6 +72,7 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
 .site-main-nav-brand {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   min-width: 0;
   gap: 10px;
   color: #194f45;
@@ -100,6 +102,7 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
 .site-main-nav-links {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   justify-content: flex-end;
   min-width: 0;
   margin: 0;
@@ -148,40 +151,49 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
 .site-lang-switch a:hover { color: #194f45; background: transparent; }
 .site-lang-switch a.is-active { background: #194f45; color: #fffdf7; }
 
+/*
+ * Two-row header. Used below 1600px, and also on wider screens whenever the
+ * single row does not fit (milk-tea-footer.js adds .is-compact), e.g. when the
+ * signed-in account buttons make the row too long.
+ */
 @media (max-width: 1600px) {
   :root { --site-nav-height: 106px; }
-
-  .site-main-nav { padding: 8px 12px; }
-
-  .site-main-nav-inner {
-    grid-template-areas:
-      "brand language"
-      "links links";
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: 42px 36px;
-    display: grid;
-    width: 100%;
-    gap: 6px 10px;
-  }
-
-  .site-main-nav-brand { grid-area: brand; overflow: hidden; }
-  .site-main-nav-brand img { width: 36px; height: 36px; }
-  .site-main-nav-brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .site-lang-switch { grid-area: language; }
-
-  .site-main-nav-links {
-    grid-area: links;
-    justify-content: flex-start;
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    flex-wrap: nowrap;
-    scrollbar-width: none;
-  }
-
-  .site-main-nav-links::-webkit-scrollbar { display: none; }
-  .site-main-nav-links a, .site-main-nav-links .site-nav-coming-soon { padding: 6px 9px; font-size: .78rem; }
 }
+html:has(.site-main-nav.is-compact) { --site-nav-height: 106px; }
+
+.site-main-nav.is-compact { padding: 8px 12px; }
+
+.site-main-nav.is-compact .site-main-nav-inner {
+  grid-template-areas:
+    "brand language"
+    "links links";
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 42px 36px;
+  display: grid;
+  width: 100%;
+  max-width: none;
+  gap: 6px 10px;
+}
+
+.site-main-nav.is-compact .site-main-nav-brand { grid-area: brand; overflow: hidden; }
+.site-main-nav.is-compact .site-main-nav-brand img { width: 36px; height: 36px; }
+.site-main-nav.is-compact .site-main-nav-brand span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.site-main-nav.is-compact .site-lang-switch,
+.site-main-nav.is-compact .site-nav-tools { grid-area: language; }
+
+.site-main-nav.is-compact .site-main-nav-links {
+  grid-area: links;
+  justify-content: flex-start;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+  scrollbar-width: none;
+}
+
+.site-main-nav.is-compact .site-main-nav-links::-webkit-scrollbar { display: none; }
+.site-main-nav.is-compact .site-main-nav-links a,
+.site-main-nav.is-compact .site-main-nav-links .site-nav-coming-soon { padding: 6px 9px; font-size: .78rem; }
 
 @media print {
   html body { padding-top: 0 !important; }
