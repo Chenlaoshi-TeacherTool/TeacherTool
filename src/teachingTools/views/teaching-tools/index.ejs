@@ -303,12 +303,6 @@
                 <p><%= t('teachingToolsIndex.lowPrepDesc') %></p>
             </div>
             <div class="tools-grid">
-                <div data-uses="project print" class="tool-card">
-                    <h3>🎮 <%= t('teachingToolsIndex.vocabGamesTitle') %></h3>
-                    <p class="tool-scope"><%= t('teachingToolsIndex.vocabGamesScope') %></p>
-                    <p><%= t('teachingToolsIndex.vocabGamesDesc') %></p>
-                    <a href="/teaching-tools/vocab-games" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
-                </div>
                 <div data-uses="print" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/low-prep/word-sudoku/word-sudoku-widget.html' }) %>
                     <h3>🧩 <%= t('teachingToolsIndex.sudokuTitle') %></h3>
