@@ -5,7 +5,7 @@ var S = {
   chars: [],
   order: [],
   terms: {},
-  opts: { targetLanguage: 'english', rings: 'auto', size: 'auto', grid: 20, shape: 'circle' },
+  opts: { targetLanguage: 'english', rings: 'auto', size: 'auto', grid: 20, shape: 'circle', theme: 'classic' },
   title: ''
 };
 var $ = function (s) { return document.querySelector(s); };
@@ -356,6 +356,67 @@ var PY_FONT = "'Andika', 'Century Gothic', 'Segoe UI', Arial, sans-serif";
 function supportFontAttr() {
   return S.opts.targetLanguage === 'pinyin' ? ' font-family="' + PY_FONT + '"' : '';
 }
+/* ---------- themes ---------- */
+// A theme changes colours, corner decorations and default team names. Layout and font sizing stay the same.
+var THEMES = {
+  classic: {
+    zh: '经典', en: 'Classic', icons: '🌻📚✏️⭐', deco: [], burst: ['⭐', '🎉', '✨'],
+    bg: '#FBF6E9', line: '#9FBCA9', tile: '#fff', edge: '#1B2A47', ink: '#1B2A47', support: '#2F5A47',
+    hub: '#35604C', hubInk: '#F6C43C', hubTitle: '#F2F6EF', header: '#35604C', cell: '#FBF6E9',
+    gameBg: '#35604C', gameBar: '#2A4E3E',
+    teams: ['#127c83', '#b25435'], names: { zh: ['甲队', '乙队'], en: ['Team A', 'Team B'] }
+  },
+  thanksgiving: {
+    zh: '感恩节', en: 'Thanksgiving', icons: '🦃🍁🥧🌽', deco: ['🦃', '🍁', '🥧', '🌽'], burst: ['🍁', '🍂', '🦃'],
+    bg: '#FFF3E0', line: '#D99A5B', tile: '#FFFBF3', edge: '#5C3317', ink: '#4A2511', support: '#A8461A',
+    hub: '#C8691C', hubInk: '#FFF6E5', hubTitle: '#FFF6E5', header: '#A8441C', cell: '#FFF3E0',
+    gameBg: '#6B3A1A', gameBar: '#4E2A12',
+    teams: ['#8B4A1F', '#E07A1F'], names: { zh: ['火鸡队', '南瓜队'], en: ['Turkeys', 'Pumpkins'] }
+  },
+  halloween: {
+    zh: '万圣节', en: 'Halloween', icons: '🎃🦇👻🕸️', deco: ['🎃', '🦇', '👻', '🕸️'], burst: ['🎃', '🦇', '🍬'],
+    bg: '#FFF5EA', line: '#B38BD1', tile: '#FFFFFF', edge: '#2E1A47', ink: '#2E1A47', support: '#7A3FA0',
+    hub: '#E8711C', hubInk: '#FFF5EA', hubTitle: '#FFF5EA', header: '#4B2A6B', cell: '#FFF5EA',
+    gameBg: '#2E1A47', gameBar: '#20122F',
+    teams: ['#E8711C', '#6E3FA3'], names: { zh: ['南瓜队', '幽灵队'], en: ['Pumpkins', 'Ghosts'] }
+  },
+  christmas: {
+    zh: '圣诞节', en: 'Christmas', icons: '🎄❄️🎁⭐', deco: ['🎄', '❄️', '🎁', '⭐'], burst: ['❄️', '⭐', '🎁'],
+    bg: '#F4FAF4', line: '#9CC5A4', tile: '#FFFFFF', edge: '#1E3D2A', ink: '#1E3D2A', support: '#B23A2E',
+    hub: '#C0392B', hubInk: '#FFFFFF', hubTitle: '#FFFFFF', header: '#1E7A46', cell: '#F4FAF4',
+    gameBg: '#1E5A3A', gameBar: '#153F29',
+    teams: ['#C0392B', '#1E7A46'], names: { zh: ['雪人队', '驯鹿队'], en: ['Snowmen', 'Reindeer'] }
+  },
+  newyear: {
+    zh: '春节', en: 'Lunar New Year', icons: '🧧🏮🧨🐉', deco: ['🧧', '🏮', '🧨', '🐉'], burst: ['🧧', '🎆', '🏮'],
+    bg: '#FFF4E6', line: '#E3A86B', tile: '#FFFCF5', edge: '#6B1414', ink: '#5A1010', support: '#A0700A',
+    hub: '#C8102E', hubInk: '#FFD86B', hubTitle: '#FFD86B', header: '#C8102E', cell: '#FFF4E6',
+    gameBg: '#8E0E1E', gameBar: '#6A0A16',
+    teams: ['#C8102E', '#B8860B'], names: { zh: ['龙队', '虎队'], en: ['Dragons', 'Tigers'] }
+  }
+};
+function skin() { return THEMES[S.opts.theme] || THEMES.classic; }
+function uiLang() { return /^zh/i.test(document.documentElement.lang || '') ? 'zh' : 'en'; }
+var EMOJI_FONT = "'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif";
+// One holiday emoji in each corner of the wheel, drawn behind the track.
+function cornerDeco(w, h, deco) {
+  if (!deco || !deco.length) return '';
+  var sz = Math.min(w, h) * 0.085, g = '';
+  [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(function (c, i) {
+    var x = c[0] ? w - sz * 0.8 : sz * 0.8, y = c[1] ? h - sz * 0.45 : sz * 1.05;
+    g += '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" font-size="' + sz.toFixed(1) + '" font-family="' + EMOJI_FONT + '" text-anchor="middle" transform="rotate(' + (i % 2 ? 12 : -12) + ' ' + x.toFixed(1) + ' ' + (y - sz * 0.35).toFixed(1) + ')">' + deco[i % deco.length] + '</text>';
+  });
+  return g;
+}
+// Page-level colours for the full-screen games come from the theme too.
+function applyTheme() {
+  var k = skin(), st = document.body.style;
+  st.setProperty('--crt-bg', k.bg);
+  st.setProperty('--crt-ink', k.ink);
+  st.setProperty('--crt-edge', k.edge);
+  st.setProperty('--crt-game-bg', k.gameBg);
+  st.setProperty('--crt-game-bar', k.gameBar);
+}
 function pathD(pts) {
   return 'M' + pts.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('L') + 'Z';
 }
@@ -374,16 +435,18 @@ function trackSVG(w, h, opt) {
   var pillH = fs * 1.5, tf = fs * TF, lh = tf * 1.18;
   var lineW = Math.max(2.5, Math.min(w, h) * 0.005);
 
-  var g = '<rect width="' + w + '" height="' + h + '" fill="#FBF6E9"/>';
+  var K = skin();
+  var g = '<rect width="' + w + '" height="' + h + '" fill="' + K.bg + '"/>';
+  g += cornerDeco(w, h, K.deco);
   L.curves.forEach(function (pts) {
-    g += '<path d="' + pathD(pts) + '" fill="none" stroke="#9FBCA9" stroke-width="' + lineW + '" stroke-linejoin="round"/>';
+    g += '<path d="' + pathD(pts) + '" fill="none" stroke="' + K.line + '" stroke-width="' + lineW + '" stroke-linejoin="round"/>';
   });
   if (L.shp.antennae) {
     var top = L.curves[0][0], tipY = cy - L.sy * 0.96;
     [-1, 1].forEach(function (d) {
       var tx = cx + d * L.sx * 0.2;
-      g += '<path d="M' + top[0] + ' ' + top[1] + ' Q' + (cx + d * L.sx * 0.04) + ' ' + tipY + ' ' + tx + ' ' + tipY + '" fill="none" stroke="#9FBCA9" stroke-width="' + lineW + '" stroke-linecap="round"/>';
-      g += '<circle cx="' + tx + '" cy="' + tipY + '" r="' + lineW * 2 + '" fill="#9FBCA9"/>';
+      g += '<path d="M' + top[0] + ' ' + top[1] + ' Q' + (cx + d * L.sx * 0.04) + ' ' + tipY + ' ' + tx + ' ' + tipY + '" fill="none" stroke="' + K.line + '" stroke-width="' + lineW + '" stroke-linecap="round"/>';
+      g += '<circle cx="' + tx + '" cy="' + tipY + '" r="' + lineW * 2 + '" fill="' + K.line + '"/>';
     });
   }
 
@@ -392,30 +455,30 @@ function trackSVG(w, h, opt) {
     var ct = S.terms[opt.centerChar] || {};
     var centerText = opt.centerTarget ? (targetText(opt.centerChar) || ct.en || ct.py || opt.centerChar) : opt.centerChar;
     var centerFont = Math.max(13, Math.min(cr0 * 0.9, cr0 * 3.2 / Math.max(1, centerText.length)));
-    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (cr0 * 0.98) + '" fill="#35604C" stroke="#1B2A47" stroke-width="5"/>';
-    g += '<text x="' + cx + '" y="' + (cy + centerFont * 0.34) + '" font-size="' + centerFont + '"' + termFontAttr(centerText) + ' fill="#F6C43C" text-anchor="middle">' + esc(centerText) + '</text>';
+    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (cr0 * 0.98) + '" fill="' + K.hub + '" stroke="' + K.edge + '" stroke-width="5"/>';
+    g += '<text x="' + cx + '" y="' + (cy + centerFont * 0.34) + '" font-size="' + centerFont + '"' + termFontAttr(centerText) + ' fill="' + K.hubInk + '" text-anchor="middle">' + esc(centerText) + '</text>';
   } else if (opt.centerLabel != null) {
     var lab = String(opt.centerLabel);
     var labFont = Math.max(12, Math.min(cr0 * 0.8, cr0 * 1.7 / Math.max(1, emW(lab))));
-    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + cr0 + '" fill="' + (opt.centerFill || '#35604C') + '" stroke="#1B2A47" stroke-width="5"/>';
-    g += '<text x="' + cx + '" y="' + (cy + labFont * 0.34) + '" font-size="' + labFont + '"' + termFontAttr(lab) + ' fill="#F6C43C" text-anchor="middle">' + esc(lab) + '</text>';
+    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + cr0 + '" fill="' + (opt.centerFill || K.hub) + '" stroke="' + K.edge + '" stroke-width="5"/>';
+    g += '<text x="' + cx + '" y="' + (cy + labFont * 0.34) + '" font-size="' + labFont + '"' + termFontAttr(lab) + ' fill="' + K.hubInk + '" text-anchor="middle">' + esc(lab) + '</text>';
   } else {
-    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + cr0 + '" fill="#35604C" stroke="#1B2A47" stroke-width="5"/>';
-    g += '<text x="' + cx + '" y="' + (cy - 2) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">TERM</text>';
-    g += '<text x="' + cx + '" y="' + (cy + cr0 * 0.45) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="#F2F6EF" text-anchor="middle">RACE</text>';
+    g += '<circle cx="' + cx + '" cy="' + cy + '" r="' + cr0 + '" fill="' + K.hub + '" stroke="' + K.edge + '" stroke-width="5"/>';
+    g += '<text x="' + cx + '" y="' + (cy - 2) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="' + K.hubTitle + '" text-anchor="middle">TERM</text>';
+    g += '<text x="' + cx + '" y="' + (cy + cr0 * 0.45) + '" font-size="' + (cr0 * 0.38) + '" font-weight="700" fill="' + K.hubTitle + '" text-anchor="middle">RACE</text>';
   }
 
   L.items.forEach(function (p, idx) {
     var m = L.M[p.tk], x = p.x, y = p.y, pw = m.pw * fs;
     g += '<g class="hz" data-ch="' + esc(p.tk) + '" data-i="' + idx + '">';
-    g += '<rect x="' + (x - pw / 2) + '" y="' + (y - pillH / 2) + '" width="' + pw + '" height="' + pillH + '" rx="' + (pillH / 2) + '" fill="#fff" stroke="#1B2A47" stroke-width="' + Math.max(2.5, fs * 0.09) + '"/>';
-    g += '<text x="' + x + '" y="' + (y + fs * 0.35) + '" font-size="' + fs + '"' + termFontAttr(p.tk) + ' fill="#1B2A47" text-anchor="middle">' + esc(p.tk) + '</text>';
+    g += '<rect x="' + (x - pw / 2) + '" y="' + (y - pillH / 2) + '" width="' + pw + '" height="' + pillH + '" rx="' + (pillH / 2) + '" fill="' + K.tile + '" stroke="' + K.edge + '" stroke-width="' + Math.max(2.5, fs * 0.09) + '"/>';
+    g += '<text x="' + x + '" y="' + (y + fs * 0.35) + '" font-size="' + fs + '"' + termFontAttr(p.tk) + ' fill="' + K.ink + '" text-anchor="middle">' + esc(p.tk) + '</text>';
     var k = m.lines.length;
     m.lines.forEach(function (line, li) {
       var ty = p.below
         ? y + pillH / 2 + tf * 0.98 + li * lh
         : y - pillH / 2 - tf * 0.3 - (k - 1 - li) * lh;
-      g += '<text x="' + x + '" y="' + ty + '" font-size="' + tf + '"' + supportFontAttr() + ' font-weight="600" fill="#2F5A47" text-anchor="middle">' + esc(line) + '</text>';
+      g += '<text x="' + x + '" y="' + ty + '" font-size="' + tf + '"' + supportFontAttr() + ' font-weight="600" fill="' + K.support + '" text-anchor="middle">' + esc(line) + '</text>';
     });
     g += '</g>';
   });
@@ -434,7 +497,7 @@ function gridSVG(w, h, cells, label) {
   for (var i = 0; i < cells; i++) {
     var r = Math.floor(i / cols), c = i % cols;
     var x = pad + c * cw, y = pad + 22 + r * chh;
-    g += '<rect x="' + x + '" y="' + y + '" width="' + (cw - 6) + '" height="' + (chh - 6) + '" fill="#FBF6E9" stroke="#1B2A47" stroke-width="3"/>';
+    g += '<rect x="' + x + '" y="' + y + '" width="' + (cw - 6) + '" height="' + (chh - 6) + '" fill="' + skin().cell + '" stroke="' + skin().edge + '" stroke-width="3"/>';
   }
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif">' + g + '</svg>';
 }
@@ -443,8 +506,8 @@ function gridSVG(w, h, cells, label) {
 function sheetSVG() {
   var W = 794, H = 1123;
   var g = '<rect width="' + W + '" height="' + H + '" fill="#fff"/>';
-  g += '<rect x="24" y="24" width="' + (W - 48) + '" height="54" rx="12" fill="#35604C" stroke="#1B2A47" stroke-width="4"/>';
-  g += '<text x="' + (W / 2) + '" y="60" font-size="28" font-weight="700" fill="#F2F6EF" text-anchor="middle">Term Race · ' + esc(S.title || '') + '</text>';
+  g += '<rect x="24" y="24" width="' + (W - 48) + '" height="54" rx="12" fill="' + skin().header + '" stroke="' + skin().edge + '" stroke-width="4"/>';
+  g += '<text x="' + (W / 2) + '" y="60" font-size="28" font-weight="700" fill="' + skin().hubTitle + '" text-anchor="middle">Term Race · ' + esc(S.title || '') + '</text>';
   g += '<text x="30" y="102" font-size="15" fill="#1B2A47">Name ＿＿＿＿＿＿＿＿　Partner ＿＿＿＿＿＿＿＿　Date ＿＿＿＿＿＿</text>';
   var cW = W - 48, cH = 672;
   g += '<g transform="translate(24,116)">' + circleSVG(cW, cH).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '') + '</g>';
@@ -521,7 +584,7 @@ function guess(ch, node) {
   } else {
     G.miss++;
     shape.setAttribute('fill', '#F7C9C4');
-    setTimeout(function () { shape.setAttribute('fill', '#fff'); }, 380);
+    setTimeout(function () { shape.setAttribute('fill', skin().tile); }, 380);
     $('#gmiss').textContent = G.miss;
   }
   $('#gscore').textContent = G.score;
@@ -591,7 +654,7 @@ function bRenderSide(side) {
       order: B.orders[side],
       // Short clues also sit in the centre; long ones only in the status line above.
       centerLabel: clue != null && emW(clue) <= 7 ? clue : (B.target && !B.resolved ? '?' : '★'),
-      centerFill: B.resolved && B.winSide === side ? bColor(side) : '#35604C'
+      centerFill: B.resolved && B.winSide === side ? bColor(side) : null
     });
   } finally { S.opts.targetLanguage = keepLang; }
   // Re-apply tile colours after a redraw (e.g. window resize mid-round).
@@ -651,11 +714,25 @@ function bAward(side) {
     bUnlock();
     bTeam(side).classList.add('won');
     bRender();
+    bBurst(side);
   }
   if (bCheckWin()) return;
   if (hadRound) {
     bStatus('<span class="bwho" style="--who:' + bColor(side) + '">' + esc(bText('scored', { team: bName(side) })) + '</span>' +
       '<span class="bword">' + esc(B.target) + '</span>');
+  }
+}
+// A short shower of the theme's emoji over the scoring team's half.
+function bBurst(side) {
+  var team = bTeam(side), list = skin().burst;
+  for (var i = 0; i < 14; i++) {
+    var sp = el('span', 'crt-burst');
+    sp.textContent = list[i % list.length];
+    sp.style.left = (4 + Math.random() * 90) + '%';
+    sp.style.animationDelay = (Math.random() * 0.35).toFixed(2) + 's';
+    sp.style.fontSize = (26 + Math.random() * 18).toFixed(0) + 'px';
+    team.appendChild(sp);
+    setTimeout(function (n) { return function () { n.remove(); }; }(sp), 2200);
   }
 }
 function bUnlock() {
@@ -679,13 +756,13 @@ function bTap(side, node) {
   var ch = node.getAttribute('data-ch');
   if ($('#bJudge').checked) {
     // Teacher judges: just show what this student picked; the teacher presses +1.
-    Array.prototype.forEach.call(bTeam(side).querySelectorAll('.bstage .hz rect'), function (r) { r.setAttribute('fill', '#fff'); });
+    Array.prototype.forEach.call(bTeam(side).querySelectorAll('.bstage .hz rect'), function (r) { r.setAttribute('fill', skin().tile); });
     bPaint(node, ch === B.target ? '#DCEBD5' : '#F7C9C4');
     return;
   }
   if (ch === B.target) { bAward(side); return; }
   bPaint(node, '#F7C9C4');
-  setTimeout(function () { if (!B.resolved) bPaint(node, '#fff'); }, 450);
+  setTimeout(function () { if (!B.resolved) bPaint(node, skin().tile); }, 450);
   bLock(side);
 }
 function bNext() {
@@ -730,6 +807,55 @@ function closeBattle() {
   bUnlock();
   $('#battle').classList.remove('open');
   if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+}
+// When the theme changes, swap team names/colours that are still at some theme's default.
+function applyThemeTeams() {
+  var k = skin(), lang = uiLang();
+  [0, 1].forEach(function (side) {
+    var team = bTeam(side);
+    if (!team) return;
+    var nameIn = team.querySelector('.bname'), colIn = team.querySelector('.bcolor');
+    var isDefaultName = Object.keys(THEMES).some(function (id) {
+      var n = THEMES[id].names; return n.zh[side] === nameIn.value || n.en[side] === nameIn.value;
+    });
+    var isDefaultColor = Object.keys(THEMES).some(function (id) { return THEMES[id].teams[side].toLowerCase() === colIn.value.toLowerCase(); });
+    if (isDefaultName) nameIn.value = k.names[lang][side];
+    if (isDefaultColor) colIn.value = k.teams[side];
+  });
+}
+function buildThemePicker() {
+  var box = $('#themePicker');
+  if (!box) return;
+  Object.keys(THEMES).forEach(function (id) {
+    var t = THEMES[id];
+    var btn = el('button', 'cr-theme-card');
+    btn.type = 'button';
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('data-theme', id);
+    btn.style.setProperty('--card-accent', t.hub);
+    btn.appendChild(el('span', 'cr-theme-icons')).textContent = t.icons;
+    btn.appendChild(el('span', 'cr-theme-name')).textContent = t.zh;
+    btn.appendChild(el('span', 'cr-theme-en')).textContent = t.en;
+    btn.addEventListener('click', function () { setTheme(id); });
+    box.appendChild(btn);
+  });
+  markTheme();
+}
+function markTheme() {
+  Array.prototype.forEach.call(document.querySelectorAll('#themePicker .cr-theme-card'), function (b) {
+    var on = b.getAttribute('data-theme') === S.opts.theme;
+    b.classList.toggle('is-active', on);
+    b.setAttribute('aria-checked', on ? 'true' : 'false');
+  });
+}
+function setTheme(id) {
+  S.opts.theme = THEMES[id] ? id : 'classic';
+  markTheme();
+  applyTheme();
+  applyThemeTeams();
+  renderPreview();
+  if ($('#battle').classList.contains('open')) { bScoreView(); bRender(); }
+  if ($('#game').classList.contains('open')) drawGame();
 }
 function initBattle() {
   var root = $('#battle');
@@ -926,5 +1052,8 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   initBattle();
+  buildThemePicker();
+  applyTheme();
+  applyThemeTeams();
   renderChips(); renderPreview(); updateTargetLanguageHint();
 });

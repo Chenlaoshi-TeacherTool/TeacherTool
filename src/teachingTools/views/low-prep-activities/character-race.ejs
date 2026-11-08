@@ -75,6 +75,11 @@
         <select id="optGrid"><option value="16">16</option><option value="20" selected>20</option><option value="25">25</option></select>
       </span>
     </div>
+    <div class="cr-theme-block">
+      <span class="field"><%= t('characterRace.themeLabel') %></span>
+      <div id="themePicker" class="cr-theme-picker" role="radiogroup" aria-label="<%= t('characterRace.themeLabel') %>"></div>
+      <p class="hint" style="margin:6px 0 0"><%= t('characterRace.themeHint') %></p>
+    </div>
     <p class="hint" id="targetLanguageHint" aria-live="polite" style="margin:8px 0 0"><%= t('characterRace.targetLanguageHint') %></p>
   </section>
 
