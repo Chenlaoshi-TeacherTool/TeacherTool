@@ -79,6 +79,9 @@
   }
 
   function linkHtml(item, lang) {
+    if (item.comingSoon) {
+      return '<span class="site-nav-coming-soon" aria-disabled="true">' + item[lang] + ' · ' + (lang === 'zh' ? '即将推出' : 'Coming soon') + '</span>';
+    }
     return '<a href="' + item.href + '">' + item[lang] + '</a>';
   }
 

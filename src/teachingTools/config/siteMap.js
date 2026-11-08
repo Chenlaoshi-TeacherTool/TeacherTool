@@ -60,7 +60,7 @@ var SECTIONS = [
       };
     })
   },
-  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, admin: ['community'] },
+  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, comingSoon: true, admin: ['community'] },
   { key: 'finds', href: '/classroom-finds', en: 'Classroom Finds', zh: '教室好物', nav: true, admin: ['recommendations'] },
   {
     key: 'shop', href: '/shop', en: 'Chen Laoshi’s Shop', zh: '陈老师的商店', navEn: 'Shop', navZh: '商店', nav: true, admin: [],
@@ -131,7 +131,9 @@ function allPaths() {
 // Compact data for the client-side nav/footer in milk-tea-footer.js.
 function clientNav() {
   function link(section) {
-    return { href: section.href, en: navLabel(section, 'en'), zh: navLabel(section, 'zh') };
+    var item = { href: section.href, en: navLabel(section, 'en'), zh: navLabel(section, 'zh') };
+    if (section.comingSoon) item.comingSoon = true;
+    return item;
   }
   return {
     nav: SECTIONS.filter(function(section) { return section.nav; }).map(link),

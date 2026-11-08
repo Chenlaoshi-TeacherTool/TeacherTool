@@ -108,7 +108,8 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
   list-style: none;
 }
 
-.site-main-nav-links a {
+.site-main-nav-links a,
+.site-main-nav-links .site-nav-coming-soon {
   display: block;
   padding: 8px 10px;
   border-radius: 999px;
@@ -121,6 +122,8 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
 
 .site-main-nav-links a:hover,
 .site-main-nav-links a[aria-current="page"] { background: #edf5df; color: #194f45; }
+
+.site-main-nav-links .site-nav-coming-soon { color: #858585; cursor: not-allowed; }
 
 .site-lang-switch {
   display: flex;
@@ -177,7 +180,7 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
   }
 
   .site-main-nav-links::-webkit-scrollbar { display: none; }
-  .site-main-nav-links a { padding: 6px 9px; font-size: .78rem; }
+  .site-main-nav-links a, .site-main-nav-links .site-nav-coming-soon { padding: 6px 9px; font-size: .78rem; }
 }
 
 @media print {
