@@ -29,7 +29,7 @@
       <fieldset><legend><%= L('Attachments', '附件') %></legend>
         <% (value.files || []).forEach(function (file, index) { %><p><a href="/materials/<%= value.id %>/files/<%= index %>"><%= file.name %></a> <label><input type="checkbox" name="removeFiles" value="<%= index %>"> <%= L('Remove', '移除') %></label></p><% }) %>
         <label for="attachments"><%= L('Add files (up to 6 total, 30 MB each)', '添加文件（合计最多6个，每个不超过30 MB）') %></label>
-        <input type="file" id="attachments" name="attachments" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.zip">
+        <input type="file" id="attachments" name="attachments" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.mp4,.zip">
       </fieldset>
       <fieldset><legend><%= L('Preview image (optional)', '预览图（可选）') %></legend>
         <% if (value.preview) { %><img src="/materials/<%= value.id %>/preview" alt="" style="max-width:240px"><label><input type="checkbox" name="removePreview"> <%= L('Remove preview', '移除预览图') %></label><% } %>

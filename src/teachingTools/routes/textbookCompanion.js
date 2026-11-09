@@ -127,14 +127,9 @@ function create(options) {
       if (!series) return next();
       var lessonPage = '/textbook-companion/' + series.key + '/' + file.book + '/' + file.lessonSlug;
       if (!(await canOpen(req, series))) return res.redirect(303, lessonPage + '#members');
-      var stream = await files.open(file.blobName);
-      if (!stream) return next();
       res.set('Cache-Control', 'private, no-store');
-      res.set('X-Content-Type-Options', 'nosniff');
-      res.type(file.contentType);
-      res.attachment(file.fileName);
-      stream.on('error', next);
-      stream.pipe(res);
+      await require('./fileResponse').send(files, req, res, next,
+        { blobName: file.blobName, contentType: file.contentType, size: file.size, name: file.fileName });
     } catch (error) { next(error); }
   });
 

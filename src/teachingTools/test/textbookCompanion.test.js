@@ -93,3 +93,23 @@ test('members see the words, patterns and activities and can download files', as
   assert.equal(await download.text(), '%PDF-test');
   assert.equal((await get('/textbook-companion/files/99')).status, 404);
 });
+
+test('members watch lesson videos on the page; the video answers byte ranges and stays locked for others', async function () {
+  var savedFiles = lesson.files, savedGetFile = repository.getFile, savedOpen = files.open;
+  var bytes = Buffer.from('0123456789');
+  lesson.files = savedFiles.concat([{ id: 4, title: '中文小故事《真心朋友》', fileName: 'story.mp4', size: 10, blobName: 'v', contentType: 'video/mp4' }]);
+  repository.getFile = async function (id) {
+    return id === 4 ? { id: 4, fileName: 'story.mp4', blobName: 'v.mp4', contentType: 'video/mp4', size: 10, series: 'jinan', book: 'book-1', lessonSlug: lesson.slug, published: true } : savedGetFile(id);
+  };
+  files.open = async function (name, range) { return stream.Readable.from([range ? bytes.subarray(range.start, range.end + 1) : bytes]); };
+  try {
+    assert.doesNotMatch(await (await get('/textbook-companion/jinan/book-1/' + lesson.slug)).text(), /<video/);
+    assert.equal((await get('/textbook-companion/files/4')).status, 303);
+    member = true;
+    var html = await (await get('/textbook-companion/jinan/book-1/' + lesson.slug)).text();
+    assert.match(html, /<video[^>]+src="\/textbook-companion\/files\/4\?play=1"/);
+    var part = await get('/textbook-companion/files/4?play=1', { range: 'bytes=3-' });
+    assert.equal(part.status, 206); assert.equal(part.headers.get('content-range'), 'bytes 3-9/10');
+    assert.equal(part.headers.get('content-disposition'), 'inline'); assert.equal(await part.text(), '3456789');
+  } finally { lesson.files = savedFiles; repository.getFile = savedGetFile; files.open = savedOpen; }
+});

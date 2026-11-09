@@ -89,7 +89,7 @@
 <% } %>
 <% if (lesson) { var files = typeof locals.files === 'undefined' ? [] : locals.files; var fileError = locals.fileError || ''; %>
 <h2 id="files" style="margin-top:28px;">Files for teachers (<%= files ? files.length : '?' %>)</h2>
-<p style="font-size:0.9rem;color:#444;">PDF, Word, PowerPoint, Excel, images, MP3 or ZIP, up to 30 MB each. In members-only series (<%= seriesList.filter(function (s) { return s.membersOnly; }).map(function (s) { return s.zh; }).join(', ') || 'none' %>) only members can download them.</p>
+<p style="font-size:0.9rem;color:#444;">PDF, Word, PowerPoint, Excel, images, MP3, MP4 video or ZIP, up to 30 MB each. Videos play on the lesson page. In members-only series (<%= seriesList.filter(function (s) { return s.membersOnly; }).map(function (s) { return s.zh; }).join(', ') || 'none' %>) only members can download them.</p>
 <% if (fileError) { %><p style="border:2px solid #dc2626;border-radius:6px;padding:10px 14px;"><%= fileError %></p><% } %>
 <% if (files === null) { %>
   <p style="color:#b91c1c;">Files could not be loaded. Run migration 0010_add-textbook-lesson-files on the database.</p>
@@ -113,7 +113,7 @@
     <label>Title shown to teachers (optional, e.g. 第一课 作业单)</label>
     <input type="text" name="title" maxlength="200">
     <label>File</label>
-    <input type="file" name="file" required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.zip">
+    <input type="file" name="file" required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.mp4,.zip">
     <div class="actions"><button type="submit">Upload file</button></div>
   </form>
 <% } %>

@@ -35,6 +35,12 @@
       </ul>
     </section>
   <% } else { %>
+    <% lesson.files.filter(function (file) { return /^video\//.test(file.contentType || ''); }).forEach(function (file) { %>
+    <section class="tc-block">
+      <h2><%= file.title %></h2>
+      <video controls playsinline preload="metadata" src="/textbook-companion/files/<%= file.id %>?play=1" style="display:block;width:100%;max-height:70vh;background:#000;border-radius:12px"></video>
+    </section>
+    <% }) %>
     <% if (lesson.files.length) { %>
     <section class="tc-block">
       <h2><%= L('Printable files', '可打印材料') %></h2>
