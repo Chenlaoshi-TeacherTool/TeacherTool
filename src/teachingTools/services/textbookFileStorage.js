@@ -25,6 +25,7 @@ var TYPES = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.mp3': 'audio/mpeg',
+  '.mp4': 'video/mp4',
   '.zip': 'application/zip'
 };
 
@@ -65,17 +66,20 @@ async function save(file) {
   return { blobName: blobName, contentType: info.contentType, size: file.buffer.length };
 }
 
-// A readable stream of the file, or null when it is missing.
-async function open(blobName) {
+// A readable stream of the file, or null when it is missing. `range` ({ start, end }, inclusive) reads part of it (video seeking).
+async function open(blobName, range) {
   if (!validBlobName(blobName)) return null;
   if (useAzure()) {
-    try { return (await (await container()).getBlockBlobClient(blobName).download()).readableStreamBody; }
+    try {
+      var client = (await container()).getBlockBlobClient(blobName);
+      return (await (range ? client.download(range.start, range.end - range.start + 1) : client.download())).readableStreamBody;
+    }
     catch (error) { if (error.statusCode === 404) return null; throw error; }
   }
   try {
     var full = path.join(LOCAL_ROOT, blobName);
     await fs.access(full);
-    return require('fs').createReadStream(full);
+    return require('fs').createReadStream(full, range ? { start: range.start, end: range.end } : undefined);
   } catch (error) { return null; }
 }
 

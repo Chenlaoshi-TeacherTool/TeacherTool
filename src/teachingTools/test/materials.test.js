@@ -172,3 +172,22 @@ test('admin material pages require admin access and invalid or empty themes cann
   assert.equal((await save(bad, 'admin')).status, 400);
   assert.equal(items.get(seed.id).revision, 1);
 });
+
+test('video attachments play inline on the detail page and answer byte-range requests', async function () {
+  var bytes = Buffer.from('0123456789');
+  var originalOpen = files.open; var asked = [];
+  files.open = async function (name, range) { asked.push(range || null); return stream.Readable.from([range ? bytes.subarray(range.start, range.end + 1) : bytes]); };
+  try {
+    var item = items.get(seed.id);
+    item.files = [{ name: '故事.mp4', blobName: '00000000-0000-0000-0000-000000000009.mp4', contentType: 'video/mp4', size: 10 }].concat(item.files);
+    var html = await (await fetch(base + '/materials/' + seed.id)).text();
+    assert.match(html, /<video[^>]+src="\/materials\/[^"]+\/files\/0\?play=1"/);
+    var part = await fetch(base + '/materials/' + seed.id + '/files/0?play=1', { headers: { range: 'bytes=2-5' } });
+    assert.equal(part.status, 206); assert.equal(part.headers.get('content-range'), 'bytes 2-5/10');
+    assert.equal(part.headers.get('content-disposition'), 'inline'); assert.equal(await part.text(), '2345');
+    var whole = await fetch(base + '/materials/' + seed.id + '/files/0');
+    assert.equal(whole.status, 200); assert.equal(whole.headers.get('accept-ranges'), 'bytes'); assert.match(whole.headers.get('content-disposition'), /attachment/);
+    assert.equal((await fetch(base + '/materials/' + seed.id + '/files/0', { headers: { range: 'bytes=20-' } })).status, 416);
+    assert.deepEqual(asked, [{ start: 2, end: 5 }, null]);
+  } finally { files.open = originalOpen; }
+});

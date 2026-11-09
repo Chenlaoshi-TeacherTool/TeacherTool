@@ -15,7 +15,10 @@
     <% if (canEdit) { %><p><a class="text-link" href="/materials/<%= item.id %>/edit"><%= L('Edit material and textbook links', '编辑材料与教材关联') %></a></p><% } %>
   </div></header>
   <main class="content-section"><div class="content-shell">
-    <% if (item.preview) { %><img src="/materials/<%= item.id %>/preview" alt="<%= item.title %>" style="display:block;max-width:100%;max-height:560px;margin:auto"><% } %>
+    <% var videoIndex = item.files.findIndex(function (file) { return !file.url && /^video\//.test(file.contentType || ''); }); %>
+    <% if (videoIndex >= 0) { %>
+    <video controls playsinline preload="metadata"<% if (item.preview) { %> poster="/materials/<%= item.id %>/preview"<% } %> src="/materials/<%= item.id %>/files/<%= videoIndex %>?play=1" style="display:block;width:100%;max-width:960px;max-height:70vh;margin:auto;background:#000;border-radius:12px"></video>
+    <% } else if (item.preview) { %><img src="/materials/<%= item.id %>/preview" alt="<%= item.title %>" style="display:block;max-width:100%;max-height:560px;margin:auto"><% } %>
     <p style="white-space:pre-wrap"><%= L(item.descriptionEn || item.description, item.description) %></p>
     <h2><%= L('Download attachments', '下载附件') %></h2>
     <ul><% item.files.forEach(function (file, index) { %>
