@@ -245,6 +245,11 @@
                     <p><%= t('teachingToolsIndex.teamRaceDesc') %></p>
                     <a href="/teaching-tools/team-race" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
                 </div>
+                <div data-uses="project" class="tool-card">
+                    <h3>🫧 <%= lang === 'zh' ? '词汇扭蛋机' : 'Vocabulary Gacha' %></h3>
+                    <p><%= lang === 'zh' ? '导入词汇，抽取扭蛋。全班合作或两组比赛，可选随机积分。' : 'Import vocabulary, open capsules and play as a class or two teams with optional surprise points.' %></p>
+                    <a href="/teaching-tools/vocabulary-gacha" class="btn"><%= t('teachingToolsIndex.openTool') %></a>
+                </div>
                 <div data-uses="project" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/reward-grid/' }) %>
                     <h3>🎁 <%= t('teachingToolsIndex.rewardGridTitle') %></h3>

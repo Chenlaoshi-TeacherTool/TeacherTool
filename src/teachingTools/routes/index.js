@@ -78,6 +78,10 @@ router.get('/teaching-tools/quiz-city', function(req, res) {
   res.render('teaching-tools/quiz-city', { title: 'CLS Quiz City — Classroom Quick Play' });
 });
 
+router.get('/teaching-tools/vocabulary-gacha', function(req, res) {
+  res.render('teaching-tools/vocabulary-gacha', { title: 'Vocabulary Gacha' });
+});
+
 router.get('/teaching-tools/team-race', function(req, res) {
   res.render('teaching-tools/team-race', { title: 'Team Quiz Race' });
 });
@@ -311,7 +315,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
   var paths = siteMap.allPaths().concat([
     '/feedback',
     '/teaching-tools/quiz-city',
-    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine', '/teaching-tools/lucky-wheel/', '/teaching-tools/team-race',
+    '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine', '/teaching-tools/lucky-wheel/', '/teaching-tools/team-race', '/teaching-tools/vocabulary-gacha',
     '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
     '/teaching-tools/missing-radicals',
