@@ -10,6 +10,7 @@
   var sheetsInput = document.querySelector("#sheets");
   var gridSizeSelect = document.querySelector("#gridSize");
   var freeSpaceCheckbox = document.querySelector("#freeSpace");
+  var callSheetCheckbox = document.querySelector("#callSheet");
   var termsInput = document.querySelector("#terms");
   var termCountEl = document.querySelector("#term-count");
   var status = document.querySelector("#generation-status");
@@ -206,7 +207,12 @@
     printRoot.innerHTML = previewArea.innerHTML;
   }
 
-  function renderPreview(cards, gridSize, fields, title) {
+  // Call-out sheet: the teacher's list of every term (the term only — no pinyin or English).
+  var CALL_SHEET_TITLE = "Call-Out Sheet";
+  var CALL_SHEET_HINT = "Tick off each term as you call it, or cut the boxes apart and draw them.";
+  var CALL_SHEET_FIELDS = ["zh"];
+
+  function renderPreview(cards, gridSize, fields, title, callItems) {
     previewArea.innerHTML = "";
     var pendingFits = [];
     cards.forEach(function (grid, i) {
@@ -279,6 +285,40 @@
       previewArea.appendChild(sheet);
     });
 
+    if (callItems && callItems.length) {
+      var callSheet = document.createElement("div");
+      callSheet.className = "bingo-sheet bingo-call-sheet";
+      var callTitle = document.createElement("h3");
+      callTitle.textContent = (title || "Bingo") + " · " + CALL_SHEET_TITLE;
+      callSheet.appendChild(callTitle);
+      var callHint = document.createElement("p");
+      callHint.className = "call-sheet-hint";
+      callHint.textContent = CALL_SHEET_HINT;
+      callSheet.appendChild(callHint);
+      var callGrid = document.createElement("div");
+      callGrid.className = "call-grid";
+      callItems.forEach(function (item) {
+        var itemEl = document.createElement("div");
+        itemEl.className = "call-item";
+        var box = document.createElement("span");
+        box.className = "call-box";
+        itemEl.appendChild(box);
+        var textEl = document.createElement("span");
+        textEl.className = "call-text";
+        cellLines(item, CALL_SHEET_FIELDS).forEach(function (line, lineIndex) {
+          var span = document.createElement("span");
+          span.className = "cell-line cell-line-" + line.field;
+          if (lineIndex === 0) span.classList.add("is-primary");
+          span.textContent = line.text;
+          textEl.appendChild(span);
+        });
+        itemEl.appendChild(textEl);
+        callGrid.appendChild(itemEl);
+      });
+      callSheet.appendChild(callGrid);
+      previewArea.appendChild(callSheet);
+    }
+
     // Every cell is the same size, so each term only needs to be measured once.
     pendingFits.forEach(function (entry) {
       if (entry.item.fit) entry.el.style.setProperty("--fit", entry.item.fit);
@@ -315,7 +355,65 @@
     return images;
   }
 
-  async function buildDocx(cards, gridSize, fields, title) {
+  function pinyinForWord(text) {
+    // Word can't use the page's Andika web font. SimSun draws ā á ǎ à
+    // single-storey; its plain "a" is swapped for ɑ (U+0251) to match.
+    return text.replace(/a/g, "ɑ");
+  }
+
+  function callSheetDocx(D, items, title, border, contentWidth) {
+    var columns = 3;
+    var colWidth = Math.floor(contentWidth / columns);
+    var out = [
+      new D.Paragraph({ children: [new D.PageBreak()] }),
+      new D.Paragraph({
+        alignment: D.AlignmentType.CENTER,
+        spacing: { after: 80 },
+        children: [new D.TextRun({ text: (title || "Bingo") + " · " + CALL_SHEET_TITLE, bold: true, size: 30 })],
+      }),
+      new D.Paragraph({
+        alignment: D.AlignmentType.CENTER,
+        spacing: { after: 200 },
+        children: [new D.TextRun({ text: CALL_SHEET_HINT, color: "65766F", size: 18 })],
+      }),
+    ];
+    var rows = [];
+    for (var r = 0; r < Math.ceil(items.length / columns); r++) {
+      var rowCells = [];
+      for (var c = 0; c < columns; c++) {
+        var item = items[r * columns + c];
+        var runs = [];
+        if (item) {
+          runs.push(new D.TextRun({ text: "☐ ", font: "Segoe UI Symbol", size: 28 }));
+          cellLines(item, CALL_SHEET_FIELDS).forEach(function (line, lineIndex) {
+            runs.push(new D.TextRun({
+              text: (lineIndex ? "  " : "") + (line.field === "py" ? pinyinForWord(line.text) : line.text),
+              font: line.field === "zh" ? "KaiTi" : (line.field === "py" ? "SimSun" : "Arial"),
+              size: lineIndex === 0 ? 28 : 18,
+            }));
+          });
+        }
+        rowCells.push(new D.TableCell({
+          width: { size: colWidth, type: D.WidthType.DXA },
+          verticalAlign: D.VerticalAlign.CENTER,
+          margins: { top: 90, bottom: 90, left: 100, right: 60 },
+          children: [new D.Paragraph({ spacing: { after: 0 }, children: runs })],
+        }));
+      }
+      rows.push(new D.TableRow({ children: rowCells, cantSplit: true }));
+    }
+    out.push(new D.Table({
+      alignment: D.AlignmentType.CENTER,
+      borders: { top: border, bottom: border, left: border, right: border, insideHorizontal: border, insideVertical: border },
+      columnWidths: new Array(columns).fill(colWidth),
+      layout: D.TableLayoutType.FIXED,
+      rows: rows,
+      width: { size: contentWidth, type: D.WidthType.DXA },
+    }));
+    return out;
+  }
+
+  async function buildDocx(cards, gridSize, fields, title, callItems) {
     var D = window.docx;
     var emojiImages = await preloadOpenMojiPngs(cards, fields);
     var border = { style: D.BorderStyle.SINGLE, size: 6, color: "315F4F" };
@@ -384,9 +482,7 @@
                 alignment: D.AlignmentType.CENTER,
                 spacing: { after: 0 },
                 children: [new D.TextRun({
-                  // Word can't use the page's Andika web font. SimSun draws ā á ǎ à
-                  // single-storey; its plain "a" is swapped for ɑ (U+0251) to match.
-                  text: line.field === "py" ? line.text.replace(/a/g, "ɑ") : line.text,
+                  text: line.field === "py" ? pinyinForWord(line.text) : line.text,
                   font: line.field === "zh" ? "KaiTi" : (line.field === "py" ? "SimSun" : "Arial"),
                   size: halfPoints(itemFit, lineIndex === 0 ? 1 : 0.62),
                   bold: line.field !== "zh" && lineIndex === 0,
@@ -423,6 +519,10 @@
         }));
       }
     });
+
+    if (callItems && callItems.length) {
+      children = children.concat(callSheetDocx(D, callItems, title, border, contentWidth));
+    }
 
     return new D.Document({
       creator: "Teacher Toolkit",
@@ -591,15 +691,17 @@
     }
 
     state.cards = buildCards(items, count, gridSize, includeFree);
-    state.meta = { gridSize: gridSize, fields: fields, title: title, includeFree: includeFree };
+    var callItems = callSheetCheckbox && callSheetCheckbox.checked ? items : null;
+    state.meta = { gridSize: gridSize, fields: fields, title: title, includeFree: includeFree, callItems: callItems };
 
-    renderPreview(state.cards, gridSize, fields, title);
+    renderPreview(state.cards, gridSize, fields, title, callItems);
 
     downloadWordBtn.disabled = false;
     printBtn.disabled = false;
     generateBtn.disabled = false;
     status.dataset.state = "success";
-    status.textContent = count + " bingo sheet" + (count === 1 ? "" : "s") + " generated below.";
+    status.textContent = count + " bingo sheet" + (count === 1 ? "" : "s") +
+      (callItems ? " and a call-out sheet" : "") + " generated below.";
     if (emojiStats) {
       status.textContent += emojiMatchText(emojiStats);
     }
@@ -617,7 +719,7 @@
       status.textContent = hasField(state.meta.fields, "emoji")
         ? "Adding OpenMoji artwork to the Word document…"
         : "Building the Word document…";
-      var doc = await buildDocx(state.cards, state.meta.gridSize, state.meta.fields, state.meta.title);
+      var doc = await buildDocx(state.cards, state.meta.gridSize, state.meta.fields, state.meta.title, state.meta.callItems);
       var blob = await window.docx.Packer.toBlob(doc);
       var url = URL.createObjectURL(blob);
       var link = document.createElement("a");
