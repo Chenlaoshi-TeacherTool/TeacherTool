@@ -41,6 +41,9 @@ test('when sales open, each plan pays its founding price through PayPal with buy
   assert.match(html, /<s[^>]*>\$29<\/s> <strong>\$19<\/strong>/);
   assert.match(html, /<s[^>]*>\$49<\/s> <strong>\$29<\/strong>/);
   assert.match(html, /id="buy"/);
+  assert.match(html, /<section class="plan-activate" id="activate"[^>]* hidden>/);
+  assert.match(html, /Thank you for being a member!/);
+  assert.match(html, /src="\/javascripts\/membership-activate\.js"/);
   assert.match(html, /Founding member prices are available until February 15, 2027/);
   var zh = await (await fetch(base + '/membership', { headers: { Cookie: 'lang=zh' } })).text();
   assert.match(zh, /PayPal 付款 \$29/);

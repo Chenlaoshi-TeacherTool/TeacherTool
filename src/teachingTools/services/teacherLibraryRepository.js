@@ -6,7 +6,10 @@ async function load(owner) {
   var pool = await db.getPool();
   var result = await pool.request().input('owner', db.sql.Char(64), owner).query(
     'SELECT content, revision FROM dbo.teacher_private_libraries WHERE owner_key = @owner; ' +
-    'SELECT write_until, trial_started_at, CASE WHEN write_until > SYSUTCDATETIME() THEN 1 ELSE 0 END AS can_write FROM dbo.teacher_library_access WHERE owner_key = @owner;'
+    'SELECT write_until, CASE WHEN write_until > SYSUTCDATETIME() THEN 1 ELSE 0 END AS can_write, ' +
+    // Still on the free trial only until an activation code is used (a refunded code does not count).
+    'CASE WHEN trial_started_at IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.teacher_activation_codes c WHERE c.redeemed_by = @owner AND c.revoked_at IS NULL) THEN 1 ELSE 0 END AS on_trial ' +
+    'FROM dbo.teacher_library_access WHERE owner_key = @owner;'
   );
   var row = result.recordsets[0][0];
   var access = result.recordsets[1][0];
@@ -15,7 +18,7 @@ async function load(owner) {
     revision: row ? row.revision : 0,
     canWrite: Boolean(access && access.can_write),
     writeUntil: access ? access.write_until : null,
-    trial: Boolean(access && access.trial_started_at)
+    trial: Boolean(access && access.on_trial)
   };
 }
 

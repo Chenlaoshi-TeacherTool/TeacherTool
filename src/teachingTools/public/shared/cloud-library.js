@@ -36,17 +36,11 @@
   confirmLabel.append(confirmBox, ' ', confirmText);
   var apply = button('Confirm', 'cloudApply', true);
   var planLine = element('p', '', 'cloud-library-plan');
-  var redeemForm = element('form', '', 'cloud-library-redeem');
-  var codeInput = document.createElement('input'); codeInput.id = 'cloudActivationCode'; codeInput.autocomplete = 'off'; codeInput.maxLength = 30; codeInput.placeholder = 'CLS-XXXX-XXXX-XXXX'; codeInput.required = true;
-  var codeLabel = element('label', t('Have an activation code?')); codeLabel.htmlFor = codeInput.id;
-  var redeemButton = button('Activate', 'cloudRedeem', true); redeemButton.type = 'submit'; redeemButton.disabled = false;
-  var redeemStatus = element('p', '', 'cloud-library-exchange'); redeemStatus.setAttribute('role', 'status'); redeemStatus.setAttribute('aria-live', 'polite');
-  var redeemRow = element('div', '', 'cloud-library-actions'); redeemRow.append(codeInput, redeemButton);
-  var buyLink = element('a', t('No code yet? See membership plans'), 'cloud-library-buy'); buyLink.href = '/membership';
-  redeemForm.append(codeLabel, redeemRow, buyLink, redeemStatus);
+  // Activation codes are entered on the Membership page.
+  var codeLink = element('a', t('Have an activation code? Enter it on the Membership page'), 'cloud-library-buy'); codeLink.href = '/membership#activate';
   var tools = element('div', '', 'cloud-library-actions'); tools.append(reload, download);
   var swap = element('div', '', 'cloud-library-actions'); swap.append(upload, restore);
-  workspace.append(planLine, redeemForm, tools, collections, element('p', t('Nothing uploads or replaces your materials automatically. Preview first, then confirm. On a shared computer, browser materials may not belong to this account.'), 'cloud-library-note'), swap, exchange, confirmLabel, apply);
+  workspace.append(planLine, codeLink, tools, collections, element('p', t('Nothing uploads or replaces your materials automatically. Preview first, then confirm. On a shared computer, browser materials may not belong to this account.'), 'cloud-library-note'), swap, exchange, confirmLabel, apply);
   var heading = element('div'); heading.append(element('p', t('Cloud sync'), 'eyebrow'), title, status);
   root.replaceChildren(heading, actions, workspace);
   // Stays hidden until the server confirms teacher accounts are open.
@@ -69,7 +63,7 @@
   function describePlan(membership) {
     if (!membership || !membership.writeUntil) return t('Cloud saving is not active on this account. Enter an activation code to turn it on.');
     if (!membership.canWrite) return t('Cloud saving ended on ') + day(membership.writeUntil) + t('. Your materials can still be viewed and exported. Enter an activation code to continue saving.');
-    return (membership.trial ? t('Free trial: cloud saving until ') : t('Member: cloud saving until ')) + day(membership.writeUntil) + stop;
+    return (membership.trial ? t('Free trial: cloud saving until ') : t('Thank you for being a member! Cloud saving until ')) + day(membership.writeUntil) + stop;
   }
   function count(data) { return data.collections.reduce(function (total, collection) { return total + collection.items.length; }, 0); }
   function summary(data) { return data.collections.length + t(' collections, ') + count(data) + t(' items'); }
@@ -182,21 +176,6 @@
     } catch (error) { exchange.textContent = t(error.message); }
   }
 
-  redeemForm.addEventListener('submit', async function (event) {
-    event.preventDefault();
-    if (busy || !accountId) return;
-    busy = true;
-    redeemButton.disabled = true;
-    redeemStatus.textContent = '';
-    try {
-      var result = await request('/redeem', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Library-Request': 'redeem' }, body: JSON.stringify({ code: codeInput.value }) });
-      codeInput.value = '';
-      busy = false;
-      await refresh();
-      redeemStatus.textContent = t('Activated: ') + result.days + t(' days added. Cloud saving until ') + day(result.writeUntil) + stop;
-    } catch (error) { redeemStatus.textContent = t(error.message); }
-    finally { busy = false; redeemButton.disabled = false; }
-  });
   upload.addEventListener('click', function () { prepare('upload'); });
   restore.addEventListener('click', function () { prepare('restore'); });
   confirmBox.addEventListener('change', function () { apply.disabled = !plan || !confirmBox.checked || busy; });

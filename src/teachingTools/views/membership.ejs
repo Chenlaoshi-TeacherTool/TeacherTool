@@ -29,6 +29,25 @@
         </section>
       <% } %>
       <%
+        // Filled in by membership-activate.js once it knows who is signed in.
+        var activateText = {};
+        ['activateSignedOut', 'activateNone', 'activateMember', 'activateTrialBefore', 'activateTrialAfter', 'activateEndedBefore', 'activateEndedAfter',
+          'activateDoneBefore', 'activateDoneMiddle', 'activateInvalid', 'activateTooMany', 'activateTryLater', 'activateStop'].forEach(function (key) { activateText[key] = t('membership.' + key); });
+      %>
+      <section class="plan-activate" id="activate" aria-labelledby="activateTitle" data-lang="<%= lang %>" data-text="<%= JSON.stringify(activateText) %>" hidden>
+        <h2 id="activateTitle"><%= t('membership.activateTitle') %></h2>
+        <p class="plan-activate-status" id="activateStatus" role="status" aria-live="polite"></p>
+        <a class="btn plan-activate-login" id="activateLogin" hidden><%= t('membership.activateLogin') %></a>
+        <form id="activateForm" hidden>
+          <label for="activationCode"><%= t('membership.activateLabel') %></label>
+          <div class="plan-activate-row">
+            <input id="activationCode" autocomplete="off" maxlength="30" placeholder="CLS-XXXX-XXXX-XXXX" required>
+            <button class="btn" type="submit" id="activateButton"><%= t('membership.activateButton') %></button>
+          </div>
+        </form>
+        <p class="plan-activate-result" id="activateResult" role="status" aria-live="polite"></p>
+      </section>
+      <%
         // Each row: feature label, then what the free plan and the paid plans get.
         // true = included, false = not included, a string = translation key for a short note.
         var rows = [
@@ -102,6 +121,7 @@
       </article>
     </div></section>
   </main>
+  <script src="/javascripts/membership-activate.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>
