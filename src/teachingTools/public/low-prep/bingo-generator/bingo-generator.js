@@ -152,8 +152,63 @@
     return cards;
   }
 
+  // ---- Auto-fit text -------------------------------------------------------
+  // Cell text is sized in container-query units (% of the cell width), so one
+  // fitted value (--fit) holds for the on-screen preview and the printed page.
+  var FIT_DEFAULT = 14;
+  var FIT_MIN = 4;
+  var FIT_MAX = 40;
+  var NOWRAP_MAX_CHARS = 5; // short words stay on one line instead of splitting
+
+  function fitCell(cellEl) {
+    var inner = cellEl.querySelector(".cell-inner");
+    if (!inner) return FIT_DEFAULT;
+    var style = window.getComputedStyle(cellEl);
+    var availH = cellEl.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    if (!(availH > 0)) return FIT_DEFAULT; // not laid out (hidden) — keep the default
+    var lines = inner.querySelectorAll(".cell-line");
+
+    function fits(value) {
+      cellEl.style.setProperty("--fit", value);
+      if (inner.scrollHeight > availH + 0.5) return false;
+      if (inner.scrollWidth > inner.clientWidth + 1) return false;
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].scrollWidth > lines[i].clientWidth + 1) return false;
+      }
+      return true;
+    }
+
+    var lo = FIT_MIN;
+    var hi = FIT_MAX;
+    if (fits(hi)) {
+      lo = hi;
+    } else {
+      for (var step = 0; step < 7; step++) {
+        var mid = (lo + hi) / 2;
+        if (fits(mid)) lo = mid; else hi = mid;
+      }
+    }
+    lo = Math.round(lo * 10) / 10;
+    cellEl.style.setProperty("--fit", lo);
+    return lo;
+  }
+
+  // Printing uses a clean copy of the sheets placed directly under <body>, so the
+  // print layout never depends on the page's scroll panels or sticky columns.
+  var printRoot = null;
+  function syncPrintRoot() {
+    if (!printRoot) {
+      printRoot = document.createElement("div");
+      printRoot.id = "bingo-print-root";
+      printRoot.setAttribute("aria-hidden", "true");
+      document.body.appendChild(printRoot);
+    }
+    printRoot.innerHTML = previewArea.innerHTML;
+  }
+
   function renderPreview(cards, gridSize, fields, title) {
     previewArea.innerHTML = "";
+    var pendingFits = [];
     cards.forEach(function (grid, i) {
       var sheet = document.createElement("div");
       sheet.className = "bingo-sheet";
@@ -164,19 +219,28 @@
 
       var gridEl = document.createElement("div");
       gridEl.className = "bingo-card-grid";
-      gridEl.style.gridTemplateColumns = "repeat(" + gridSize + ", 1fr)";
+      gridEl.style.gridTemplateColumns = "repeat(" + gridSize + ", minmax(0, 1fr))";
+      gridEl.style.gridTemplateRows = "repeat(" + gridSize + ", minmax(0, 1fr))";
 
       grid.forEach(function (cell) {
-        var cellEl = document.createElement("div");
-        cellEl.className = "bingo-cell";
+        var outerEl = document.createElement("div");
+        outerEl.className = "bingo-cell";
+        var cellEl = outerEl;
         if (cell.free) {
           cellEl.classList.add("is-free");
-          cellEl.textContent = "FREE";
+          var freeEl = document.createElement("span");
+          freeEl.className = "cell-free";
+          freeEl.textContent = "FREE";
+          cellEl.appendChild(freeEl);
         } else {
+          cellEl = document.createElement("div");
+          cellEl.className = "cell-inner";
+          outerEl.appendChild(cellEl);
+          pendingFits.push({ el: outerEl, item: cell.item });
           var showEmoji = hasField(fields, "emoji");
           if (showEmoji) {
-            cellEl.classList.add("has-emoji");
-            if (fields.length === 1) cellEl.classList.add("emoji-only");
+            outerEl.classList.add("has-emoji");
+            if (fields.length === 1) outerEl.classList.add("emoji-only");
             if (cell.item.openmoji) {
               var img = document.createElement("img");
               img.className = "cell-emoji";
@@ -193,14 +257,16 @@
               cellEl.appendChild(missing);
             }
           }
-          cellLines(cell.item, fields).forEach(function (line) {
+          cellLines(cell.item, fields).forEach(function (line, lineIndex) {
             var span = document.createElement("span");
             span.className = "cell-line cell-line-" + line.field;
+            if (lineIndex === 0) span.classList.add("is-primary");
+            if (Array.from(line.text).length <= NOWRAP_MAX_CHARS) span.classList.add("is-nowrap");
             span.textContent = line.text;
             cellEl.appendChild(span);
           });
         }
-        gridEl.appendChild(cellEl);
+        gridEl.appendChild(outerEl);
       });
 
       sheet.appendChild(gridEl);
@@ -212,6 +278,13 @@
       }
       previewArea.appendChild(sheet);
     });
+
+    // Every cell is the same size, so each term only needs to be measured once.
+    pendingFits.forEach(function (entry) {
+      if (entry.item.fit) entry.el.style.setProperty("--fit", entry.item.fit);
+      else entry.item.fit = fitCell(entry.el);
+    });
+    syncPrintRoot();
   }
 
   function fileName(title) {
@@ -252,6 +325,12 @@
     };
     var contentWidth = 10800;
     var cellWidth = Math.floor(contentWidth / gridSize);
+    var cellPt = cellWidth / 20;
+    // Same fitted size as the preview (% of cell width), with a margin for Word's font metrics.
+    function halfPoints(fit, ratio) {
+      return Math.max(12, Math.round((fit || FIT_DEFAULT) / 100 * cellPt * 2 * 0.85 * (ratio || 1)));
+    }
+    var emojiPx = Math.round(cellPt * 96 / 72 * (fields.length === 1 ? 0.55 : 0.34));
     var children = [];
 
     cards.forEach(function (grid, i) {
@@ -273,7 +352,7 @@
           if (cell.free) {
             paragraphs = [new D.Paragraph({
               alignment: D.AlignmentType.CENTER,
-              children: [new D.TextRun({ text: "FREE", bold: true, size: 22 })],
+              children: [new D.TextRun({ text: "FREE", bold: true, size: halfPoints(20) })],
             })];
           } else {
             paragraphs = [];
@@ -284,7 +363,7 @@
                 emojiRun = new D.ImageRun({
                   type: "png",
                   data: emojiImages[openmoji.hexcode],
-                  transformation: { width: fields.length === 1 ? 42 : 28, height: fields.length === 1 ? 42 : 28 },
+                  transformation: { width: emojiPx, height: emojiPx },
                 });
               } else {
                 emojiRun = new D.TextRun({
@@ -299,14 +378,15 @@
                 children: [emojiRun],
               }));
             }
-            paragraphs = paragraphs.concat(cellLines(cell.item, fields).map(function (line) {
+            var itemFit = cell.item.fit;
+            paragraphs = paragraphs.concat(cellLines(cell.item, fields).map(function (line, lineIndex) {
               return new D.Paragraph({
                 alignment: D.AlignmentType.CENTER,
                 spacing: { after: 0 },
                 children: [new D.TextRun({
                   text: line.text,
                   font: "Microsoft YaHei",
-                  size: line.field === "zh" ? 20 : 14,
+                  size: halfPoints(itemFit, lineIndex === 0 ? 1 : 0.62),
                   bold: line.field === "zh" || (fields.length === 1 && line.field !== "py"),
                   italics: line.field === "py",
                 })],
@@ -322,7 +402,7 @@
         }
         rows.push(new D.TableRow({
           children: rowCells,
-          height: { value: 1450, rule: D.HeightRule.ATLEAST },
+          height: { value: cellWidth, rule: D.HeightRule.ATLEAST },
         }));
       }
 

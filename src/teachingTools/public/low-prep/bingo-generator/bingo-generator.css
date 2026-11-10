@@ -159,17 +159,25 @@ input:focus, select:focus, textarea:focus {
   background: var(--bingo-cream);
 }
 .bingo-sheet h3 { margin: 0 0 12px; text-align: center; color: var(--bingo-green-dark); font-size: 1.02rem; }
+/* Named fonts only (no system-ui / -apple-system): some browsers cannot embed the
+   system UI font when saving as PDF, which turns the text into garbage. The same
+   stack is used on screen so the fitted text sizes match the printed page. */
+.bingo-sheet {
+  font-family: Arial, "Helvetica Neue", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Noto Sans SC", "Heiti SC", sans-serif;
+}
 .bingo-card-grid {
   display: grid;
   gap: 4px;
   aspect-ratio: 1 / 1;
 }
+/* Text is sized in container-query units: --fit is "% of the cell width", set per
+   cell by bingo-generator.js so the content fills the square without overflowing. */
 .bingo-cell {
+  --fit: 14;
+  container-type: size;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
   padding: 4px;
   border: 1px solid var(--bingo-green);
   border-radius: 6px;
@@ -177,16 +185,23 @@ input:focus, select:focus, textarea:focus {
   text-align: center;
   overflow: hidden;
   min-width: 0;
+  min-height: 0;
 }
 .bingo-cell.is-free { background: var(--bingo-gold); color: var(--bingo-green-dark); font-weight: 900; }
-.cell-emoji { display: block; width: min(40px, 43%); height: auto; max-height: 40px; object-fit: contain; flex: 0 1 auto; }
-.bingo-cell.emoji-only .cell-emoji { width: min(62px, 62%); max-height: 62px; }
-.cell-emoji-missing { display: grid; place-items: center; width: 34px; height: 34px; border: 1px dashed #b7c8be; border-radius: 50%; color: #829088; font-size: 1rem; font-weight: 800; }
-.cell-line { display: block; max-width: 100%; overflow-wrap: break-word; line-height: 1.15; }
-.cell-line-zh { font-weight: 800; font-size: .82rem; color: var(--bingo-green-dark); }
-.cell-line-py { font-size: .68rem; font-style: italic; color: var(--bingo-muted); }
-.cell-line-en { font-size: .68rem; color: #46615a; }
+/* cq units resolve against the cell only for its descendants, hence the inner span. */
+.cell-free { font-size: 1rem; font-size: 22cqw; }
+.cell-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; gap: 2cqh; width: 100%; min-width: 0; }
+.cell-emoji { display: block; width: 40px; height: 40px; width: 40cqw; height: 40cqh; object-fit: contain; flex: 0 0 auto; }
+.bingo-cell.emoji-only .cell-emoji { width: 62px; height: 62px; width: 62cqw; height: 62cqh; }
+.cell-emoji-missing { display: grid; place-items: center; flex: 0 0 auto; width: 34px; height: 34px; width: 34cqw; height: 34cqh; border: 1px dashed #b7c8be; border-radius: 50%; color: #829088; font-size: 1rem; font-size: 16cqw; font-weight: 800; }
+.cell-line { display: block; max-width: 100%; line-height: 1.15; font-size: .68rem; font-size: calc(var(--fit) * .62cqw); }
+.cell-line.is-primary { font-weight: 800; font-size: .82rem; font-size: calc(var(--fit) * 1cqw); }
+.cell-line.is-nowrap { white-space: nowrap; }
+.cell-line-zh { color: var(--bingo-green-dark); }
+.cell-line-py { font-style: italic; color: var(--bingo-muted); }
+.cell-line-en { color: #46615a; }
 .openmoji-sheet-credit { margin: 7px 0 0; color: var(--bingo-muted); text-align: right; font-size: .58rem; line-height: 1.25; }
+#bingo-print-root { display: none; }
 
 @media (max-width: 980px) {
   .bingo-grid { grid-template-columns: 1fr; }
@@ -197,11 +212,19 @@ input:focus, select:focus, textarea:focus {
   .mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 }
 
+/* Print only the clean copy of the sheets (#bingo-print-root, a direct child of
+   <body>). Everything else is removed from the layout — not just made invisible —
+   so there are no blank pages, and nothing is clipped by the sticky/scrolling
+   preview panel or by absolute positioning. */
+@page { size: portrait; margin: 12mm; }
 @media print {
-  body.bingo-page * { visibility: hidden; }
-  #preview-area, #preview-area * { visibility: visible; }
-  #preview-area { position: absolute; top: 0; left: 0; width: 100%; }
-  .bingo-sheet { page-break-after: always; border: none; background: #fff; margin: 0; padding: 12px; }
-  .bingo-sheet:last-child { page-break-after: auto; }
+  html, body.bingo-page { background: #fff !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
+  body.bingo-page > *:not(#bingo-print-root) { display: none !important; }
+  #bingo-print-root { display: block !important; }
+  .bingo-sheet { break-after: page; page-break-after: always; break-inside: avoid; page-break-inside: avoid; border: none; background: #fff; margin: 0; padding: 0; }
+  .bingo-sheet:last-child { break-after: auto; page-break-after: auto; }
+  .bingo-sheet h3 { margin: 0 0 6mm; font-size: 18pt; }
+  .bingo-card-grid { width: 180mm; max-width: 100%; margin: 0 auto; }
+  .bingo-cell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .openmoji-sheet-credit { font-size: 7pt; }
 }
