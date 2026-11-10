@@ -25,7 +25,6 @@ test('new section pages render in both languages with the required categories', 
     '/textbook-companion': ['/textbook-companion/jinan', 'Members', 'PEP Chinese', 'HSK Standard Course', 'Chinese Made Easy', 'Coming soon', 'is-coming-soon'],
     '/textbook-companion/jinan': ['/textbook-companion/jinan/book-1', '/textbook-companion/jinan/book-2', 'Book 1', 'Book 2'],
     '/theme-activities/self-introduction': ['Who Am I? 我是谁？阅读卡片', '/printables/self-introduction/who-am-i-reading-cards.pdf', '/printables/self-introduction/who-am-i-reading-cards.docx'],
-    '/theme-activities/school': ['我是小导游：带新同学参观我们学校', '/printables/school/school-tour-guide.pdf', '/printables/school/school-tour-guide.docx', 'Free for a limited time'],
     '/theme-activities/five-elements': ['五行星球活动', 'Free for a limited time', '/materials/five-elements-planets'],
     '/theme-activities/halloween': ['Vocabulary', 'Games', 'Printables', '/theme-activities/halloween/printables'],
     '/theme-activities/halloween/printables': ['万圣节方位词_Gallery_Walk', 'halloween-position-words-gallery-walk.pdf', 'halloween-position-words-gallery-walk.docx'],
@@ -33,7 +32,7 @@ test('new section pages render in both languages with the required categories', 
     '/theme-activities/animals': ['Vocabulary', 'Games', 'Printables'],
     '/theme-activities/weather': ['Printables', '/theme-activities/weather/songs'],
     '/theme-activities/weather/songs': ['<html lang="en">'],
-    '/theme-activities': ['/theme-activities/self-introduction', '/theme-activities/school','/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals'],
+    '/theme-activities': ['/theme-activities/self-introduction', '/theme-activities/halloween', '/theme-activities/chinese-new-year', '/theme-activities/animals'],
     '/teaching-tools': ['/teaching-tools/random-group-generator']
   };
   for (var path of Object.keys(pages)) {

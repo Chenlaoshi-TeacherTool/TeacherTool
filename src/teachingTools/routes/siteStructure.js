@@ -49,22 +49,6 @@ router.get('/theme-activities/self-introduction', function(req, res) {
   });
 });
 
-router.get('/theme-activities/school', function(req, res) {
-  res.render('theme-activities/school', {
-    title: text(req, 'School', '学校'),
-    parent: parentLink(req, 'activities'),
-    printables: [{
-      title: '我是小导游：带新同学参观我们学校',
-      en: 'A one-minute speaking project: students guide a new classmate around the school in Chinese. Six scaffolded steps with a vocabulary bank, 14 connecting words, sentence frames, a model script, peer review, a listener sheet, and a rubric.',
-      zh: '一分钟口语项目：学生当小导游，用中文带新同学参观学校。六步支架，含词汇银行、14 个连接词、句型框架、示范稿、同伴互评、听众任务单和评分标准。',
-      pages: 10,
-      limitedFree: true,
-      pdf: '/printables/school/school-tour-guide.pdf',
-      docx: '/printables/school/school-tour-guide.docx'
-    }]
-  });
-});
-
 router.get('/theme-activities/five-elements', function(req, res) {
   res.render('theme-activities/five-elements', {
     title: text(req, 'Five Elements', '五行'),
