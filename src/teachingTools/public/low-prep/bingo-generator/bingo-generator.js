@@ -384,11 +384,12 @@
                 alignment: D.AlignmentType.CENTER,
                 spacing: { after: 0 },
                 children: [new D.TextRun({
-                  text: line.text,
-                  font: "Microsoft YaHei",
+                  // Word can't use the page's Andika web font. SimSun draws ā á ǎ à
+                  // single-storey; its plain "a" is swapped for ɑ (U+0251) to match.
+                  text: line.field === "py" ? line.text.replace(/a/g, "ɑ") : line.text,
+                  font: line.field === "zh" ? "KaiTi" : (line.field === "py" ? "SimSun" : "Arial"),
                   size: halfPoints(itemFit, lineIndex === 0 ? 1 : 0.62),
-                  bold: line.field === "zh" || (fields.length === 1 && line.field !== "py"),
-                  italics: line.field === "py",
+                  bold: line.field !== "zh" && lineIndex === 0,
                 })],
               });
             }));
@@ -577,6 +578,15 @@
         status.textContent = "OpenMoji could not be loaded. Check your connection and try again.";
         generateBtn.disabled = false;
         return;
+      }
+    }
+
+    // Text is fitted by measuring it, so the pinyin web font must be loaded first.
+    if (hasField(fields, "py") && document.fonts && document.fonts.load) {
+      try {
+        await Promise.all([document.fonts.load("400 16px Andika", "āa"), document.fonts.load("700 16px Andika", "āa")]);
+      } catch (error) {
+        console.error(error);
       }
     }
 

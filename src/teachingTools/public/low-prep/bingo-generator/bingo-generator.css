@@ -197,8 +197,12 @@ input:focus, select:focus, textarea:focus {
 .cell-line { display: block; max-width: 100%; line-height: 1.15; font-size: .68rem; font-size: calc(var(--fit) * .62cqw); }
 .cell-line.is-primary { font-weight: 800; font-size: .82rem; font-size: calc(var(--fit) * 1cqw); }
 .cell-line.is-nowrap { white-space: nowrap; }
-.cell-line-zh { color: var(--bingo-green-dark); }
-.cell-line-py { font-style: italic; color: var(--bingo-muted); }
+/* Chinese in 楷体 (regular weight — KaiTi has no real bold). */
+.cell-line-zh { color: var(--bingo-green-dark); font-family: "KaiTi", "STKaiti", "Kaiti SC", "BiauKai", "楷体", serif; }
+.cell-line-zh.is-primary { font-weight: 400; }
+/* Pinyin: Andika draws every a as the single-storey ɑ, like school textbooks. */
+.cell-line-py { color: var(--bingo-muted); font-family: "Andika", "Century Gothic", "Segoe UI", Arial, sans-serif; }
+.cell-line-py.is-primary { font-weight: 700; }
 .cell-line-en { color: #46615a; }
 .openmoji-sheet-credit { margin: 7px 0 0; color: var(--bingo-muted); text-align: right; font-size: .58rem; line-height: 1.25; }
 #bingo-print-root { display: none; }
