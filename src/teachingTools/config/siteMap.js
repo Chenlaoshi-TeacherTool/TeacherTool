@@ -36,6 +36,7 @@ var SECTIONS = [
     children: [
       { key: 'five-elements', href: '/theme-activities/five-elements', en: 'Five Elements', zh: '五行' },
       { key: 'self-introduction', href: '/theme-activities/self-introduction', en: 'Self-introduction', zh: '个人介绍' },
+      { key: 'school', href: '/theme-activities/school', en: 'School', zh: '学校' },
       {
         key: 'halloween', href: '/theme-activities/halloween', en: 'Halloween', zh: '万圣节', template: 'theme',
         children: [{ key: 'halloween-printables', href: '/theme-activities/halloween/printables', en: 'Halloween printables', zh: '万圣节可打印材料' }]
