@@ -27,6 +27,19 @@ test('www pages forward to the canonical host with the same path and query', asy
   assert.equal(response.headers.get('location'), 'https://clsteachingtools.com/membership?lang=zh');
 });
 
+test('the default Azure address forwards to the canonical host', async function() {
+  var previousAzure = process.env.WEBSITE_HOSTNAME;
+  process.env.WEBSITE_HOSTNAME = 'chenlaoshi-teachingtools.azurewebsites.net';
+  try {
+    var response = await fetch(base + '/teaching-tools?lang=zh', { redirect: 'manual', headers: { 'x-forwarded-host': 'chenlaoshi-teachingtools.azurewebsites.net' } });
+    assert.equal(response.status, 301);
+    assert.equal(response.headers.get('location'), 'https://clsteachingtools.com/teaching-tools?lang=zh');
+    assert.equal((await fetch(base + '/membership', { redirect: 'manual', headers: { 'x-forwarded-host': 'clsteachingtools.com' } })).status, 200);
+  } finally {
+    if (previousAzure === undefined) delete process.env.WEBSITE_HOSTNAME; else process.env.WEBSITE_HOSTNAME = previousAzure;
+  }
+});
+
 test('the canonical host and non-GET requests are served normally', async function() {
   assert.equal((await fetch(base + '/membership', { redirect: 'manual', headers: { 'x-forwarded-host': 'clsteachingtools.com' } })).status, 200);
   var post = await fetch(base + '/api/teacher-library/redeem', { method: 'POST', redirect: 'manual', headers: { 'x-forwarded-host': 'www.clsteachingtools.com' } });
