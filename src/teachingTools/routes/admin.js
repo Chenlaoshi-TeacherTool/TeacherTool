@@ -1270,15 +1270,12 @@ router.post('/textbooks/lessons/:id/items/:itemId/delete', async function (req, 
 // Activation codes: shown once at creation, only their hashes are stored.
 router.get('/memberships', async function (req, res, next) {
   try {
-    var email = String(req.query.email || '').trim().slice(0, 320);
-    var teachers = email ? await teacherAccountsRepository.search(email) : null;
-    if (teachers && teachers.length) {
-      var events = await teacherLibraryRepository.listEvents(teachers.map(function (teacher) { return teacher.ownerKey; }));
-      teachers.forEach(function (teacher) { teacher.events = events.filter(function (event) { return event.ownerKey === teacher.ownerKey; }); });
-    }
+    var directory = await teacherAccountsRepository.list(req.query);
+    var selected = directory.teachers.find(function(teacher) { return teacher.ownerKey === req.query.teacher; });
+    if (selected) selected.events = await teacherLibraryRepository.listEvents([selected.ownerKey]);
     res.set('Cache-Control', 'private, no-store');
     res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser,
-      search: { email: email, teachers: teachers } });
+      directory: directory, selectedTeacher: selected ? selected.ownerKey : '', membershipTab: ['codes', 'batches'].includes(req.query.tab) ? req.query.tab : 'teachers' });
   } catch (err) { next(err); }
 });
 
@@ -1289,7 +1286,7 @@ router.post('/memberships/revoke', async function (req, res, next) {
     var hash = activationCodes.hash(req.body.code);
     var result = hash ? await teacherLibraryRepository.revokeCode(hash, req.adminUser.name) : { outcome: 'not-found' };
     res.set('Cache-Control', 'private, no-store');
-    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, revoked: result, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser });
+    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, revoked: result, membershipTab: 'codes', planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser });
   } catch (err) { next(err); }
 });
 
@@ -1304,7 +1301,7 @@ router.post('/memberships/codes', async function (req, res, next) {
     for (var i = 0; i < count; i += 1) codes.push(activationCodes.generate());
     await teacherLibraryRepository.createCodes(codes.map(function (code) { return { hash: activationCodes.hash(code), days: days, label: label }; }), req.adminUser.name);
     res.set('Cache-Control', 'private, no-store');
-    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: { codes: codes, days: days, label: label }, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser });
+    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: { codes: codes, days: days, label: label }, membershipTab: 'codes', planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser });
   } catch (err) { next(err); }
 });
 

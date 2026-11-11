@@ -48,3 +48,47 @@ test('each teacher found shows their membership history', async function () {
   assert.match(page, /Free trial<\/td>\s*<td>\+3<\/td>\s*<td>—<\/td>\s*<td>—<\/td>\s*<td>teacher \/ site/);
   assert.match(page, /No membership changes recorded/);
 });
+
+
+test('directory shows all-account totals, selected status, persistent pagination and lazy history', async function() {
+  var directory = { email: 'lin & chen', status: 'trial', page: 2, pages: 3, total: 60, teachers: [
+    { ownerKey: 'a'.repeat(64), email: 'lin@example.org', name: '<img onerror=alert(1)>', status: 'trial', createdAt: new Date(), events: [{ kind: 'code', days: 30, createdAt: new Date() }] },
+    { ownerKey: 'b'.repeat(64), email: null, name: 'Teacher B', status: 'expired', createdAt: new Date() }
+  ] };
+  var html = await render({ directory: directory, selectedTeacher: '', membershipTab: 'teachers' });
+  assert.match(html, /共 60 位老师/);
+  assert.match(html, /data-copy-email="lin@example.org"/);
+  assert.match(html, /未提供邮箱/);
+  assert.match(html, /试用中/);
+  assert.match(html, /value="trial" selected/);
+  assert.ok(html.includes('email=lin+%26+chen'));
+  assert.ok(html.includes('status=trial&amp;page=1'));
+  assert.ok(html.includes('status=trial&amp;page=3'));
+  assert.ok(!html.includes('<img onerror'));
+  assert.ok(!html.includes('Membership history (1)'));
+  html = await render({ directory: directory, selectedTeacher: 'a'.repeat(64) });
+  assert.ok(html.includes('Membership history (1)'));
+  assert.ok(!html.includes('No membership changes recorded.'));
+});
+
+test('account listing escapes LIKE patterns, searches names, bounds pages and fetches only 25 accounts', async function() {
+  var inputs = {}, query;
+  var client = { sql: { NVarChar: function() {}, VarChar: function() {}, Int: 'Int' }, getPool: async function() {
+    return { request: function() { return { input: function(key,type,value) { inputs[key]=value; return this; }, query: async function(sql) { query=sql; return { recordsets: [[{ total: 0, page: 1, pages: 1 }], []] }; } }; } };
+  } };
+  var repo = require('../services/teacherAccountsRepository');
+  var result = await repo.list({ email: '  a%_[  ', status: 'invalid', page: '-4' }, client);
+  assert.equal(inputs.query, '%a\\%\\_\\[%');
+  assert.equal(inputs.status, 'all');
+  assert.equal(inputs.page, 1);
+  assert.match(query, /a.display_name LIKE @query/);
+  assert.match(query, /@query=N'%%'/);
+  assert.match(query, /revoked_at IS NULL/);
+  assert.match(query, /ORDER BY created_at DESC, owner_key/);
+  assert.match(query, /FETCH NEXT 25 ROWS ONLY/);
+  assert.equal(result.total,0);
+  await repo.list({ status: 'active', page: '9999999' }, client);
+  assert.equal(inputs.page,9999999);
+  assert.equal(inputs.status,'active');
+  assert.match(query,/IF @page > @pages SET @page=@pages/);
+});

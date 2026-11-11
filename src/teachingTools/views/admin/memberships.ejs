@@ -1,5 +1,15 @@
 <%- include('layout-head') %>
-<h1>Memberships</h1>
+<h1>会员管理</h1>
+<% var tab = typeof membershipTab !== 'undefined' ? membershipTab : 'teachers';
+var listing = typeof directory !== 'undefined' ? directory : null;
+var selectedKey = typeof selectedTeacher !== 'undefined' ? selectedTeacher : '';
+function listLink(page, teacher) { var q = new URLSearchParams({ tab: 'teachers', email: listing ? listing.email : '', status: listing ? listing.status : 'all', page: String(page) }); if(teacher) q.set('teacher',teacher); return '/admin/memberships?' + q.toString(); }
+%>
+<nav class="membership-tabs" aria-label="会员管理分区">
+<a href="/admin/memberships" <%- tab === 'teachers' ? 'aria-current="page"' : '' %>>老师账户</a>
+<a href="/admin/memberships?tab=codes" <%- tab === 'codes' ? 'aria-current="page"' : '' %>>激活码管理</a>
+<a href="/admin/memberships?tab=batches" <%- tab === 'batches' ? 'aria-current="page"' : '' %>>生成批次记录</a>
+</nav>
 <p>Each activation code extends a teacher's cloud saving once. New accounts get a 3-day trial automatically on first sign-in.</p>
 
 <% if (created) { %>
@@ -25,42 +35,45 @@
   </div>
 <% } %>
 
-<% var lookup = typeof search !== 'undefined' && search ? search : { email: '', teachers: null }; %>
-<h2 style="font-size:1.1rem;">Find a teacher</h2>
-<p>Search by the email the teacher signed up with (for example the one in their PayPal note). Accounts appear here after the teacher signs in once.</p>
+<section <%= tab !== 'teachers' ? 'hidden' : '' %>>
+<% var lookup = listing || (typeof search !== 'undefined' && search ? search : { email: '', teachers: null }); %>
+<h2 style="font-size:1.1rem;">老师账户</h2>
+<p>显示已建立账户的老师，包括试用及已到期账户。默认按注册时间从新到旧排列，时间以 UTC 显示。</p>
 <form method="GET" action="/admin/memberships">
-  <label for="teacherEmail">Email (or part of it)</label>
-  <input id="teacherEmail" name="email" type="search" maxlength="320" value="<%= lookup.email %>" autocomplete="off" required>
-  <div class="actions"><button type="submit">Search</button></div>
+  <label for="teacherEmail">邮箱或姓名</label>
+  <input id="teacherEmail" name="email" type="search" maxlength="320" value="<%= lookup.email %>" autocomplete="off">
+  <label for="membershipStatus">权限状态</label><select id="membershipStatus" name="status"><% [['all','全部'],['trial','试用中'],['active','权限有效'],['expired','已到期 / 无有效权限']].forEach(function(option) { %><option value="<%= option[0] %>" <%= listing && listing.status === option[0] ? 'selected' : '' %>><%= option[1] %></option><% }); %></select>
+  <div class="actions"><button type="submit">搜索</button><a href="/admin/memberships">清除筛选</a></div>
 </form>
+<% if (listing) { %><p>共 <%= listing.total %> 位老师 · 第 <%= listing.page %> / <%= listing.pages %> 页 · 每页 25 位</p><% } %>
 <% if (lookup.teachers) { %>
   <% if (!lookup.teachers.length) { %>
-    <p>No account matches “<%= lookup.email %>”. The teacher may not have signed in yet, or signed up with a different email.</p>
+    <p>没有符合条件的账户。No account matches “<%= lookup.email %>”。老师需要先在网站登录，才会出现在这里。</p>
   <% } else { %>
     <% var day = function (value) { return value ? new Date(value).toISOString().slice(0, 10) : '—'; }; %>
-    <table>
-      <thead><tr><th>Email</th><th>Name</th><th>Signed up</th><th>Last seen</th><th>Cloud saving until</th><th>Trial</th><th>Codes used</th><th>Activities</th></tr></thead>
+    <div class="table-scroll"><table>
+      <thead><tr><th>邮箱</th><th>姓名</th><th>注册时间</th><th>最近登录</th><th>云端保存到期日</th><th>权限状态</th><th>操作</th></tr></thead>
       <tbody>
         <% lookup.teachers.forEach(function (teacher) { var active = teacher.writeUntil && new Date(teacher.writeUntil) > new Date(); %>
           <tr>
-            <td><%= teacher.email || '(none)' %></td>
+            <td><%= teacher.email || '未提供邮箱' %><% if(teacher.email) { %><br><button type="button" class="secondary" data-copy-email="<%= teacher.email %>">复制邮箱</button><% } %></td>
             <td><%= teacher.name || '' %></td>
             <td><%= day(teacher.createdAt) %></td>
             <td><%= day(teacher.lastSeenAt) %></td>
             <td><strong style="color:<%= active ? '#15803d' : '#b91c1c' %>"><%= day(teacher.writeUntil) %><%= teacher.writeUntil ? (active ? ' (active)' : ' (ended)') : '' %></strong></td>
-            <td><%= teacher.trialStartedAt ? day(teacher.trialStartedAt) : '—' %></td>
-            <td><%= teacher.codesUsed %></td>
-            <td><%= teacher.activities %></td>
+            <td><%= { trial: '试用中', active: '权限有效', expired: '已到期 / 无有效权限' }[teacher.status] || (active ? '权限有效' : '已到期') %></td>
+            <td><a href="<%= listLink(listing ? listing.page : 1, teacher.ownerKey) %>#teacher-details">查看详情</a></td>
           </tr>
-          <tr>
-            <td colspan="8" style="background:#f8fafc;">
+          <% if (!listing || selectedKey === teacher.ownerKey) { %>
+          <tr id="teacher-details">
+            <td colspan="7" style="background:#f8fafc;">
               <% var events = teacher.events || []; %>
               <% if (!events.length) { %>
                 <span style="color:#64748b;">No membership changes recorded.</span>
               <% } else { %>
-                <details<%= lookup.teachers.length === 1 ? ' open' : '' %>>
+                <details open>
                   <summary>Membership history (<%= events.length %>)</summary>
-                  <table style="margin-top:8px;">
+                  <div class="table-scroll"><table style="margin-top:8px;">
                     <thead><tr><th>When (UTC)</th><th>Change</th><th>Days</th><th>Until before</th><th>Until after</th><th>By</th></tr></thead>
                     <tbody>
                       <% events.forEach(function (event) { %>
@@ -74,17 +87,22 @@
                         </tr>
                       <% }) %>
                     </tbody>
-                  </table>
+                  </table></div>
                 </details>
               <% } %>
             </td>
           </tr>
+          <% } %>
         <% }) %>
       </tbody>
-    </table>
+    </table></div>
   <% } %>
 <% } %>
 
+<% if(listing) { %><nav class="actions" aria-label="老师列表分页"><% if(listing.page > 1) { %><a href="<%= listLink(listing.page - 1) %>">← 上一页</a><% } %><% if(listing.page < listing.pages) { %><a href="<%= listLink(listing.page + 1) %>">下一页 →</a><% } %></nav><% } %>
+<p id="email-copy-status" role="status" aria-live="polite"></p>
+</section>
+<section <%= tab !== 'codes' ? 'hidden' : '' %>>
 <h2 style="font-size:1.1rem;margin-top:28px;">Create codes</h2>
 <form method="POST" action="/admin/memberships/codes">
   <label for="days">Plan</label>
@@ -106,17 +124,21 @@
   <div class="actions"><button class="danger" type="submit">Deactivate code</button></div>
 </form>
 
+</section>
+<section <%= tab !== 'batches' ? 'hidden' : '' %>>
 <h2 style="font-size:1.1rem;margin-top:28px;">Recent batches</h2>
 <% if (!batches.length) { %>
   <p>No codes yet.</p>
 <% } else { %>
-  <table>
+  <div class="table-scroll"><table>
     <thead><tr><th>Created (UTC)</th><th>Note</th><th>Days</th><th>Used / total</th><th>Deactivated</th></tr></thead>
     <tbody>
       <% batches.forEach(function (batch) { %>
         <tr><td><%= new Date(batch.created_at).toISOString().slice(0, 16).replace('T', ' ') %></td><td><%= batch.batch_label || '' %></td><td><%= batch.days %></td><td><%= batch.redeemed %> / <%= batch.total %></td><td><%= batch.revoked || 0 %></td></tr>
       <% }) %>
     </tbody>
-  </table>
+  </table></div>
 <% } %>
+</section>
+<script src="/javascripts/admin-memberships.js" defer></script>
 <%- include('layout-foot') %>

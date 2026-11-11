@@ -38,3 +38,6 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline:3px solid
 @media(max-width:540px) { body { padding:16px; } body .top-bar { flex-direction:column; } .workspace-grid,.page-fields { grid-template-columns:1fr; } .quick-actions .button { width:100%; box-sizing:border-box; text-align:center; } .nav-group > div { position:static; } body .q-grid { grid-template-columns:1fr; } }
 
 input[type=search] { box-sizing:border-box; width:100%; max-width:480px; padding:10px; border:1px solid #a9b7ca; border-radius:6px; font:inherit; }
+
+.membership-tabs { display:flex; flex-wrap:wrap; gap:12px; margin:20px 0; }
+.membership-tabs a { padding:8px 14px; border:1px solid #dce3ed; border-radius:6px; text-decoration:none; }
