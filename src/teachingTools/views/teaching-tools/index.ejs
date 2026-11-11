@@ -228,7 +228,8 @@
             </div>
             <div class="tools-grid">
                 <% section.tools.forEach(function(tool, index) { %>
-                <div data-uses="<%= tool.uses.join(' ') %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %><%= index >= 8 ? ' tool-card--extra' : '' %>">
+                <% var searchText = [tool.titleKey, tool.scopeKey, tool.descKey].map(function(key) { return key ? t(key) + ' ' + tOther(key) : ''; }).join(' '); %>
+                <div data-uses="<%= tool.uses.join(' ') %>" data-search="<%= searchText %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %><%= index >= 8 ? ' tool-card--extra' : '' %>">
                     <% if (tool.href) { %><%- include('../partials/tool-snapshot', { previewHref: tool.href }) %><% } %>
                     <h3><% if (tool.icon) { %><%= tool.icon %> <% } %><%= t(tool.titleKey) %><% if (tool.limitedFree) { %> <span class="tool-limited-free"><%= t('teachingToolsIndex.limitedFree') %></span><% } %></h3>
                     <p class="tool-scope"><%= t(tool.scopeKey) %></p>
@@ -272,7 +273,7 @@
 
                 cards.forEach(function (card) {
                     var inScope = selectedUse === 'all' || (card.dataset.uses || '').split(' ').indexOf(selectedUse) !== -1;
-                    var isMatch = inScope && (!query || card.textContent.toLocaleLowerCase().indexOf(query) !== -1);
+                    var isMatch = inScope && (!query || (card.dataset.search || card.textContent).toLocaleLowerCase().indexOf(query) !== -1);
                     card.hidden = !isMatch;
                     if (isMatch) matches += 1;
                 });

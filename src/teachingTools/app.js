@@ -58,6 +58,8 @@ app.use(function(req, res, next) {
   var lang = i18n.normalizeLang(req.cookies && req.cookies.lang);
   res.locals.lang = lang;
   res.locals.t = function(key) { return i18n.t(lang, key); };
+  // The same key in the other language, so search can match either one.
+  res.locals.tOther = function(key) { return i18n.t(lang === 'zh' ? 'en' : 'zh', key); };
   next();
 });
 
