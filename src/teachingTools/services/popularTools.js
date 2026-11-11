@@ -1,6 +1,6 @@
 'use strict';
 
-var catalog = require('../config/popularTools.json');
+var catalog = require('../config/tools').LIVE;
 var BlobServiceClient = require('@azure/storage-blob').BlobServiceClient;
 var DAY = 24 * 60 * 60 * 1000;
 var fallbackSlugs = ['lucky-wheel', 'random-group-generator', 'qr-code-generator', 'class-pet-points', 'jeopardy', 'bingo-generator', 'maze-generator', 'word-cloud'];

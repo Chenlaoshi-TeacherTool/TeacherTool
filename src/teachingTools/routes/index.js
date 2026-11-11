@@ -4,6 +4,7 @@ var siteContentStore = require('../services/siteContentStore');
 var siteMap = require('../config/siteMap');
 var membership = require('../config/membership');
 var popularTools = require('../services/popularTools');
+var tools = require('../config/tools');
 var toolPreviews = require('../config/toolPreviews.json');
 
 router.use(function(req, res, next) {
@@ -91,11 +92,11 @@ router.get('/teaching-tools/lucky-wheel', function(req, res) {
 });
 
 router.get('/chinese-teaching', function(req, res) {
-  res.render('chinese-teaching', { title: 'Chinese Teaching' });
+  res.render('chinese-teaching', { title: 'Chinese Teaching', toolByHref: tools.byHref });
 });
 
 router.get('/teaching-tools', function(req, res, next) {
-  res.render('teaching-tools/index', { title: 'Teaching Tools' });
+  res.render('teaching-tools/index', { title: 'Teaching Tools', toolSections: tools.sections() });
 });
 
 router.get('/teaching-tools/qr-code-generator', function(req, res, next) {

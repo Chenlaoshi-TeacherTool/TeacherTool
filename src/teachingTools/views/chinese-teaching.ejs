@@ -15,22 +15,22 @@
     <p><%= lang === 'zh' ? '为中文课堂准备的识字、书写、词汇、句型和教材配套资源。' : 'Character recognition, writing, vocabulary, sentence patterns, and textbook resources for Chinese classrooms.' %></p>
     <% var groups = [
       { id:'characters', zh:'汉字与书写', en:'Characters & writing', items:[
-        ['stroke-order-worksheet','strokeOrderTitle','strokeOrderDesc'],
-        ['missing-radicals','missingPartsTitle','missingPartsDesc'],
-        ['hanzi-batch/index.html','hanziBatchTitle','hanziBatchDesc'],
-        ['yu-duoyinzi-font','fontTitle','fontDesc']
+        'stroke-order-worksheet',
+        'missing-radicals',
+        'hanzi-batch/index.html',
+        'yu-duoyinzi-font'
       ] },
       { id:'vocabulary', zh:'词汇与句型', en:'Vocabulary & sentence patterns', items:[
-        ['word-list-library/word-list-library.html','libraryTitle','libraryDesc'],
-        ['flash-card-generator','flashCardTitle','flashCardDesc'],
-        ['sentence-reorder','sentenceReorderTitle','sentenceReorderDesc'],
-        ['vocabulary-booklet/vocabulary-booklet.html','vocabBookletTitle','vocabBookletDesc']
+        'word-list-library/word-list-library.html',
+        'flash-card-generator',
+        'sentence-reorder',
+        'vocabulary-booklet/vocabulary-booklet.html'
       ] },
       { id:'reading', zh:'阅读与表达', en:'Reading & expression', items:[
-        ['independent-reading','independentReadingTitle','independentReadingDesc'],
-        ['book-generator','bookGenTitle','bookGenDesc'],
-        ['social-media-classroom-tools/','socialMediaHubTitle','socialMediaHubDesc'],
-        ['question-bank-library/question-bank-library.html','questionBankTitle','questionBankDesc']
+        'independent-reading',
+        'book-generator',
+        'social-media-classroom-tools/',
+        'question-bank-library/question-bank-library.html'
       ] },
       { id:'textbooks', zh:'教材配套', en:'Textbook companion', items:[] }
     ]; %>
@@ -43,11 +43,11 @@
     <section class="task-section" id="<%= group.id %>" aria-labelledby="<%= group.id %>-title">
       <h2 id="<%= group.id %>-title"><%= lang === 'zh' ? group.zh : group.en %></h2>
       <div class="resource-grid">
-        <% group.items.forEach(function(item) { %>
+        <% group.items.forEach(function(item) { var tool = toolByHref('/teaching-tools/' + item); %>
         <article class="resource-card">
-          <h3><%= t('teachingToolsIndex.' + item[1]) %></h3>
-          <p><%= t('teachingToolsIndex.' + item[2]) %></p>
-          <a class="resource-card__link" href="/teaching-tools/<%= item[0] %>"><%= lang === 'zh' ? '打开资源' : 'Open resource' %> →</a>
+          <h3><%= t(tool.titleKey) %></h3>
+          <p><%= t(tool.descKey) %></p>
+          <a class="resource-card__link" href="<%= tool.href %>"><%= lang === 'zh' ? '打开资源' : 'Open resource' %> →</a>
         </article>
         <% }); %>
         <% if (group.id === 'textbooks') { %>
