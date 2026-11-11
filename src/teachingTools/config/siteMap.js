@@ -71,9 +71,8 @@ var SECTIONS = [
   { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, comingSoon: true, admin: ['community'] },
   { key: 'finds', href: '/classroom-finds', en: 'Classroom Finds', zh: '教室好物', nav: true, admin: ['recommendations'] },
   {
-    key: 'shop', href: '/shop', en: 'Chen Laoshi’s Shop', zh: '陈老师的商店', navEn: 'Shop', navZh: '商店', nav: true, admin: [],
+    key: 'shop', href: '/shop', en: 'Chen Laoshi’s Shop', zh: '陈老师的商店', navEn: 'Shop', navZh: '商店', nav: false, redirect: '/classroom-finds', admin: [],
     children: [
-      { key: 'printable-packs', href: '/shop/printable-packs', en: 'Printable packs', zh: '可打印材料包' },
       { key: 'physical-products', href: '/shop/physical-products', en: 'Physical products', zh: '实体产品', redirect: 'https://www.ebay.com/usr/clsteachingtools' }
     ]
   },

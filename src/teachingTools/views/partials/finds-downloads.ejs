@@ -1,0 +1,11 @@
+<% if (downloadProduct.companionFiles && downloadProduct.companionFiles.length) { %>
+<section class="finds-downloads">
+  <h3><%= lang === 'zh' ? '配套材料下载' : 'Companion downloads' %></h3>
+  <p><%= lang === 'zh' ? '下载标签、学习单等材料，配合这件产品使用。' : 'Download labels, worksheets, and other materials to use with this product.' %></p>
+  <ul>
+    <% downloadProduct.companionFiles.forEach(function(file) { %>
+    <li><a href="/classroom-finds/<%= encodeURIComponent(downloadProduct.slug) %>/files/<%= encodeURIComponent(file.blobName) %>" download><%= file.title || file.fileName %> ↓</a> <span><%= (file.fileName.split('.').pop() || '').toUpperCase() %> · <%= (file.size / 1024 / 1024).toFixed(1) %> MB</span></li>
+    <% }) %>
+  </ul>
+</section>
+<% } %>

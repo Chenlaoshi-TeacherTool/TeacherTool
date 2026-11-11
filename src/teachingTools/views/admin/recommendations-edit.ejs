@@ -4,8 +4,28 @@
 <form method="POST" action="<%= (product && product.slug) ? '/admin/recommendations/' + encodeURIComponent(product.slug) : '/admin/recommendations/new' %>">
   <label>Slug (used internally, no spaces)</label>
   <input type="text" name="slug" value="<%= product ? product.slug : '' %>" <%= !isNew ? 'readonly' : 'required' %>>
-  <label>Title</label>
+  <label>Default title / 默认产品名称（未填写分语言名称时使用）</label>
   <input type="text" name="title" value="<%= product ? product.title : '' %>" required>
+  <% var finds = product ? (product.classroomContent || {}) : {}; var categories = finds.categories || ['every-classroom']; %>
+  <h2>Display categories / 展示分类</h2>
+  <% [['every-classroom', 'For Every Classroom / 各学科通用'], ['chinese-class', 'For Chinese Class / 中文课堂精选']].forEach(function (entry) { %>
+  <label><input type="checkbox" name="finds_categories" value="<%= entry[0] %>" <%= categories.includes(entry[0]) ? 'checked' : '' %>> <%= entry[1] %></label>
+  <% }) %>
+  <p>至少选择一个分类。同一件产品可以同时出现在两类中。每种语言未填写时使用另一种语言或原有产品内容。</p>
+  <% ['zh', 'en'].forEach(function (language) { var content = finds[language] || {}; %>
+  <fieldset>
+    <legend><%= language === 'zh' ? '中文内容' : 'English content' %></legend>
+    <% [['title', 'Product name / 产品名称', 1], ['summary', 'Card summary / 卡片简短介绍', 2], ['usage', 'How to use / 完整使用方法（可分段）', 6], ['general', 'Use across subjects / 各学科通用用法', 3], ['chinese', 'Use in Chinese class / 中文课堂用法', 3], ['video', 'YouTube link / 视频链接（可不填）', 1]].forEach(function (field) { %>
+    <label for="finds_<%= field[0] %>_<%= language %>"><%= field[1] %></label>
+    <% if (field[2] === 1) { %>
+    <input id="finds_<%= field[0] %>_<%= language %>" type="<%= field[0] === 'video' ? 'url' : 'text' %>" name="finds_<%= field[0] %>_<%= language %>" value="<%= content[field[0]] || '' %>">
+    <% } else { %>
+    <textarea id="finds_<%= field[0] %>_<%= language %>" name="finds_<%= field[0] %>_<%= language %>" rows="<%= field[2] %>"><%= content[field[0]] || '' %></textarea>
+    <% } %>
+    <% }) %>
+  </fieldset>
+  <% }) %>
+  <h2>Shared product details / 共用产品资料</h2>
   <label>Subtitle</label>
   <input type="text" name="subtitle" value="<%= product ? (product.subtitle || '') : '' %>">
   <label>Category / meta line</label>
@@ -53,6 +73,31 @@
     <button type="submit"><%= !isNew ? 'Save changes' : 'Create recommendation' %></button>
   </div>
 </form>
+
+<section id="companion-files">
+  <h2>Companion downloads / 配套材料下载</h2>
+  <p>上传与这件产品配套的标签、学习单或活动材料，老师可在产品使用说明弹窗和详情页免费下载。每次上传一个文件，可重复上传多个。</p>
+  <% if (isNew) { %>
+  <p>请先创建产品，再上传配套文件。 / Create the product first, then upload companion files.</p>
+  <% } else { %>
+  <% (product.companionFiles || []).forEach(function(file) { %>
+  <div class="file-row">
+    <strong><%= file.title %></strong> · <%= file.fileName %> (<%= (file.size / 1024 / 1024).toFixed(1) %> MB)
+    <form method="POST" action="/admin/recommendations/<%= encodeURIComponent(product.slug) %>/files/<%= encodeURIComponent(file.blobName) %>/delete">
+      <button type="submit" class="danger">Remove attachment / 移除附件</button>
+    </form>
+  </div>
+  <% }) %>
+  <form method="POST" enctype="multipart/form-data" action="/admin/recommendations/<%= encodeURIComponent(product.slug) %>/files">
+    <label for="companion-title">Download title / 下载名称（可选）</label>
+    <input id="companion-title" type="text" name="title" maxlength="200" placeholder="推车抽屉标签 / Cart drawer labels">
+    <label for="companion-upload">File / 配套文件</label>
+    <input id="companion-upload" type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.mp4,.zip" required>
+    <p>PDF、Word、PowerPoint、Excel、图片、音视频或 ZIP；每个文件最多 30 MB。选好后点击上传，无需重新保存产品文字。</p>
+    <button type="submit">Upload companion file / 上传配套文件</button>
+  </form>
+  <% } %>
+</section>
 
 <% if (!isNew) { %>
 <form method="POST" action="/admin/recommendations/<%= encodeURIComponent(product.slug) %>/delete" onsubmit="return confirm('Delete this recommendation?');" style="margin-top:24px;">

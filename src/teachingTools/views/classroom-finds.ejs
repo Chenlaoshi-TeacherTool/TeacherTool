@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= lang === 'zh' ? '教室好物' : 'Classroom Finds' %> · Chen Laoshi's Teaching Toolkit</title>
+  <%- include('partials/seo', { pageDescription: 'Explore Chen Laoshi’s shop and Amazon classroom finds for every subject and Chinese lessons.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/stylesheets/content-pages.css">
+</head>
+<body>
+  <% function copy(en, zh) { return lang === 'zh' ? zh : en; } %>
+  <header class="content-hero">
+    <div class="content-shell">
+      <p class="content-kicker"><%= copy('Chosen with classroom teaching in mind', '从课堂需要出发') %></p>
+      <h1><%= copy('Classroom Finds', '教室好物') %></h1>
+      <p><%= copy('Explore Chen Laoshi’s shop and practical Amazon finds for every classroom and Chinese lessons.', '逛逛陈老师的小店，发现适合各学科与中文课堂的 Amazon 好物。') %></p>
+      <nav class="finds-shortcuts" aria-label="<%= copy('Browse classroom finds', '浏览教室好物') %>">
+        <a class="btn" href="https://www.ebay.com/usr/clsteachingtools" target="_blank" rel="noopener noreferrer"><%= copy('My shop ↗', '我的店铺 ↗') %></a>
+        <a class="btn" href="#every-classroom"><%= copy('For Every Classroom', '各学科通用') %></a>
+        <a class="btn" href="#chinese-class"><%= copy('For Chinese Class', '中文课堂精选') %></a>
+      </nav>
+    </div>
+  </header>
+  <main class="content-shell finds-main">
+    <section class="finds-store" aria-labelledby="my-shop-title">
+      <div><p class="content-kicker">Chen Laoshi’s Shop</p><h2 id="my-shop-title"><%= copy('My shop', '我的店铺') %></h2><p><%= copy('Visit my eBay store to browse available classroom products and order there.', '直接前往陈老师的 eBay 店铺，查看在售教具并购买。') %></p></div>
+      <a class="btn" href="https://www.ebay.com/usr/clsteachingtools" target="_blank" rel="noopener noreferrer"><%= copy('Visit my eBay shop ↗', '前往 eBay 店铺 ↗') %></a>
+    </section>
+    <section class="amazon-chart" aria-labelledby="amazon-title">
+      <header class="amazon-chart__head">
+        <p class="amazon-chart__eyebrow">Amazon Finds</p>
+        <h2 id="amazon-title"><%= copy('Amazon classroom finds', 'Amazon 好物推荐') %></h2>
+        <p><%= copy('Browse by classroom use. Photos show examples; links open Amazon search results so you can compare options.', '按教学用途浏览。图片展示商品示例；链接打开 Amazon 选购结果，方便比较规格。') %></p>
+      </header>
+      <div class="finds-categories" aria-label="<%= copy('Amazon categories', 'Amazon 推荐分类') %>">
+        <a class="btn" href="#every-classroom" data-finds-category="every-classroom"><%= copy('For Every Classroom', '各学科通用') %></a>
+        <a class="btn" href="#chinese-class" data-finds-category="chinese-class"><%= copy('For Chinese Class', '中文课堂精选') %></a>
+      </div>
+      <aside class="affiliate-note finds-disclosure"><h3><%= t('recommendations.affiliateTitle') %></h3><p><%= t('recommendations.affiliateP1') %></p><p><%= t('recommendations.affiliateP2') %></p></aside>
+      <% ['every-classroom', 'chinese-class'].forEach(function(category) { %>
+      <section id="<%= category %>" data-finds-panel aria-labelledby="<%= category %>-title">
+        <h3 id="<%= category %>-title"><%= category === 'every-classroom' ? copy('For Every Classroom', '各学科通用') : copy('For Chinese Class', '中文课堂精选') %></h3>
+        <p><%= category === 'every-classroom' ? copy('Reusable supplies for feedback, group work, displays, and classroom routines across subjects.', '适合各学科的可重复使用用品，支持即时反馈、小组合作、展示与课堂常规。') : copy('Use familiar materials for characters, pinyin, reading, and spoken Chinese.', '把常见用品用在汉字、拼音、阅读和中文口语活动中。') %></p>
+        <ul class="amazon-chart__list finds-card-grid">
+          <% products.forEach(function(product, index) { var item = localizeFind(product, lang, category); if (!item.categories.includes(category)) return; var dialogId = 'finds-dialog-' + category + '-' + index; %>
+          <li class="finds-card">
+            <button class="finds-open" type="button" data-finds-open="<%= dialogId %>" aria-haspopup="dialog" aria-label="<%= copy('How to use: ', '查看使用方法：') + item.title %>">
+              <% if (item.imageUrl) { %><span class="amazon-chart__image"><img src="<%= item.imageUrl %>" alt="" loading="lazy"></span><% } %>
+              <span class="amazon-chart__copy"><strong class="finds-card-title"><%= item.title %></strong><span class="finds-card-summary"><%= item.summary %></span><span class="finds-card-help"><%= copy('How to use', '查看使用方法') %> →</span></span>
+            </button>
+            <% if (item.productUrl) { %><a class="amazon-chart__cta" href="<%= item.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= copy('Browse on Amazon', '在 Amazon 选购') %> →<span class="visually-hidden"> · <%= item.title %></span></a><% } %>
+          </li>
+          <% }) %>
+        </ul>
+        <% if (!products.some(function(product) { return localizeFind(product, lang, category).categories.includes(category); })) { %><p><%= copy('No finds in this category yet.', '这个分类暂时没有产品。') %></p><% } %>
+      </section>
+      <% }) %>
+    </section>
+  </main>
+  <% ['every-classroom', 'chinese-class'].forEach(function(category) { products.forEach(function(product, index) { var item = localizeFind(product, lang, category); if (!item.categories.includes(category)) return; var dialogId = 'finds-dialog-' + category + '-' + index; %>
+  <dialog class="finds-dialog" id="<%= dialogId %>" aria-labelledby="<%= dialogId %>-title">
+    <button class="finds-close" type="button" data-finds-close aria-label="<%= copy('Close', '关闭') %>">×</button>
+    <h2 id="<%= dialogId %>-title"><%= item.title %></h2>
+    <% if (item.imageUrl) { %><img class="finds-dialog-image" src="<%= item.imageUrl %>" alt="<%= item.imageAlt || item.title %>" loading="lazy"><% } %>
+    <h3><%= copy('How to use', '使用方法') %></h3>
+    <p class="finds-usage"><%= item.usage || item.summary %></p>
+    <% if (item.categoryUse) { %><h3><%= category === 'chinese-class' ? copy('In Chinese class', '中文课堂用法') : copy('Across subjects', '各学科通用用法') %></h3><p class="finds-usage"><%= item.categoryUse %></p><% } %>
+    <% if (item.reasons && item.reasons.length) { %><h3><%= copy('Teaching ideas', '教学建议') %></h3><% item.reasons.forEach(function(reason) { %><h4><%= reason.title %></h4><p class="finds-usage"><%= reason.text %></p><% }) %><% } %>
+    <% if (item.teacherTip) { %><h3><%= item.teacherTipTitle || copy('Classroom tip', '课堂小贴士') %></h3><p class="finds-usage"><%= item.teacherTip %></p><% } %>
+    <% if (item.video) { %><h3><%= copy('Video demonstration', '视频示范') %></h3><iframe class="finds-video<%= item.video.vertical ? ' finds-video--vertical' : '' %>" data-video-src="https://www.youtube-nocookie.com/embed/<%= item.video.id %>" title="<%= copy('Video demonstration: ', '视频示范：') + item.title %>" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe><a href="https://www.youtube.com/watch?v=<%= item.video.id %>" target="_blank" rel="noopener noreferrer"><%= copy('Watch on YouTube', '在 YouTube 观看') %> ↗</a><% } %>
+    <%- include('partials/finds-downloads', { downloadProduct: item }) %>
+    <% if (item.printableLabelUrl) { %><p><a href="<%= item.printableLabelUrl %>"><%= item.printableLabelText || copy('Download printable labels', '下载配套标签') %></a></p><% } %>
+    <% if (item.printableLabelNote) { %><p><%= item.printableLabelNote %></p><% } %>
+    <p><a href="/classroom-finds/<%= encodeURIComponent(item.slug) %>"><%= copy('Open product page', '打开产品详情页') %> →</a></p>
+    <% if (item.productUrl) { %><a class="amazon-chart__cta" href="<%= item.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= copy('Browse on Amazon', '在 Amazon 选购') %> →</a><% } %>
+    <% if (item.linkNote) { %><p><%= item.linkNote %></p><% } %>
+  </dialog>
+  <% }); }); %>
+
+  <script src="/javascripts/classroom-finds.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

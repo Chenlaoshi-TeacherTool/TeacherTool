@@ -68,6 +68,8 @@ function toRecommendationProduct(row) {
     printableLabelUrl: row.printable_label_url,
     printableLabelText: row.printable_label_text,
     printableLabelNote: row.printable_label_note,
+    classroomContent: JSON.parse(row.classroom_content || '{}'),
+    companionFiles: JSON.parse(row.companion_files || '[]'),
     sortOrder: row.sort_order
   };
 }
@@ -76,8 +78,10 @@ async function loadAll() {
   var toolGuideRows = await dabGet('/toolguides');
   var articleRows = await dabGet('/articles?$orderby=created_at');
   var recommendationRows = [];
+  var recommendationsLoaded = false;
   try {
     recommendationRows = await dabGet('/recommendationproducts?$filter=is_published eq true&$orderby=sort_order');
+    recommendationsLoaded = true;
   } catch (err) {
     console.error('Could not load recommendations from DAB:', err.message);
   }
@@ -88,6 +92,7 @@ async function loadAll() {
   return {
     toolGuides: toolGuides,
     articles: articleRows.map(toArticle),
+    recommendationsLoaded: recommendationsLoaded,
     recommendations: recommendationRows.map(toRecommendationProduct)
   };
 }

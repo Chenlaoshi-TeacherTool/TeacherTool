@@ -20,7 +20,7 @@ test.after(function() { server.close(); });
 
 test('new section pages render in both languages with the required categories', async function() {
   var pages = {
-    '/shop': ['Printable packs', 'Physical products'],
+    '/shop': ['Classroom Finds', 'For Every Classroom', 'For Chinese Class'],
     '/shop/printable-packs': ['No printable packs are listed for sale yet.'],
     '/textbook-companion': ['/textbook-companion/jinan', 'Members', 'PEP Chinese', 'HSK Standard Course', 'Chinese Made Easy', 'Coming soon', 'is-coming-soon'],
     '/textbook-companion/jinan': ['/textbook-companion/jinan/book-1', '/textbook-companion/jinan/book-2', 'Book 1', 'Book 2'],
@@ -83,7 +83,7 @@ test('product detail pages preserve published content and fallback; unknown page
       assert.equal((await fetch(base + path)).status, 404, path);
     }
     var sitemap = await (await fetch(base + '/sitemap.xml')).text();
-    for (var path of ['/theme-activities/self-introduction', '/shop', '/textbook-companion', '/theme-activities/animals', '/classroom-finds/test-cart']) assert.ok(sitemap.includes(base + path));
+    for (var path of ['/theme-activities/self-introduction', '/classroom-finds', '/textbook-companion', '/theme-activities/animals', '/classroom-finds/test-cart']) assert.ok(sitemap.includes(base + path));
   } finally { products = []; }
 });
 
@@ -108,4 +108,19 @@ test('existing article pages remain available after retiring the list', async fu
     assert.ok(html.includes('Existing content'));
     assert.ok(!html.includes('href="/resources"'));
   } finally { articles = []; }
+});
+
+test('merged finds has one navigation entry, bilingual categories, and a direct shop link', async function() {
+  var response = await fetch(base + '/shop', { redirect: 'manual' });
+  assert.equal(response.status, 301);
+  assert.equal(response.headers.get('location'), '/classroom-finds');
+  var nav = require('../config/siteMap').clientNav().nav;
+  assert.equal(nav.filter(function(item) { return item.href === '/classroom-finds'; }).length, 1);
+  assert.ok(!nav.some(function(item) { return item.href === '/shop'; }));
+  for (var lang of ['en', 'zh']) {
+    var html = await (await fetch(base + '/classroom-finds', { headers: { Cookie: 'lang=' + lang } })).text();
+    for (var expected of ['https://www.ebay.com/usr/clsteachingtools', 'id="every-classroom"', 'id="chinese-class"', 'data-finds-category', 'sponsored nofollow', '/javascripts/classroom-finds.js']) assert.ok(html.includes(expected), expected);
+    assert.ok(html.includes(lang === 'zh' ? '听写汉字、拼音' : 'Dictate Chinese characters'));
+    assert.ok(!html.includes('/shop/printable-packs'));
+  }
 });

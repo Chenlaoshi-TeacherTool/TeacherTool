@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var siteContentStore = require('../services/siteContentStore');
-var amazonPicks = require('../config/amazonPicks');
+var classroomFinds = require('../services/classroomFinds');
+var findsDefaults = require('../config/classroomFindsDefaults.json');
 var siteMap = require('../config/siteMap');
 
 function text(req, en, zh) {
@@ -68,25 +69,12 @@ router.get('/theme-activities/halloween/printables', function(req, res) {
   res.redirect(301, '/theme-activities/halloween');
 });
 
-var shopCardCopy = {
-  'printable-packs': { en: ['Browse printable teaching packs.', 'Browse printables'], zh: ['浏览可打印的教学材料包。', '查看材料包'] },
-  'physical-products': { en: ['Hands-on materials for your classroom, sold in Chen Laoshi’s eBay store.', 'Visit the eBay store'], zh: ['适合课堂动手活动的教具，在陈老师的 eBay 店铺出售。', '前往 eBay 店铺'] }
-};
-
 router.get('/shop', function(req, res) {
-  var shop = section('shop');
-  renderPage(req, res, {
-    heading: text(req, shop.en, shop.zh),
-    intro: text(req, 'Explore Chen Laoshi’s printable packs and physical classroom products.', '浏览陈老师的可打印材料包与实体教具。'),
-    cards: shop.children.map(function(item) {
-      var copy = shopCardCopy[item.key] || { en: ['', 'Open'], zh: ['', '打开'] };
-      return { heading: text(req, item.en, item.zh), description: text(req, copy.en[0], copy.zh[0]), href: item.redirect || item.href, label: text(req, copy.en[1], copy.zh[1]) };
-    })
-  });
+  res.redirect(301, '/classroom-finds');
 });
 
 router.get('/shop/printable-packs', function(req, res) {
-  var packs = child('shop', 'printable-packs');
+  var packs = { en: 'Printable packs', zh: '可打印材料包' };
   renderPage(req, res, {
     heading: text(req, packs.en, packs.zh),
     intro: text(req, 'No printable packs are listed for sale yet.', '暂未上架可打印材料包。'),
@@ -101,14 +89,34 @@ router.get('/shop/physical-products', function(req, res) {
 });
 
 router.get('/classroom-finds', function(req, res) {
-  res.render('recommendations', { title: 'Classroom Finds', products: siteContentStore.get().recommendations || [], amazonPicks: amazonPicks });
+  var state = siteContentStore.get();
+  var products = state.recommendationsLoaded || (state.recommendations || []).length ? (state.recommendations || []) : findsDefaults;
+  res.render('classroom-finds', { title: 'Classroom Finds', products: products, localizeFind: classroomFinds.localized });
+});
+
+router.get('/classroom-finds/:slug/files/:blobName', async function(req, res, next) {
+  try {
+    var product = (siteContentStore.get().recommendations || []).find(function(item) { return item.slug === req.params.slug; });
+    var file = product && (product.companionFiles || []).find(function(item) { return item.blobName === req.params.blobName; });
+    if (!file) return res.sendStatus(404);
+    var stream = await require('../services/textbookFileStorage').open(file.blobName);
+    if (!stream) return res.sendStatus(404);
+    res.attachment(file.fileName || file.title).type(file.contentType);
+    res.set('Cache-Control', 'no-store');
+    require('stream').pipeline(stream, res, function(error) { if (error && !res.headersSent) next(error); });
+  } catch (error) { next(error); }
 });
 
 router.get('/classroom-finds/:slug', function(req, res, next) {
-  var products = siteContentStore.get().recommendations || [];
+  var state = siteContentStore.get();
+  var products = state.recommendationsLoaded || (state.recommendations || []).length ? (state.recommendations || []) : findsDefaults;
   var product = products.find(function(item) { return item.slug === req.params.slug; });
   // Keep the existing rolling-cart fallback available when DAB content is absent.
-  if (!product && (products.length || req.params.slug !== '15-drawer-rolling-cart')) return next();
+  if (!product && (state.recommendationsLoaded || products.length || req.params.slug !== '15-drawer-rolling-cart')) return next();
+  if (product && product.classroomContent) {
+    var localized = classroomFinds.localized(product, req.cookies && req.cookies.lang === 'zh' ? 'zh' : 'en', 'every-classroom');
+    product = Object.assign({}, localized, { description: localized.usage || localized.summary });
+  }
   res.render('recommendations', {
     title: product ? product.title : text(req, '15-drawer classroom rolling cart', '15抽屉教室收纳推车'),
     products: product ? [product] : [],

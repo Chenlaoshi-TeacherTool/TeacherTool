@@ -18,6 +18,8 @@ var communityRepository = require('../services/communityRepository');
 var textbookRepository = require('../services/textbookRepository');
 var textbookFileStorage = require('../services/textbookFileStorage');
 var toolVideos = require('../services/toolVideos');
+var classroomFinds = require('../services/classroomFinds');
+var recommendationFiles = require('../services/recommendationFiles');
 var toolCatalog = require('../services/toolCatalog');
 var communityService = require('../services/community');
 var sql = sqlClient.sql;
@@ -885,6 +887,7 @@ function parseReasons(body) {
 }
 
 function attachReasonFields(product) {
+  product.classroomContent = classroomFinds.read(product.classroom_content);
   var reasons = JSON.parse(product.reasons || '[]');
   [0, 1, 2].forEach(function (index) {
     var reason = reasons[index] || {};
@@ -897,8 +900,8 @@ function attachReasonFields(product) {
 router.get('/recommendations', async function (req, res, next) {
   try {
     var pool = await sqlClient.getPool();
-    var result = await pool.request().query('SELECT slug, title, category, sort_order, is_published FROM recommendation_products ORDER BY sort_order, title');
-    res.render('admin/recommendations-index', { title: 'Recommendations', products: result.recordset, adminUser: req.adminUser });
+    var result = await pool.request().query('SELECT slug, title, category, classroom_content, sort_order, is_published FROM recommendation_products ORDER BY sort_order, title');
+    res.render('admin/recommendations-index', { title: 'Recommendations', products: result.recordset.map(function (product) { product.classroomContent = classroomFinds.read(product.classroom_content); return product; }), adminUser: req.adminUser });
   } catch (err) { next(err); }
 });
 
@@ -908,10 +911,14 @@ router.get('/recommendations/new', function (req, res) {
 
 router.post('/recommendations/new', async function (req, res, next) {
   try {
+    var classroomContent;
+    try { classroomContent = classroomFinds.fromForm(req.body); }
+    catch (error) { return res.status(400).send(error.message); }
     var pool = await sqlClient.getPool();
     await pool.request()
       .input('slug', sql.NVarChar, req.body.slug)
-      .input('title', sql.NVarChar, req.body.title)
+      .input('title', sql.NVarChar, req.body.finds_title_zh || req.body.finds_title_en || req.body.title)
+      .input('classroomContent', sql.NVarChar, JSON.stringify(classroomContent))
       .input('subtitle', sql.NVarChar, req.body.subtitle || null)
       .input('category', sql.NVarChar, req.body.category || null)
       .input('description', sql.NVarChar, req.body.description || null)
@@ -929,8 +936,8 @@ router.post('/recommendations/new', async function (req, res, next) {
       .input('sortOrder', sql.Int, Number(req.body.sort_order) || 0)
       .input('isPublished', sql.Bit, req.body.is_published === 'on')
       .query(
-        'INSERT INTO recommendation_products (slug, title, subtitle, category, description, image_url, image_alt, product_url, link_text, link_note, reasons, teacher_tip_title, teacher_tip, printable_label_url, printable_label_text, printable_label_note, sort_order, is_published) ' +
-        'VALUES (@slug, @title, @subtitle, @category, @description, @imageUrl, @imageAlt, @productUrl, @linkText, @linkNote, @reasons, @teacherTipTitle, @teacherTip, @printableLabelUrl, @printableLabelText, @printableLabelNote, @sortOrder, @isPublished)'
+        'INSERT INTO recommendation_products (slug, title, subtitle, category, description, image_url, image_alt, product_url, link_text, link_note, reasons, teacher_tip_title, teacher_tip, printable_label_url, printable_label_text, printable_label_note, sort_order, is_published, classroom_content) ' +
+        'VALUES (@slug, @title, @subtitle, @category, @description, @imageUrl, @imageAlt, @productUrl, @linkText, @linkNote, @reasons, @teacherTipTitle, @teacherTip, @printableLabelUrl, @printableLabelText, @printableLabelNote, @sortOrder, @isPublished, @classroomContent)'
       );
     await siteContentStore.refresh();
     res.redirect('/admin/recommendations/' + encodeURIComponent(req.body.slug) + '/edit');
@@ -943,16 +950,21 @@ router.get('/recommendations/:slug/edit', async function (req, res, next) {
     var result = await pool.request().input('slug', sql.NVarChar, req.params.slug).query('SELECT * FROM recommendation_products WHERE slug = @slug');
     var product = result.recordset[0];
     if (!product) return res.status(404).send('Recommendation not found.');
+    product.companionFiles = JSON.parse(product.companion_files || '[]');
     res.render('admin/recommendations-edit', { title: 'Edit ' + product.title, product: attachReasonFields(product), isNew: false, adminUser: req.adminUser });
   } catch (err) { next(err); }
 });
 
 router.post('/recommendations/:slug', async function (req, res, next) {
   try {
+    var classroomContent;
+    try { classroomContent = classroomFinds.fromForm(req.body); }
+    catch (error) { return res.status(400).send(error.message); }
     var pool = await sqlClient.getPool();
     await pool.request()
       .input('slug', sql.NVarChar, req.params.slug)
-      .input('title', sql.NVarChar, req.body.title)
+      .input('title', sql.NVarChar, req.body.finds_title_zh || req.body.finds_title_en || req.body.title)
+      .input('classroomContent', sql.NVarChar, JSON.stringify(classroomContent))
       .input('subtitle', sql.NVarChar, req.body.subtitle || null)
       .input('category', sql.NVarChar, req.body.category || null)
       .input('description', sql.NVarChar, req.body.description || null)
@@ -970,11 +982,46 @@ router.post('/recommendations/:slug', async function (req, res, next) {
       .input('sortOrder', sql.Int, Number(req.body.sort_order) || 0)
       .input('isPublished', sql.Bit, req.body.is_published === 'on')
       .query(
-        'UPDATE recommendation_products SET title=@title, subtitle=@subtitle, category=@category, description=@description, image_url=@imageUrl, image_alt=@imageAlt, product_url=@productUrl, link_text=@linkText, link_note=@linkNote, reasons=@reasons, teacher_tip_title=@teacherTipTitle, teacher_tip=@teacherTip, printable_label_url=@printableLabelUrl, printable_label_text=@printableLabelText, printable_label_note=@printableLabelNote, sort_order=@sortOrder, is_published=@isPublished, updated_at=SYSUTCDATETIME() WHERE slug=@slug'
+        'UPDATE recommendation_products SET classroom_content=@classroomContent, title=@title, subtitle=@subtitle, category=@category, description=@description, image_url=@imageUrl, image_alt=@imageAlt, product_url=@productUrl, link_text=@linkText, link_note=@linkNote, reasons=@reasons, teacher_tip_title=@teacherTipTitle, teacher_tip=@teacherTip, printable_label_url=@printableLabelUrl, printable_label_text=@printableLabelText, printable_label_note=@printableLabelNote, sort_order=@sortOrder, is_published=@isPublished, updated_at=SYSUTCDATETIME() WHERE slug=@slug'
       );
     await siteContentStore.refresh();
     res.redirect('/admin/recommendations/' + encodeURIComponent(req.params.slug) + '/edit');
   } catch (err) { next(err); }
+});
+
+// Companion materials use the same private blob storage as activity materials.
+router.post('/recommendations/:slug/files', function (req, res, next) {
+  uploadMaterial.single('file')(req, res, function (error) {
+    if (error) return res.status(400).send(error.code === 'LIMIT_FILE_SIZE' ? 'Files can be at most 30 MB. / 单个文件不能超过 30 MB。' : error.message);
+    next();
+  });
+}, async function (req, res, next) {
+  var stored;
+  var attached = false;
+  try {
+    if (await recommendationFiles.list(req.params.slug) === null) return res.status(404).send('Recommendation not found.');
+    try { textbookFileStorage.check(req.file); }
+    catch (error) { return res.status(400).send(error.message); }
+    var fileName = Buffer.from(req.file.originalname, 'latin1').toString('utf8').slice(0, 200);
+    var title = String(req.body.title || '').trim().slice(0, 200) || fileName;
+    stored = await textbookFileStorage.save(req.file);
+    attached = await recommendationFiles.add(req.params.slug, Object.assign({ title: title, fileName: fileName }, stored));
+    if (!attached) { await textbookFileStorage.remove(stored.blobName); return res.status(404).send('Recommendation not found.'); }
+    await siteContentStore.refresh();
+    res.redirect(303, '/admin/recommendations/' + encodeURIComponent(req.params.slug) + '/edit#companion-files');
+  } catch (error) {
+    if (stored && !attached) await textbookFileStorage.remove(stored.blobName);
+    next(error);
+  }
+});
+
+router.post('/recommendations/:slug/files/:blobName/delete', async function (req, res, next) {
+  try {
+    await recommendationFiles.remove(req.params.slug, req.params.blobName);
+    // Retain the blob, as activity materials do, so in-flight downloads can finish.
+    await siteContentStore.refresh();
+    res.redirect(303, '/admin/recommendations/' + encodeURIComponent(req.params.slug) + '/edit#companion-files');
+  } catch (error) { next(error); }
 });
 
 router.post('/recommendations/:slug/delete', async function (req, res, next) {

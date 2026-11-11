@@ -173,6 +173,8 @@ CREATE TABLE recommendation_products (
     sort_order          INT           NOT NULL DEFAULT 0,
     is_published        BIT           NOT NULL DEFAULT 1,
     updated_at          DATETIME2     NOT NULL DEFAULT SYSUTCDATETIME(),
+    classroom_content nvarchar(max) NULL,
+    companion_files   nvarchar(max) NULL,
     CONSTRAINT CK_recommendation_products_reasons_json CHECK (reasons IS NULL OR ISJSON(reasons) = 1)
 );
 

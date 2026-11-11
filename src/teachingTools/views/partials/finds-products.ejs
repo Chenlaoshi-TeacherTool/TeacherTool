@@ -1,0 +1,72 @@
+        <% if (products && products.length) { %>
+          <% products.forEach(function (product) { %>
+        <article class="recommendation-product" aria-labelledby="product-<%= product.slug %>-title">
+          <% if (product.productUrl || product.imageUrl) { %>
+          <a class="recommendation-product__image" href="<%= product.productUrl || product.imageUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer" aria-label="<%= product.title %>">
+            <% if (product.imageUrl) { %><img src="<%= product.imageUrl %>" alt="<%= product.imageAlt || product.title %>" loading="lazy"><% } %>
+          </a>
+          <% } %>
+
+          <div class="recommendation-product__copy">
+            <% if (product.category) { %><p class="product-number"><%= product.category %></p><% } %>
+            <h2 id="product-<%= product.slug %>-title"><%= product.title %></h2>
+            <% if (!isDetail) { %><a class="resource-card__link" href="/classroom-finds/<%= encodeURIComponent(product.slug) %>"><%= lang === 'zh' ? '查看产品详情' : 'View product details' %> →</a><% } %>
+            <% if (product.subtitle) { %><p class="product-subtitle"><%= product.subtitle %></p><% } %>
+            <% if (product.description) { %><p><%= product.description %></p><% } %>
+
+            <% if (product.reasons && product.reasons.length) { %>
+            <h3><%= t('recommendations.product1WhyTitle') %></h3>
+            <div class="product-reasons">
+              <% product.reasons.forEach(function (reason) { %>
+              <section><strong><%= reason.title %></strong><p><%= reason.text %></p></section>
+              <% }) %>
+            </div>
+            <% } %>
+
+            <% if (product.teacherTip || product.teacherTipTitle) { %>
+            <div class="product-teacher-tip"><strong><%= product.teacherTipTitle || t('recommendations.product1TipStrong') %></strong><span> <%= product.teacherTip || '' %></span></div>
+            <% } %>
+
+            <%- include('finds-downloads', { downloadProduct: product }) %>
+            <% if (product.printableLabelUrl) { %>
+            <div class="product-printable-label">
+              <a href="<%= product.printableLabelUrl %>"><%= product.printableLabelText || 'Download printable labels' %></a>
+              <% if (product.printableLabelNote) { %><p><%= product.printableLabelNote %></p><% } %>
+            </div>
+            <% } %>
+
+            <% if (product.video) { %><iframe class="finds-video" src="https://www.youtube-nocookie.com/embed/<%= product.video.id %>" title="<%= product.title %>" allowfullscreen></iframe><% } %>
+            <% if (product.productUrl) { %>
+            <a class="btn product-link" href="<%= product.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= product.linkText || 'View product →' %></a>
+            <% } %>
+            <% if (product.linkNote) { %><p class="product-link-note"><%= product.linkNote %></p><% } %>
+          </div>
+        </article>
+          <% }) %>
+        <% } else { %>
+        <article class="recommendation-product" aria-labelledby="rolling-cart-title">
+          <a class="recommendation-product__image" href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer" aria-label="View the 15-drawer classroom rolling cart on Amazon">
+            <img src="/images/15-drawer-rolling-cart.png" alt="Classroom rolling cart with fifteen colorful drawers, a top work surface, and wheels" loading="lazy">
+          </a>
+
+          <div class="recommendation-product__copy">
+            <p class="product-number"><%= t('recommendations.product1Meta') %></p>
+            <h2 id="rolling-cart-title"><%= t('recommendations.product1Title') %></h2>
+            <% if (!isDetail) { %><a class="resource-card__link" href="/classroom-finds/15-drawer-rolling-cart"><%= lang === 'zh' ? '查看产品详情' : 'View product details' %> →</a><% } %>
+            <p class="product-subtitle"><%= t('recommendations.product1Subtitle') %></p>
+            <p><%= t('recommendations.product1Desc') %></p>
+
+            <h3><%= t('recommendations.product1WhyTitle') %></h3>
+            <div class="product-reasons">
+              <section><strong><%= t('recommendations.product1Reason1Strong') %></strong><p><%= t('recommendations.product1Reason1Text') %></p></section>
+              <section><strong><%= t('recommendations.product1Reason2Strong') %></strong><p><%= t('recommendations.product1Reason2Text') %></p></section>
+              <section><strong><%= t('recommendations.product1Reason3Strong') %></strong><p><%= t('recommendations.product1Reason3Text') %></p></section>
+            </div>
+
+            <div class="product-teacher-tip"><strong><%= t('recommendations.product1TipStrong') %></strong><span> <%= t('recommendations.product1TipText') %></span></div>
+
+            <a class="btn product-link" href="https://amzn.to/4qpPByl" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= t('recommendations.product1LinkText') %></a>
+            <p class="product-link-note"><%= t('recommendations.product1LinkNote') %></p>
+          </div>
+        </article>
+        <% } %>
