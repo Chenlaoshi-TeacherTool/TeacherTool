@@ -56,10 +56,6 @@
             color: #5d7168;
             font-size: .9rem;
         }
-        .tool-use-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-        .tool-use-filters button { font: inherit; padding: 9px 14px; border: 1px solid #356e57; border-radius: 22px; background: white; color: #194f45; cursor: pointer; }
-        .tool-use-filters button[aria-pressed="true"] { background: #194f45; color: white; }
-        .tool-use-filters button:focus-visible { outline: 3px solid #bf7f35; outline-offset: 3px; }
         .tool-search input { box-sizing: border-box; }
         .tool-empty-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .tool-empty-actions[hidden] { display: none; }
@@ -201,15 +197,9 @@
             <span aria-hidden="true">⌕</span>
             <input id="toolSearch" type="search" placeholder="<%= t('teachingToolsIndex.searchPlaceholder') %>" autocomplete="off" aria-describedby="toolSearchStatus">
         </div>
-        <div class="tool-use-filters" role="group" aria-label="<%= lang === 'zh' ? '按用途筛选' : 'Filter by use' %>">
-          <% [['all','All','全部'],['print','Printables','打印材料'],['project','Projector games','投影游戏'],['independent','Independent practice','学生自主练习'],['manage','Classroom management','课堂管理']].forEach(function(use) { %>
-          <button type="button" data-use="<%= use[0] %>" aria-pressed="<%= use[0] === 'all' %>"><%= use[lang === 'zh' ? 2 : 1] %></button>
-          <% }); %>
-        </div>
         <p id="toolSearchStatus" class="tool-search-status" role="status"><%= t('teachingToolsIndex.searchStatusDefault') %></p>
         <div id="toolEmptyActions" class="tool-empty-actions" hidden>
             <button id="clearToolSearch" class="btn" type="button"><%= lang === 'zh' ? '清除搜索' : 'Clear search' %></button>
-            <button id="showAllTools" class="btn" type="button"><%= lang === 'zh' ? '查看全部工具' : 'View all tools' %></button>
         </div>
     </section>
 
@@ -229,7 +219,7 @@
             <div class="tools-grid">
                 <% section.tools.forEach(function(tool, index) { %>
                 <% var searchText = [tool.titleKey, tool.scopeKey, tool.descKey].map(function(key) { return key ? t(key) + ' ' + tOther(key) : ''; }).join(' '); %>
-                <div data-uses="<%= tool.uses.join(' ') %>" data-search="<%= searchText %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %><%= index >= 8 ? ' tool-card--extra' : '' %>">
+                <div data-search="<%= searchText %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %><%= index >= 8 ? ' tool-card--extra' : '' %>">
                     <% if (tool.href) { %><%- include('../partials/tool-snapshot', { previewHref: tool.href }) %><% } %>
                     <h3><% if (tool.icon) { %><%= tool.icon %> <% } %><%= t(tool.titleKey) %><% if (tool.limitedFree) { %> <span class="tool-limited-free"><%= t('teachingToolsIndex.limitedFree') %></span><% } %></h3>
                     <p class="tool-scope"><%= t(tool.scopeKey) %></p>
@@ -263,17 +253,14 @@
 
             var emptyActions = document.getElementById('toolEmptyActions');
             var clearSearch = document.getElementById('clearToolSearch');
-            var selectedUse = 'all';
             var chinese = <%- JSON.stringify(lang === 'zh') %>;
-            var useButtons = document.querySelectorAll('[data-use]');
 
             function updateToolResults() {
                 var query = search.value.trim().toLocaleLowerCase();
                 var matches = 0;
 
                 cards.forEach(function (card) {
-                    var inScope = selectedUse === 'all' || (card.dataset.uses || '').split(' ').indexOf(selectedUse) !== -1;
-                    var isMatch = inScope && (!query || (card.dataset.search || card.textContent).toLocaleLowerCase().indexOf(query) !== -1);
+                    var isMatch = !query || (card.dataset.search || card.textContent).toLocaleLowerCase().indexOf(query) !== -1;
                     card.hidden = !isMatch;
                     if (isMatch) matches += 1;
                 });
@@ -283,29 +270,15 @@
                     section.hidden = sectionCards.every(function (card) { return card.hidden; });
                     document.querySelector('.tool-jump a[href="#' + section.id + '"]').hidden = section.hidden;
                 });
-                document.querySelector('.tool-sections').classList.toggle('is-filtering', Boolean(query) || selectedUse !== 'all');
+                document.querySelector('.tool-sections').classList.toggle('is-filtering', Boolean(query));
 
                 emptyActions.hidden = matches !== 0;
                 clearSearch.hidden = !query;
                 status.textContent = chinese ? '找到 ' + matches + ' 个工具和活动' + (query ? '：' + search.value.trim() : '') + '。' : 'Showing ' + matches + ' tools and activities' + (query ? ' for “' + search.value.trim() + '”' : '') + '.';
             }
 
-            useButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    selectedUse = button.dataset.use;
-                    useButtons.forEach(function(item) { item.setAttribute('aria-pressed', String(item === button)); });
-                    updateToolResults();
-                });
-            });
             clearSearch.addEventListener('click', function() {
                 search.value = '';
-                updateToolResults();
-                search.focus();
-            });
-            document.getElementById('showAllTools').addEventListener('click', function() {
-                selectedUse = 'all';
-                search.value = '';
-                useButtons.forEach(function(item) { item.setAttribute('aria-pressed', String(item.dataset.use === 'all')); });
                 updateToolResults();
                 search.focus();
             });
