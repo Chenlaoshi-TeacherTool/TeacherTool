@@ -1,0 +1,23 @@
+<% var L = function(en, zh) { return lang === 'zh' ? zh : en; }; %>
+<% if (item.limitedFree) { %><span class="printable-badge printable-badge--inline"><%= L('Free for a limited time', '限时免费') %></span><% } %>
+<h2 id="materialDialogTitle"><%= L(item.titleEn || item.title, item.title) %></h2>
+<p class="material-description"><%= L(item.descriptionEn || item.description, item.description || item.descriptionEn) %></p>
+<% var videoIndex = item.files.findIndex(function(file) { return !file.url && /^video\//.test(file.contentType || ''); }); %>
+<% if (videoIndex >= 0) { %><video class="material-video" controls playsinline preload="metadata" src="/materials/<%= item.id %>/files/<%= videoIndex %>?play=1"<% if (item.preview) { %> poster="/materials/<%= item.id %>/preview"<% } %>></video>
+<% } else if (item.preview) { %><img class="material-preview" src="/materials/<%= item.id %>/preview" alt="<%= item.title %>"><% } %>
+<p><%= L('Choose a version to download:', '选择需要下载的版本：') %></p>
+<div class="material-downloads"><% item.files.forEach(function(file, index) { var copy = download(file, lang); %>
+<a class="material-download" target="_blank" rel="noopener" href="/materials/<%= item.id %>/files/<%= index %>"><strong><%= copy.title %></strong><span><%= copy.note %></span></a>
+<% }) %></div>
+<% if (products.length) { %><section class="material-products"><h3><%= L('Classroom finds (optional)', '配套教学好物（选用）') %></h3>
+<% products.forEach(function(product) { %><article class="material-product">
+<% if (product.imageUrl) { %><img src="<%= product.imageUrl %>" alt="" loading="lazy"><% } %>
+<div><h4><%= product.title %></h4><p><%= product.summary %></p>
+<% if (product.activityUsage) { %><p class="material-description"><strong><%= L('Use with this activity: ', '配套玩法：') %></strong><%= product.activityUsage %></p><% } %>
+<a class="resource-card__link" href="<%= product.productUrl %>" target="_blank" rel="sponsored nofollow noopener noreferrer"><%= L('View on Amazon', '在 Amazon 查看') %> ↗</a></div>
+</article><% }) %>
+<p class="material-disclosure"><%= L('As an Amazon Associate I earn from qualifying purchases, at no extra cost to you.', '作为 Amazon 联盟会员，符合条件的购买会为我带来收益，您无需支付额外费用。') %></p></section><% } %>
+<% if (item.lessons.length) { %><section class="material-lessons"><h3><%= L('Applicable textbooks', '适用教材') %></h3><ul>
+<% item.lessons.forEach(function(lesson) { var series = textbooks.findSeries(lesson.series); var book = textbooks.findBook(series, lesson.book); %>
+<li><a href="/textbook-companion/<%= lesson.series %>/<%= lesson.book %>/<%= lesson.slug %>"><%= series ? L(series.en, series.zh) : lesson.series %> · <%= book ? L(book.en, book.zh) : lesson.book %> · <%= L('Lesson ' + lesson.lessonNo, '第' + lesson.lessonNo + '课') %>《<%= lesson.title %>》</a></li>
+<% }) %></ul></section><% } %>

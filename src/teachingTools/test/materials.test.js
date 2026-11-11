@@ -191,3 +191,24 @@ test('video attachments play inline on the detail page and answer byte-range req
     assert.deepEqual(asked, [{ start: 2, end: 5 }, null]);
   } finally { files.open = originalOpen; }
 });
+
+test('admin saves download copy and product usage; dialog escapes copy and links Amazon', async function () {
+  var product = require('../services/materialPresentation').products('zh')[0];
+  var data = form({ titleEn: 'Five Elements Planets', label_0: '星球图片 PDF', note_0: '打印使用', products: JSON.stringify([{ slug: product.slug, usage: '<script>test</script>', usageEn: 'Use these cards together.' }]) });
+  assert.equal((await save(data, 'admin')).status, 200);
+  var saved = items.get(seed.id);
+  assert.equal(saved.files[0].label, '星球图片 PDF');
+  assert.equal(saved.products[0].slug, product.slug);
+  var html = await (await fetch(base + '/materials/' + seed.id + '?dialog=1')).text();
+  assert.match(html, /星球图片 PDF/); assert.match(html, /&lt;script&gt;test&lt;\/script&gt;/);
+  assert.ok(!html.includes('<script>test</script>')); assert.match(html, /配套教学好物/);
+  assert.match(html, /rel="sponsored nofollow noopener noreferrer"/);
+  assert.ok(!html.includes('<html'));
+  var english = await (await fetch(base + '/materials/' + seed.id + '?dialog=1', { headers: { 'test-lang': 'en' } })).text();
+  assert.match(english, /Use these cards together/); assert.match(english, /Five Elements Planets/);
+  assert.equal((await save(form({ revision: '2', products: '[{"slug":"missing"}]' }), 'admin')).status, 400);
+  assert.equal((await save(form({ revision: '2', products: 'broken json' }), 'admin')).status, 400);
+  saved.ownerKey = 'teacher';
+  assert.equal((await save(form({ revision: '2', products: '[]' }), 'teacher')).status, 200);
+  assert.equal(items.get(seed.id).products[0].slug, product.slug);
+});

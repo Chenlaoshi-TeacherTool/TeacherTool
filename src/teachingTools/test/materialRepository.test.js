@@ -18,7 +18,7 @@ test('seed reuses the original blobs, edits persist once, and removing a link re
   assert.equal(item.lessons[0].slug, 'jinan-1-04');
   assert.ok(item.files.every(function (file) { return file.url.startsWith('https://chenlaoshitteaching.blob.core.windows.net/printables/'); }));
   var oldFiles = JSON.stringify(item.files);
-  var saved = await repository.save(Object.assign({}, item, { description: '持久化修改', themes: ['five-elements', 'weather'] }), [1], 1);
+  var saved = await repository.save(Object.assign({}, item, { products: [{ slug: 'sample', usage: '配套玩法', usageEn: 'Activity use' }], description: '持久化修改', themes: ['five-elements', 'weather'] }), [1], 1);
   assert.equal(saved.revision, 2);
   assert.equal((await repository.list({ theme: 'five-elements' }))[0].description, '持久化修改');
   assert.equal((await repository.list({ theme: 'weather' }))[0].id, item.id);
@@ -30,6 +30,7 @@ test('seed reuses the original blobs, edits persist once, and removing a link re
   assert.equal((await repository.list({ lesson: { series: 'jinan', book: 'book-1', slug: 'jinan-1-04' } })).length, 0);
   assert.equal((await repository.list()).length, 1);
   var onDisk = JSON.parse(await fs.readFile(process.env.MATERIALS_LOCAL_FILE, 'utf8'));
+  assert.deepEqual(onDisk[0].products, [{ slug: 'sample', usage: '配套玩法', usageEn: 'Activity use' }]);
   assert.deepEqual(onDisk[0].themes, ['five-elements', 'weather']);
   assert.equal(onDisk.length, 1); assert.equal(onDisk[0].revision, 3); assert.deepEqual(onDisk[0].lessons, []);
 });

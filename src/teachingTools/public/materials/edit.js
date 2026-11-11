@@ -69,6 +69,37 @@
       finally { $('refreshTextbooks').disabled = false; }
     });
   }
+  if ($('productLinks')) {
+    var productLinks = data.linkedProducts.slice();
+    function renderProducts() {
+      $('productLinks').replaceChildren();
+      productLinks.forEach(function (link, index) {
+        var product = data.products.find(function (p) { return p.slug === link.slug; });
+        var box = document.createElement('fieldset');
+        var title = document.createElement('legend'); title.textContent = product ? product.title : link.slug; box.append(title);
+        ['usage', 'usageEn'].forEach(function (key) {
+          var label = document.createElement('label'); label.textContent = key === 'usage' ? '配套玩法（中文）' : 'Use with this activity (English)';
+          var input = document.createElement('textarea'); input.rows = 3; input.maxLength = 2000; input.value = link[key] || '';
+          input.addEventListener('input', function () { link[key] = input.value; }); label.append(input); box.append(label);
+        });
+        [['↑', -1], ['↓', 1], [L('Remove', '移除'), 0]].forEach(function (action) {
+          var button = document.createElement('button'); button.type = 'button'; button.textContent = action[0];
+          button.disabled = action[1] === -1 && index === 0 || action[1] === 1 && index === productLinks.length - 1;
+          button.addEventListener('click', function () {
+            productLinks.splice(index, 1); if (action[1]) productLinks.splice(index + action[1], 0, link); renderProducts();
+          }); box.append(button);
+        });
+        $('productLinks').append(box);
+      });
+    }
+    $('addProduct').addEventListener('click', function () {
+      var slug = $('productChoice').value;
+      if (slug && !productLinks.some(function (p) { return p.slug === slug; })) productLinks.push({ slug: slug, usage: '', usageEn: '' });
+      renderProducts();
+    });
+    renderProducts();
+    $('materialForm').addEventListener('submit', function () { $('productsField').value = JSON.stringify(productLinks); });
+  }
   $('materialForm').addEventListener('submit', async function (event) {
     event.preventDefault(); $('materialError').hidden = true; $('saveMaterial').disabled = true;
     try {

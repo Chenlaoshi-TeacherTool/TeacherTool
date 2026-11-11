@@ -23,11 +23,15 @@
         <% if (adminMode) { %><button type="button" id="newTheme"><%= L('+ New theme', '＋新增主题') %></button><% } %>
       </fieldset>
       <label for="title"><%= L('Title', '标题') %></label><input id="title" name="title" maxlength="120" required value="<%= value.title || '' %>">
+      <label for="titleEn"><%= L('English title (optional)', '英文标题（可选）') %></label><input id="titleEn" name="titleEn" maxlength="120" value="<%= value.titleEn || '' %>">
       <label for="description"><%= L('Description (Chinese)', '中文简介') %></label><textarea id="description" name="description" maxlength="2000" rows="5"><%= value.description || '' %></textarea>
       <label for="descriptionEn"><%= L('Description (English, optional)', '英文简介（可选）') %></label><textarea id="descriptionEn" name="descriptionEn" maxlength="2000" rows="4"><%= value.descriptionEn || '' %></textarea>
       <% if (admin) { %><label><input type="checkbox" name="limitedFree"<%= value.limitedFree ? ' checked' : '' %>> <%= L('Free for a limited time', '限时免费') %></label><% } %>
       <fieldset><legend><%= L('Attachments', '附件') %></legend>
-        <% (value.files || []).forEach(function (file, index) { %><p><a href="/materials/<%= value.id %>/files/<%= index %>"><%= file.name %></a> <label><input type="checkbox" name="removeFiles" value="<%= index %>"> <%= L('Remove', '移除') %></label></p><% }) %>
+        <% (value.files || []).forEach(function (file, index) { %><p><a href="/materials/<%= value.id %>/files/<%= index %>"><%= file.name %></a> <label><input type="checkbox" name="removeFiles" value="<%= index %>"> <%= L('Remove', '移除') %></label></p><% ['label', 'labelEn', 'note', 'noteEn'].forEach(function(key, field) { %>
+        <label><%= ['按钮名称（中文）', 'Button title (English)', '用途说明（中文）', 'Description (English)'][field] %><input name="<%= key %>_<%= index %>" maxlength="120" value="<%= file[key] || '' %>" placeholder="<%= field < 2 ? 'PDF / Word / 任务卡 PDF' : L('Ready to print / Editable', '直接打印 / 可以编辑') %>"></label>
+        <% }) %><% }) %>
+        <p><%= L('New files use format labels automatically. Save first to customize their buttons.', '新附件默认按格式显示按钮，保存后可修改按钮名称和用途说明。') %></p>
         <label for="attachments"><%= L('Add files (up to 6 total, 30 MB each)', '添加文件（合计最多6个，每个不超过30 MB）') %></label>
         <input type="file" id="attachments" name="attachments" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.mp4,.zip">
       </fieldset>
@@ -45,6 +49,14 @@
         <p id="noLessons" hidden><%= L('No published lessons available.', '暂无可关联的已发布课次。') %></p>
         <ul id="lessonLinks"></ul>
       </fieldset>
+      <% if (admin) { %>
+      <fieldset><legend><%= L('Classroom finds (optional)', '配套 Amazon 产品（可选）') %></legend>
+      <p><%= L('Product introductions come from Classroom Finds. Add activity-specific instructions below.', '自动使用好物推荐中的产品简介；下方单独填写与本活动配套的玩法。') %></p>
+      <select id="productChoice"><% products.forEach(function(product) { %><option value="<%= product.slug %>"><%= product.title %></option><% }) %></select>
+      <button type="button" id="addProduct"><%= L('Add product', '添加产品') %></button>
+      <div id="productLinks"></div><input type="hidden" name="products" id="productsField">
+      </fieldset>
+      <% } %>
       <p id="materialError" role="alert" class="community-error" hidden></p>
       <button class="btn" type="submit" id="saveMaterial"><%= L('Save material', '保存材料') %></button>
     </form>
@@ -60,7 +72,7 @@
     </form>
   </dialog>
   <% } %>
-  <script type="application/json" id="materialData"><%- JSON.stringify({ catalog: catalog, series: textbooks.SERIES, selected: (value.lessons || []).map(function (lesson) { return lesson.id; }), lang: lang }).replace(/</g, '\\u003c') %></script>
+  <script type="application/json" id="materialData"><%- JSON.stringify({ products: products, linkedProducts: value.products || [], catalog: catalog, series: textbooks.SERIES, selected: (value.lessons || []).map(function (lesson) { return lesson.id; }), lang: lang }).replace(/</g, '\\u003c') %></script>
   <script src="/materials/edit.js"></script>
   <% if (!adminMode) { %><script src="/javascripts/milk-tea-footer.js"></script><% } %>
 </body>

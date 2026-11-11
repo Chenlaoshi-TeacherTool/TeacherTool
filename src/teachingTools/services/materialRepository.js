@@ -14,8 +14,8 @@ async function localData() {
 }
 function material(row) {
   return { id: row.id, ownerKey: row.owner_key, theme: row.theme, themes: JSON.parse(row.themes), title: row.title, description: row.description,
-    descriptionEn: row.description_en, limitedFree: Boolean(row.limited_free), preview: row.preview,
-    files: JSON.parse(row.files), revision: row.revision };
+    titleEn: row.title_en || '', descriptionEn: row.description_en, limitedFree: Boolean(row.limited_free), preview: row.preview,
+    products: JSON.parse(row.products || '[]'), files: JSON.parse(row.files), revision: row.revision };
 }
 async function catalog() {
   if (!process.env.SQL_CONNECTION_STRING) return [Object.assign({}, seed.lessons[0])];
@@ -66,12 +66,13 @@ async function save(item, lessonIds, revision) {
     var request = new db.sql.Request(tx).input('id', db.sql.VarChar(64), item.id)
       .input('owner', db.sql.Char(64), item.ownerKey).input('theme', db.sql.VarChar(40), item.theme)
       .input('themes', db.sql.NVarChar(db.sql.MAX), JSON.stringify(item.themes))
-      .input('title', db.sql.NVarChar(120), item.title).input('description', db.sql.NVarChar(2000), item.description)
+      .input('title', db.sql.NVarChar(120), item.title).input('titleEn', db.sql.NVarChar(120), item.titleEn || '').input('description', db.sql.NVarChar(2000), item.description)
       .input('en', db.sql.NVarChar(2000), item.descriptionEn).input('free', db.sql.Bit, item.limitedFree)
+      .input('products', db.sql.NVarChar(db.sql.MAX), JSON.stringify(item.products || []))
       .input('preview', db.sql.NVarChar(500), item.preview).input('files', db.sql.NVarChar(db.sql.MAX), JSON.stringify(item.files));
     await request.query(current.recordset.length
-      ? 'UPDATE dbo.activity_materials SET theme=@theme, themes=@themes, title=@title, description=@description, description_en=@en, limited_free=@free, preview=@preview, files=@files, revision=revision+1, updated_at=SYSUTCDATETIME() WHERE id=@id;'
-      : 'INSERT INTO dbo.activity_materials (id, owner_key, theme, themes, title, description, description_en, limited_free, preview, files) VALUES (@id,@owner,@theme,@themes,@title,@description,@en,@free,@preview,@files);');
+      ? 'UPDATE dbo.activity_materials SET theme=@theme, themes=@themes, title=@title, title_en=@titleEn, description=@description, description_en=@en, limited_free=@free, products=@products, preview=@preview, files=@files, revision=revision+1, updated_at=SYSUTCDATETIME() WHERE id=@id;'
+      : 'INSERT INTO dbo.activity_materials (id, owner_key, theme, themes, title, title_en, description, description_en, limited_free, products, preview, files) VALUES (@id,@owner,@theme,@themes,@title,@titleEn,@description,@en,@free,@products,@preview,@files);');
     await new db.sql.Request(tx).input('id', db.sql.VarChar(64), item.id).query('DELETE FROM dbo.activity_material_lessons WHERE material_id=@id;');
     for (var lessonId of lessonIds) {
       var linked = await new db.sql.Request(tx).input('id', db.sql.VarChar(64), item.id).input('lesson', db.sql.Int, lessonId)

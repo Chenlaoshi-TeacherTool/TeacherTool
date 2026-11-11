@@ -8,6 +8,8 @@ function create(options) {
   options = options || {};
   var repository = options.repository || require('../services/materialRepository');
   var files = options.files || require('../services/textbookFileStorage');
+  var presentation = require('../services/materialPresentation');
+  var getProducts = options.getProducts || presentation.products;
   var adminMode = Boolean(options.adminMode);
   var basePath = adminMode ? '/admin/materials' : '/materials';
   var getUser = options.getUser || function (req) {
@@ -25,7 +27,7 @@ function create(options) {
     if (!/^\/(?:materials|theme-activities)(?:\/|$)/.test(req.path)) return next();
     try { req.contentCatalog = await contentCatalog.load(); next(); } catch (error) { next(error); }
   });
-  var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: files.MAX_BYTES, files: 7, fields: 40, fieldSize: 10000 } })
+  var upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: files.MAX_BYTES, files: 7, fields: 100, fieldSize: 100000 } })
     .fields([{ name: 'attachments', maxCount: 6 }, { name: 'preview', maxCount: 1 }]);
   var validId = function (id) { return /^[a-zA-Z0-9_-]{1,64}$/.test(id); };
   function canEdit(user, item) { return Boolean(user && (user.admin || (item.ownerKey && item.ownerKey === user.key))); }
@@ -67,7 +69,7 @@ function create(options) {
       res.render('materials/edit', { title: item ? item.title : 'Upload material', item: item, themes: req.contentCatalog.themes,
         selectedTheme: !item && req.contentCatalog.themes.some(function (theme) { return theme.key === req.query.theme; }) ? req.query.theme : '',
         catalog: await repository.catalog(), textbooks: req.contentCatalog.textbooks, admin: user.admin,
-        adminMode: adminMode, basePath: basePath, adminUser: req.adminUser });
+        products: user.admin ? getProducts(res.locals.lang) : [], adminMode: adminMode, basePath: basePath, adminUser: req.adminUser });
     } catch (error) { next(error); }
   }
   router.get('/materials/new', editor);
@@ -77,7 +79,12 @@ function create(options) {
     try {
       var item = await repository.get(req.params.id);
       if (!item) return next();
-      res.render('materials/detail', { title: item.title, item: item, textbooks: req.contentCatalog.textbooks, canEdit: canEdit(getUser(req), item) });
+      var products = getProducts(res.locals.lang);
+      var linkedProducts = (item.products || []).map(function (link) {
+        var product = products.find(function (p) { return p.slug === link.slug; });
+        return product ? Object.assign({}, product, { activityUsage: res.locals.lang === 'zh' ? (link.usage || link.usageEn) : (link.usageEn || link.usage) }) : null;
+      }).filter(Boolean);
+      res.render(req.query.dialog === '1' ? 'materials/content' : 'materials/detail', { title: item.title, item: item, products: linkedProducts, textbooks: req.contentCatalog.textbooks, canEdit: canEdit(getUser(req), item), download: presentation.download });
     } catch (error) { next(error); }
   });
   router.get('/materials/:id/files/:index', async function (req, res, next) {
@@ -128,10 +135,30 @@ function create(options) {
       var catalog = await repository.catalog();
       if (ids.length > 100 || ids.some(function (id) { return !Number.isInteger(id) || !catalog.some(function (lesson) { return lesson.id === id; }); })) fail('Choose an available lesson. / 请选择有效课次。');
       var item = { id: id, ownerKey: old ? old.ownerKey : user.key, theme: selectedThemes[0], themes: selectedThemes,
-        title: text(body.title, 120, true), description: text(body.description || '', 2000, false),
+        title: text(body.title, 120, true), titleEn: text(body.titleEn || '', 120, false), description: text(body.description || '', 2000, false),
         descriptionEn: text(body.descriptionEn || '', 2000, false), limitedFree: old ? old.limitedFree : false,
         preview: old ? old.preview : '', files: old ? old.files.slice() : [] };
-      if (user.admin) item.limitedFree = body.limitedFree === 'on';
+      item.products = old ? (old.products || []) : [];
+      if (user.admin) {
+        item.limitedFree = body.limitedFree === 'on';
+        if (body.products !== undefined) {
+          var links;
+          try { links = JSON.parse(body.products); } catch (error) { fail('Invalid products. / 产品信息无效。'); }
+          var available = getProducts();
+          if (!Array.isArray(links) || links.length > 12) fail('Choose up to 12 products. / 最多关联12个产品。');
+          item.products = links.map(function (link) {
+            if (!link || !available.some(function (p) { return p.slug === link.slug; })) fail('Choose an available product. / 请选择有效产品。');
+            return { slug: link.slug, usage: text(link.usage || '', 2000, false), usageEn: text(link.usageEn || '', 2000, false) };
+          });
+        }
+      }
+      item.files = item.files.map(function (file, index) {
+        var copy = Object.assign({}, file);
+        ['label', 'labelEn', 'note', 'noteEn'].forEach(function (key) {
+          if (body[key + '_' + index] !== undefined) copy[key] = text(body[key + '_' + index], 120, false);
+        });
+        return copy;
+      });
       var remove = array(body.removeFiles).map(Number);
       if (remove.some(function (index) { return !Number.isInteger(index) || !item.files[index]; })) fail('Invalid attachment. / 附件无效。');
       item.files = item.files.filter(function (file, index) { return !remove.includes(index); });
