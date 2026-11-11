@@ -1,0 +1,128 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>什么不见了 · What's Missing - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'What\'s Missing vocabulary memory game for Chinese class. Type your words, show them with emoji, Chinese or pinyin, then one to three words disappear and the rest are shuffled.' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/whats-missing/whats-missing.css?v=2">
+</head>
+<body class="wm-page">
+  <main class="wm-wrap">
+    <header class="wm-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="wm-eyebrow"><%= L('Vocabulary memory game', '词汇记忆游戏') %></p>
+      <h1>🙈 <%= L('What\'s Missing?', '什么不见了？') %></h1>
+      <p><%= L('Students study the word cards and close their eyes. Some words disappear, the rest are shuffled, and students say what is missing.', '学生先记住词卡，然后闭上眼睛。有的词会消失，其余的词会打乱，学生说出什么不见了。') %></p>
+    </header>
+
+    <div class="wm-layout">
+      <section class="wm-panel" aria-labelledby="wmWordsHeading">
+        <p class="wm-kicker"><%= L('Step 1', '第一步') %></p>
+        <h2 id="wmWordsHeading"><label for="wmWords"><%= L('Type your words', '输入词语') %></label></h2>
+        <p class="wm-hint"><%= L('One word per line, 4 to 24 words. Pinyin and pictures are filled in for you. To set them yourself:', '每行一个词，4 到 24 个词。拼音和图片会自动配好。也可以自己写：') %> <code>猫 | māo | cat</code></p>
+        <textarea id="wmWords" class="wm-input" rows="10" spellcheck="false" placeholder="苹果&#10;香蕉&#10;西瓜&#10;草莓&#10;葡萄&#10;橙子"></textarea>
+        <p id="wmCount" class="wm-count" role="status" aria-live="polite"></p>
+
+        <div id="wmPreviewBox" hidden>
+          <h3><%= L('Pictures', '配图') %></h3>
+          <p class="wm-hint"><%= L('Click a word to choose a different picture, add one, or remove it.', '点一下词语，可以换一张图片、自己选一张，或者不用图片。') %></p>
+          <div id="wmPreview" class="wm-preview"></div>
+          <div id="wmPicker" class="wm-picker" hidden>
+            <div class="wm-picker-head">
+              <strong id="wmPickerTitle"></strong>
+              <button id="wmPickerClose" class="wm-btn wm-btn-ghost" type="button"><%= L('Close', '关闭') %></button>
+            </div>
+            <label for="wmPickerSearch" class="wm-hint"><%= L('Search in Chinese or English:', '用中文或英文搜索：') %></label>
+            <input id="wmPickerSearch" class="wm-input" type="search" autocomplete="off" placeholder="<%= L('e.g. fruit, 学校, happy', '比如：水果、school、开心') %>">
+            <div id="wmPickerResults" class="wm-picker-results" role="listbox" aria-label="<%= L('Pictures to choose from', '可选的图片') %>"></div>
+            <button id="wmPickerNone" class="wm-btn wm-btn-ghost" type="button"><%= L('No picture for this word', '这个词不用图片') %></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="wm-panel" aria-labelledby="wmSettingsHeading">
+        <p class="wm-kicker"><%= L('Step 2', '第二步') %></p>
+        <h2 id="wmSettingsHeading"><%= L('Game settings', '游戏设置') %></h2>
+
+        <fieldset class="wm-field">
+          <legend><%= L('Show on the cards', '词卡上显示') %></legend>
+          <div class="wm-options">
+            <label><input type="radio" name="wmMode" value="zh" checked> <span><%= L('Chinese', '中文') %></span></label>
+            <label><input type="radio" name="wmMode" value="py"> <span><%= L('Pinyin', '拼音') %></span></label>
+            <label><input type="radio" name="wmMode" value="both"> <span><%= L('Chinese + pinyin', '中文 + 拼音') %></span></label>
+          </div>
+          <label class="wm-check"><input type="checkbox" id="wmEmoji" checked> <span><%= L('Add an emoji picture to each word', '给每个词配 emoji 图片') %></span></label>
+        </fieldset>
+
+        <fieldset class="wm-field">
+          <legend><%= L('Words that disappear each round', '每轮消失几个词') %></legend>
+          <div class="wm-options">
+            <label><input type="radio" name="wmMissing" value="1" checked> <span>1</span></label>
+            <label><input type="radio" name="wmMissing" value="2"> <span>2</span></label>
+            <label><input type="radio" name="wmMissing" value="3"> <span>3</span></label>
+            <label><input type="radio" name="wmMissing" value="random"> <span><%= L('Random (1–3)', '随机（1–3 个）') %></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="wm-field">
+          <legend><%= L('Words that already disappeared', '消失过的词') %></legend>
+          <label class="wm-check"><input type="checkbox" id="wmRepeat"> <span><%= L('Can disappear again', '可以再次消失') %></span></label>
+          <p class="wm-hint"><%= L('When this is off, every word disappears once and then the game ends.', '不勾选时，每个词只消失一次，全部轮完后游戏结束。') %></p>
+        </fieldset>
+
+        <div class="wm-field">
+          <label for="wmTime" class="wm-label"><%= L('Time to memorize', '记忆时间') %></label>
+          <select id="wmTime" class="wm-input wm-select">
+            <option value="0"><%= L('No timer (teacher clicks)', '不限时（老师自己点）') %></option>
+            <option value="5"><%= L('5 seconds', '5 秒') %></option>
+            <option value="10"><%= L('10 seconds', '10 秒') %></option>
+            <option value="15"><%= L('15 seconds', '15 秒') %></option>
+            <option value="30"><%= L('30 seconds', '30 秒') %></option>
+          </select>
+        </div>
+
+        <p id="wmError" class="wm-error" role="alert"></p>
+        <button id="wmStart" class="wm-btn wm-btn-big" type="button">▶ <%= L('Start the game', '开始游戏') %></button>
+      </section>
+    </div>
+  </main>
+
+  <div id="wmStage" class="wm-stage" hidden>
+    <div class="wm-stage-top">
+      <p id="wmRound" class="wm-round"></p>
+      <div class="wm-headline">
+        <h2 id="wmHeadline" aria-live="polite"></h2>
+        <p id="wmSubline"></p>
+      </div>
+      <div class="wm-stage-tools">
+        <button id="wmFullscreen" class="wm-btn wm-btn-ghost" type="button"><%= L('Full screen', '全屏') %></button>
+        <button id="wmExit" class="wm-btn wm-btn-ghost" type="button"><%= L('Settings', '返回设置') %></button>
+      </div>
+    </div>
+    <div id="wmBoard" class="wm-board"></div>
+    <div class="wm-stage-bottom">
+      <button id="wmNext" class="wm-btn wm-btn-big" type="button"></button>
+    </div>
+    <div id="wmCurtain" class="wm-curtain" aria-hidden="true">
+      <div>
+        <span class="wm-curtain-face">🙈</span>
+        <p>闭上眼睛！</p>
+        <% if (!zh) { %><p class="wm-curtain-en">Close your eyes!</p><% } %>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/wordlist-core.js?v=cedict-1"></script>
+  <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/low-prep/whats-missing/whats-missing.js?v=2" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

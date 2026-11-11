@@ -381,6 +381,13 @@
                     <a href="/teaching-tools/measure-words" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
                 </div>
                 <div data-uses="project" class="tool-card snapshot-card">
+                    <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/whats-missing' }) %>
+                    <h3>🙈 <%= t('teachingToolsIndex.whatsMissingTitle') %></h3>
+                    <p class="tool-scope"><%= t('teachingToolsIndex.whatsMissingScope') %></p>
+                    <p><%= t('teachingToolsIndex.whatsMissingDesc') %></p>
+                    <a href="/teaching-tools/whats-missing" class="btn"><%= t('teachingToolsIndex.openActivity') %></a>
+                </div>
+                <div data-uses="project" class="tool-card snapshot-card">
                     <%- include('../partials/tool-snapshot', { previewHref: '/teaching-tools/character-race' }) %>
                     <h3>🏁 <%= t('teachingToolsIndex.termRaceTitle') %></h3>
                     <p class="tool-scope"><%= t('teachingToolsIndex.termRaceScope') %></p>
