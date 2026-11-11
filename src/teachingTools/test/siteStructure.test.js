@@ -24,10 +24,9 @@ test('new section pages render in both languages with the required categories', 
     '/shop/printable-packs': ['No printable packs are listed for sale yet.'],
     '/textbook-companion': ['/textbook-companion/jinan', 'Members', 'PEP Chinese', 'HSK Standard Course', 'Chinese Made Easy', 'Coming soon', 'is-coming-soon'],
     '/textbook-companion/jinan': ['/textbook-companion/jinan/book-1', '/textbook-companion/jinan/book-2', 'Book 1', 'Book 2'],
-    '/theme-activities/self-introduction': ['Who Am I? 我是谁？阅读卡片', '/printables/self-introduction/who-am-i-reading-cards.pdf', '/printables/self-introduction/who-am-i-reading-cards.docx'],
+    '/theme-activities/self-introduction': ['Self-introduction', 'Practice self-introductions'],
     '/theme-activities/five-elements': ['五行星球活动', 'Free for a limited time', '/materials/five-elements-planets'],
-    '/theme-activities/halloween': ['Vocabulary', 'Games', 'Printables', '/theme-activities/halloween/printables'],
-    '/theme-activities/halloween/printables': ['万圣节方位词_Gallery_Walk', 'halloween-position-words-gallery-walk.pdf', 'halloween-position-words-gallery-walk.docx'],
+    '/theme-activities/halloween': ['Vocabulary', 'Games', 'Printables', '/teaching-tools/secret-message'],
     '/theme-activities/chinese-new-year': ['Vocabulary', 'Games', 'Printables'],
     '/theme-activities/animals': ['Vocabulary', 'Games', 'Printables'],
     '/theme-activities/weather': ['Printables', '/theme-activities/weather/songs'],
@@ -50,6 +49,9 @@ test('legacy URLs redirect to the reorganized content', async function() {
   var response = await fetch(base + '/recommendations', { redirect: 'manual' });
   assert.equal(response.status, 301);
   assert.equal(response.headers.get('location'), '/classroom-finds');
+  var printables = await fetch(base + '/theme-activities/halloween/printables', { redirect: 'manual' });
+  assert.equal(printables.status, 301);
+  assert.equal(printables.headers.get('location'), '/theme-activities/halloween');
 });
 
 test('physical products go to the eBay store', async function() {

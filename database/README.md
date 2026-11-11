@@ -83,6 +83,9 @@ warning and the app logs one at start-up.
 - `0016_add-theme-order.sql` — `sort_order` on `content_catalog`: the theme order set by dragging
   on `/admin/materials`. A theme row with the key of a built-in theme (`config/siteMap.js`) now
   renames and orders that built-in theme; its page stays in code.
+- `0017_move-printables-to-materials.sql` — the self-introduction and Halloween printables that
+  were hard-coded in `routes/siteStructure.js` become `activity_materials` rows. Their files stay in
+  `public/printables` and the printables blob container; the rows link to them.
 
 ## Other files
 

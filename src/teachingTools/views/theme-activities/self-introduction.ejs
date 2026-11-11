@@ -12,59 +12,10 @@
     <div class="content-shell">
       <a class="text-link" href="<%= parent.href %>">← <%= parent.label %></a>
       <h1><%= title %></h1>
-      <p><%= lang === 'zh' ? '通过阅读、人物配对和猜人游戏练习个人介绍。选择 PDF 直接打印，或下载可编辑版本。' : 'Practice self-introductions through reading, character matching, and Guess Who. Print the PDF or download an editable version.' %></p>
+      <p><%= lang === 'zh' ? '通过阅读、人物配对和猜人游戏练习个人介绍。可直接打印 PDF，或下载可编辑版本。' : 'Practice self-introductions through reading, character matching, and Guess Who. Print the PDF or download an editable version.' %></p>
     </div>
   </header>
-  <main class="content-section">
-    <div class="content-shell resource-grid">
-      <% printables.forEach(function(item, index) { %>
-      <button type="button" class="resource-card printable-card" data-dialog="printable-<%= index %>">
-        <% if (item.limitedFree) { %><span class="printable-badge"><%= lang === 'zh' ? '限时免费' : 'Free for a limited time' %></span><% } %>
-        <span class="resource-card__meta">👋 <%= item.pages %> <%= lang === 'zh' ? '页' : 'pages' %> · PDF<%= item.docx ? ' / Word' : '' %><%= item.pptx ? ' / PowerPoint' : '' %></span>
-        <h2><%= item.title %></h2>
-        <p><%= lang === 'zh' ? item.zh : item.en %></p>
-        <span class="resource-card__link"><%= lang === 'zh' ? '下载' : 'Download' %> →</span>
-      </button>
-
-      <dialog class="printable-dialog" id="printable-<%= index %>" aria-labelledby="printable-<%= index %>-title">
-        <form method="dialog" class="printable-dialog__close"><button aria-label="<%= lang === 'zh' ? '关闭' : 'Close' %>">×</button></form>
-        <% if (item.limitedFree) { %><span class="printable-badge printable-badge--inline"><%= lang === 'zh' ? '限时免费' : 'Free for a limited time' %></span><% } %>
-        <h2 id="printable-<%= index %>-title"><%= item.title %></h2>
-        <p><%= lang === 'zh' ? '选择要下载的版本：' : 'Choose a version to download:' %></p>
-        <div class="printable-dialog__options">
-          <a class="printable-option" href="<%= item.pdf %>" target="_blank" rel="noopener">
-            <strong>PDF</strong>
-            <span><%= lang === 'zh' ? '直接打印' : 'Ready to print' %></span>
-          </a>
-          <% if (item.docx) { %>
-          <a class="printable-option" href="<%= item.docx %>" download>
-            <strong>Word</strong>
-            <span><%= lang === 'zh' ? '可编辑修改' : 'Editable' %></span>
-          </a>
-          <% } %>
-          <% if (item.pptx) { %>
-          <a class="printable-option" href="<%= item.pptx %>" download>
-            <strong>PowerPoint</strong>
-            <span><%= lang === 'zh' ? '可编辑修改' : 'Editable' %></span>
-          </a>
-          <% } %>
-        </div>
-        <% if (item.createHref) { %>
-        <p><%= lang === 'zh' ? '想创建自己的 Secret Message？' : 'Want to create your own Secret Message?' %> <a class="text-link" href="<%= item.createHref %>"><%= lang === 'zh' ? '前往图形密码生成器' : 'Open the Secret Message generator' %> →</a></p>
-        <% } %>
-      </dialog>
-      <% }) %>
-    </div>
-  </main>
   <%- include('../materials/theme-section') %>
-  <script>
-    document.querySelectorAll('[data-dialog]').forEach(function (card) {
-      var dialog = document.getElementById(card.dataset.dialog);
-      card.addEventListener('click', function () { dialog.showModal(); });
-      // Clicking the backdrop (outside the dialog box) closes it.
-      dialog.addEventListener('click', function (event) { if (event.target === dialog) dialog.close(); });
-    });
-  </script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>

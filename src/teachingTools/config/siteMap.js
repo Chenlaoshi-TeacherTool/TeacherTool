@@ -43,8 +43,7 @@ var SECTIONS = [
         descEn: 'Practice personal introductions with character reading and matching activities.', descZh: '通过人物介绍阅读与配对活动，练习介绍自己。', tags: 'personal introduction 自我介绍 我是谁 Who Am I' },
       {
         key: 'halloween', href: '/theme-activities/halloween', en: 'Halloween', zh: '万圣节', template: 'theme', icon: '🎃',
-        descEn: 'Vocabulary, games, and printables.', descZh: '词汇、游戏与可打印材料。',
-        children: [{ key: 'halloween-printables', href: '/theme-activities/halloween/printables', en: 'Halloween printables', zh: '万圣节可打印材料' }]
+        descEn: 'Vocabulary, games, and printables.', descZh: '词汇、游戏与可打印材料。'
       },
       { key: 'chinese-new-year', href: '/theme-activities/chinese-new-year', en: 'Chinese New Year', zh: '春节', template: 'theme', icon: '🧧',
         descEn: 'Vocabulary, games, and printables.', descZh: '词汇、游戏与可打印材料。' },

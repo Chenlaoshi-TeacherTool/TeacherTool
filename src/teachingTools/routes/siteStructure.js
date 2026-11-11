@@ -34,24 +34,7 @@ function child(sectionKey, key) {
 router.get('/theme-activities/self-introduction', function(req, res) {
   res.render('theme-activities/self-introduction', {
     title: themeTitle(req, 'self-introduction'),
-    parent: parentLink(req, 'activities'),
-    printables: [{
-      title: 'Who Am I? 我是谁？阅读卡片',
-      en: 'Read six personal introductions and match each one to a character letter. Practice names, ages, birthdays, hobbies, possessions, and places of residence.',
-      zh: '阅读 6 段人物介绍，将每段与对应的人物字母配对。练习姓名、年龄、生日、爱好、物品和居住地等表达。',
-      pages: 2,
-      limitedFree: true,
-      pdf: '/printables/self-introduction/who-am-i-reading-cards.pdf',
-      docx: '/printables/self-introduction/who-am-i-reading-cards.docx'
-    }, {
-      title: 'Guess Who? 猜人游戏卡片',
-      en: 'Ask and answer questions in Chinese to guess your partner’s character.',
-      zh: '用中文提问和回答，猜出同伴选的是哪个人物。',
-      pages: 4,
-      limitedFree: true,
-      pdf: '/printables/self-introduction/guess-who-game-cards.pdf',
-      pptx: '/printables/self-introduction/guess-who-game-cards.pptx'
-    }]
+    parent: parentLink(req, 'activities')
   });
 });
 
@@ -74,41 +57,15 @@ router.get('/theme-activities/:theme', function(req, res, next) {
       { heading: text(req, 'Vocabulary', '词汇'), description: text(req, 'Theme vocabulary has not been added yet.', '此主题的词汇尚未添加。') },
       { heading: text(req, 'Games', '游戏'), description: text(req, 'Use your own theme words with the existing classroom games.', '把自己的主题词汇用于现有课堂游戏。'), href: theme.key === 'halloween' ? '/teaching-tools/witchs-poison' : '/teaching-tools/bingo-generator', label: text(req, 'Open game', '打开游戏') },
       theme.key === 'halloween'
-        ? { heading: text(req, 'Printables', '可打印材料'), description: text(req, 'Ready-to-print Halloween worksheets in PDF and Word.', '可直接打印的万圣节练习单，提供 PDF 和 Word 版。'), href: '/theme-activities/halloween/printables', label: text(req, 'Browse printables', '查看材料') }
+        ? { heading: text(req, 'Printables', '可打印材料'), description: text(req, 'Make your own Halloween Secret Message worksheet with your class words.', '用自己班的词语制作万圣节图形密码练习纸。'), href: '/teaching-tools/secret-message', label: text(req, 'Open the Secret Message generator', '前往图形密码生成器') }
         : { heading: text(req, 'Printables', '可打印材料'), description: text(req, 'Theme packs have not been added yet. Create a worksheet with your own words.', '主题材料包尚未添加，可用自己的词汇制作练习单。'), href: '/teaching-tools/worksheet-generator', label: text(req, 'Create a worksheet', '制作练习单') }
     ]
   });
 });
 
-// Files live in the public "printables" blob container.
-var PRINTABLES_BASE = 'https://chenlaoshitteaching.blob.core.windows.net/printables/';
-var halloweenPrintables = [
-  {
-    title: '万圣节图形密码 · Secret Message',
-    en: 'Decode Halloween pictures to reveal a secret message from your teacher. Includes a worksheet and answer key.',
-    zh: '对照图形密码表，写出汉字，解开老师的万圣节秘密信息。含练习纸和答案页。',
-    pages: 2,
-    pdf: '/printables/halloween/halloween-secret-message.pdf',
-    createHref: '/teaching-tools/secret-message'
-  },
-  {
-    title: '万圣节方位词_Gallery_Walk',
-    en: 'Read each position-word sentence, find the matching picture around the room, and write its letter. Includes 10 picture cards and an answer key.',
-    zh: '读方位词句子，在教室里找到对应的图片并写下字母。含 10 张图片卡和答案。',
-    pages: 12,
-    limitedFree: true,
-    pdf: PRINTABLES_BASE + 'halloween/halloween-position-words-gallery-walk.pdf',
-    docx: PRINTABLES_BASE + 'halloween/halloween-position-words-gallery-walk.docx'
-  }
-];
-
+// Halloween printables are activity materials now, listed on the theme page itself.
 router.get('/theme-activities/halloween/printables', function(req, res) {
-  var halloween = child('activities', 'halloween');
-  res.render('theme-activities/halloween/printables', {
-    title: text(req, 'Halloween printables', '万圣节可打印材料'),
-    parent: { href: halloween.href, label: text(req, halloween.en, halloween.zh) },
-    printables: halloweenPrintables
-  });
+  res.redirect(301, '/theme-activities/halloween');
 });
 
 var shopCardCopy = {
