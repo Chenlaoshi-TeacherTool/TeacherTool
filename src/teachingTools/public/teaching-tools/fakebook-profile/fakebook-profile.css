@@ -104,7 +104,7 @@
 .fb-cover {
   position: relative;
   height: 220px;
-  background: linear-gradient(135deg, #1877f2, #4a9eff 65%, #7fc0ff);
+  background: #e4e6eb;
   background-size: cover;
   background-position: center;
   display: flex;
@@ -118,12 +118,12 @@
 }
 .fb-cover.has-image.dragging { cursor: grabbing; }
 .fb-cover-hint {
-  color: rgba(255,255,255,0.92);
+  color: #65676b;
   font-weight: 900;
   font-size: 1.3rem;
   text-align: center;
   max-width: 80%;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  text-shadow: none;
 }
 .fb-cover.has-image .fb-cover-hint { display: none; }
 .fb-cover-edit {
@@ -141,6 +141,21 @@
   cursor: pointer;
 }
 .fb-cover-edit:hover { background: #fff; }
+.fb-cover-remove {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: #1c1e21;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.fb-cover-remove[hidden], .fb-print-value { display: none; }
 
 .fb-identity {
   display: flex;
@@ -556,9 +571,31 @@
 }
 
 @media print {
+  @page { margin: 12mm; }
+  .fb-app, .fb-app * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
   .fb-tools-bar, .fb-privacy-note, .fb-composer, .fb-reply-form, .fb-post-delete,
-  .fb-reply-delete, .fb-remove-line, .fb-friend-remove, .fb-cover-edit,
+  .fb-reply-delete, .fb-remove-line, .fb-friend-remove, .fb-cover-edit, .fb-cover-remove,
+  .fb-cover-hint, #addIntroLineButton, #addFriendButton,
   .fb-about, .fb-toast, .site-main-nav, .milk-tea-site-footer, .account-coming-soon { display: none !important; }
   .fb-app { padding: 0; max-width: 100%; }
-  body { background: #fff; }
+  body.fb-body { background: #f0f2f5; margin: 0; }
+  .fb-columns { grid-template-columns: minmax(0, 32%) minmax(0, 1fr); gap: 12px; }
+  .fb-cover { height: 180px; }
+  .fb-cover-card, .fb-card, .fb-post, .fb-empty-posts {
+    border: 1px solid #dfe3ea;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  .fb-card, .fb-post { padding: 12px; }
+  .fb-posts { display: block; }
+  .fb-post { margin-bottom: 12px; }
+  .fb-reply, .fb-friend-card { break-inside: avoid; }
+  .fb-post-image { max-height: 140mm; object-fit: contain; }
+  input.fb-name-input, input.fb-intro-line, input.fb-inline-title-input, input.fb-friend-name { display: none; }
+  .fb-print-value { display: block; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .fb-name-input.fb-print-value { font-size: 24pt; }
+  .fb-intro-line.fb-print-value { font-size: 10pt; }
 }

@@ -44,6 +44,7 @@
     els.coverPhoto = document.getElementById('coverPhoto');
     els.coverHint = document.getElementById('coverHint');
     els.coverEditButton = document.getElementById('coverEditButton');
+    els.coverRemoveButton = document.getElementById('coverRemoveButton');
     els.avatarPhoto = document.getElementById('avatarPhoto');
     els.characterName = document.getElementById('characterName');
 
@@ -192,6 +193,7 @@
       els.coverPhoto.classList.remove('has-image');
     }
     var coverPos = profile.coverPosition || { x: 50, y: 50 };
+    els.coverRemoveButton.hidden = !profile.cover;
     els.coverPhoto.style.backgroundPosition = coverPos.x + '% ' + coverPos.y + '%';
 
     if (profile.avatar) {
@@ -596,6 +598,7 @@
     }
 
     els.coverPhoto.addEventListener('pointerdown', function (evt) {
+      if (evt.target.closest('button')) return;
       var profile = activeProfile();
       if (!profile || !profile.cover) return;
       var rect = els.coverPhoto.getBoundingClientRect();
@@ -652,7 +655,21 @@
       evt.stopPropagation();
       triggerCoverPick();
     });
+    els.coverRemoveButton.addEventListener('click', function (evt) {
+      evt.stopPropagation();
+      var profile = activeProfile();
+      profile.cover = '';
+      profile.coverPosition = { x: 50, y: 50 };
+      coverJustDragged = false;
+      els.coverPhoto.style.backgroundImage = '';
+      els.coverPhoto.style.backgroundPosition = '50% 50%';
+      els.coverPhoto.classList.remove('has-image', 'dragging');
+      els.coverRemoveButton.hidden = true;
+      persist(true);
+      els.coverEditButton.focus();
+    });
     els.coverPhoto.addEventListener('keydown', function (evt) {
+      if (evt.target !== els.coverPhoto) return;
       if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); triggerCoverPick(); }
     });
     function triggerCoverPick() {
@@ -803,7 +820,18 @@
       reader.readAsText(file);
     });
 
+    function preparePrint() {
+      els.printButton.ownerDocument.querySelectorAll('.fb-print-value').forEach(function (node) { node.remove(); });
+      document.querySelectorAll('.fb-name-input, .fb-intro-line, .fb-inline-title-input, .fb-friend-name').forEach(function (input) {
+        var text = document.createElement('span');
+        text.className = input.className + ' fb-print-value';
+        text.textContent = input.value || input.placeholder || '';
+        input.insertAdjacentElement('afterend', text);
+      });
+    }
+    window.addEventListener('beforeprint', preparePrint);
     els.printButton.addEventListener('click', function () {
+      preparePrint();
       window.print();
     });
   }
