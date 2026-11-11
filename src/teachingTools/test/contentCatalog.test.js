@@ -85,12 +85,12 @@ test('a theme icon is optional, shows on the theme list, and admins can edit nam
   assert.equal((await add('/themes/spring-test/edit', { zh: '春天', en: 'Spring', icon: '🌸' }, { 'x-ms-client-principal-idp': 'teachers' })).status, 403);
   assert.equal((await add('/themes/spring-test/edit', { zh: '春天', en: 'Spring', icon: '🌸' }, { origin: 'https://other.example' })).status, 403);
   assert.equal((await add('/themes/spring-test/edit', { zh: '', en: 'Spring' })).status, 400);
-  assert.equal((await add('/themes/weather/edit', { zh: '天气', en: 'Weather', icon: '🌸' })).status, 404);
+  assert.equal((await add('/themes/no-such-theme/edit', { zh: '天气', en: 'Weather', icon: '🌸' })).status, 404);
   assert.equal((await add('/themes/spring-test/edit', { zh: '春天测试', en: 'Spring test', icon: '🌸' })).status, 200);
   assert.match(await (await fetch(base + '/theme-activities', { headers: { 'test-lang': 'zh' } })).text(), /<h3>🌸 春天测试<\/h3>/);
   var reloaded = await catalog.create({ file: process.env.CONTENT_CATALOG_LOCAL_FILE }).load();
   assert.equal(reloaded.themes.find(function (theme) { return theme.key === 'spring-test'; }).icon, '🌸');
-  assert.match(await (await fetch(base + '/admin/materials', { headers: admin })).text(), /\/admin\/themes\/spring-test\/edit/);
+  assert.match(await (await fetch(base + '/admin/materials', { headers: admin })).text(), /<li draggable="true" data-key="spring-test">/);
 });
 
 test('invalid, duplicate and reserved URLs never replace existing entries', async function () {
@@ -132,6 +132,27 @@ test('new textbooks and books reach public pages, Excel import and material less
   var theme = await (await fetch(base + '/theme-activities/spring-test')).text(); assert.match(theme, /跨主题教材材料/);
   var lesson = await (await fetch(base + '/textbook-companion/test-course/book-1/test-01')).text(); assert.match(lesson, /跨主题教材材料/);
   var detail = await (await fetch(base + '/materials/' + savedMaterial.id)).text(); assert.match(detail, /测试教材/);
+});
+
+test('built-in themes can be renamed, and the saved order is used on the public list', async function () {
+  assert.equal((await add('/themes/animals/edit', { zh: '小动物', en: 'Little animals', icon: '🐼' })).status, 200);
+  var list = await (await fetch(base + '/theme-activities', { headers: { 'test-lang': 'zh' } })).text();
+  assert.match(list, /<h3>🐼 小动物<\/h3>/); assert.doesNotMatch(list, /<h3>🐾 动物<\/h3>/);
+  assert.match(await (await fetch(base + '/theme-activities/animals', { headers: { 'test-lang': 'en' } })).text(), /Little animals/);
+  var animals = (await catalog.load()).themes.find(function (theme) { return theme.key === 'animals'; });
+  assert.equal(animals.template, 'theme'); assert.ok(!animals.custom);
+  var keys = (await catalog.load()).themes.map(function (theme) { return theme.key; });
+  var reversed = keys.slice().reverse();
+  assert.equal((await add('/themes/order', { keys: reversed }, { origin: 'https://other.example' })).status, 403);
+  assert.equal((await add('/themes/order', { keys: reversed.slice(1) })).status, 400);
+  assert.equal((await add('/themes/order', { keys: reversed.slice(1).concat(['no-such-theme']) })).status, 400);
+  assert.equal((await add('/themes/order', { keys: reversed })).status, 200);
+  assert.deepEqual((await catalog.create({ file: process.env.CONTENT_CATALOG_LOCAL_FILE }).load()).themes.map(function (theme) { return theme.key; }), reversed);
+  list = await (await fetch(base + '/theme-activities')).text();
+  assert.ok(list.indexOf('/theme-activities/' + reversed[0] + '"') < list.indexOf('/theme-activities/' + reversed[1] + '"'));
+  assert.equal((await add('/themes/new', { key: 'added-later', zh: '后加', en: 'Added later' })).status, 200);
+  assert.equal((await catalog.load()).themes.pop().key, 'added-later');
+  assert.equal((await catalog.load()).themes.find(function (theme) { return theme.key === 'animals'; }).zh, '小动物');
 });
 
 test('SQL catalog writes use parameters, reload saved entries and translate duplicate key errors', async function () {

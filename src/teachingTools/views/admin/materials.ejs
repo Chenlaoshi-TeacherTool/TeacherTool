@@ -1,25 +1,112 @@
 <%- include('layout-head', { title: title, adminUser: adminUser }) %>
 <% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; %>
-<h1><%= L('Activity materials', '活动材料管理') %></h1>
-<p><a class="button" href="/admin/themes/new"><%= L('+ New theme', '＋新增主题') %></a></p>
-<% var customThemes = themes.filter(function (theme) { return theme.custom; }); if (customThemes.length) { %>
-<p><%= L('Themes you added:', '你新增的主题：') %>
-  <% customThemes.forEach(function (theme) { %><span style="display:inline-block;margin-right:1em"><%= theme.icon ? theme.icon + ' ' : '' %><%= L(theme.en, theme.zh) %> · <a href="/admin/themes/<%= theme.key %>/edit"><%= L('Edit name / icon', '编辑名称和图标') %></a></span><% }) %>
-</p>
-<% } %>
-<p><%= L('Upload once, then choose the theme pages and textbook lessons where this material appears.', '上传一份材料，选择展示的主题页和教材课次。以后编辑一次，所有入口一起更新。') %></p>
-<p><a class="button" href="/admin/materials/new"><%= L('Upload material', '上传材料') %></a></p>
-<div style="overflow-x:auto">
-<table>
-  <thead><tr><th><%= L('Material', '材料') %></th><th><%= L('Theme pages', '主题页') %></th><th><%= L('Textbook lessons', '教材课次') %></th><th><%= L('Actions', '操作') %></th></tr></thead>
-  <tbody><% items.forEach(function (item) { %>
-    <tr><td><strong><%= item.title %></strong><br><%= item.files.length %> <%= L('attachments', '个附件') %><% if (item.limitedFree) { %><br><%= L('Free for a limited time', '限时免费') %><% } %></td>
-      <td><% (item.themes || [item.theme]).forEach(function (key) { var theme = themes.find(function (t) { return t.key === key; }); %><div><%= theme ? L(theme.en, theme.zh) : key %></div><% }) %></td>
-      <td><% item.lessons.forEach(function (lesson) { var series = textbooks.findSeries(lesson.series); var book = textbooks.findBook(series, lesson.book); %><div><%= series ? L(series.en, series.zh) : lesson.series %> · <%= book ? L(book.en, book.zh) : lesson.book %> · <%= L('Lesson ' + lesson.lessonNo, '第' + lesson.lessonNo + '课') %> <%= lesson.title %></div><% }) %></td>
-      <td><a href="/admin/materials/<%= item.id %>/edit"><%= L('Edit', '编辑') %></a> · <a href="/materials/<%= item.id %>"><%= L('View', '查看') %></a></td>
-    </tr>
-  <% }) %></tbody>
-</table>
+<style>
+  body { max-width: 1240px; }
+  [hidden] { display: none !important; }
+  button:disabled { opacity: 0.45; cursor: default; }
+  .tm { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .tm-side { position: sticky; top: 12px; border: 1px solid #ddd; border-radius: 8px; padding: 8px; background: #fafafa; }
+  .tm-side ul { list-style: none; margin: 0; padding: 0; }
+  .tm-item { display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box; padding: 8px; margin: 2px 0; border: 1px solid transparent; border-radius: 6px; background: none; color: #1a1a1a; font-size: 0.92rem; text-align: left; cursor: pointer; }
+  .tm-item:hover { background: #eef2ff; }
+  .tm-item[aria-current="true"] { background: #2563eb; color: #fff; }
+  .tm-item .tm-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tm-item .tm-count { font-size: 0.78rem; opacity: 0.75; }
+  .tm-grip { cursor: grab; opacity: 0.45; }
+  li.tm-dragging { opacity: 0.4; }
+  li.tm-over .tm-item { border-top-color: #2563eb; }
+  .tm-side .tm-add { width: 100%; margin-top: 8px; background: #fff; color: #2563eb; border: 1px dashed #2563eb; }
+  .tm-hint { font-size: 0.78rem; color: #666; margin: 8px 4px 0; }
+  .tm-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-bottom: 4px; }
+  .tm-head label { margin: 0; font-weight: 400; font-size: 0.75rem; color: #666; }
+  .tm-head input[type=text] { font-size: 1.15rem; font-weight: 600; padding: 4px 6px; border: 1px solid transparent; border-radius: 4px; background: transparent; width: 100%; }
+  .tm-head input[type=text]:hover, .tm-head input[type=text]:focus { border-color: #94a3b8; background: #fff; }
+  .tm-head .tm-f-icon { width: 4.5em; } .tm-head .tm-f-name { flex: 1 1 160px; }
+  .tm-status { font-size: 0.85rem; color: #166534; min-height: 1.3em; margin: 2px 0 12px; }
+  .tm-status.error { color: #b91c1c; }
+  .tm-drop { border: 2px dashed #94a3b8; border-radius: 10px; padding: 22px; text-align: center; color: #475569; background: #f8fafc; margin: 12px 0; }
+  .tm-drop.over { border-color: #2563eb; background: #eff6ff; }
+  .tm-panel { border: 1px solid #ddd; border-radius: 10px; padding: 14px; margin: 12px 0; }
+  .tm-panel h2 { font-size: 1rem; margin: 0 0 8px; }
+  .tm-file { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; margin: 6px 0; }
+  .tm-file small { color: #666; } .tm-file .error { color: #b91c1c; } .tm-file .ok { color: #166534; }
+  .tm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+  .tm-chips label { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 4px 10px; border: 1px solid #cbd5e1; border-radius: 999px; font-weight: 400; cursor: pointer; }
+  .tm-chips label:has(input:checked) { background: #dbeafe; border-color: #2563eb; }
+  .tm-lessons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tm-lesson-list { max-height: 220px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 10px; margin-top: 8px; }
+  .tm-lesson-list label { font-weight: 400; margin: 4px 0; }
+  .tm-picked button { background: #e5e7eb; color: #1a1a1a; margin: 0 6px 6px 0; }
+  @media (max-width: 760px) { .tm { grid-template-columns: 1fr; } .tm-side { position: static; } }
+</style>
+<h1><%= L('Themes and materials', '主题与材料') %></h1>
+<div class="tm">
+  <aside class="tm-side" aria-label="<%= L('Themes', '主题') %>">
+    <button type="button" class="tm-item" data-key="" id="tmAll"><span class="tm-name"><%= L('All materials', '全部材料') %></span><span class="tm-count"><%= items.length %></span></button>
+    <ul id="tmList"><% themes.forEach(function (theme) { var count = items.filter(function (item) { return (item.themes || [item.theme]).includes(theme.key); }).length; %>
+      <li draggable="true" data-key="<%= theme.key %>"><button type="button" class="tm-item" data-key="<%= theme.key %>"><span class="tm-grip" aria-hidden="true">⠿</span><span class="tm-icon"><%= theme.icon %></span><span class="tm-name"><%= L(theme.en, theme.zh) %></span><span class="tm-count"><%= count %></span></button></li>
+    <% }) %></ul>
+    <button type="button" class="button tm-add" id="tmNew"><%= L('+ New theme', '＋新增主题') %></button>
+    <p class="tm-hint"><%= L('Drag a theme to change its order on the Theme Activities page.', '拖动主题可调整它在“主题活动”页面上的顺序。') %></p>
+  </aside>
+  <section>
+    <form id="tmHead" class="tm-head" hidden>
+      <div class="tm-f-icon"><label for="tmIcon"><%= L('Icon', '图标') %></label><input type="text" id="tmIcon" name="icon" maxlength="16"></div>
+      <div class="tm-f-name"><label for="tmZh"><%= L('Chinese name', '中文名称') %></label><input type="text" id="tmZh" name="zh" maxlength="120" required></div>
+      <div class="tm-f-name"><label for="tmEn"><%= L('English name', '英文名称') %></label><input type="text" id="tmEn" name="en" maxlength="120" required></div>
+      <button type="submit" id="tmSaveName" disabled><%= L('Save name', '保存名称') %></button>
+      <button type="button" class="secondary" id="tmUp" aria-label="<%= L('Move theme up', '上移主题') %>">↑</button>
+      <button type="button" class="secondary" id="tmDown" aria-label="<%= L('Move theme down', '下移主题') %>">↓</button>
+      <a id="tmView" href="#" target="_blank" rel="noopener"><%= L('View page', '查看页面') %></a>
+    </form>
+    <h2 id="tmAllHead" style="font-size:1.15rem;margin:0"><%= L('All materials', '全部材料') %></h2>
+    <p id="tmStatus" class="tm-status" role="status"></p>
+
+    <div class="tm-drop" id="tmDrop">
+      <p style="margin:0 0 8px"><strong id="tmDropText"></strong><br><%= L('Each file becomes its own material. PDF, Word, PowerPoint, Excel, images, audio, video or zip; 30 MB each.', '每个文件单独成为一份材料。支持 PDF、Word、PPT、Excel、图片、音频、视频、zip，每个不超过 30 MB。') %></p>
+      <input type="file" id="tmFiles" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.mp4,.zip" aria-label="<%= L('Choose files', '选择文件') %>">
+    </div>
+
+    <div class="tm-panel" id="tmUpload" hidden>
+      <h2><%= L('Files to upload', '待上传的文件') %></h2>
+      <div id="tmQueue"></div>
+      <h2 style="margin-top:14px"><%= L('Show on theme pages', '显示在哪些主题页') %></h2>
+      <div class="tm-chips" id="tmThemeChips"></div>
+      <h2><%= L('Textbook lessons (optional)', '课本第几课（可选）') %></h2>
+      <div class="tm-lessons">
+        <div><label for="tmSeries"><%= L('Textbook', '教材') %></label><select id="tmSeries"></select></div>
+        <div><label for="tmBook"><%= L('Book', '册数') %></label><select id="tmBook"></select></div>
+      </div>
+      <div class="tm-lesson-list" id="tmLessonList"></div>
+      <p class="tm-picked" id="tmPicked"></p>
+      <label><input type="checkbox" id="tmFree"> <%= L('Free for a limited time', '限时免费') %></label>
+      <div class="actions"><button type="button" id="tmStart"><%= L('Upload', '上传') %></button> <button type="button" class="secondary" id="tmClear"><%= L('Clear', '清空') %></button></div>
+    </div>
+
+    <div style="overflow-x:auto">
+    <table id="tmTable">
+      <thead><tr><th><%= L('Material', '材料') %></th><th><%= L('Theme pages', '主题页') %></th><th><%= L('Textbook lessons', '教材课次') %></th><th><%= L('Actions', '操作') %></th></tr></thead>
+      <tbody><% items.forEach(function (item) { var keys = item.themes || [item.theme]; %>
+        <tr data-themes="<%= keys.join(' ') %>"><td><strong><%= item.title %></strong><br><%= item.files.length %> <%= L('attachments', '个附件') %><% if (item.limitedFree) { %><br><%= L('Free for a limited time', '限时免费') %><% } %></td>
+          <td><% keys.forEach(function (key) { var theme = themes.find(function (t) { return t.key === key; }); %><div><%= theme ? L(theme.en, theme.zh) : key %></div><% }) %></td>
+          <td><% item.lessons.forEach(function (lesson) { var series = textbooks.findSeries(lesson.series); var book = textbooks.findBook(series, lesson.book); %><div><%= series ? L(series.en, series.zh) : lesson.series %> · <%= book ? L(book.en, book.zh) : lesson.book %> · <%= L('Lesson ' + lesson.lessonNo, '第' + lesson.lessonNo + '课') %> <%= lesson.title %></div><% }) %></td>
+          <td><a href="/admin/materials/<%= item.id %>/edit"><%= L('Edit', '编辑') %></a> · <a href="/materials/<%= item.id %>"><%= L('View', '查看') %></a></td>
+        </tr>
+      <% }) %></tbody>
+    </table>
+    </div>
+    <p id="tmEmpty" hidden><%= L('No materials here yet. Drop files above to add some.', '这里还没有材料，把文件拖到上面的框里即可添加。') %></p>
+    <p><a href="/admin/materials/new" id="tmSingle"><%= L('Upload one material with several attachments, a description or a preview image', '上传一份带多个附件、简介或预览图的材料') %></a></p>
+  </section>
 </div>
-<% if (!items.length) { %><p><%= L('No materials yet. Upload your first material.', '还没有材料，请上传第一份材料。') %></p><% } %>
+<dialog id="tmDialog" aria-labelledby="tmDialogTitle" style="max-width:480px;width:calc(100% - 48px);border:1px solid #ddd;border-radius:12px;padding:24px">
+  <h2 id="tmDialogTitle" style="margin-top:0"><%= L('New theme', '新增主题') %></h2>
+  <form id="tmNewForm" action="/admin/themes/new" method="post">
+    <%- include('catalog-fields', { values: {}, kind: 'theme', editing: false }) %>
+    <p role="alert" id="tmNewError" class="tm-status error" hidden></p>
+    <div class="actions"><button type="submit" id="tmNewSave"><%= L('Save theme', '保存主题') %></button> <button type="button" class="secondary" id="tmNewCancel"><%= L('Cancel', '取消') %></button></div>
+  </form>
+</dialog>
+<script type="application/json" id="tmData"><%- JSON.stringify({ lang: lang, themes: themes.map(function (theme) { return { key: theme.key, en: theme.en, zh: theme.zh, icon: theme.icon || '', href: theme.href }; }), series: textbooks.SERIES, catalog: catalog }).replace(/</g, '\\u003c') %></script>
+<script src="/materials/admin.js"></script>
 </body></html>

@@ -54,7 +54,7 @@ function create(options) {
   });
   router.use('/materials', function (req, res, next) { res.set('Cache-Control', 'private, no-store'); next(); });
   router.get('/materials', async function (req, res, next) {
-    try { res.render(adminMode ? 'admin/materials' : 'materials/index', { title: 'Activity materials', items: await repository.list(), themes: req.contentCatalog.themes, textbooks: req.contentCatalog.textbooks, user: getUser(req), adminUser: req.adminUser }); }
+    try { res.render(adminMode ? 'admin/materials' : 'materials/index', { title: 'Activity materials', items: await repository.list(), themes: req.contentCatalog.themes, textbooks: req.contentCatalog.textbooks, catalog: adminMode ? await repository.catalog() : [], user: getUser(req), adminUser: req.adminUser }); }
     catch (error) { next(error); }
   });
   async function editor(req, res, next) {

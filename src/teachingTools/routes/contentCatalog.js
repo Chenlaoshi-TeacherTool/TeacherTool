@@ -37,16 +37,22 @@ function create(options) {
       }
     });
   });
-  // Edit the names and icon of an admin-created theme ("new" is a reserved theme key, so this never shadows /themes/new).
+  // Edit the names and icon of any theme ("new" and "order" never reach these: "new" is a reserved key, "order" has no /edit).
   function renderEdit(req, res, values, error) {
     res.render('admin/catalog-new', { title: 'Edit theme / 编辑主题', kind: 'theme', editing: true, parent: '', values: values, error: error || '', adminUser: req.adminUser });
   }
-  async function customTheme(key) {
-    return (await catalog.load()).themes.find(function (theme) { return theme.custom && theme.key === key; });
+  async function findTheme(key) {
+    return (await catalog.load()).themes.find(function (theme) { return theme.key === key; });
   }
+  // Save the order of the theme list: { keys: [every theme key, in order] }.
+  router.post('/themes/order', async function (req, res, next) {
+    if (!sameOrigin(req)) return res.status(403).json({ error: 'Save from this website. / 请从本站保存。' });
+    try { await catalog.orderThemes(req.body && req.body.keys); res.json({ ok: true }); }
+    catch (error) { if (error.status === 400) return res.status(400).json({ error: error.message }); next(error); }
+  });
   router.get('/themes/:key/edit', async function (req, res, next) {
     try {
-      var theme = await customTheme(req.params.key);
+      var theme = await findTheme(req.params.key);
       if (!theme) return res.sendStatus(404);
       renderEdit(req, res, theme);
     } catch (error) { next(error); }
@@ -54,7 +60,7 @@ function create(options) {
   router.post('/themes/:key/edit', async function (req, res, next) {
     if (!sameOrigin(req)) return res.status(403).send('Save from this website. / 请从本站保存。');
     try {
-      if (!(await customTheme(req.params.key))) return res.sendStatus(404);
+      if (!(await findTheme(req.params.key))) return res.sendStatus(404);
       var row = await catalog.updateTheme(req.params.key, req.body || {});
       if (req.get('accept') === 'application/json') return res.json({ key: row.entry_key, en: row.en, zh: row.zh, icon: row.icon });
       res.redirect(303, '/admin/materials');

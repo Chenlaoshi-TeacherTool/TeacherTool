@@ -294,7 +294,7 @@ router.get('/low-prep-activities', function(req, res) {
 
 // Theme Activities Routes
 router.get('/theme-activities', function(req, res, next) {
-  res.render('theme-activities/index', { title: 'Theme Activities', customThemes: req.contentCatalog ? req.contentCatalog.themes.filter(function (theme) { return theme.custom; }) : [] });
+  res.render('theme-activities/index', { title: 'Theme Activities', themes: req.contentCatalog ? req.contentCatalog.themes : siteMap.children('activities') });
 });
 
 router.get('/theme-activities/weather', function(req, res, next) {

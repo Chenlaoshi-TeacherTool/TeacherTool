@@ -33,19 +33,28 @@ var SECTIONS = [
   { key: 'chinese', href: '/chinese-teaching', en: 'Chinese Teaching', zh: '中文教学专区', admin: [] },
   {
     key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: ['materials'],
+    // Built-in themes. Names, icons and order here are defaults: an admin can rename and reorder
+    // them at /admin/materials (services/contentCatalog.js merges the saved values).
+    // icon / descEn / descZh / tags are for the card on /theme-activities.
     children: [
-      { key: 'five-elements', href: '/theme-activities/five-elements', en: 'Five Elements', zh: '五行' },
-      { key: 'self-introduction', href: '/theme-activities/self-introduction', en: 'Self-introduction', zh: '个人介绍' },
+      { key: 'five-elements', href: '/theme-activities/five-elements', en: 'Five Elements', zh: '五行', icon: '🪐',
+        descEn: 'Classroom activities, printable materials and textbook resources about the Five Elements.', descZh: '五行主题课堂活动、可打印材料与教材配套资源。', tags: '五行星球 星球寻宝 金木水火土' },
+      { key: 'self-introduction', href: '/theme-activities/self-introduction', en: 'Self-introduction', zh: '个人介绍', icon: '👋',
+        descEn: 'Practice personal introductions with character reading and matching activities.', descZh: '通过人物介绍阅读与配对活动，练习介绍自己。', tags: 'personal introduction 自我介绍 我是谁 Who Am I' },
       {
-        key: 'halloween', href: '/theme-activities/halloween', en: 'Halloween', zh: '万圣节', template: 'theme',
+        key: 'halloween', href: '/theme-activities/halloween', en: 'Halloween', zh: '万圣节', template: 'theme', icon: '🎃',
+        descEn: 'Vocabulary, games, and printables.', descZh: '词汇、游戏与可打印材料。',
         children: [{ key: 'halloween-printables', href: '/theme-activities/halloween/printables', en: 'Halloween printables', zh: '万圣节可打印材料' }]
       },
-      { key: 'chinese-new-year', href: '/theme-activities/chinese-new-year', en: 'Chinese New Year', zh: '春节', template: 'theme' },
+      { key: 'chinese-new-year', href: '/theme-activities/chinese-new-year', en: 'Chinese New Year', zh: '春节', template: 'theme', icon: '🧧',
+        descEn: 'Vocabulary, games, and printables.', descZh: '词汇、游戏与可打印材料。' },
+      { key: 'animals', href: '/theme-activities/animals', en: 'Animals', zh: '动物', template: 'theme', icon: '🐾',
+        descEn: 'Vocabulary, games, and printables.', descZh: '词汇、游戏与可打印材料。' },
       {
-        key: 'weather', href: '/theme-activities/weather', en: 'Weather', zh: '天气',
+        key: 'weather', href: '/theme-activities/weather', en: 'Seasons & Weather', zh: '四季与天气', icon: '🌦',
+        descEn: 'Weather words, seasonal questions, songs, and a suggested lesson sequence for Chinese learners.', descZh: '为中文学习者准备的天气词汇、季节问答、歌曲，以及建议的教学顺序。', tags: 'weather seasons 四季 天气',
         children: [{ key: 'weather-songs', href: '/theme-activities/weather/songs', en: 'Weather songs', zh: '天气儿歌' }]
-      },
-      { key: 'animals', href: '/theme-activities/animals', en: 'Animals', zh: '动物', template: 'theme' }
+      }
     ]
   },
   {

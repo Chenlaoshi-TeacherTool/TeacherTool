@@ -21,13 +21,19 @@ function parentLink(req, key) {
   return { href: parent.href, label: text(req, parent.en, parent.zh) };
 }
 
+// A theme's name: the one saved at /admin/materials, else the built-in name.
+function themeTitle(req, key) {
+  var theme = ((req.contentCatalog && req.contentCatalog.themes) || siteMap.children('activities')).find(function (item) { return item.key === key; });
+  return text(req, theme.en, theme.zh);
+}
+
 function child(sectionKey, key) {
   return siteMap.children(sectionKey).find(function(item) { return item.key === key; });
 }
 
 router.get('/theme-activities/self-introduction', function(req, res) {
   res.render('theme-activities/self-introduction', {
-    title: text(req, 'Self-introduction', '个人介绍'),
+    title: themeTitle(req, 'self-introduction'),
     parent: parentLink(req, 'activities'),
     printables: [{
       title: 'Who Am I? 我是谁？阅读卡片',
@@ -51,7 +57,7 @@ router.get('/theme-activities/self-introduction', function(req, res) {
 
 router.get('/theme-activities/five-elements', function(req, res) {
   res.render('theme-activities/five-elements', {
-    title: text(req, 'Five Elements', '五行'),
+    title: themeTitle(req, 'five-elements'),
     parent: parentLink(req, 'activities')
   });
 });

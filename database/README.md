@@ -80,6 +80,9 @@ warning and the app logs one at start-up.
 - `0015_add-theme-icon.sql` — `icon` on `content_catalog`: an optional emoji shown before an
   admin-created theme's name on the Theme Activities list. Set it when adding a theme, or later at
   `/admin/themes/:key/edit` (linked from `/admin/materials`).
+- `0016_add-theme-order.sql` — `sort_order` on `content_catalog`: the theme order set by dragging
+  on `/admin/materials`. A theme row with the key of a built-in theme (`config/siteMap.js`) now
+  renames and orders that built-in theme; its page stays in code.
 
 ## Other files
 
