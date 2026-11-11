@@ -77,6 +77,16 @@
         .tool-section[hidden] {
             display: none;
         }
+        .tool-jump { display: flex; flex-wrap: wrap; gap: 8px; max-width: 1200px; margin: 0 auto 30px; }
+        .tool-jump a { padding: 8px 14px; border: 1px solid #cbdac2; border-radius: 22px; background: #fffdf7; color: #194f45; font-weight: 700; text-decoration: none; }
+        .tool-jump a:hover { background: #edf5df; }
+        .tool-jump a:focus-visible, .tool-section-toggle:focus-visible { outline: 3px solid #bf7f35; outline-offset: 3px; }
+        .tool-jump a[hidden] { display: none; }
+        .tool-jump span { margin-left: 4px; color: #5d7168; font-weight: 400; }
+        /* Long groups fold after eight cards; searching or filtering shows every match. */
+        .tool-sections:not(.is-filtering) .tool-section.is-collapsed .tool-card--extra { display: none; }
+        .tool-section-toggle { display: block; margin: 20px auto 0; padding: 10px 20px; border: 1px solid #356e57; border-radius: 22px; background: white; color: #194f45; font: inherit; font-weight: 700; cursor: pointer; }
+        .tool-sections.is-filtering .tool-section-toggle { display: none; }
         .tool-section-heading {
             max-width: 760px;
             margin-bottom: 18px;
@@ -203,16 +213,22 @@
         </div>
     </section>
 
-    <main class="tool-sections">
-        <% toolSections.forEach(function(section) { %>
-        <section class="tool-section"<% if (section.id) { %> id="<%= section.id %>"<% } %> aria-labelledby="<%= section.headingId %>">
+    <%# id: older links and tool pages' back buttons point at #low-prep-activities. %>
+    <main class="tool-sections" id="low-prep-activities">
+        <nav class="tool-jump" aria-label="<%= t('teachingToolsIndex.jumpLabel') %>">
+            <% toolSections.forEach(function(section) { %>
+            <a href="#<%= section.key %>"><%= t('teachingToolsIndex.groups.' + section.key + '.heading') %><span><%= section.tools.length %></span></a>
+            <% }); %>
+        </nav>
+        <% toolSections.forEach(function(section) { var folds = section.tools.length > 8; %>
+        <section class="tool-section<%= folds ? ' is-collapsed' : '' %>" id="<%= section.key %>" aria-labelledby="<%= section.key %>-heading">
             <div class="tool-section-heading">
-                <h2 id="<%= section.headingId %>"><%= t(section.headingKey) %></h2>
-                <p><%= t(section.descKey) %></p>
+                <h2 id="<%= section.key %>-heading"><%= t('teachingToolsIndex.groups.' + section.key + '.heading') %></h2>
+                <p><%= t('teachingToolsIndex.groups.' + section.key + '.desc') %></p>
             </div>
             <div class="tools-grid">
-                <% section.tools.forEach(function(tool) { %>
-                <div data-uses="<%= tool.uses.join(' ') %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %>">
+                <% section.tools.forEach(function(tool, index) { %>
+                <div data-uses="<%= tool.uses.join(' ') %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %><%= index >= 8 ? ' tool-card--extra' : '' %>">
                     <% if (tool.href) { %><%- include('../partials/tool-snapshot', { previewHref: tool.href }) %><% } %>
                     <h3><% if (tool.icon) { %><%= tool.icon %> <% } %><%= t(tool.titleKey) %><% if (tool.limitedFree) { %> <span class="tool-limited-free"><%= t('teachingToolsIndex.limitedFree') %></span><% } %></h3>
                     <p class="tool-scope"><%= t(tool.scopeKey) %></p>
@@ -225,6 +241,9 @@
                 </div>
                 <% }); %>
             </div>
+            <% if (folds) { %>
+            <button class="tool-section-toggle" type="button" aria-expanded="false" data-more="<%= t('teachingToolsIndex.showAll').replace('{count}', section.tools.length) %>" data-less="<%= t('teachingToolsIndex.showFewer') %>"><%= t('teachingToolsIndex.showAll').replace('{count}', section.tools.length) %></button>
+            <% } %>
         </section>
         <% }); %>
     </main>
@@ -261,7 +280,9 @@
                 sections.forEach(function (section) {
                     var sectionCards = Array.prototype.slice.call(section.querySelectorAll('.tool-card'));
                     section.hidden = sectionCards.every(function (card) { return card.hidden; });
+                    document.querySelector('.tool-jump a[href="#' + section.id + '"]').hidden = section.hidden;
                 });
+                document.querySelector('.tool-sections').classList.toggle('is-filtering', Boolean(query) || selectedUse !== 'all');
 
                 emptyActions.hidden = matches !== 0;
                 clearSearch.hidden = !query;
@@ -286,6 +307,13 @@
                 useButtons.forEach(function(item) { item.setAttribute('aria-pressed', String(item.dataset.use === 'all')); });
                 updateToolResults();
                 search.focus();
+            });
+            Array.prototype.forEach.call(document.querySelectorAll('.tool-section-toggle'), function(toggle) {
+                toggle.addEventListener('click', function() {
+                    var collapsed = toggle.parentNode.classList.toggle('is-collapsed');
+                    toggle.setAttribute('aria-expanded', String(!collapsed));
+                    toggle.textContent = collapsed ? toggle.dataset.more : toggle.dataset.less;
+                });
             });
             search.addEventListener('input', updateToolResults);
             updateToolResults();

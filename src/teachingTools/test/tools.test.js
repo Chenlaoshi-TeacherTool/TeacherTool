@@ -13,10 +13,10 @@ function translated(lang, key) {
 }
 
 test('every catalog entry is complete and translated in both languages', function() {
-  var sections = tools.SECTIONS.map(function(section) { return section.key; });
   tools.TOOLS.forEach(function(tool) {
     var name = tool.href || tool.titleKey;
-    assert.ok(sections.indexOf(tool.section) !== -1, name + ' section');
+    assert.ok(tools.SECTIONS.indexOf(tool.section) !== -1, name + ' section');
+    assert.equal(tool.section === 'coming-soon', Boolean(tool.comingSoon), name + ' coming-soon section');
     tool.uses.forEach(function(use) { assert.ok(['print', 'project', 'independent', 'manage'].indexOf(use) !== -1, name + ' use ' + use); });
     assert.equal(Boolean(tool.href), !tool.comingSoon, name + ' needs a page or comingSoon');
     var keys = [tool.titleKey, tool.scopeKey, tool.descKey].concat(tool.href ? [tool.actionKey] : []);
@@ -24,8 +24,11 @@ test('every catalog entry is complete and translated in both languages', functio
       ['en', 'zh'].forEach(function(lang) { assert.ok(key && translated(lang, key), name + ' ' + lang + ' ' + key); });
     });
   });
-  tools.SECTIONS.forEach(function(section) {
-    ['en', 'zh'].forEach(function(lang) { assert.ok(translated(lang, section.headingKey) && translated(lang, section.descKey), section.key); });
+  tools.sections().forEach(function(section) {
+    assert.ok(section.tools.length > 0, section.key + ' is empty');
+    ['en', 'zh'].forEach(function(lang) {
+      ['heading', 'desc'].forEach(function(part) { assert.ok(translated(lang, 'teachingToolsIndex.groups.' + section.key + '.' + part), section.key + ' ' + lang + ' ' + part); });
+    });
   });
   var hrefs = tools.LIVE.map(function(tool) { return tool.href; });
   assert.equal(new Set(hrefs).size, hrefs.length);
