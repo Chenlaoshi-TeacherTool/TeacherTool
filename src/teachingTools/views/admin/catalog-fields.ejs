@@ -2,6 +2,15 @@
 <input type="text" id="catalogZh" name="zh" maxlength="120" required value="<%= values.zh || '' %>">
 <label for="catalogEn">英文名称 / English name</label>
 <input type="text" id="catalogEn" name="en" maxlength="120" required value="<%= values.en || '' %>">
+<% if (typeof kind !== 'undefined' && kind === 'theme') { %>
+<label for="catalogIcon">图标（可选）/ Icon (optional)</label>
+<input type="text" id="catalogIcon" name="icon" maxlength="16" style="max-width:8em" aria-describedby="catalogIconHint" value="<%= values.icon || '' %>">
+<p id="catalogIconHint">填一个表情符号，例如 🏫，会显示在主题活动列表的主题名称前面。 / One emoji, e.g. 🏫, shown before the theme name on the Theme Activities list.</p>
+<% } %>
+<% if (typeof editing !== 'undefined' && editing) { %>
+<p>页面地址名称 / URL name: <code><%= values.key %></code>（不能修改 / cannot be changed）</p>
+<% } else { %>
 <label for="catalogKey">页面地址名称 / URL name</label>
 <input type="text" id="catalogKey" name="key" maxlength="40" pattern="[a-z0-9]+(-[a-z0-9]+)*" required aria-describedby="catalogKeyHint" value="<%= values.key || '' %>">
 <p id="catalogKeyHint">使用小写英文字母、数字或连字符，例如 mid-autumn、hsk 或 book-1。 / Lowercase letters, numbers and hyphens, e.g. mid-autumn, hsk or book-1.</p>
+<% } %>

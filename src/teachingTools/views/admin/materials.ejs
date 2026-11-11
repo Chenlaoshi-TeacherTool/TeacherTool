@@ -2,6 +2,11 @@
 <% var L = function (en, zh) { return lang === 'zh' ? zh : en; }; %>
 <h1><%= L('Activity materials', '活动材料管理') %></h1>
 <p><a class="button" href="/admin/themes/new"><%= L('+ New theme', '＋新增主题') %></a></p>
+<% var customThemes = themes.filter(function (theme) { return theme.custom; }); if (customThemes.length) { %>
+<p><%= L('Themes you added:', '你新增的主题：') %>
+  <% customThemes.forEach(function (theme) { %><span style="display:inline-block;margin-right:1em"><%= theme.icon ? theme.icon + ' ' : '' %><%= L(theme.en, theme.zh) %> · <a href="/admin/themes/<%= theme.key %>/edit"><%= L('Edit name / icon', '编辑名称和图标') %></a></span><% }) %>
+</p>
+<% } %>
 <p><%= L('Upload once, then choose the theme pages and textbook lessons where this material appears.', '上传一份材料，选择展示的主题页和教材课次。以后编辑一次，所有入口一起更新。') %></p>
 <p><a class="button" href="/admin/materials/new"><%= L('Upload material', '上传材料') %></a></p>
 <div style="overflow-x:auto">

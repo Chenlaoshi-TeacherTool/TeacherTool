@@ -5,5 +5,5 @@
 // checks that it matches the newest file. Admin pages warn while the
 // database is behind, i.e. the migration was not run before deploying.
 module.exports = {
-  requiredMigration: '0014_add-content-catalog'
+  requiredMigration: '0015_add-theme-icon'
 };

@@ -77,6 +77,9 @@ warning and the app logs one at start-up.
 - `0013_add-material-themes.sql` — preserves each existing theme and adds multiple theme-page
   selections per material. Admins manage uploads, attachments, previews and lesson links directly
   at `/admin/materials`, `/admin/materials/new` and `/admin/materials/:id/edit`.
+- `0015_add-theme-icon.sql` — `icon` on `content_catalog`: an optional emoji shown before an
+  admin-created theme's name on the Theme Activities list. Set it when adding a theme, or later at
+  `/admin/themes/:key/edit` (linked from `/admin/materials`).
 
 ## Other files
 

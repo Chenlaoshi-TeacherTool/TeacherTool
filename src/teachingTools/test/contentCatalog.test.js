@@ -35,7 +35,7 @@ test.before(async function () {
         return { recordset: [{ id: 42 }] };
       }
       if (/SELECT \* FROM textbook_lessons WHERE id/.test(sql)) return { recordset: lessons.map(function (lesson) { return Object.assign({ is_published: true, book_name: '第一册', lesson_no: 1 }, lesson); }) };
-      if (/schema_migrations/.test(sql)) return { recordset: [{ applied: '0014_add-content-catalog' }] };
+      if (/schema_migrations/.test(sql)) return { recordset: [{ applied: require('../config/database').requiredMigration }] };
       return { recordset: [] };
     } };
   } }; };
@@ -73,6 +73,24 @@ test('new themes persist across repository instances and appear in both language
   var editor = await (await fetch(base + '/admin/materials/new?theme=spring-test', { headers: admin })).text();
   assert.match(editor, /value="spring-test" checked/); assert.match(editor, /id="themeDialog"/);
   assert.match(await (await fetch(base + '/sitemap.xml')).text(), /\/theme-activities\/spring-test/);
+});
+
+test('a theme icon is optional, shows on the theme list, and admins can edit name and icon later', async function () {
+  assert.equal((await add('/themes/new', { key: 'icon-test', zh: '图标测试', en: 'Icon test', icon: ' 🏫 ' })).status, 200);
+  assert.equal((await add('/themes/new', { key: 'long-icon', zh: '长图标', en: 'Long icon', icon: 'x'.repeat(17) })).status, 400);
+  var list = await (await fetch(base + '/theme-activities', { headers: { 'test-lang': 'zh' } })).text();
+  assert.match(list, /<h3>🏫 图标测试<\/h3>/); assert.match(list, /<h3>春天测试<\/h3>/);
+  var form = await (await fetch(base + '/admin/themes/spring-test/edit', { headers: admin })).text();
+  assert.match(form, /name="icon"/); assert.match(form, /value="春天测试"/); assert.doesNotMatch(form, /name="key"/);
+  assert.equal((await add('/themes/spring-test/edit', { zh: '春天', en: 'Spring', icon: '🌸' }, { 'x-ms-client-principal-idp': 'teachers' })).status, 403);
+  assert.equal((await add('/themes/spring-test/edit', { zh: '春天', en: 'Spring', icon: '🌸' }, { origin: 'https://other.example' })).status, 403);
+  assert.equal((await add('/themes/spring-test/edit', { zh: '', en: 'Spring' })).status, 400);
+  assert.equal((await add('/themes/weather/edit', { zh: '天气', en: 'Weather', icon: '🌸' })).status, 404);
+  assert.equal((await add('/themes/spring-test/edit', { zh: '春天测试', en: 'Spring test', icon: '🌸' })).status, 200);
+  assert.match(await (await fetch(base + '/theme-activities', { headers: { 'test-lang': 'zh' } })).text(), /<h3>🌸 春天测试<\/h3>/);
+  var reloaded = await catalog.create({ file: process.env.CONTENT_CATALOG_LOCAL_FILE }).load();
+  assert.equal(reloaded.themes.find(function (theme) { return theme.key === 'spring-test'; }).icon, '🌸');
+  assert.match(await (await fetch(base + '/admin/materials', { headers: admin })).text(), /\/admin\/themes\/spring-test\/edit/);
 });
 
 test('invalid, duplicate and reserved URLs never replace existing entries', async function () {
@@ -124,13 +142,17 @@ test('SQL catalog writes use parameters, reload saved entries and translate dupl
       if (/^SELECT/.test(query)) return { recordset: rows };
       assert.ok(!query.includes('SQL theme')); assert.equal(params.zh, 'SQL 主题');
       if (rejectDuplicate) { var error = new Error('duplicate'); error.number = 2627; throw error; }
-      rows.push({ kind: params.kind, parent_key: params.parent, entry_key: params.key, zh: params.zh, en: params.en, members_only: params.members });
+      if (/^UPDATE/.test(query)) { Object.assign(rows.find(function (row) { return row.entry_key === params.key; }) || {}, { zh: params.zh, en: params.en, icon: params.icon }); return { recordset: [] }; }
+      rows.push({ kind: params.kind, parent_key: params.parent, entry_key: params.key, zh: params.zh, en: params.en, members_only: params.members, icon: params.icon });
       return { recordset: [] };
     } };
   } }; } };
   var sqlCatalog = catalog.create({ db: db });
   await sqlCatalog.add('theme', { key: 'sql-theme', zh: 'SQL 主题', en: 'SQL theme' });
   assert.ok((await catalog.create({ db: db }).load()).themes.some(function (theme) { return theme.key === 'sql-theme'; }));
+  await sqlCatalog.updateTheme('sql-theme', { zh: 'SQL 主题', en: 'SQL theme', icon: '🏫' });
+  assert.equal((await catalog.create({ db: db }).load()).themes.find(function (theme) { return theme.key === 'sql-theme'; }).icon, '🏫');
+  await assert.rejects(sqlCatalog.updateTheme('missing', { zh: 'SQL 主题', en: 'SQL theme' }), { status: 404 });
   rejectDuplicate = true;
   await assert.rejects(sqlCatalog.add('theme', { key: 'concurrent-key', zh: 'SQL 主题', en: 'SQL theme' }), { status: 409 });
 });

@@ -53,7 +53,7 @@
   <dialog id="themeDialog" aria-labelledby="themeDialogTitle" style="max-width:480px;width:calc(100% - 48px);border:1px solid #ddd;border-radius:16px;padding:24px">
     <h2 id="themeDialogTitle"><%= L('New theme', '新增主题') %></h2>
     <form id="themeForm" class="community-form" action="/admin/themes/new" method="post">
-      <%- include('../admin/catalog-fields', { values: {} }) %>
+      <%- include('../admin/catalog-fields', { values: {}, kind: 'theme', editing: false }) %>
       <p role="alert" id="themeError" hidden></p>
       <button type="submit" id="saveTheme"><%= L('Save theme', '保存主题') %></button>
       <button type="button" id="cancelTheme"><%= L('Cancel', '取消') %></button>
