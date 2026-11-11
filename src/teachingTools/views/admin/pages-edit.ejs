@@ -1,0 +1,12 @@
+<%- include('layout-head') %>
+<p><a href="/admin/pages">← 网站页面</a></p><h1><%= page.title %></h1>
+<p>中英文分别编辑。保存草稿供下次继续；发布内容后，公开页面会立即使用新文字。</p>
+<% if(notice) { %><p role="status"><%= notice %></p><% } %>
+<% if(error) { %><p role="alert"><%= error %></p><% } %>
+<form method="post" action="/admin/pages/<%= key %>">
+<% page.fields.forEach(function(field, index) { %>
+<section class="page-field"><h2><%= field[1] %></h2><div class="page-fields"><% ['zh','en'].forEach(function(lang) { %><div><label for="field-<%= index %>-<%= lang %>"><%= lang === 'zh' ? '中文' : 'English' %></label><textarea id="field-<%= index %>-<%= lang %>" name="<%= lang + ':' + field[0] %>" rows="3" required maxlength="4000"><%= values[lang][field[0]] %></textarea></div><% }); %></div></section>
+<% }); %>
+<div class="actions"><button name="action" value="draft" class="secondary">保存草稿</button><button name="action" value="publish">发布内容</button><a href="<%= page.href %>" target="_blank" rel="noopener">查看公开页面 ↗</a></div>
+</form>
+<%- include('layout-foot') %>

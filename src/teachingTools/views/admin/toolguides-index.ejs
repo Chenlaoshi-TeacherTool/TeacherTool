@@ -4,7 +4,9 @@
 <% if (!guides.some(function (g) { return g.slug === 'book-generator'; })) { %>
 <p><a class="button" href="/admin/toolguides/new?slug=book-generator&title=Book+Generator&appUrl=%2Fteaching-tools%2Fbook-generator">+ Create guide for Book Generator</a></p>
 <% } %>
-<table>
+<label for="content-search">搜索当前列表</label>
+<input id="content-search" type="search" data-admin-filter="content-table" placeholder="输入名称、分类或关键词">
+<table id="content-table">
   <thead><tr><th>Title</th><th>Slug</th><th>Eyebrow</th><th>App URL</th><th></th></tr></thead>
   <tbody>
     <% guides.forEach(function (guide) { %>

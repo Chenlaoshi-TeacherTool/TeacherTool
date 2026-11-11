@@ -29,6 +29,7 @@ var ebayStoreUrl = siteMap.children('shop').find(function(item) { return item.ke
 
 router.get('/', async function(req, res, next) {
   try {
+    res.locals.t = await require('../services/editablePages').publicText('home', res.locals.lang, res.locals.t);
     res.render('index', { title: 'Home', ebayStoreUrl: ebayStoreUrl, popularTools: await popularTools.getCards() });
   } catch (err) { next(err); }
 });
@@ -41,8 +42,11 @@ router.get('/membership', function(req, res, next) {
   res.render('membership', { title: 'Membership', paymentsOpen: membership.paymentsOpen, plans: membership.plans, paypalMe: membership.paypalMe, foundingEndsAt: membership.foundingEndsAt });
 });
 
-router.get('/about', function(req, res, next) {
-  res.render('about', { title: 'About Chen Laoshi' });
+router.get('/about', async function(req, res, next) {
+  try {
+    res.locals.t = await require('../services/editablePages').publicText('about', res.locals.lang, res.locals.t);
+    res.render('about', { title: 'About Chen Laoshi' });
+  } catch (error) { next(error); }
 });
 
 // Contact now lives on the About page.
@@ -92,7 +96,7 @@ router.get('/teaching-tools/lucky-wheel', function(req, res) {
 });
 
 router.get('/chinese-teaching', function(req, res) {
-  res.render('chinese-teaching', { title: 'Chinese Teaching', toolByHref: tools.byHref });
+  res.render('chinese-teaching', { title: 'Chinese Teaching', articles: siteContentStore.get().articles, toolByHref: tools.byHref });
 });
 
 router.get('/teaching-tools', function(req, res, next) {

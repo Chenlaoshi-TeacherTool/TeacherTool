@@ -60,6 +60,9 @@
       </div>
     </section>
     <% }); %>
+    <% if (typeof articles !== 'undefined' && articles.length) { %>
+    <section class="task-section" aria-labelledby="articles-title"><h2 id="articles-title"><%= lang === 'zh' ? '教学文章' : 'Teaching articles' %></h2><div class="resource-grid"><% articles.forEach(function(article) { %><article class="resource-card"><h3><a href="/resources/<%= encodeURIComponent(article.slug) %>"><%= article.title %></a></h3><p><%= article.description %></p></article><% }); %></div></section>
+    <% } %>
   </div></main>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body></html>

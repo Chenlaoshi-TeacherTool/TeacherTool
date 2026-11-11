@@ -1,7 +1,10 @@
 <%- include('layout-head') %>
-<h1>Articles</h1>
-<p><a class="button" href="/admin/articles/new">+ New article</a></p>
-<table>
+<h1>教学文章</h1>
+<p>文章将在中文教学专区显示，已有文章保留原来的公开地址。保存后立即公开，请在保存前检查内容。</p>
+<p><a class="button" href="/admin/articles/new">＋ 新建文章</a></p>
+<label for="content-search">搜索当前列表</label>
+<input id="content-search" type="search" data-admin-filter="content-table" placeholder="输入名称、分类或关键词">
+<table id="content-table">
   <thead><tr><th>Title</th><th>Slug</th><th>Category</th><th></th></tr></thead>
   <tbody>
     <% articles.forEach(function (article) { %>

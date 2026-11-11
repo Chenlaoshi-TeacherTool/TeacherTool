@@ -24,13 +24,13 @@
  */
 
 var SECTIONS = [
-  { key: 'home', href: '/', en: 'Home', zh: '首页', nav: true, admin: [] },
+  { key: 'home', href: '/', en: 'Home', zh: '首页', nav: true, admin: ['pages'] },
   {
     key: 'tools', href: '/teaching-tools', en: 'Teaching Tools', zh: '教学工具', nav: true,
     admin: ['toolguides', 'toolvideos', 'wordlists', 'questionbanks']
   },
   { key: 'library', href: '/teaching-tools/word-list-library/word-list-library.html', en: 'My materials', zh: '我的资料', sitemap: false, admin: [] },
-  { key: 'chinese', href: '/chinese-teaching', en: 'Chinese Teaching', zh: '中文教学专区', admin: [] },
+  { key: 'chinese', href: '/chinese-teaching', en: 'Chinese Teaching', zh: '中文教学专区', admin: ['articles'] },
   {
     key: 'activities', href: '/theme-activities', en: 'Theme Activities', zh: '主题活动', nav: true, admin: ['materials'],
     // Built-in themes. Names, icons and order here are defaults: an admin can rename and reorder
@@ -76,7 +76,7 @@ var SECTIONS = [
       { key: 'physical-products', href: '/shop/physical-products', en: 'Physical products', zh: '实体产品', redirect: 'https://www.ebay.com/usr/clsteachingtools' }
     ]
   },
-  { key: 'about', href: '/about', en: 'About and Contact', zh: '关于与联系', navEn: 'About', navZh: '关于', nav: true, admin: [] },
+  { key: 'about', href: '/about', en: 'About and Contact', zh: '关于与联系', navEn: 'About', navZh: '关于', nav: true, admin: ['pages'] },
   { key: 'membership', href: '/membership', en: 'Membership', zh: '会员', admin: ['memberships'] },
   { key: 'privacy', href: '/privacy', en: 'Privacy Policy', zh: '隐私政策', admin: [] }
 ];
@@ -95,6 +95,7 @@ var UNLISTED = [
 
 // Admin editors. `href` must match a GET route in routes/admin.js.
 var ADMIN_EDITORS = {
+  pages: { href: '/admin/pages', label: 'Site Pages', description: 'Home and About page content' },
   materials: { href: '/admin/materials', label: 'Activity Materials', description: 'Upload and edit theme materials and textbook lesson links' },
   toolguides: { href: '/admin/toolguides', label: 'Tool Guides', description: 'How-to guides shown on individual tool pages' },
   toolvideos: { href: '/admin/toolvideos', label: 'Tool Videos', description: 'YouTube tutorial for each tool (Chinese and English); shows a Watch how button on the tool' },

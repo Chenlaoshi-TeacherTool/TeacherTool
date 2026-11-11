@@ -1,0 +1,4 @@
+<%- include('layout-head') %>
+<h1>网站页面</h1><p>编辑中英文介绍文字。保存草稿后，点击“发布内容”才会更新公开页面。</p>
+<div class="workspace-grid"><% Object.keys(pages).forEach(function(key) { %><article class="workspace-card"><h2><%= pages[key].title %></h2><p>保留当前页面布局，编辑页面文字。</p><a href="/admin/pages/<%= key %>">编辑内容 →</a></article><% }); %></div>
+<%- include('layout-foot') %>

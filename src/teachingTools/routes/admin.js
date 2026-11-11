@@ -37,6 +37,8 @@ router.use('/textbooks', async function (req, res, next) {
 // Admin nav and dashboard follow the public site structure in config/siteMap.js.
 router.use(function (req, res, next) {
   res.locals.adminNav = siteMap.adminNav();
+  res.locals.adminWorkspace = require('../config/adminWorkspace').groups();
+  res.locals.adminPath = req.originalUrl.split('?')[0];
   next();
 });
 
@@ -48,9 +50,10 @@ router.use(async function (req, res, next) {
 });
 
 router.use(require('./contentCatalog'));
+router.use(require('./adminPages'));
 
 router.get('/', function (req, res) {
-  res.render('admin/dashboard', { title: 'Admin', adminUser: req.adminUser, groups: siteMap.adminGroups() });
+  res.render('admin/dashboard', { title: 'Admin', adminUser: req.adminUser, groups: siteMap.adminGroups(), requireWorkspace: require('../config/adminWorkspace').groups() });
 });
 
 router.get('/materials', function (req, res, next) {

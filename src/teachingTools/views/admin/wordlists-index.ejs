@@ -4,7 +4,9 @@
   <a class="button" href="/admin/wordlists/new">+ New word list</a>
   <a class="button" href="/admin/wordlists/import">+ Bulk import from Excel</a>
 </p>
-<table>
+<label for="content-search">搜索当前列表</label>
+<input id="content-search" type="search" data-admin-filter="content-table" placeholder="输入名称、分类或关键词">
+<table id="content-table">
   <thead>
     <tr><th>Name</th><th>Slug</th><th>Theme</th><th>Level</th><th># Terms</th><th></th></tr>
   </thead>

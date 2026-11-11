@@ -66,7 +66,7 @@ test('sitemap.xml lists every page in the site map', async function() {
 });
 
 test('admin editors and admin routes match one-to-one', function() {
-  var adminGets = adminRouter.stack
+  var adminGets = adminRouter.stack.concat(require('../routes/adminPages').stack)
     .filter(function(layer) { return layer.route && layer.route.methods.get; })
     .map(function(layer) { return layer.route.path; });
   var listRoutes = adminGets.filter(function(route) { return /^\/[a-z-]+$/.test(route); });
@@ -88,7 +88,7 @@ test('every admin editor is attached to a site section, and every reference is v
 
 test('admin dashboard and nav show every section and editor', async function() {
   var html = await ejs.renderFile(path.join(__dirname, '../views/admin/dashboard.ejs'), {
-    title: 'Admin', adminUser: { name: 'Test' }, adminNav: siteMap.adminNav(), groups: siteMap.adminGroups()
+    title: 'Admin', adminUser: { name: 'Test' }, adminNav: siteMap.adminNav(), groups: siteMap.adminGroups(), requireWorkspace: require('../config/adminWorkspace').groups()
   });
   for (var group of siteMap.SECTIONS.concat(siteMap.UNLISTED)) assert.ok(html.includes(group.en), group.key);
   for (var editor of siteMap.adminNav()) assert.ok(html.includes('href="' + editor.href + '"'), editor.href);

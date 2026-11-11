@@ -1,6 +1,7 @@
 <%- include('layout-head') %>
 <h1><%= article ? 'Edit: ' + article.title : 'New Article' %></h1>
 
+<p>保存后立即更新公开文章。新建文章后会显示在中文教学专区。</p>
 <% if (error) { %>
 <p style="color:#dc2626;"><%= error %></p>
 <% } %>

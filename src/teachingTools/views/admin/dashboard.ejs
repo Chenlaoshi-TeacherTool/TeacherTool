@@ -1,27 +1,26 @@
 <%- include('layout-head') %>
-<h1>Admin</h1>
-<p>Content editing, organized by site section. Sections come from <code>config/siteMap.js</code>, the same file that drives the public navigation and sitemap.</p>
-<table>
-  <thead><tr><th>Site section</th><th>Editors</th></tr></thead>
-  <tbody>
-  <% groups.forEach(function (group) { %>
-    <tr>
-      <td>
-        <strong><%= group.label %></strong>
-        <% if (group.href) { %><br><a href="<%= group.href %>" target="_blank" rel="noopener"><%= group.href %></a><% } %>
-        <% if (group.note) { %><br><span style="font-size:0.8rem;color:#666;"><%= group.note %></span><% } %>
-      </td>
-      <td>
-        <% if (group.editors.length) { %>
-          <% group.editors.forEach(function (editor) { %>
-            <div><a href="<%= editor.href %>"><%= editor.label %></a> — <%= editor.description %></div>
-          <% }) %>
-        <% } else { %>
-          <span style="color:#999;">No editor yet (content is in code)</span>
-        <% } %>
-      </td>
-    </tr>
-  <% }) %>
-  </tbody>
-</table>
+<header class="workspace-heading"><p class="eyebrow">CLS TEACHING TOOLS</p><h1>管理工作台</h1><p>从这里上传教学资源、整理课本内容和更新网站。</p></header>
+<section aria-labelledby="quick-title" class="quick-panel">
+  <h2 id="quick-title">常用操作</h2>
+  <div class="quick-actions">
+    <a class="button" href="/admin/materials/new">＋ 上传活动材料</a>
+    <a class="button" href="/admin/textbooks">管理课本词汇</a>
+    <a class="button" href="/admin/wordlists/new">＋ 新建词汇表</a>
+    <a class="button" href="/admin/questionbanks/new">＋ 新建题库</a>
+  </div>
+</section>
+<% var workspace = requireWorkspace; workspace.forEach(function(group) { %>
+<section class="workspace-section" aria-labelledby="group-<%= group.key %>">
+  <h2 id="group-<%= group.key %>"><%= group.label %></h2>
+  <div class="workspace-grid">
+    <% group.editors.forEach(function(editor) { %>
+    <article class="workspace-card"><h3><%= editor.label %></h3><p><%= editor.description %></p><a href="<%= editor.href %>">进入管理 <span class="sr-only"><%= editor.label %></span> →</a></article>
+    <% }); %>
+  </div>
+</section>
+<% }); %>
+<details class="other-pages"><summary>其他网站页面与说明</summary>
+  <p>我的资料是教师的个人资料库；公共共享资源请在“活动材料”中管理。商店目前跳转到教室好物。</p>
+  <ul><% groups.forEach(function(group) { %><li><%= group.label %>：<% if(group.href) { %><a href="<%= group.href %>" target="_blank" rel="noopener">查看页面</a> · <% } %><%= group.editors.length ? '已有管理入口' : '通过代码维护' %></li><% }); %></ul>
+</details>
 <%- include('layout-foot') %>
