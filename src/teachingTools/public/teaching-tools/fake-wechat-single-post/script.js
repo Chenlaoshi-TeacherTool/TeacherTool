@@ -130,6 +130,7 @@
   }
 
   function renderLikes() {
+    els.likesButton.classList.toggle('empty-likes', !state.likes.length);
     els.likesButton.textContent = state.likes.length ? '♡ ' + state.likes.join(', ') : '♡ Tap to add likes';
   }
 
@@ -235,6 +236,10 @@
     });
 
     els.saveButton.addEventListener('click', save);
+    document.getElementById('pdfButton').addEventListener('click', function () {
+      showToast('Choose Save as PDF in the print dialog.');
+      window.print();
+    });
     els.loadButton.addEventListener('click', function () {
       var saved = loadSaved();
       if (!saved) {

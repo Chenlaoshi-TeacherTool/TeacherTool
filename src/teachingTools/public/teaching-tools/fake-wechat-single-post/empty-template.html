@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>WeChat Moments — Empty Template</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    .phone-shell { margin: 20px auto; border: 1px solid #ddd; min-height: 0; }
+    .writing-line { display: block; height: 28px; border-bottom: 1px solid #bbb; }
+    .post-text { margin-bottom: 16px; white-space: normal; }
+    .photo-grid { grid-template-columns: repeat(3, 1fr); }
+    .photo-box { height: 80px; border: 1px dashed #aaa; }
+    .comment { display: block; margin-bottom: 10px; }
+    .avatar { background: white; border: 1px dashed #aaa; font-size: 12px; font-weight: 400; }
+    @media print { .phone-shell { margin: 0 auto; } }
+  </style>
+</head>
+<body class="single-body">
+  <main class="phone-shell" aria-label="Blank WeChat Moments worksheet">
+    <div class="status-bar"><span>9:41</span><span>Moments</span><span>100%</span></div>
+    <section class="profile-strip">
+      <div class="avatar">Avatar</div>
+      <div>Name<span class="writing-line"></span></div>
+    </section>
+    <article class="moment-card">
+      <div class="post-text">Post
+        <span class="writing-line"></span><span class="writing-line"></span>
+        <span class="writing-line"></span><span class="writing-line"></span>
+      </div>
+      <div>Photos / drawings</div>
+      <div class="photo-grid"><div class="photo-box"></div><div class="photo-box"></div><div class="photo-box"></div></div>
+      <div class="meta-row">Time: __________________ &nbsp; Location: __________________</div>
+      <section class="interaction" aria-label="Likes and comments">
+        <div class="likes">♡ Likes<span class="writing-line"></span></div>
+        <div class="comments">Comments
+          <div class="comment"><span class="writing-line"></span><span class="writing-line"></span></div>
+          <div class="comment"><span class="writing-line"></span><span class="writing-line"></span></div>
+        </div>
+      </section>
+    </article>
+  </main>
+</body>
+</html>

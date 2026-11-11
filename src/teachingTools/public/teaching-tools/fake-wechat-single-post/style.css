@@ -70,6 +70,19 @@
   color: var(--text);
 }
 
+.download-link {
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.profile-name,
+.post-text,
+.comment-user,
+.comment-text {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
 .phone-shell {
   width: min(430px, 100%);
   min-height: calc(100vh - 55px);
@@ -289,5 +302,50 @@
   .phone-shell {
     min-height: calc(100vh - 112px);
     box-shadow: none;
+  }
+}
+
+@page {
+  size: auto;
+  margin: 15mm;
+}
+
+@media print {
+  body.single-body {
+    background: #fff;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body.single-body > :not(.phone-shell) {
+    display: none !important;
+  }
+
+  .phone-shell {
+    width: 430px;
+    max-width: 100%;
+    min-height: 0;
+    box-shadow: none;
+    border: 1px solid var(--line);
+  }
+
+  [contenteditable="true"]:focus {
+    outline: none;
+  }
+
+  .photo-slot.empty,
+  .empty-likes,
+  .comment-empty {
+    display: none;
+  }
+
+  .profile-strip,
+  .photo-slot,
+  .comment {
+    break-inside: avoid;
+  }
+
+  .avatar {
+    -webkit-print-color-adjust: exact;
   }
 }
