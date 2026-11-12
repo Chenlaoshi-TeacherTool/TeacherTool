@@ -330,6 +330,7 @@
   "Recommended use": "建议用法",
   "A list name and items are required.": "请填写词汇表名称并添加词条。",
   "Browser storage is full or unavailable. Download a JSON backup instead.": "浏览器存储空间已满或不可用，请下载 JSON 备份。",
+  "My Space": "我的空间",
   "My materials": "我的资料",
   "My materials · Chen Laoshi's Teaching Toolkit": "我的资料 · 陈老师教学工具包",
   "Browser saving · cloud sync when signed in": "保存在浏览器 · 登录后可云端同步",
