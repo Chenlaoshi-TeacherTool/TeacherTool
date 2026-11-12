@@ -413,3 +413,13 @@ test('free teachers get a membership notice instead of activity status or class 
     membershipLimits.canViewQuizResults = original.results;
   }
 });
+
+test('quiz results allow same-origin referrers for Azure session-authenticated POST requests', async function () {
+  var response = await fetch(baseUrl + '/teaching-tools/my-activities/quiz-results.html');
+  assert.equal(response.status, 200);
+  var html = await response.text();
+  // Azure rejects authenticated POSTs without a Referer. External sites must
+  // still receive no quiz URL or identifier.
+  assert.match(html, /<meta name="referrer" content="same-origin">/);
+  assert.doesNotMatch(html, /<meta name="referrer" content="no-referrer">/);
+});
