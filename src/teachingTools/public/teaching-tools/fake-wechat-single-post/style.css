@@ -155,7 +155,7 @@
 }
 
 .post-text {
-  min-height: 110px;
+  min-height: 1.5em;
   white-space: pre-wrap;
   line-height: 1.5;
 }
