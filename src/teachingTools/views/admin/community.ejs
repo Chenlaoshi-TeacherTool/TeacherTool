@@ -1,6 +1,6 @@
 <%- include('layout-head') %>
 <h1>Community</h1>
-<p>Teacher posts at <a href="/community" target="_blank" rel="noopener">/community</a>. Posts go live as soon as a teacher shares them. Reported posts are listed first.
+<p>Teacher posts at <a href="/community" target="_blank" rel="noopener">/community</a>. Competition and website submissions need approval before going live. Reported posts are listed first.
   <strong>Hide</strong> takes a post off the community (its author can still see it); <strong>Delete</strong> removes it for good. Both clear its reports.</p>
 
 <% if (done) { %>
@@ -20,19 +20,20 @@
       <td>
         <a href="/community/<%= post.id %>" target="_blank" rel="noopener"><%= post.title %></a>
         <% if (post.description) { %><div style="color:#555;font-size:.85rem;"><%= post.description %></div><% } %>
+        <% if (post.payload && post.payload.url) { %><p><a href="<%= post.payload.url %>" target="_blank" rel="noopener noreferrer">Review website ↗</a></p><% if (post.payload.audience) { %><p>Suitable ages: <%= post.payload.audience %></p><% } %><% if (post.payload.deadline) { %><p>Deadline: <%= post.payload.deadline %></p><% } %><% } %>
         <% (post.reports || []).forEach(function (report) { %>
           <div style="color:#b91c1c;font-size:.85rem;">⚑ <%= report.reason || '(no reason given)' %></div>
         <% }) %>
       </td>
-      <td><%= post.kind === 'game' ? community.gameLabel(post.gameType, 'en') || post.gameType : 'Word list' %> · <%= post.itemCount %></td>
+      <td><%= post.kind === 'game' ? community.gameLabel(post.gameType, 'en') || post.gameType : community.kindLabel(post.kind, 'en') %></td>
       <td><%= post.authorName %></td>
-      <td><%= post.status === 'live' ? 'Live' : 'Hidden' %></td>
+      <td><%= post.status === 'live' ? 'Live' : post.status === 'pending' ? 'Pending review' : 'Hidden' %></td>
       <td><%= post.reportCount %></td>
       <td><%= post.useCount %></td>
       <td><%= String(post.createdAt).slice(0, 10) %></td>
       <td style="white-space:nowrap;">
         <form method="post" action="/admin/community/<%= post.id %>/<%= post.status === 'live' ? 'hide' : 'show' %>" style="display:inline;">
-          <button type="submit"><%= post.status === 'live' ? 'Hide' : 'Make live' %></button>
+          <button type="submit"><%= post.status === 'live' ? 'Hide' : post.status === 'pending' ? 'Approve' : 'Make live' %></button>
         </form>
         <form method="post" action="/admin/community/<%= post.id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this post for good?');">
           <button type="submit" class="danger">Delete</button>

@@ -10,6 +10,17 @@
   var gameId = params.get('game');
   function $(id) { return document.getElementById(id); }
 
+  function updateKind() {
+    var kind = $('shareKind').value;
+    var external = kind === 'contest' || kind === 'website';
+    $('shareWords').hidden = kind !== 'wordlist';
+    $('shareGame').hidden = kind !== 'game' || !gameId;
+    $('shareGameHelp').hidden = kind !== 'game' || Boolean(gameId);
+    $('shareExternal').hidden = !external;
+    $('shareContestFields').hidden = kind !== 'contest';
+    $('shareSubmit').textContent = external ? text.submitReview : text.publish;
+  }
+
   function parsedWords() {
     var items = window.ChenWordlist.parseText($('shareWordsText').value, { spaced: true });
     return window.ChenWordlist.dedupe(items).map(function (item) { return { zh: item.zh, py: item.py, en: item.en }; });
@@ -46,7 +57,19 @@
       textbook: $('shareTextbook').value,
       stages: Array.prototype.map.call(document.querySelectorAll('input[name="stages"]:checked'), function (box) { return box.value; })
     };
-    if (gameId) { body.kind = 'game'; body.activityId = gameId; }
+    body.kind = $('shareKind').value;
+    if (body.kind === 'contest' || body.kind === 'website') {
+      body.url = $('shareUrl').value.trim();
+      body.audience = $('shareAudience').value.trim();
+      body.deadline = $('shareDeadline').value;
+      try {
+        var url = new URL(body.url);
+        if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error();
+      } catch (error) { return showError(text.needUrl); }
+    } else if (body.kind === 'game') {
+      if (!gameId) return showError(text.chooseGame);
+      body.activityId = gameId;
+    }
     else {
       body.kind = 'wordlist';
       body.words = parsedWords();
@@ -65,12 +88,12 @@
       });
       var result = await response.json().catch(function () { return {}; });
       if (!response.ok) throw new Error(result.error || text.failed);
-      try { sessionStorage.removeItem(DRAFT_KEY); } catch (error) { /* ignore */ }
+      try { if (body.kind === 'wordlist') sessionStorage.removeItem(DRAFT_KEY); } catch (error) { /* ignore */ }
       window.location.href = result.url;
     } catch (error) {
       showError(error.message || text.failed);
       button.disabled = false;
-      button.textContent = text.publish;
+      updateKind();
     }
   }
 
@@ -90,6 +113,7 @@
     $('shareForm').hidden = false;
     if (me.displayName) $('shareAuthor').value = me.displayName;
     if (gameId) {
+      $('shareKind').value = 'game';
       $('shareWords').hidden = true;
       $('shareGame').hidden = false;
       $('shareGameName').textContent = params.get('title') || '';
@@ -99,6 +123,9 @@
       $('shareWordsText').addEventListener('input', updateCount);
       updateCount();
     }
+    if (!gameId && ['contest', 'website'].includes(params.get('kind'))) $('shareKind').value = params.get('kind');
+    $('shareKind').addEventListener('change', updateKind);
+    updateKind();
     $('shareForm').addEventListener('submit', submit);
   }
 

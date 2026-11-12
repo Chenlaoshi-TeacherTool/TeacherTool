@@ -1,8 +1,8 @@
 'use strict';
 
-// Teacher community (/community): word lists and games teachers publish for
+// Teacher community (/community): resources and links teachers share with
 // each other. Browsing and using posts needs no account; publishing needs a
-// signed-in teacher account. Posts go live at once; reports flag them for
+// signed-in teacher account. External links wait for review; reports flag posts for
 // /admin/community (routes/admin.js), where they can be hidden or deleted.
 
 var express = require('express');
@@ -143,8 +143,10 @@ function create(options) {
         var count = ['sentences', 'items', 'words', 'questions', 'rounds'].map(function (key) { return Array.isArray(payload[key]) ? payload[key].length : 0; })
           .reduce(function (a, b) { return Math.max(a, b); }, 0);
         Object.assign(post, { kind: 'game', gameType: adapter.type, gameVersion: adapter.version, payload: payload, itemCount: count });
+      } else if (body.kind === 'contest' || body.kind === 'website') {
+        Object.assign(post, { kind: body.kind, payload: community.cleanExternal(body), itemCount: 0, status: 'pending' });
       } else {
-        return res.status(400).json({ error: 'Choose a word list or a game to share.' });
+        return res.status(400).json({ error: 'Choose a supported category to share.' });
       }
     } catch (error) {
       if (error.status === 400 || error.status === 413) return res.status(400).json({ error: error.message });

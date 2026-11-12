@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#194f45">
   <title><%= t('community.pageTitle') %> - Chen Laoshi's Teaching Toolkit</title>
-  <%- include('../partials/seo', { pageDescription: 'Word lists and classroom games shared by Chinese teachers. Search by learner, grade, and textbook, then use them in your own class.' }) %>
+  <%- include('../partials/seo', { pageDescription: 'Teaching resources, competitions and websites shared by Chinese teachers. Search by category, learner, grade and textbook.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
   <link rel="stylesheet" href="/community/community.css">
 </head>
@@ -38,6 +38,7 @@
         <a class="chip<%= !result.kind ? ' is-on' : '' %>" href="<%- link({ kind: '' }) %>"><%= t('community.all') %></a>
         <a class="chip<%= result.kind === 'wordlist' ? ' is-on' : '' %>" href="<%- link({ kind: 'wordlist' }) %>"><%= t('community.wordLists') %></a>
         <a class="chip<%= result.kind === 'game' ? ' is-on' : '' %>" href="<%- link({ kind: 'game' }) %>"><%= t('community.games') %></a>
+        <% ['contest', 'website'].forEach(function (kind) { %><a class="chip<%= result.kind === kind ? ' is-on' : '' %>" href="<%- link({ kind: kind }) %>"><%= community.kindLabel(kind, lang) %></a><% }) %>
       </div>
       <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterStage') %></span>
         <a class="chip<%= !result.stage ? ' is-on' : '' %>" href="<%- link({ stage: '' }) %>"><%= t('community.all') %></a>
@@ -72,18 +73,19 @@
         <li class="community-card">
           <a href="/community/<%= post.id %>">
             <span class="community-card-type <%= post.kind === 'game' ? 'is-game' : 'is-list' %>">
-              <span aria-hidden="true"><%= game ? game.icon : '📝' %></span>
-              <%= game ? gameLabel(post.gameType) : t('community.wordList') %>
+              <span aria-hidden="true"><%= game ? game.icon : post.kind === 'contest' ? '🏆' : post.kind === 'website' ? '🌐' : '📝' %></span>
+              <%= game ? gameLabel(post.gameType) : community.kindLabel(post.kind, lang) %>
             </span>
             <h3><%= post.title %></h3>
             <% if (post.description) { %><p class="community-card-desc"><%= post.description %></p><% } %>
+            <% if (post.kind === 'contest' && post.payload && post.payload.deadline) { %><p class="hint"><%= t('community.deadline') %>: <%= post.payload.deadline %> <% if (post.payload.deadline < new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })) { %><span class="community-tag"><%= t('community.closed') %></span><% } %></p><% } %>
             <p class="community-tags">
               <% post.stages.forEach(function (key) { %><span class="community-tag"><%= stageLabel(key) %></span><% }) %>
               <% if (post.textbook) { %><span class="community-tag is-book"><%= textbookLabel(post.textbook) %></span><% } %>
             </p>
             <p class="community-card-foot">
               <span>👩‍🏫 <%= post.authorName %></span>
-              <span><%= post.itemCount %> <%= post.kind === 'game' ? t('community.itemsUnit') : t('community.wordsUnit') %><% if (post.useCount) { %> · <%= post.useCount %> <%= t('community.usesUnit') %><% } %></span>
+              <span><% if (post.kind === 'contest' || post.kind === 'website') { %><%= t('community.externalLink') %><% } else { %><%= post.itemCount %> <%= post.kind === 'game' ? t('community.itemsUnit') : t('community.wordsUnit') %><% if (post.useCount) { %> · <%= post.useCount %> <%= t('community.usesUnit') %><% } %><% } %></span>
             </p>
           </a>
         </li>

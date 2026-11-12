@@ -167,3 +167,44 @@ test('search filters by text, type, stage and textbook and pages the results', f
   assert.equal(community.search(list, { textbook: 'hsk', q: 'lesson 1' }).total, 1);
   assert.equal(community.search(list, { stage: 'not-a-stage' }).total, 30);
 });
+
+test('external submissions wait for review, then filter and open safely when approved', async function () {
+  for (var kind of ['contest', 'website']) {
+    var response = await publish('external-' + kind, { kind: kind, title: kind + ' recommendation', authorName: 'Teacher',
+      url: 'https://example.org/events?year=2026', audience: 'Ages 6–12', deadline: '2020-01-01' });
+    assert.equal(response.status, 201);
+    var created = await response.json();
+    var saved = posts.get(created.id);
+    assert.equal(saved.status, 'pending');
+    assert.equal(saved.payload.url, 'https://example.org/events?year=2026');
+    assert.equal((await fetch(origin + created.url)).status, 404);
+    var own = await (await fetch(origin + created.url, { headers: { 'test-user': 'external-' + kind } })).text();
+    assert.match(own, /awaiting review/);
+    assert.match(own, /target="_blank" rel="noopener noreferrer"/);
+    if (kind === 'contest') {
+      assert.match(own, /Ages 6–12/);
+      assert.match(own, /Registration closed/);
+    } else assert.equal(saved.payload.deadline, undefined);
+    var pendingList = await (await fetch(origin + '/community?kind=' + kind)).text();
+    assert.doesNotMatch(pendingList, new RegExp(kind + ' recommendation'));
+    await repository.setStatus(created.id, 'live');
+    // Publishing invalidates the list cache, just as admin approval does.
+    await publish('cache-' + kind, wordList());
+    var list = await (await fetch(origin + '/community?kind=' + kind)).text();
+    assert.match(list, new RegExp(kind + ' recommendation'));
+    assert.doesNotMatch(list, /轻松学中文 3A 第一课/);
+    assert.equal((await fetch(origin + created.url)).status, 200);
+  }
+});
+
+test('external links reject unsafe URLs and invalid competition deadlines', async function () {
+  for (var url of ['', 'javascript:alert(1)', 'data:text/html,test', '/relative', 'https://user:pass@example.org', 'not a url']) {
+    var response = await publish('invalid-external', { kind: 'website', title: 'Test', authorName: 'T', url: url });
+    assert.equal(response.status, 400, url);
+  }
+  for (var deadline of ['2026-02-30', 'yesterday', '2026-13-01']) {
+    var response = await publish('invalid-date', { kind: 'contest', title: 'Test', authorName: 'T', url: 'https://example.org', deadline: deadline });
+    assert.equal(response.status, 400, deadline);
+  }
+  assert.equal(posts.size, 0);
+});

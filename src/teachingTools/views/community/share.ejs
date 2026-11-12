@@ -25,6 +25,18 @@
     </div>
 
     <form class="community-form" id="shareForm" hidden novalidate>
+      <label for="shareKind"><%= t('community.filterType') %></label>
+      <select id="shareKind"><% community.KINDS.forEach(function (kind) { %><option value="<%= kind %>"><%= community.kindLabel(kind, lang) %></option><% }) %></select>
+      <p id="shareGameHelp" hidden><a href="/teaching-tools/teacher-library/teacher-library.html#works"><%= t('community.chooseGame') %></a></p>
+      <fieldset id="shareExternal" hidden>
+        <legend><%= t('community.externalLink') %></legend>
+        <label for="shareUrl"><%= t('community.websiteUrl') %></label><input id="shareUrl" type="url" maxlength="2000" placeholder="https://">
+        <div id="shareContestFields" hidden>
+          <label for="shareAudience"><%= t('community.audience') %></label><input id="shareAudience" maxlength="120">
+          <label for="shareDeadline"><%= t('community.deadline') %></label><input id="shareDeadline" type="date">
+        </div>
+        <p class="hint"><%= t('community.reviewHint') %></p>
+      </fieldset>
       <fieldset id="shareGame" hidden>
         <legend><%= t('community.sharingGame') %></legend>
         <p class="community-share-game" id="shareGameName"></p>
@@ -72,7 +84,7 @@
     window.COMMUNITY_TEXT = <%- JSON.stringify({
       words: t('community.jsWords'), tooMany: t('community.jsTooMany'), noWords: t('community.jsNoWords'), needTitle: t('community.jsNeedTitle'),
       needAuthor: t('community.jsNeedAuthor'), publishing: t('community.jsPublishing'), publish: t('community.publish'), failed: t('community.jsFailed'),
-      maxWords: community.MAX_WORDS
+      needUrl: t('community.needUrl'), chooseGame: t('community.chooseGame'), submitReview: t('community.submitReview'), maxWords: community.MAX_WORDS
     }).replace(/</g, '\\u003c') %>;
   </script>
   <script src="/shared/wordlist-core.js"></script>

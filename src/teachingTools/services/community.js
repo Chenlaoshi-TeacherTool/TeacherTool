@@ -34,6 +34,27 @@ var GAME_TYPES = {
   'word-sudoku': { zh: '词语数独', en: 'Word Sudoku', icon: '🔢', tool: '/low-prep/word-sudoku/word-sudoku-widget.html' }
 };
 
+var KINDS = ['wordlist', 'game', 'contest', 'website'];
+
+function cleanExternal(body) {
+  var value = text(body.url, 2000, 'Website URL', true);
+  var url;
+  try { url = new URL(value); } catch (error) { fail('Enter a valid http or https website URL.'); }
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) fail('Enter a valid http or https website URL.');
+  var payload = { url: url.href };
+  if (body.kind === 'contest') {
+    payload.audience = text(body.audience, 120, 'Suitable ages', false);
+    payload.deadline = text(body.deadline, 10, 'Deadline', false);
+    if (payload.deadline && (!/^\d{4}-\d{2}-\d{2}$/.test(payload.deadline) || !Number.isFinite(Date.parse(payload.deadline)) || new Date(payload.deadline).toISOString().slice(0, 10) !== payload.deadline)) fail('Enter a valid deadline date.');
+  }
+  return payload;
+}
+
+function kindLabel(kind, lang) {
+  var labels = { wordlist: ['Word list', '词表'], game: ['Game', '游戏'], contest: ['Competitions & events', '比赛与活动'], website: ['Recommended websites', '推荐网站'] };
+  return labels[kind] ? labels[kind][lang === 'zh' ? 1 : 0] : '';
+}
+
 var MAX_WORDS = 300;
 var PAGE_SIZE = 24;
 
@@ -99,7 +120,7 @@ function search(posts, query) {
   var q = String(query.q || '').trim().toLowerCase().slice(0, 60);
   var stage = cleanStages([query.stage])[0] || '';
   var textbook = cleanTextbook(query.textbook);
-  var kind = ['wordlist', 'game'].indexOf(query.kind) !== -1 ? query.kind : '';
+  var kind = KINDS.indexOf(query.kind) !== -1 ? query.kind : '';
   var matches = posts.filter(function (post) {
     if (stage && post.stages.indexOf(stage) === -1) return false;
     if (textbook && post.textbook !== textbook) return false;
@@ -124,7 +145,7 @@ function label(list, key, lang) {
 }
 
 module.exports = {
-  STAGES: STAGES, TEXTBOOKS: TEXTBOOKS, GAME_TYPES: GAME_TYPES, MAX_WORDS: MAX_WORDS, PAGE_SIZE: PAGE_SIZE,
+  KINDS: KINDS, cleanExternal: cleanExternal, kindLabel: kindLabel, STAGES: STAGES, TEXTBOOKS: TEXTBOOKS, GAME_TYPES: GAME_TYPES, MAX_WORDS: MAX_WORDS, PAGE_SIZE: PAGE_SIZE,
   newId: newId, validId: validId, cleanPost: cleanPost, cleanWords: cleanWords, search: search, wordsAsText: wordsAsText,
   stageLabel: function (key, lang) { return label(STAGES, key, lang); },
   textbookLabel: function (key, lang) { return label(TEXTBOOKS, key, lang); },

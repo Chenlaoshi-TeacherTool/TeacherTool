@@ -10,7 +10,7 @@ var path = require('path');
 var db = require('./sqlClient');
 
 var LOCAL_FILE = process.env.COMMUNITY_LOCAL_FILE || path.join(__dirname, '..', 'tmp', 'community-posts.json');
-var META_COLUMNS = 'id, kind, owner_key, author_name, title, description, stages, textbook, game_type, game_version, item_count, status, report_count, use_count, created_at';
+var META_COLUMNS = "id, kind, owner_key, author_name, title, description, stages, textbook, game_type, game_version, item_count, status, report_count, use_count, created_at, CASE WHEN kind IN ('contest', 'website') THEN payload ELSE NULL END AS external_payload";
 
 function useSql() { return Boolean(process.env.SQL_CONNECTION_STRING); }
 
@@ -22,6 +22,10 @@ function fromRow(row, withPayload) {
     status: row.status, reportCount: row.report_count || 0, useCount: row.use_count || 0,
     createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at
   };
+  if (row.kind === 'contest' || row.kind === 'website') {
+    var external = row.external_payload || row.payload;
+    post.payload = typeof external === 'string' ? JSON.parse(external) : external;
+  }
   if (withPayload) post.payload = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
   return post;
 }
@@ -31,7 +35,7 @@ function toRow(post) {
     id: post.id, kind: post.kind, owner_key: post.ownerKey, author_name: post.authorName, title: post.title,
     description: post.description || null, stages: (post.stages || []).join(','), textbook: post.textbook || null,
     game_type: post.gameType || null, game_version: post.gameVersion || null, item_count: post.itemCount || 0,
-    payload: JSON.stringify(post.payload), status: 'live', report_count: 0, use_count: 0, created_at: new Date().toISOString()
+    payload: JSON.stringify(post.payload), status: post.status === 'pending' ? 'pending' : 'live', report_count: 0, use_count: 0, created_at: new Date().toISOString()
   };
 }
 
@@ -98,13 +102,13 @@ async function create(post) {
     .input('title', db.sql.NVarChar(120), row.title).input('description', db.sql.NVarChar(500), row.description)
     .input('stages', db.sql.VarChar(200), row.stages).input('textbook', db.sql.VarChar(40), row.textbook)
     .input('gameType', db.sql.VarChar(40), row.game_type).input('gameVersion', db.sql.Int, row.game_version)
-    .input('count', db.sql.Int, row.item_count).input('payload', db.sql.NVarChar(db.sql.MAX), row.payload)
-    .query('INSERT INTO dbo.community_posts (id, kind, owner_key, author_name, title, description, stages, textbook, game_type, game_version, item_count, payload) ' +
-      'VALUES (@id, @kind, @owner, @author, @title, @description, @stages, @textbook, @gameType, @gameVersion, @count, @payload);');
+    .input('status', db.sql.VarChar(10), row.status).input('count', db.sql.Int, row.item_count).input('payload', db.sql.NVarChar(db.sql.MAX), row.payload)
+    .query('INSERT INTO dbo.community_posts (id, kind, owner_key, author_name, title, description, stages, textbook, game_type, game_version, item_count, payload, status) ' +
+      'VALUES (@id, @kind, @owner, @author, @title, @description, @stages, @textbook, @gameType, @gameVersion, @count, @payload, @status);');
   return fromRow(row, false);
 }
 
-// Every post's details without its content, newest first. status: 'live', 'hidden' or null for all.
+// Post metadata (including external link details), newest first. Null status lists all posts.
 async function listAll(status) {
   if (!useSql()) return local.listAll(status);
   var pool = await db.getPool();

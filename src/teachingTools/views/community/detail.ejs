@@ -14,12 +14,12 @@
 
     <article class="community-post" id="communityPost" data-id="<%= post.id %>" data-kind="<%= post.kind %>"
       data-title="<%= post.title %>" data-game-type="<%= post.gameType || '' %>" data-game-version="<%= post.gameVersion || '' %>">
-      <% if (post.status !== 'live') { %><p class="community-hidden-note"><%= t('community.hiddenNote') %></p><% } %>
+      <% if (post.status !== 'live') { %><p class="community-hidden-note"><%= t(post.status === 'pending' ? 'community.pendingNote' : 'community.hiddenNote') %></p><% } %>
       <span class="community-card-type <%= game ? 'is-game' : 'is-list' %>">
-        <span aria-hidden="true"><%= game ? game.icon : '📝' %></span> <%= game ? gameLabel(post.gameType) : t('community.wordList') %>
+        <span aria-hidden="true"><%= game ? game.icon : post.kind === 'contest' ? '🏆' : post.kind === 'website' ? '🌐' : '📝' %></span> <%= game ? gameLabel(post.gameType) : community.kindLabel(post.kind, lang) %>
       </span>
       <h1><%= post.title %></h1>
-      <p class="community-post-meta">👩‍🏫 <%= post.authorName %> · <%= String(post.createdAt).slice(0, 10) %> · <%= post.itemCount %> <%= game ? t('community.itemsUnit') : t('community.wordsUnit') %><% if (post.useCount) { %> · <%= post.useCount %> <%= t('community.usesUnit') %><% } %></p>
+      <p class="community-post-meta">👩‍🏫 <%= post.authorName %> · <%= String(post.createdAt).slice(0, 10) %><% if (post.kind === 'wordlist' || game) { %> · <%= post.itemCount %> <%= game ? t('community.itemsUnit') : t('community.wordsUnit') %><% if (post.useCount) { %> · <%= post.useCount %> <%= t('community.usesUnit') %><% } %><% } %></p>
       <% if (post.description) { %><p class="community-post-desc"><%= post.description %></p><% } %>
       <p class="community-tags">
         <% post.stages.forEach(function (key) { %><span class="community-tag"><%= stageLabel(key) %></span><% }) %>
@@ -48,6 +48,16 @@
             <% }) %>
           </tbody>
         </table>
+      <% } else if (post.kind === 'contest' || post.kind === 'website') { %>
+        <section class="community-use">
+          <% if (post.kind === 'contest') { %>
+            <% if (post.payload.audience) { %><p><strong><%= t('community.audience') %>:</strong> <%= post.payload.audience %></p><% } %>
+            <% if (post.payload.deadline) { %><p><strong><%= t('community.deadline') %>:</strong> <%= post.payload.deadline %> <% if (post.payload.deadline < new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })) { %><span class="community-tag"><%= t('community.closed') %></span><% } %></p><% } %>
+          <% } %>
+          <a class="btn" href="<%= post.payload.url %>" target="_blank" rel="noopener noreferrer"><%= t(post.kind === 'contest' ? 'community.visitContest' : 'community.visitWebsite') %> ↗</a>
+          <p class="hint"><%= t('community.externalHint') %></p>
+          <p class="community-status" id="communityStatus" role="status" aria-live="polite"></p>
+        </section>
       <% } else if (game) { %>
         <section class="community-use">
           <h2><%= t('community.useTitle') %></h2>
