@@ -44,7 +44,7 @@
     [
       'words', 'unit', 'per', 'font', 'color', 'background', 'bg-upload', 'bg-file', 'bg-fade', 'bg-status',
       'guides', 'title', 'levels',
-      'out-sheet', 'out-board', 'out-answer', 'practice', 'dashed',
+      'out-sheet', 'out-board', 'out-answer', 'practice', 'practice-rows', 'dashed',
       'generate', 'page-count', 'reshuffle', 'png', 'pdf', 'print', 'status', 'empty', 'pages', 'print-area'
     ].forEach(function (id) {
       el[id.replace(/-(\w)/g, function (_, c) { return c.toUpperCase(); })] = document.getElementById('cu-' + id);
@@ -127,6 +127,7 @@
       board: el.outBoard.checked,
       answer: el.outAnswer.checked,
       practice: el.practice.checked,
+      practiceRows: parseInt(el.practiceRows.value, 10) || 1,
       dashed: el.dashed.checked
     };
   }
@@ -438,7 +439,7 @@
   // ---- Drawing the sheets --------------------------------------------------------------
 
   // Where the puzzle goes on a sheet: as large as fits, leaving room below
-  // for the writing practice on the worksheet.
+  // for the writing practice on the board or worksheet.
   function puzzleBox(p, kind, opts) {
     var area = puzzleArea(opts, kind);
     var aspect = p.art.width / p.art.height;
@@ -448,7 +449,7 @@
 
   function puzzleArea(opts, kind) {
     var usableH = PAGE_H - MARGIN * 2 - HEADER_H;
-    var practice = (kind || 'sheet') === 'sheet' && opts.practice;
+    var practice = opts.practice && (opts.board || opts.sheet);
     return { w: PAGE_W - MARGIN * 2, h: practice ? usableH * 0.6 : usableH };
   }
 
@@ -482,18 +483,22 @@
 
     drawGridLines(ctx, box, p.rows, p.cols, kind === 'sheet' && opts.dashed, kind === 'board' ? '#9ca3af' : '#555');
 
-    if (kind === 'sheet' && opts.practice) {
+    if (hasPractice(kind, opts)) {
       var top = box.y + box.h + 60;
       drawPractice(ctx, p.chars, opts, MARGIN, top, PAGE_W - MARGIN * 2, PAGE_H - MARGIN - top);
     }
     return canvas;
   }
 
+  function hasPractice(kind, opts) {
+    return opts.practice && kind === (opts.board ? 'board' : 'sheet');
+  }
+
   function drawHeader(ctx, p, kind, opts) {
     var title = opts.title || '汉字拼图 · Character Unscrambler';
     var sub = {
-      sheet: '剪下方格，拼出汉字' + (opts.practice ? '，再写一写' : '') + ' · Cut out the squares, rebuild the character' + (opts.practice ? ', then practise writing it.' : '.'),
-      board: '把剪下的方格贴在对应的位置 · Glue each square in the right place.',
+      sheet: '剪下方格，拼出汉字' + (hasPractice(kind, opts) ? '，再写一写' : '') + ' · Cut out the squares, rebuild the character' + (hasPractice(kind, opts) ? ', then practise writing it.' : '.'),
+      board: '把剪下的方格贴在对应的位置' + (hasPractice(kind, opts) ? '，再写一写' : '') + ' · Glue each square in the right place' + (hasPractice(kind, opts) ? ', then practise writing it.' : '.'),
       answer: '答案：字母表示练习纸上的方格 · Answer key: letters match the squares on the worksheet.'
     }[kind];
     var nameW = 560;
@@ -540,18 +545,18 @@
 
   // Rows per character: a grey model to trace, then empty 田字格 boxes.
   // Rows pack two or three characters side by side when there are many, and
-  // each character gets up to three rows when there is room to fill.
+  // each character gets the number of rows selected by the teacher.
   function drawPractice(ctx, chars, opts, x, y, w, h) {
     var gap = 16;
     var perRow = 1;
     var boxSize = 0;
     var lines = 1;
+    var repeat = opts.practiceRows;
     for (perRow = 1; perRow <= 3; perRow++) {
-      lines = Math.ceil(chars.length / perRow);
+      lines = Math.ceil(chars.length / perRow) * repeat;
       boxSize = Math.min(180, (h - (lines - 1) * gap) / lines);
       if (boxSize >= 120 || perRow === 3) break;
     }
-    var repeat = Math.max(1, Math.min(3, Math.floor((h + gap) / ((boxSize + gap) * lines))));
     var segW = (w - (perRow - 1) * gap * 2) / perRow;
     var count = Math.max(2, Math.floor(segW / boxSize));
     var s = segW / count;

@@ -136,10 +136,17 @@
 
           <label>Options · 选项</label>
           <div class="cu-options">
-            <label class="cu-check"><input type="checkbox" id="cu-practice" checked><span>Writing practice boxes · 田字格练写 <small>Under the puzzle on the worksheet.</small></span></label>
+            <label class="cu-check"><input type="checkbox" id="cu-practice" checked><span>Writing practice boxes · 田字格练写 <small>On the glue board, or on the worksheet if no board is selected. 优先放在拼贴底板；不选底板时放在练习纸。</small></span></label>
             <label class="cu-check"><input type="checkbox" id="cu-guides"><span>田字格 guides behind the character · 拼图里加田字格 <small>Helps students line the pieces up.</small></span></label>
             <label class="cu-check"><input type="checkbox" id="cu-dashed" checked><span>Dashed cut lines · 虚线剪裁线</span></label>
           </div>
+
+          <label for="cu-practice-rows">Rows per character · 每个字写几行</label>
+          <select id="cu-practice-rows">
+            <option value="1" selected>1 row · 1 行</option>
+            <option value="2">2 rows · 2 行</option>
+            <option value="3">3 rows · 3 行</option>
+          </select>
 
           <button id="cu-generate" class="cu-btn cu-btn-primary" type="button">✂️ Make puzzle · 生成拼图</button>
         </section>
