@@ -5,20 +5,28 @@ function create(options) {
   options = options || {};
   var editor = options.editor || require('../services/textbookBookEditor');
   var words = options.words || require('../services/textbookWords');
+  var repository = options.repository || require('../services/textbookRepository');
   var origin = new URL(options.origin || process.env.SITE_URL || 'https://clsteachingtools.com').origin;
   var router = express.Router();
   router.use(require('../middleware/requireAdmin'));
   // An entire book can exceed the application's default JSON body limit.
   router.use(express.json({ type: 'application/vnd.cls-textbook+json', limit: '2mb' }));
-  router.get('/textbooks/books/:series/:book/words', async function (req, res, next) {
+  router.get('/textbooks/books/:series/:book/words', function (req, res) {
+    res.redirect('/admin/textbooks/books/' + encodeURIComponent(req.params.series) + '/' + encodeURIComponent(req.params.book));
+  });
+  router.get('/textbooks/books/:series/:book', async function (req, res, next) {
     try {
       var series = req.textbooks.findSeries(req.params.series);
       if (!series) return res.sendStatus(404);
       var lessons = await editor.load(series.key, req.params.book);
-      if (!lessons.length) return res.status(404).send('本册暂无课次。');
+      var configuredBook = req.textbooks.findBook(series, req.params.book);
+      for (var lesson of lessons) {
+        try { lesson.files = await repository.listFiles(lesson.id); } catch (error) { lesson.files = null; }
+      }
       res.set('Cache-Control', 'private, no-store');
-      res.render('admin/textbooks-book-words', { title: '整册词汇编辑', series: series, bookSlug: req.params.book,
-        bookName: lessons[0].book_name, lessons: lessons, adminUser: req.adminUser });
+      res.render('admin/textbooks-book-words', { title: '整本教材编辑', series: series, bookSlug: req.params.book,
+        bookName: lessons.length ? lessons[0].book_name : configuredBook ? configuredBook.zh : req.params.book,
+        fileError: req.query.fileError || '', lessons: lessons, adminUser: req.adminUser });
     } catch (error) { next(error); }
   });
   router.post('/textbooks/books/:series/:book/words/:action', async function (req, res, next) {

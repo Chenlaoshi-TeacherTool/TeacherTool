@@ -16,7 +16,7 @@ Request.prototype.input = function (name, type, value) { this.values[name] = val
 Request.prototype.query = async function (query) {
   var rows = this.tx ? this.tx.items : stored; var v = this.values;
   var lessons = this.tx ? this.tx.lessons : lessonRows;
-  if (query.startsWith('UPDATE textbook_lessons')) { lessons.find(function (l) { return l.id === v.id; }).title = v.title; return {}; }
+  if (query.startsWith('UPDATE textbook_lessons')) { Object.assign(lessons.find(function (l) { return l.id === v.id; }), v); return {}; }
   if (query.startsWith('DELETE')) { this.tx.items = rows.filter(function (r) { return r.lesson_id !== v.id; }); return {}; }
   if (query.includes('FROM textbook_lessons')) return { recordset: lessons.filter(function (l) { return (!v.id || l.id === v.id) && l.series === v.series && l.book_slug === v.book; }).map(function (l) { return Object.assign({}, l); }) };
   return { recordset: rows.filter(function (r) { return v.id ? r.lesson_id === v.id : lessonRows.some(function (l) { return l.id === r.lesson_id && l.series === v.series && l.book_slug === v.book; }); }).sort(function (a, b) { return a.sort_order - b.sort_order || a.id - b.id; }) };
@@ -69,6 +69,25 @@ test('rejects blank, non-text and oversized titles before writing', async functi
     await assert.rejects(editor.save('jinan', 'book-2', input), { status: 400 });
   }
   assert.equal(commits, 0); assert.equal(rollbacks, 0);
+});
+test('saves sentences and teaching details atomically and detects concurrent sentence edits', async function () {
+  var loaded = await editor.load('jinan', 'book-2');
+  var input = payload([loaded[0]]);
+  Object.assign(input[0], { sentence_patterns: '你好！\n老师好！', activities: '问好', games: '配对', lesson_no: 1, sort_order: 2, is_published: true });
+  var result = await editor.save('jinan', 'book-2', input);
+  assert.equal(result.lessons[0].sentence_patterns, '你好！\n老师好！');
+  assert.equal(lessonRows[0].activities, '问好');
+  var stale = payload(await editor.load('jinan', 'book-2'));
+  lessonRows[0].sentence_patterns = '其他窗口的句子';
+  await assert.rejects(editor.save('jinan', 'book-2', stale), { status: 409 });
+  assert.equal(lessonRows[0].sentence_patterns, '其他窗口的句子');
+});
+test('rejects invalid sentence and course metadata before writing', async function () {
+  for (var invalid of [{ sentence_patterns: 3 }, { sentence_patterns: '句'.repeat(20001) }, { lesson_no: 1.5 }, { sort_order: 2147483648 }, { is_published: 'yes' }]) {
+    var input = payload(await editor.load('jinan', 'book-2')); Object.assign(input[0], invalid);
+    await assert.rejects(editor.save('jinan', 'book-2', input), { status: 400 });
+  }
+  assert.equal(commits, 0);
 });
 test('stale revisions, new concurrent words, and cross-book IDs cannot overwrite data', async function () {
   var input = payload(await editor.load('jinan', 'book-2'));

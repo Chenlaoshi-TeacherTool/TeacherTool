@@ -1109,36 +1109,9 @@ router.get('/textbooks/export', async function (req, res, next) {
   } catch (err) { next(err); }
 });
 
-router.get('/textbooks/books/:series/:book', async function (req, res, next) {
-  try {
-    var series = req.textbooks.findSeries(req.params.series);
-    if (!series) return res.status(404).send('Textbook series not found.');
-    var pool = await sqlClient.getPool();
-    var result = await pool.request()
-      .input('series', sql.NVarChar, series.key)
-      .input('bookSlug', sql.NVarChar, req.params.book)
-      .query(
-        'SELECT tl.id, tl.slug, tl.book_name, tl.sort_order, tl.lesson_no, tl.title, tl.is_published, COUNT(tli.id) AS word_count ' +
-        'FROM textbook_lessons tl LEFT JOIN textbook_lesson_items tli ON tli.lesson_id = tl.id ' +
-        'WHERE tl.series = @series AND tl.book_slug = @bookSlug ' +
-        'GROUP BY tl.id, tl.slug, tl.book_name, tl.sort_order, tl.lesson_no, tl.title, tl.is_published ORDER BY tl.sort_order, tl.id'
-      );
-    var configuredBook = req.textbooks.findBook(series, req.params.book);
-    var bookName = configuredBook ? configuredBook.zh : result.recordset[0] ? result.recordset[0].book_name : req.params.book;
-    res.render('admin/textbooks-book', {
-      title: series.zh + ' ' + bookName, series: series, bookSlug: req.params.book, bookName: bookName,
-      lessons: result.recordset, adminUser: req.adminUser
-    });
-  } catch (err) { next(err); }
-});
-
 router.get('/textbooks/lessons/new', function (req, res) {
   var series = req.textbooks.findSeries(req.query.series) || req.textbooks.SERIES[0];
-  res.render('admin/textbooks-lesson-edit', {
-    title: 'New lesson', seriesList: req.textbooks.SERIES, items: [], bookPath: bookPath,
-    lesson: null, defaults: { series: series.key, book_slug: req.query.book || '', book_name: req.query.book_name || '' },
-    adminUser: req.adminUser
-  });
+  res.redirect(req.query.book ? bookPath(series.key, String(req.query.book)) + '#new-lesson' : '/admin/textbooks');
 });
 
 router.post('/textbooks/lessons/new', async function (req, res, next) {
@@ -1159,15 +1132,7 @@ router.get('/textbooks/lessons/:id/edit', async function (req, res, next) {
     var lessonResult = await pool.request().input('id', sql.Int, req.params.id).query('SELECT * FROM textbook_lessons WHERE id = @id');
     var lesson = lessonResult.recordset[0];
     if (!lesson) return res.status(404).send('Lesson not found.');
-    var itemsResult = await pool.request().input('lessonId', sql.Int, lesson.id)
-      .query('SELECT * FROM textbook_lesson_items WHERE lesson_id = @lessonId ORDER BY sort_order, id');
-    var files = [];
-    try { files = await textbookRepository.listFiles(lesson.id); } catch (error) { files = null; }
-    res.render('admin/textbooks-lesson-edit', {
-      title: 'Edit ' + lesson.title, seriesList: req.textbooks.SERIES, lesson: lesson, defaults: lesson,
-      wordsSaved: /^\d{1,2}$/.test(req.query.wordsAdded || '') && /^\d{1,2}$/.test(req.query.wordsSkipped || '') ? { added: Number(req.query.wordsAdded), skipped: Number(req.query.wordsSkipped) } : null,
-      items: itemsResult.recordset, files: files, fileError: req.query.fileError || '', bookPath: bookPath, adminUser: req.adminUser
-    });
+    res.redirect(bookPath(lesson.series, lesson.book_slug) + (req.query.fileError ? '?fileError=' + encodeURIComponent(req.query.fileError) : '') + '#lesson-' + lesson.id);
   } catch (err) { next(err); }
 });
 

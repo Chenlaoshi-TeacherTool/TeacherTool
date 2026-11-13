@@ -18,6 +18,13 @@ body:has(#bookEditor) { max-width:1400px; }
 #bookStatus { min-height:24px; }
 #bookStatus[data-error=true] { color:#b91c1c; }
 button:disabled { opacity:.55; cursor:wait; }
+#bookEditor [hidden] { display:none; }
+#bookEditor textarea, #bookEditor select { width:100%; box-sizing:border-box; }
+#bookEditor [data-view][aria-pressed=true], #bookEditor [data-bulk-kind][aria-pressed=true] { background:#1d4ed8; color:white; }
+.book-lesson details, .book-new-lesson { margin:24px 0; }
+.book-lesson input[type=checkbox] { display:inline; width:auto; }
+.book-new-lesson label { display:block; margin:12px 0; }
+#bulkSummary { margin:16px 0; }
 @media(max-width:760px) {
   .book-workspace { grid-template-columns:minmax(0,1fr); }
   .book-workspace aside { position:static; max-height:200px; }

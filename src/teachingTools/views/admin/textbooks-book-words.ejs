@@ -1,9 +1,15 @@
 <%- include('layout-head') %>
 <link rel="stylesheet" href="/admin-textbook-book.css">
-<h1><%= series.zh %> · <%= bookName %> · 整册词汇编辑</h1>
-<p><a href="/admin/textbooks/books/<%= encodeURIComponent(series.key) %>/<%= encodeURIComponent(bookSlug) %>">← 返回本册 / Back to book</a></p>
-<p>生成只补全空白，保留已有内容。请核对多音字和英文词义，再统一保存。切换课次不会丢失修改。</p>
+<h1><%= series.zh %> · <%= bookName %> · 整本教材编辑</h1>
+<p><a href="/admin/textbooks">← 返回教材管理</a></p>
+<p>在同一页维护课程、词汇、句子与附件。批量输入先预览，再加入草稿，最后统一保存。</p>
+<% if (fileError) { %><p role="alert"><%= fileError %></p><% } %>
 <div id="bookEditor" data-base="/admin/textbooks/books/<%= encodeURIComponent(series.key) %>/<%= encodeURIComponent(bookSlug) %>/words">
+  <div class="book-toolbar" aria-label="编辑区域">
+    <button type="button" data-view="info" aria-pressed="false">教材资料</button>
+    <button type="button" data-view="catalog" aria-pressed="true">课程目录</button>
+    <button type="button" data-view="bulk" aria-pressed="false">批量输入</button>
+  </div>
   <div class="book-toolbar">
     <button type="button" data-command="english-book">补全整册英文</button>
     <button type="button" data-command="pinyin-book">补全整册拼音</button>
@@ -11,7 +17,24 @@
     <button type="button" data-command="export" class="secondary">导出当前修改 CSV</button>
   </div>
   <p id="bookStatus" role="status" aria-live="polite"></p>
-  <div class="book-workspace">
+  <section data-panel="info" hidden>
+    <h2>教材资料</h2>
+    <p>教材：<%= series.zh %> · <%= bookName %></p>
+    <p>课程数：<%= lessons.length %> · 本页按课保存词汇、句子和教学内容。</p>
+    <p><a href="/admin/textbooks/import">通过 Excel 导入或更新教材资料</a></p>
+  </section>
+  <section data-panel="bulk" hidden>
+    <h2>批量输入</h2>
+    <div class="book-toolbar"><button type="button" data-bulk-kind="words" aria-pressed="true">批量输入词汇</button><button type="button" data-bulk-kind="sentences" aria-pressed="false">批量输入句子</button></div>
+    <label for="bulkScope">输入范围</label>
+    <select id="bulkScope"><option value="book">整本书 · 按课号分配</option><% lessons.forEach(function (lesson) { %><option value="<%= lesson.id %>">第 <%= lesson.lesson_no == null ? '—' : lesson.lesson_no %> 课 · <%= lesson.title %></option><% }) %></select>
+    <p id="bulkFormat"></p>
+    <label for="bulkText">从 Excel 复制粘贴，每行一条（列之间使用 Tab）</label>
+    <textarea id="bulkText" rows="8"></textarea>
+    <div class="book-toolbar"><button type="button" id="bulkPreview">预览分课结果</button></div>
+    <div id="bulkResult" hidden><div id="bulkSummary" role="status"></div><div class="book-table-wrap"><table><thead><tr><th>课程</th><th>中文</th><th>拼音</th><th>英文</th><th>结果</th></tr></thead><tbody id="bulkRows"></tbody></table></div><button type="button" id="bulkApply">确认加入草稿</button></div>
+  </section>
+  <div class="book-workspace" data-panel="catalog">
     <aside><nav id="lessonNavigation" aria-label="课次"></nav></aside>
     <main>
       <div class="book-toolbar">
@@ -20,10 +43,26 @@
         <button type="button" data-command="save-lesson">保存本课</button>
       </div>
       <div id="bookLessons"></div>
+      <details class="book-new-lesson" id="new-lesson"><summary>＋ 添加课程</summary>
+        <form method="POST" action="/admin/textbooks/lessons/new">
+          <input type="hidden" name="series" value="<%= series.key %>"><input type="hidden" name="book_slug" value="<%= bookSlug %>"><input type="hidden" name="book_name" value="<%= bookName %>">
+          <label>课程标识（唯一，如 jinan-1-01）<input name="slug" required></label>
+          <label>课号<input name="lesson_no" type="number"></label><label>顺序<input name="sort_order" type="number" value="<%= lessons.length %>"></label><label>课题<input name="title" maxlength="200" required></label>
+          <label><input type="checkbox" name="is_published" checked> 发布</label><button type="submit">创建课程</button>
+        </form>
+      </details>
     </main>
   </div>
 </div>
+<% lessons.forEach(function (lesson) { %>
+<template id="lessonFiles-<%= lesson.id %>"><details><summary>附件管理</summary>
+<% if (lesson.files === null) { %><p role="alert">附件加载失败，请检查附件数据库后重试。</p><% } else { %>
+<% lesson.files.forEach(function (file) { %><div class="book-toolbar"><a href="/textbook-companion/files/<%= file.id %>"><%= file.title %></a><form method="POST" action="/admin/textbooks/lessons/<%= lesson.id %>/files/<%= file.id %>/delete"><button type="submit" class="danger">删除附件</button></form></div><% }) %>
+<form method="POST" action="/admin/textbooks/lessons/<%= lesson.id %>/files" enctype="multipart/form-data"><label>附件标题<input name="title" maxlength="200"></label><label>文件（最大 30 MB）<input type="file" name="file" required accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg,.mp3,.mp4,.zip"></label><button type="submit">上传附件</button></form>
+<% } %></details></template>
+<% }) %>
 <script id="bookData" type="application/json"><%- JSON.stringify(lessons).replace(/</g, '\\u003c') %></script>
 <script src="/vendor/pinyin-pro.js" defer></script>
+<script src="/admin-textbook-bulk.js" defer></script>
 <script src="/admin-textbook-book.js" defer></script>
 <%- include('layout-foot') %>

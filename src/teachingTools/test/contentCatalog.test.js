@@ -118,7 +118,9 @@ test('new textbooks and books reach public pages, Excel import and material less
   var adminList = await (await fetch(base + '/admin/textbooks', { headers: admin })).text();
   assert.match(adminList, /测试教材/); assert.match(adminList, /\/admin\/textbooks\/books\/test-course\/book-1/);
   var newLesson = await (await fetch(base + '/admin/textbooks/lessons/new?series=test-course&book=book-1&book_name=' + encodeURIComponent('第一册'), { headers: admin })).text();
-  assert.match(newLesson, /value="test-course" selected/);
+  assert.match(newLesson, /name="series" value="test-course"/);
+  assert.match(newLesson, /id="new-lesson"/);
+  assert.match(newLesson, /批量输入句子/);
   var created = await add('/textbooks/lessons/new', { series: 'test-course', book_slug: 'book-1', book_name: '第一册', slug: 'test-01', lesson_no: 1, title: '第一课', is_published: 'on' });
   assert.equal(created.status, 302); assert.match(created.headers.get('location'), /lessons\/42\/edit/);
   var selectors = await (await fetch(base + '/admin/materials/catalog', { headers: admin })).json();
