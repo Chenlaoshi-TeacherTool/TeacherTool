@@ -57,7 +57,7 @@ async function list(options, client) {
     .query(
       "SELECT a.owner_key, a.email, a.display_name, a.created_at, a.last_seen_at, l.write_until, l.trial_started_at, " +
       "CASE WHEN l.write_until > SYSUTCDATETIME() THEN CASE WHEN l.trial_started_at IS NOT NULL AND NOT EXISTS " +
-      "(SELECT 1 FROM dbo.teacher_activation_codes c WHERE c.redeemed_by=a.owner_key AND c.revoked_at IS NULL) THEN 'trial' ELSE 'active' END ELSE 'expired' END AS membership_status " +
+      "(SELECT 1 FROM dbo.teacher_activation_codes c WHERE c.redeemed_by=a.owner_key AND c.revoked_at IS NULL) AND NOT EXISTS (SELECT 1 FROM dbo.membership_events m WHERE m.owner_key=a.owner_key AND m.kind IN ('extend','set')) THEN 'trial' ELSE 'active' END ELSE 'expired' END AS membership_status " +
       "INTO #accounts FROM dbo.teacher_accounts a LEFT JOIN dbo.teacher_library_access l ON l.owner_key=a.owner_key " +
       "WHERE (@query=N'%%' OR a.email LIKE @query ESCAPE '\\' OR a.display_name LIKE @query ESCAPE '\\'); " +
       "DELETE FROM #accounts WHERE @status <> 'all' AND membership_status <> @status; " +

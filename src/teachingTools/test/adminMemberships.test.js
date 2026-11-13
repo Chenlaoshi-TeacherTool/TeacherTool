@@ -92,3 +92,14 @@ test('account listing escapes LIKE patterns, searches names, bounds pages and fe
   assert.equal(inputs.status,'active');
   assert.match(query,/IF @page > @pages SET @page=@pages/);
 });
+
+
+test('teacher rows link to adjustment and show manual audit reasons safely', async function() {
+  var owner='a'.repeat(64);
+  var directory={email:'',status:'all',page:1,pages:1,total:1,teachers:[{ownerKey:owner,email:'teacher@example.org',createdAt:new Date(),events:[{kind:'set',days:30,createdAt:new Date(),reason:'<script>test</script>',actor:'Admin'}]}]};
+  var html=await render({directory:directory,selectedTeacher:owner});
+  assert.ok(html.includes('/admin/memberships/'+owner+'/adjust'));
+  assert.match(html,/设置到期日期/);
+  assert.match(html,/原因：&lt;script&gt;test/);
+  assert.ok(!html.includes('<script>test</script>'));
+});

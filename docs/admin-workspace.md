@@ -31,3 +31,21 @@ continues its existing redirect to Classroom Finds; Privacy remains maintained i
 Run `npm test` from `src/teachingTools`. Page tests cover persistence, draft/publish
 separation, both languages, escaping, origin checks, SQL parameters and migration fallback.
 Browser verification covers 1280px and 390px layouts, real form submissions and article links.
+
+## Manual membership adjustment
+
+The teacher directory links to `/admin/memberships/:owner/adjust`. Admins can add
+1–3660 days from the later of now or the current expiry, set an inclusive UTC end
+date (2000–2099), or stop access now. A reason is required. The page displays the
+account and an estimated before/after preview and asks for confirmation on save.
+
+Apply `0022_add-membership-adjustments` before deploying. It adds audit reasons
+and event types. Updates lock the access row, check the page's expected expiry,
+and write the new expiry and audit record in one transaction. Stale submissions
+return 409 for review. Original trial history is retained; manual activation is
+classified as active membership. Stopping access does not delete library data or
+issue a payment refund. Existing activation-code and refund workflows remain.
+
+Validation includes fixture-only browser submissions, unit/route tests, and SQL
+execution against session-local temporary tables, including rollback on audit
+failure. No real teacher account was altered during validation.

@@ -62,7 +62,7 @@ function listLink(page, teacher) { var q = new URLSearchParams({ tab: 'teachers'
             <td><%= day(teacher.lastSeenAt) %></td>
             <td><strong style="color:<%= active ? '#15803d' : '#b91c1c' %>"><%= day(teacher.writeUntil) %><%= teacher.writeUntil ? (active ? ' (active)' : ' (ended)') : '' %></strong></td>
             <td><%= { trial: '试用中', active: '权限有效', expired: '已到期 / 无有效权限' }[teacher.status] || (active ? '权限有效' : '已到期') %></td>
-            <td><a href="<%= listLink(listing ? listing.page : 1, teacher.ownerKey) %>#teacher-details">查看详情</a></td>
+            <td><a href="<%= listLink(listing ? listing.page : 1, teacher.ownerKey) %>#teacher-details">查看详情</a><br><a href="/admin/memberships/<%= teacher.ownerKey %>/adjust">调整会员</a></td>
           </tr>
           <% if (!listing || selectedKey === teacher.ownerKey) { %>
           <tr id="teacher-details">
@@ -79,7 +79,7 @@ function listLink(page, teacher) { var q = new URLSearchParams({ tab: 'teachers'
                       <% events.forEach(function (event) { %>
                         <tr>
                           <td><%= new Date(event.createdAt).toISOString().slice(0, 16).replace('T', ' ') %></td>
-                          <td><%= event.kind === 'trial' ? 'Free trial' : event.kind === 'code' ? 'Activation code' : event.kind === 'refund' ? 'Refund (code deactivated)' : event.kind %><%= event.batchLabel ? ' · ' + event.batchLabel : '' %></td>
+                          <td><%= event.kind === 'trial' ? 'Free trial' : event.kind === 'code' ? 'Activation code' : event.kind === 'refund' ? 'Refund (code deactivated)' : ({ extend:'手动激活 / 延长', set:'设置到期日期', stop:'立即停用' }[event.kind] || event.kind) %><%= event.batchLabel ? ' · ' + event.batchLabel : '' %><% if(event.reason) { %><br>原因：<%= event.reason %><% } %></td>
                           <td><%= event.days > 0 ? '+' + event.days : event.days %></td>
                           <td><%= event.untilBefore ? day(event.untilBefore) : '—' %></td>
                           <td><%= event.untilAfter ? day(event.untilAfter) : '—' %></td>

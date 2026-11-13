@@ -7,8 +7,8 @@ async function load(owner) {
   var result = await pool.request().input('owner', db.sql.Char(64), owner).query(
     'SELECT content, revision FROM dbo.teacher_private_libraries WHERE owner_key = @owner; ' +
     'SELECT write_until, CASE WHEN write_until > SYSUTCDATETIME() THEN 1 ELSE 0 END AS can_write, ' +
-    // Still on the free trial only until an activation code is used (a refunded code does not count).
-    'CASE WHEN trial_started_at IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.teacher_activation_codes c WHERE c.redeemed_by = @owner AND c.revoked_at IS NULL) THEN 1 ELSE 0 END AS on_trial ' +
+    // A code or manual activation ends the trial label; refunded codes do not count.
+    "CASE WHEN trial_started_at IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.teacher_activation_codes c WHERE c.redeemed_by = @owner AND c.revoked_at IS NULL) AND NOT EXISTS (SELECT 1 FROM dbo.membership_events m WHERE m.owner_key=@owner AND m.kind IN ('extend','set')) THEN 1 ELSE 0 END AS on_trial " +
     'FROM dbo.teacher_library_access WHERE owner_key = @owner;'
   );
   var row = result.recordsets[0][0];
@@ -68,12 +68,12 @@ async function listEvents(owners) {
   var request = pool.request();
   var names = owners.slice(0, 50).map(function (owner, index) { request.input('o' + index, db.sql.Char(64), owner); return '@o' + index; });
   var result = await request.query(
-    'SELECT TOP 500 e.owner_key, e.kind, e.days, e.until_before, e.until_after, e.actor, e.created_at, c.batch_label ' +
+    'SELECT TOP 500 e.owner_key, e.kind, e.days, e.until_before, e.until_after, e.actor, e.created_at, e.reason, c.batch_label ' +
     'FROM dbo.membership_events e LEFT JOIN dbo.teacher_activation_codes c ON c.code_hash = e.code_hash ' +
     'WHERE e.owner_key IN (' + names.join(', ') + ') ORDER BY e.created_at DESC, e.id DESC;'
   );
   return result.recordset.map(function (row) {
-    return { ownerKey: row.owner_key, kind: row.kind, days: row.days, untilBefore: row.until_before, untilAfter: row.until_after, actor: row.actor, createdAt: row.created_at, batchLabel: row.batch_label };
+    return { ownerKey: row.owner_key, kind: row.kind, days: row.days, untilBefore: row.until_before, untilAfter: row.until_after, actor: row.actor, reason: row.reason, createdAt: row.created_at, batchLabel: row.batch_label };
   });
 }
 

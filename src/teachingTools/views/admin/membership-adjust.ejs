@@ -1,0 +1,20 @@
+<%- include('layout-head') %>
+<p><a href="/admin/memberships">← 老师账户列表</a></p>
+<h1>调整会员</h1>
+<% if(saved) { %><p role="status">会员权限已更新，调整记录已保存。老师刷新页面后即可使用对应权限。</p><% } %>
+<% if(error) { %><p role="alert"><%= error %></p><% } %>
+<section class="page-field"><h2><%= teacher.email || '未提供邮箱' %></h2><p><%= teacher.name || '' %></p>
+<p>当前到期时间（UTC）：<strong id="current-until"><%= teacher.until ? new Date(teacher.until).toISOString() : '无' %></strong></p></section>
+<form id="membership-adjust" method="POST" action="/admin/memberships/<%= teacher.owner %>/adjust" data-until="<%= teacher.until ? new Date(teacher.until).toISOString() : '' %>">
+<input name="expected" type="hidden" value="<%= teacher.expected %>">
+<label for="adjust-action">调整操作</label><select id="adjust-action" name="action"><% [['extend','激活 / 延长会员'],['set','设置到期日期'],['stop','立即停用']].forEach(function(option) { %><option value="<%= option[0] %>" <%= values.action === option[0] ? 'selected' : '' %>><%= option[1] %></option><% }); %></select>
+<div id="adjust-days"><label for="preset-days">常用天数</label><select id="preset-days"><option value="">自定义</option><% [30,90,180,365].forEach(function(days) { %><option value="<%= days %>" <%= Number(values.days) === days ? 'selected' : '' %>><%= days %> 天</option><% }); %></select>
+<label for="adjust-days-value">增加天数（1–3660）</label><input id="adjust-days-value" name="days" type="number" min="1" max="3660" step="1" value="<%= values.days || '' %>"></div>
+<div id="adjust-date"><label for="adjust-date-value">有效至（UTC 当日结束）</label><input id="adjust-date-value" name="date" type="date" min="2000-01-01" max="2099-12-31" value="<%= values.date || '' %>"></div>
+<label for="adjust-reason">调整原因（必填）</label><textarea id="adjust-reason" name="reason" rows="3" maxlength="500" required><%= values.reason || '' %></textarea>
+<p id="adjust-preview" role="status" aria-live="polite"></p>
+<p>延长操作从当前到期日或现在两者中较晚的时间开始。停用只结束权限，不会删除老师已保存的资料，也不会执行付款退款。</p>
+<div class="actions"><button id="adjust-confirm" type="submit">确认调整</button><a href="/admin/memberships">取消</a></div>
+</form>
+<script src="/javascripts/admin-membership-adjust.js" defer></script>
+<%- include('layout-foot') %>

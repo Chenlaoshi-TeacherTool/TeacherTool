@@ -8,7 +8,7 @@
       dirty.add(form);
       if (status) { status.hidden = false; status.textContent = '有未保存的修改，请保存后再离开。'; }
     });
-    form.addEventListener('submit', function () { dirty.clear(); });
+    form.addEventListener('submit', function (event) { if (!event.defaultPrevented) dirty.clear(); });
   });
   window.addEventListener('beforeunload', function (event) {
     if (!dirty.size) return;
