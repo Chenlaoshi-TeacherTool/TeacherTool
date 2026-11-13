@@ -15,7 +15,7 @@ body.tm-page {
   margin: 0;
   background: #fff;
   color: var(--tm-text);
-  font-family: Inter, "Noto Sans SC", "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: KaiTi, STKaiti, "Kaiti SC", "楷体", serif;
 }
 
 .tm-wrap {
