@@ -38,7 +38,7 @@
   };
 
   const formatters = {
-    year: v => String(v),
+    year: v => v + '年',
     month: v => v + '月',
     day: v => v + '日',
     week: v => WEEKDAYS[v]
