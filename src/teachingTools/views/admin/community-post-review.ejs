@@ -1,0 +1,10 @@
+<%- include('layout-head') %><link rel="stylesheet" href="/stylesheets/community-admin.css">
+<p><a href="/admin/community">← 返回分享区管理</a></p><h1><%= post.title %></h1><p><span class="sharing-kind kind-<%= post.kind %>"><%= kinds[post.kind] %></span> · <%= statusLabels[rowInfo.status] %> · <%= rowInfo.task || '无待处理事项' %></p><p>投稿人：<%= post.authorName %></p><p><%= post.description %></p>
+<% if(post.payload && post.payload.url) { %><p><a href="<%= post.payload.url %>" target="_blank" rel="noopener noreferrer">查看第三方网站 ↗</a></p><% if(post.payload.audience) { %><p>适用对象：<%= post.payload.audience %></p><% } %><% if(post.payload.deadline) { %><p>截止日期：<%= post.payload.deadline %></p><% } %><% } %>
+<% if(post.kind==='wordlist') { %><table><thead><tr><th>词语</th><th>拼音</th><th>英文</th></tr></thead><tbody><% post.payload.forEach(function(word) { %><tr><td><%= word.zh %></td><td><%= word.py %></td><td><%= word.en %></td></tr><% }); %></tbody></table><% } %>
+<% if(post.kind==='game') { %><details><summary>查看游戏内容</summary><pre class="sharing-payload"><%= JSON.stringify(post.payload,null,2) %></pre></details><% } %>
+<% reports.forEach(function(report) { %><p class="review-alert">举报：<%= report.reason || '未填写原因' %></p><% }); %>
+<% if(post.status==='live') { %><p><a href="/community/<%= post.id %>" target="_blank" rel="noopener">查看公开页面 ↗</a></p><% } %>
+<form method="post" action="/admin/community/bulk/preview"><input type="hidden" name="selected" value="<%= rowInfo.key %>"><% if(post.status!=='live') { %><button name="action" value="publish">检查并发布 →</button> <% } %><% if(post.status==='live' || post.status==='pending') { %><button name="action" value="unpublish"><%= post.status==='pending' ? '检查并拒绝（不公开）' : '检查并下架' %> →</button><% } %></form>
+<form method="post" action="/admin/community/<%= post.id %>/delete" class="sharing-delete" onsubmit="return confirm('永久删除这条分享？删除后无法恢复，作者也将看不到它。');"><p class="sharing-help">下架会保留记录、作者仍可看到；删除会永久移除，无法恢复。</p><button type="submit" class="danger">永久删除</button></form>
+<%- include('layout-foot') %>

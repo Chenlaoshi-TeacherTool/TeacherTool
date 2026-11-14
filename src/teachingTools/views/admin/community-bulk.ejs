@@ -1,0 +1,8 @@
+<%- include('layout-head') %><link rel="stylesheet" href="/stylesheets/community-admin.css">
+<p><a href="/admin/community">← 返回分享区管理</a></p><h1><%= title %></h1>
+<% var eligible = results.filter(function(row) {return !row.error;}); var actionLabel={publish:'发布',unpublish:'下架',category:'修改网站用途分类'}[action]; %>
+<p><%= execute ? '本次已处理' : '准备操作' %>：<strong><%= actionLabel %></strong><% if(action==='category') { %> → <%= category %><% } %></p>
+<p><%= execute ? '完成' : '可以执行' %> <%= eligible.length %> 项；跳过 <%= results.length-eligible.length %> 项。<%= execute ? '未成功的条目保持原状态，请按提示检查后重试。' : '请检查以下名单。确认后只处理通过检查的条目。' %></p>
+<div class="table-scroll"><table><thead><tr><th>内容</th><th>检查结果</th></tr></thead><tbody><% results.forEach(function(row) { %><tr><td><%= row.name %></td><td><%= row.error || (execute ? '已完成' : '可以执行') %></td></tr><% }); %></tbody></table></div>
+<% if (!execute && eligible.length) { %><form method="post" action="/admin/community/bulk/execute"><input type="hidden" name="action" value="<%= action %>"><input type="hidden" name="category" value="<%= category %>"><% eligible.forEach(function(row) { %><input type="hidden" name="selected" value="<%= row.key %>"><% }); %><label class="sharing-confirm"><input type="checkbox" name="confirmed" value="yes" required> 我已核对所选内容<%= action==='publish' ? '、介绍准确性及商业关系，同意公开发布' : '，确认执行以上操作' %>。</label><button type="submit">确认<%= actionLabel %> <%= eligible.length %> 项</button> <a href="/admin/community">取消</a></form><% } %>
+<%- include('layout-foot') %>

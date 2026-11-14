@@ -35,7 +35,7 @@ function create(options) {
   function save(id, body, owner) {
     if (id && !/^[a-z0-9-]{1,40}$/.test(id)) invalid('资源编号无效。');
     var action = owner ? 'submit' : body.action;
-    var value = ['unpublish','return'].includes(action) ? null : clean(Object.assign({},body,{ action: action }));
+    var value = ['unpublish','return','category'].includes(action) ? null : clean(Object.assign({},body,{ action: action }));
     if (owner && (!value.summary || !value.category || !value.disclosure || typeof body.authorName !== 'string' || !body.authorName.trim() || String(body.authorName).length > 40)) invalid('请填写简介、分类、署名与利益关系说明。');
     var note = String(body.reviewNote || '').trim();
     if (note.length > 1000 || (action === 'return' && !note)) invalid('退回补充时请填写处理意见，最多1000字。');
@@ -43,12 +43,17 @@ function create(options) {
     var task = pending.then(async function() {
       var rows = await list();
       var row = rows.find(function(item) { return item.id === id; });
-      if (!row) { if (['unpublish','return'].includes(action)) invalid('资源不存在。'); row = { id: id, published: null, review: {}, revision: 0 }; rows.push(row); }
+      if (!row) { if (['unpublish','return','category'].includes(action)) invalid('资源不存在。'); row = { id: id, published: null, review: {}, revision: 0 }; rows.push(row); }
       row.review = row.review || {};
       var expected = row.revision || 0;
       if (owner && row.review.ownerKey && row.review.ownerKey !== owner) { var forbidden = new Error('无法编辑其他老师的投稿。'); forbidden.status = 404; throw forbidden; }
       if (owner && !row.review.ownerKey && row.draft) { var forbidden = new Error('无法编辑此资源。'); forbidden.status = 404; throw forbidden; }
       if (body.revision != null && Number(body.revision) !== expected) { var conflict = new Error('内容已更新，请刷新页面后再检查和提交。'); conflict.status = 409; throw conflict; }
+      if (action === 'category') {
+        if (typeof body.category !== 'string' || !body.category.trim() || body.category.trim().length > 120) invalid('请填写120字以内的网站用途分类。');
+        row.draft.category = body.category.trim();
+        if (row.published) row.published.category = body.category.trim();
+      }
       if (value) value.promotion = owner ? (row.draft && row.draft.promotion || row.published && row.published.promotion || { type: 'unknown' }) : promotion.clean(body, action === 'publish');
       if (owner) row.review = Object.assign({}, row.review, { ownerKey: owner, authorName: body.authorName.trim(), status: 'pending', note: '', submittedAt: new Date().toISOString() });
       else if (action === 'return') { if (!row.review.ownerKey) invalid('此资源不是老师投稿。'); row.review.status = 'returned'; row.review.note = note; }

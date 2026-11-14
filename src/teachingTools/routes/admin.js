@@ -1274,17 +1274,6 @@ router.post('/memberships/codes', async function (req, res, next) {
 
 // Teacher community posts: reported posts first. Hide keeps the post for its
 // author; delete removes it for good.
-router.get('/community', async function (req, res, next) {
-  try {
-    var posts = await communityRepository.listAll(null);
-    posts.sort(function (a, b) { return (b.reportCount - a.reportCount) || String(b.createdAt).localeCompare(String(a.createdAt)); });
-    var reported = posts.filter(function (post) { return post.reportCount > 0; });
-    for (var post of reported.slice(0, 30)) post.reports = await communityRepository.reports(post.id);
-    res.set('Cache-Control', 'private, no-store');
-    res.render('admin/community', { title: 'Community', posts: posts, community: communityService, adminUser: req.adminUser, done: req.query.done || '' });
-  } catch (err) { next(err); }
-});
-
 router.post('/community/:id/:action', async function (req, res, next) {
   try {
     if (req.get('origin') && new URL(req.get('origin')).host !== req.get('host')) return res.status(403).send('Change posts from the admin page.');

@@ -1,0 +1,39 @@
+.sharing-heading { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin:12px 0 24px; }
+.sharing-heading h1 { font-size:1.8rem; margin:0 0 8px; }
+.sharing-heading p,.sharing-help { color:#52616c; }
+.sharing-tabs,.sharing-status-tabs { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; }
+.sharing-tabs a,.sharing-status-tabs a { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border:1px solid #d6dfda; border-radius:10px; background:#fff; color:#294e46; text-decoration:none; }
+.sharing-tabs a[aria-current],.sharing-status-tabs a[aria-current] { outline:2px solid #28594e; outline-offset:2px; font-weight:700; }
+.sharing-tabs .kind-game,.sharing-kind.kind-game { background:#fbe5dc; color:#883f2d; }
+.sharing-tabs .kind-wordlist,.sharing-kind.kind-wordlist { background:#e6eedf; color:#365b3e; }
+.sharing-tabs .kind-website,.sharing-kind.kind-website { background:#e2edf5; color:#305b78; }
+.sharing-tabs .kind-contest,.sharing-kind.kind-contest { background:#eee5f4; color:#67457d; }
+.sharing-search,.sharing-bulk-bar { display:flex; align-items:end; flex-wrap:wrap; gap:12px; padding:16px; background:white; border:1px solid #dce3dd; border-radius:12px; margin:18px 0; }
+.sharing-search label,.sharing-bulk-bar label { margin:0; flex:1 1 170px; }
+.sharing-search input,.sharing-bulk-bar input { display:block; width:100%; box-sizing:border-box; padding:8px; border:1px solid #bdc9c5; border-radius:5px; }
+.sharing-bulk-bar { background:#edf3f0; }
+.sharing-bulk-bar strong { align-self:center; }
+.sharing-table { min-width:820px; }
+.sharing-table td { vertical-align:top; }
+.sharing-table td:nth-child(2) { min-width:190px; }
+.sharing-table p { margin:8px 0 0; font-size:.8rem; color:#52616c; }
+.sharing-kind,.sharing-state { display:inline-block; border-radius:6px; padding:4px 7px; font-size:.8rem; font-weight:600; }
+.sharing-state { background:#eceff1; color:#43505a; }
+.sharing-state.state-published { background:#e1f1e5; color:#295c3a; }
+.sharing-warning,.review-alert { color:#843a20; }
+.review-alert { background:#fff0dd; padding:14px; border:1px solid #e4bc86; border-radius:10px; }
+.sharing-empty { padding:32px; text-align:center; color:#52616c; }
+.sharing-pagination { display:flex; gap:16px; margin:20px 0; }
+.sharing-confirm { margin:24px 0; }
+.review-summary { padding:16px; background:#edf3f0; border-radius:10px; }
+.version-comparison { margin:20px 0; padding:16px; background:white; border:1px solid #d6dfda; border-radius:10px; }
+.version-comparison td { white-space:pre-wrap; overflow-wrap:anywhere; max-width:280px; vertical-align:top; }
+.changed-field { background:#fff7e6; }
+.version-comparison dt { font-weight:700; margin-top:14px; }
+.version-comparison dd { margin:5px 0; white-space:pre-wrap; overflow-wrap:anywhere; }
+.promotion-settings { padding:14px; margin:22px 0; border:1px solid #d6dfda; border-radius:10px; }
+.promotion-settings summary { cursor:pointer; font-weight:700; }
+.sharing-payload { white-space:pre-wrap; overflow-wrap:anywhere; }
+.sharing-delete { margin-top:32px; padding-top:16px; border-top:1px solid #e3e7e5; }
+.sharing-notice { background:#e1f1e5; color:#295c3a; padding:10px 14px; border-radius:8px; }
+@media(min-width:1000px) { body:has(.sharing-table) { max-width:1200px; } }

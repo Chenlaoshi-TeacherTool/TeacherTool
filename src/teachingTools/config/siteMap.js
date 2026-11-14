@@ -68,7 +68,7 @@ var SECTIONS = [
       };
     })
   },
-  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, admin: ['community', 'teacherResources'] },
+  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, admin: ['community'] },
   { key: 'finds', href: '/classroom-finds', en: 'Classroom Finds', zh: '教室好物', nav: true, admin: ['recommendations'] },
   {
     key: 'shop', href: '/shop', en: 'Chen Laoshi’s Shop', zh: '陈老师的商店', navEn: 'Shop', navZh: '商店', nav: false, redirect: '/classroom-finds', admin: [],
@@ -95,7 +95,6 @@ var UNLISTED = [
 
 // Admin editors. `href` must match a GET route in routes/admin.js.
 var ADMIN_EDITORS = {
-  teacherResources: { href: '/admin/teacher-resources', label: '教师资源分享', description: '第三方教学网站推荐、草稿和发布' },
   pages: { href: '/admin/pages', label: 'Site Pages', description: 'Home and About page content' },
   materials: { href: '/admin/materials', label: 'Activity Materials', description: 'Upload and edit theme materials and textbook lesson links' },
   toolguides: { href: '/admin/toolguides', label: 'Tool Guides', description: 'How-to guides shown on individual tool pages' },
@@ -105,7 +104,7 @@ var ADMIN_EDITORS = {
   textbooks: { href: '/admin/textbooks', label: 'Textbooks', description: 'Textbook lessons: words, sentence patterns, and activities, plus Excel import' },
   recommendations: { href: '/admin/recommendations', label: 'Classroom Finds', description: 'Product pages, affiliate links, and printable labels' },
   articles: { href: '/admin/articles', label: 'Articles', description: 'Existing /resources/:slug articles' },
-  community: { href: '/admin/community', label: 'Community', description: 'Teacher posts: reported first; hide, restore, or delete' },
+  community: { href: '/admin/community', label: '分享区管理', description: '统一管理游戏、词汇材料、教学网站和比赛活动' },
   memberships: { href: '/admin/memberships', label: 'Memberships', description: 'Activation codes that extend teacher cloud saving' }
 };
 

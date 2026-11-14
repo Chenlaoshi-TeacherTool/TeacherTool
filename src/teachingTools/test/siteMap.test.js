@@ -69,7 +69,7 @@ test('admin editors and admin routes match one-to-one', function() {
   var adminGets = adminRouter.stack.concat(require('../routes/adminPages').stack, require('../routes/adminTeacherResources').stack)
     .filter(function(layer) { return layer.route && layer.route.methods.get; })
     .map(function(layer) { return layer.route.path; });
-  var listRoutes = adminGets.filter(function(route) { return /^\/[a-z-]+$/.test(route); });
+  var listRoutes = adminGets.filter(function(route) { return route !== '/teacher-resources' && /^\/[a-z-]+$/.test(route); });
   var editorHrefs = Object.keys(siteMap.ADMIN_EDITORS).map(function(key) { return siteMap.ADMIN_EDITORS[key].href; });
   for (var href of editorHrefs) assert.ok(adminGets.includes(href.replace(/^\/admin/, '')), href + ' has no route in routes/admin.js');
   for (var route of listRoutes) assert.ok(editorHrefs.includes('/admin' + route), '/admin' + route + ' is missing from ADMIN_EDITORS in config/siteMap.js');

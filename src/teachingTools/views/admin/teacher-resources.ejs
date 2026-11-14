@@ -1,22 +1,20 @@
 <%- include('layout-head') %>
-<h1>教师资源分享</h1>
-<p>管理 Community 中的第三方网站推荐。保存草稿不会改变已发布内容；下架后仍保留草稿。</p>
-<p><a href="/community?kind=website" target="_blank" rel="noopener">查看前台 ↗</a> · <a href="#new-resource">新增资源</a></p>
+<link rel="stylesheet" href="/stylesheets/community-admin.css">
+<p><a href="/admin/community?kind=website">← 返回分享区管理</a></p><h1><%= title %></h1>
+<% if (error) { %><p class="review-alert" role="alert"><%= error %></p><% } %>
 <% if (saved) { %><p role="status">已保存。</p><% } %>
-<% if (error) { %><p role="alert"><%= error %></p><% } %>
-<p>老师投稿：待审核 → 编辑检查 → 批准发布，或填写意见后退回补充。退回不影响已批准的旧版本。</p>
-<p><a href="/admin/community">查看原有社区投稿审核 →</a></p>
-<% rows.sort(function(a,b) { return Number(Boolean(b.review && b.review.status === 'pending')) - Number(Boolean(a.review && a.review.status === 'pending')); }); %>
-<% rows.concat([{ id: '', draft: {} }]).forEach(function(row) { var item = values.id === row.id || (!row.id && error && !values.id) ? values : row.draft; %>
-<details class="question-card" id="<%= row.id || 'new-resource' %>" <%= !row.id || (error && values.id === row.id) ? 'open' : '' %>>
-<summary><strong><%= row.draft.name || '新增资源' %></strong> · <%= row.review && row.review.ownerKey ? ({pending:'老师投稿 · 待审核',returned:'老师投稿 · 退回补充',approved:'老师投稿 · 已批准',hidden:'老师投稿 · 已下架'}[row.review.status] || '老师投稿') : (row.published ? '已发布（可编辑下一版草稿）' : '草稿 / 未发布') %></summary>
+<% if (rows[0].id) { var current = rowInfo; %><p class="review-summary"><strong>前台：<%= statusLabels[current.status] %></strong> · <%= current.task || '无待处理事项' %></p><% } %>
+<% if (rows[0].published) { %><details class="version-comparison" open><summary>当前公开版本与编辑草稿对照</summary><p>下表仅显示存在差异的字段。保存草稿不会改变公开内容。</p><div class="table-scroll"><table><thead><tr><th>字段</th><th>当前公开版本</th><th>编辑草稿</th></tr></thead><tbody><% changes.forEach(function(change) { %><tr class="changed-field"><th><%= change.label %></th><td><%= change.published %></td><td><%= change.draft %></td></tr><% }); %><% if(!changes.length) { %><tr><td colspan="3">当前草稿与公开版本一致。</td></tr><% } %></tbody></table></div><details><summary>查看完整公开版本</summary><dl><% Object.keys(fields).forEach(function(key) { %><dt><%= fields[key] %></dt><dd><%= rows[0].published[key] || '—' %></dd><% }); %></dl></details></details><% } %>
+<% rows.forEach(function(row) { var item = values.id === row.id || (!row.id && error && !values.id) ? values : row.draft; %>
+<section class="question-card" id="<%= row.id || 'new-resource' %>">
+<h2><%= row.draft.name || '新增资源' %></h2>
 <% if (row.review && row.review.ownerKey) { %><p>投稿老师：<%= row.review.authorName %><% if (row.published && row.review.status !== 'approved') { %> · 原批准版本仍公开<% } %></p><% } %>
 <form method="post" action="/admin/teacher-resources">
 <input type="hidden" name="id" value="<%= row.id %>"><input type="hidden" name="revision" value="<%= row.revision || 0 %>">
 <% Object.keys(fields).forEach(function(key) { %><label for="<%= row.id %>-<%= key %>"><%= fields[key] %></label>
 <% if (['features','audience','reason','limitations','disclosure'].includes(key)) { %><textarea id="<%= row.id %>-<%= key %>" name="<%= key %>" rows="3" maxlength="3000"><%= item[key] || '' %></textarea>
 <% } else { %><input id="<%= row.id %>-<%= key %>" type="<%= key === 'checkedAt' ? 'date' : 'text' %>" name="<%= key %>" value="<%= item[key] || '' %>" maxlength="<%= key === 'summary' ? 500 : key === 'name' || key === 'category' ? 120 : 3000 %>" <%= key === 'name' || key === 'url' ? 'required' : '' %>><% } %><% }); %>
-<fieldset class="promotion-settings"><legend>商业合作与推广（仅 Admin 可设置）</legend>
+<details class="promotion-settings"><summary>商业合作与推广设置</summary><fieldset><legend>商业合作与推广（仅 Admin 可设置）</legend>
 <% var promo = item.promotion || {}; var relation = item.relationshipType || promo.type || 'unknown'; %>
 <label for="<%= row.id %>-relationship">商业关系类型</label>
 <select id="<%= row.id %>-relationship" name="relationshipType"><% Object.keys(promotionTypes).forEach(function(type) { %><option value="<%= type %>" <%= relation === type ? 'selected' : '' %>><%= promotionTypes[type] %></option><% }); %></select>
@@ -27,9 +25,11 @@
 <label><input type="checkbox" name="promotionPinned" value="yes" <%= item.promotionPinned === 'yes' || (!Object.hasOwn(item,'relationshipType') && promo.pinned) ? 'checked' : '' %>> 推广期间在列表中优先展示（前台标注付费推广）</label>
 <label for="<%= row.id %>-expiry">付费推广到期后</label><select id="<%= row.id %>-expiry" name="afterExpiry"><option value="retain" <%= (item.afterExpiry || promo.afterExpiry) !== 'hide' ? 'selected' : '' %>>保留普通收录，注明曾付费推广</option><option value="hide" <%= (item.afterExpiry || promo.afterExpiry) === 'hide' ? 'selected' : '' %>>停止前台展示，保留后台记录</option></select>
 <% if (row.published) { var ps = promotionState(row.published); %><p>当前公开版本：<%= promotionTypes[ps.type] || '待核实' %><% if (ps.phase) { %> · <%= {scheduled:'未开始',active:'推广中',expired:'已到期'}[ps.phase] %><% } %><% if (!ps.visible) { %> · 到期后停止展示<% } %></p><% } %>
-</fieldset>
+</fieldset></details>
 <% if (row.review && row.review.ownerKey) { %><label for="<%= row.id %>-reviewNote">处理意见（退回时必填）</label><textarea id="<%= row.id %>-reviewNote" name="reviewNote" maxlength="1000" rows="2"><%= item.reviewNote || row.review.note || '' %></textarea><% } %>
 <label><input type="checkbox" name="confirmed" value="yes"> 我已核实介绍、推荐理由和商业关系；未把公开资料整理写成亲测体验。</label>
 <div class="actions"><button name="action" value="draft">保存草稿</button> <button name="action" value="publish"><%= row.review && row.review.ownerKey ? '批准并发布' : '发布内容' %></button><% if (row.review && row.review.ownerKey) { %> <button class="secondary" name="action" value="return" formnovalidate>退回补充</button><% } %><% if (row.published) { %> <button class="secondary" name="action" value="unpublish" formnovalidate>下架</button><% } %></div>
-</form></details><% }); %>
+</form></section><% }); %>
+
+
 <%- include('layout-foot') %>
