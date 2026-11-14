@@ -24,10 +24,12 @@
       game.phase = 'closed'; return true;
     };
     game.open = function () { if (game.phase === 'closed') game.phase = 'answer'; };
-    game.answer = function (correct) {
+    game.answer = function (correct, recipient) {
       if (game.phase !== 'answer') return false;
+      recipient = recipient === undefined ? game.turn : recipient;
+      if (correct && (!Number.isInteger(recipient) || recipient < 0 || recipient > (teams ? 1 : 0))) return false;
       game.history.push({ current: game.current, turn: game.turn, scores: game.scores.slice() });
-      if (correct) game.scores[game.turn] += game.current.points;
+      if (correct) game.scores[recipient] += game.current.points;
       game.turn = teams ? 1 - game.turn : 0; game.current = null;
       game.phase = pool.length ? 'ready' : 'done'; return true;
     };

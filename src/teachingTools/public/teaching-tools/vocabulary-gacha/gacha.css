@@ -50,10 +50,10 @@ body.gacha-page {
 #gacha .machine:disabled { cursor: default; }
 #gacha .machine-card:not(.active) .machine { filter: saturate(.75); }
 #gacha .machine-card > p:last-child { font-size: 14px; margin: 6px 0; }
-#gacha .spinning img { animation: machine-shake .18s ease-in-out alternate 4; }
-#gacha button.capsule { position: absolute; z-index: 2; bottom: 12px; left: 50%; margin-left: -70px; width: 140px; height: 150px; padding: 0; border: 0; background: transparent; color: #17352d; font-size: 14px; animation: capsule-drop .4s ease-out; }
+#gacha .spinning img { animation: machine-shake .6s cubic-bezier(0.77, 0, 0.175, 1); }
+#gacha button.capsule { position: absolute; z-index: 2; bottom: 12px; left: 50%; margin-left: -70px; width: 140px; height: 150px; padding: 0; border: 0; background: transparent; color: #17352d; font-size: 14px; animation: capsule-drop .65s cubic-bezier(0.23, 1, 0.32, 1); }
 #gacha button.capsule:hover { background: transparent; }
-#gacha .capsule-art { display: block; width: 100%; aspect-ratio: 1; background-image: url('./assets/capsule-colors.png'); background-size: 300% 300%; background-repeat: no-repeat; filter: drop-shadow(0 6px 6px #17352d33); }
+#gacha .capsule-art { position: absolute; inset: 0 0 auto; display: block; width: 100%; aspect-ratio: 1; background-image: url('./assets/capsule-colors.png'); background-size: 300% 300%; background-repeat: no-repeat; filter: drop-shadow(0 6px 6px #17352d33); }
 #gacha .capsule-label { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); white-space: nowrap; background: #fffdf2; border: 1px solid #cad9cf; border-radius: 999px; padding: 4px 10px; }
 #gacha #reveal, #gacha #finish { text-align: center; margin: 16px auto; max-width: 850px; }
 #gacha #term { font-size: clamp(34px, 5vw, 60px); overflow-wrap: anywhere; margin: 4px 0; }
@@ -64,8 +64,16 @@ body.gacha-page {
 #gacha.playing header h1 { font-size: 28px; letter-spacing: 0; }
 #gacha.playing header > p { display: none; }
 #gacha [hidden] { display: none !important; }
-@keyframes machine-shake { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
-@keyframes capsule-drop { from { transform: translateY(-65px) rotate(-25deg); } to { transform: translateY(0); } }
+@keyframes machine-shake { 0%, 100% { transform: rotate(0); } 20%, 60% { transform: rotate(-3deg) translateY(-2px); } 40%, 80% { transform: rotate(3deg); } }
+@keyframes capsule-drop {
+  0% { transform: translateY(-70px) scale(.45) rotate(-30deg); opacity: 0; }
+  18% { opacity: 1; }
+  48% { transform: translateY(0) scale(1) rotate(12deg); }
+  68% { transform: translateY(-24px) rotate(-8deg); }
+  84% { transform: translateY(0) rotate(4deg); }
+  93% { transform: translateY(-6px) rotate(-2deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
 @media(max-width: 700px) {
   #gacha { padding-top: 16px; }
   #gacha .setup-grid { grid-template-columns: 1fr; gap: 15px; }
@@ -80,3 +88,32 @@ body.gacha-page {
   #gacha .lib-picker-library-link { white-space: normal; }
 }
 @media(prefers-reduced-motion: reduce) { #gacha *, #gacha *::before, #gacha *::after { animation: none !important; transition: none !important; } }
+
+#gacha .capsule-top { clip-path: inset(0 0 50%); }
+#gacha .capsule-bottom { clip-path: inset(50% 0 0); }
+#gacha .capsule-art { transition: transform 280ms cubic-bezier(0.23, 1, 0.32, 1), opacity 280ms cubic-bezier(0.23, 1, 0.32, 1); }
+#gacha .opening .capsule-top { transform: translateY(-48px) rotate(-18deg); opacity: 0; }
+#gacha .opening .capsule-bottom { transform: translateY(24px) rotate(12deg); opacity: 0; }
+#gacha .opening .capsule-label { opacity: 0; }
+#gacha button.capsule:disabled { opacity: 1; }
+#gacha #reveal { width: min(680px, calc(100% - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: clamp(24px, 5vw, 48px); color: inherit; overflow-y: auto; border: 1px solid #d8e2d9; background: #fffef9; }
+#gacha #reveal[open] { animation: word-enter 240ms cubic-bezier(0.23, 1, 0.32, 1); }
+#gacha #reveal::backdrop { background: #102c25a6; }
+#gacha #term { font-size: clamp(40px, 8vw, 80px); margin: 24px 0; line-height: 1.2; }
+#gacha #term:focus { outline: none; }
+#gacha .support { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px; }
+#gacha .support button { background: #eaf3ec; }
+#gacha #awards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; margin-bottom: 16px; }
+#gacha .award { overflow-wrap: anywhere; }
+#gacha .award.team-0 { background: #e4f1ff; border-color: #8bbbe5; color: #174d7b; }
+#gacha .award.team-1 { background: #fff0df; border-color: #e3b17d; color: #804211; }
+#gacha .award.team-0:hover { background: #d0e7ff; }
+#gacha .award.team-1:hover { background: #ffe2c1; }
+#gacha #reveal #miss { background: transparent; margin: 0; }
+#gacha .dialog-hint { color: #4f7466; font-size: 13px; margin-bottom: 0; }
+#gacha .scored .score { animation: score-pop 280ms cubic-bezier(0.23, 1, 0.32, 1); }
+#gacha .score-bonus { position: absolute; top: 62px; right: 20px; color: #315f4f; font-size: 28px; font-weight: 800; pointer-events: none; animation: score-rise 900ms cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+@keyframes word-enter { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes score-pop { 50% { transform: scale(1.15); } }
+@keyframes score-rise { 0% { opacity: 0; transform: translateY(10px); } 20%, 60% { opacity: 1; } 100% { opacity: 0; transform: translateY(-30px); } }
+@media (prefers-reduced-motion: reduce) { #gacha .score-bonus { display: none; } }

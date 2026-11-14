@@ -6,6 +6,29 @@
   var game, names, teams, busy = false, lists = [], selected = [];
   function count() { $('error').textContent = ''; $('count').textContent = GachaCore.parse($('words').value).length + t(' 个词（相同词语自动合并）',' words (duplicates merged)'); }
   $('words').addEventListener('input', count); count();
+  $('words').addEventListener('input', function () { $('generate-status').textContent = ''; });
+  $('generate').onclick = async function () {
+    if (!GachaCore.parse($('words').value).length) {
+      $('generate-status').textContent = t('请先输入中文词汇，每行一个。', 'Enter Chinese words first, one per line.'); return;
+    }
+    $('generate').disabled = true;
+    $('generate-status').textContent = t('正在生成…', 'Generating…');
+    try {
+      try { await ChenWordlist.loadCedict(); } catch (error) { /* Built-in dictionary remains available offline. */ }
+      var words = GachaCore.parse($('words').value), missing = [];
+      words.forEach(function (word) {
+        if (!/[\u3400-\u9fff\uf900-\ufaff]/.test(word.term)) return;
+        if (!word.py) word.py = ChenWordlist.toPinyin(word.term, { spaced: true });
+        if (!word.en) word.en = ChenWordlist.toEnglish(word.term);
+        if (!word.en) missing.push(word.term);
+      });
+      $('words').value = words.map(function (word) { return [word.term, word.py, word.en].join(' | '); }).join('\n');
+      count();
+      $('generate-status').textContent = missing.length ?
+        t('拼音已生成；以下词汇未找到英文，请手动补充：', 'Pinyin generated. Add English manually for: ') + missing.join('、') :
+        t('已补全拼音和英文，保留已有内容。请检查词义和多音字，可直接修改。', 'Pinyin and English filled in; existing entries kept. Review meanings and pronunciations, and edit as needed.');
+    } finally { $('generate').disabled = false; }
+  };
   $('mode').onchange = function () { $('team-names').hidden = $('mode').value !== 'teams'; };
   $('random').onchange = function () { $('fixed-label').hidden = $('random').checked; };
   $('fullscreen').onclick = async function () {
@@ -91,12 +114,27 @@
       var hint = document.createElement('p'); hint.textContent = i === game.turn && game.phase === 'ready' ? t('点击旋钮，抽一颗扭蛋','Tap the handle to draw') : '✦';
       card.append(heading,score,machine,hint); $('machines').append(card);
     });
-    $('reveal').hidden = game.phase !== 'answer'; $('finish').hidden = game.phase !== 'done';
+    if (game.phase !== 'answer' && $('reveal').open) $('reveal').close(); $('finish').hidden = game.phase !== 'done';
     if (game.phase === 'answer') {
       $('term').textContent = game.current.word.term;
       $('points').textContent = '✦ ' + game.current.points + t(' 分',' POINTS');
       support('pinyin',game.current.word.py,$('show-py').checked,t('显示拼音','Reveal pinyin'));
       support('english',game.current.word.en,$('show-en').checked,t('显示英文','Reveal English'));
+      $('awards').replaceChildren();
+      names.forEach(function (name, i) {
+        var button = document.createElement('button'); button.className = 'award team-' + i;
+        button.textContent = t('给 ', 'Award ') + name + ' +' + game.current.points + t(' 分', ' points');
+        button.onclick = function () {
+          var points = game.current.points;
+          if (!game.answer(true, i)) return;
+          render();
+          var card = $('machines').children[i]; card.classList.add('scored');
+          var bonus = document.createElement('span'); bonus.className = 'score-bonus'; bonus.textContent = '+' + points;
+          card.append(bonus);
+        };
+        $('awards').append(button);
+      });
+      if (!$('reveal').open) { $('reveal').showModal(); $('term').focus(); }
     }
     if (game.phase === 'done') $('result').textContent = !teams ? names[0] + ' · ' + game.scores[0] + t(' 分！',' points!') : game.scores[0] === game.scores[1] ? t('平局！','It’s a tie!') : names[game.scores[0] > game.scores[1] ? 0 : 1] + t(' 获胜！',' wins!');
   }
@@ -105,19 +143,27 @@
     if (busy || !game.draw()) return;
     busy = true; render();
     var machine = $('machines').children[game.turn].querySelector('.machine'); machine.classList.add('spinning');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.setTimeout(function () {
-      var capsule = document.createElement('button'); capsule.className = 'capsule';
+      var capsule = document.createElement('button'); capsule.className = 'capsule'; capsule.disabled = true;
       var color = Math.floor(Math.random() * 9);
-      var art = document.createElement('span'); art.className = 'capsule-art';
-      art.style.backgroundPosition = (color % 3 * 50) + '% ' + (Math.floor(color / 3) * 50) + '%';
-      art.setAttribute('aria-hidden', 'true');
-      var label = document.createElement('span'); label.className = 'capsule-label'; label.textContent = t('点击打开','Tap to open');
-      capsule.append(art, label);
-      capsule.onclick = function () { if (game.phase !== 'closed') return; game.open(); capsule.remove(); busy = false; render(); };
+      ['top', 'bottom'].forEach(function (half) {
+        var art = document.createElement('span'); art.className = 'capsule-art capsule-' + half;
+        art.style.backgroundPosition = (color % 3 * 50) + '% ' + (Math.floor(color / 3) * 50) + '%';
+        art.setAttribute('aria-hidden', 'true'); capsule.append(art);
+      });
+      var label = document.createElement('span'); label.className = 'capsule-label'; label.textContent = t('点击打开', 'Tap to open');
+      capsule.append(label);
+      capsule.onclick = function () {
+        if (game.phase !== 'closed' || capsule.disabled) return;
+        capsule.disabled = true; capsule.classList.add('opening');
+        window.setTimeout(function () { game.open(); capsule.remove(); busy = false; render(); }, reduce ? 0 : 280);
+      };
       machine.parentNode.append(capsule);
-    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700);
+      window.setTimeout(function () { capsule.disabled = false; }, reduce ? 0 : 650);
+    }, reduce ? 0 : 600);
   }
-  $('correct').onclick = function () { if (game.answer(true)) render(); };
+  $('reveal').addEventListener('cancel', function (event) { event.preventDefault(); $('miss').focus(); });
   $('miss').onclick = function () { if (game.answer(false)) render(); };
   $('undo').onclick = function () { if (game.undo()) render(); };
 })();
