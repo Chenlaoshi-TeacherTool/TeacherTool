@@ -66,7 +66,7 @@ test('sitemap.xml lists every page in the site map', async function() {
 });
 
 test('admin editors and admin routes match one-to-one', function() {
-  var adminGets = adminRouter.stack.concat(require('../routes/adminPages').stack)
+  var adminGets = adminRouter.stack.concat(require('../routes/adminPages').stack, require('../routes/adminTeacherResources').stack)
     .filter(function(layer) { return layer.route && layer.route.methods.get; })
     .map(function(layer) { return layer.route.path; });
   var listRoutes = adminGets.filter(function(route) { return /^\/[a-z-]+$/.test(route); });

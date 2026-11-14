@@ -1,0 +1,18 @@
+<!DOCTYPE html><html lang="<%= lang %>"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title><%= title %></title><link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css"><link rel="stylesheet" href="/community/community.css"></head>
+<body class="community-page"><main class="content-section community-share"><div class="content-shell">
+<a class="community-back" href="/community/websites/mine">← <%= lang === 'zh' ? '我的网站投稿' : 'My submissions' %></a>
+<h1><%= lang === 'zh' ? '分享教学网站' : 'Share a teaching website' %></h1>
+<p><%= lang === 'zh' ? '请用自己的话介绍公开网站，说明你与网站的关系。提交后由陈老师审核，不会立即公开。' : 'Describe a public website in your own words and disclose your relationship to it. Submissions are reviewed before publication.' %></p>
+<% if (item.review && item.review.note) { %><p class="community-hidden-note"><%= item.review.note %></p><% } %>
+<% if (error) { %><p class="community-error" role="alert"><%= error %></p><% } %>
+<form class="community-form" method="post" action="/community/websites/submit">
+<input type="hidden" name="id" value="<%= item.id || '' %>"><input type="hidden" name="revision" value="<%= values.revision == null ? '' : values.revision %>">
+<% var english = {name:'Website name',url:'Public HTTPS URL',summary:'Short introduction',category:'Category',features:'Features',audience:'Teaching scenarios and users',reason:'Why share it?',limitations:'Limitations',pricing:'Pricing',disclosure:'Your relationship to the website',checkedAt:'Last checked'};
+Object.keys(fields).forEach(function(key) { %><label for="website-<%= key %>"><%= lang === 'zh' ? fields[key] : english[key] %><%= ['name','url','summary','category','disclosure'].includes(key) ? ' *' : '' %></label>
+<% if (['features','audience','reason','limitations','disclosure'].includes(key)) { %><textarea id="website-<%= key %>" name="<%= key %>" rows="3" maxlength="3000" <%= key === 'disclosure' ? 'required' : '' %>><%= values[key] || '' %></textarea>
+<% } else { %><input id="website-<%= key %>" name="<%= key %>" type="<%= key === 'url' ? 'url' : key === 'checkedAt' ? 'date' : 'text' %>" maxlength="<%= key === 'summary' ? 500 : key === 'name' || key === 'category' ? 120 : 3000 %>" value="<%= values[key] || '' %>" <%= ['name','url','summary','category'].includes(key) ? 'required' : '' %>><% } %><% }); %>
+<p class="hint"><%= lang === 'zh' ? '利益关系示例：我是网站作者；我是普通使用者、无商业关系；受网站方委托。请如实填写。' : 'Examples: I created this website; I am a user with no commercial relationship; I represent the website. Disclose accurately.' %></p>
+<label for="website-author"><%= lang === 'zh' ? '公开署名 *' : 'Public display name *' %></label><input id="website-author" name="authorName" maxlength="40" required value="<%= values.authorName || '' %>">
+<p class="community-rules"><%= lang === 'zh' ? '请只提交文字和公开链接，不复制宣传文案。核查日期只填写实际检查日期；未知的收费或功能请写明未核实。' : 'Submit text and public links only. Do not copy promotional text. Use the actual date checked and mark uncertain pricing or features as unverified.' %></p>
+<button class="btn" type="submit"><%= lang === 'zh' ? '提交审核' : 'Submit for review' %></button>
+</form></div></main><script src="/javascripts/milk-tea-footer.js"></script></body></html>

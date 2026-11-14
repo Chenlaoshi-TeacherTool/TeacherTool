@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="<%= lang %>"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title><%= title %></title><link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css"><link rel="stylesheet" href="/community/community.css"></head>
+<body class="community-page"><main class="content-section community-share"><div class="content-shell">
+<a class="community-back" href="/community">← <%= lang === 'zh' ? '返回分享区' : 'Back to Community' %></a>
+<h1><%= lang === 'zh' ? '我的网站投稿' : 'My website submissions' %></h1>
+<% if (!signedIn) { %><p><%= lang === 'zh' ? '请登录教师账户后提交或管理网站投稿。' : 'Sign in to submit or manage websites.' %></p><% if (loginUrl) { %><a class="btn" href="<%= loginUrl %>"><%= lang === 'zh' ? '登录' : 'Sign in' %></a><% } else { %><p><%= lang === 'zh' ? '当前环境暂时无法使用教师登录；本地预览不连接正式站账号。' : 'Teacher sign-in is unavailable in this environment.' %></p><% } %>
+<% } else { %>
+<p><%= lang === 'zh' ? '网站由陈老师审核后公开。修改已发布网站需要重新审核，期间保留原来已批准的版本。' : 'Websites appear after review. Changes require another review; the approved version remains public meanwhile.' %></p>
+<a class="btn" href="/community/websites/new"><%= lang === 'zh' ? '提交教学网站' : 'Submit a website' %></a>
+<% if (!rows.length) { %><p><%= lang === 'zh' ? '你还没有网站投稿。' : 'No submissions yet.' %></p><% } %>
+<% rows.forEach(function(row) { var status = row.review.status; %><article class="community-use">
+<h2><%= row.draft.name %></h2><p><%= row.draft.summary %></p>
+<p><strong><%= lang === 'zh' ? ({pending:'待审核',returned:'退回补充',approved:'已批准',hidden:'已下架'}[status] || '草稿') : ({pending:'Pending review',returned:'Needs changes',approved:'Approved',hidden:'Unpublished'}[status] || 'Draft') %></strong><% if (row.published && status !== 'approved') { %> · <%= lang === 'zh' ? '原批准版本仍公开' : 'Previous approved version remains public' %><% } %></p>
+<% if (row.review.note) { %><p class="community-hidden-note"><%= lang === 'zh' ? '处理意见：' : 'Review note: ' %><%= row.review.note %></p><% } %>
+<a href="/community/websites/<%= row.id %>/edit"><%= lang === 'zh' ? '修改并重新提交 →' : 'Edit and resubmit →' %></a>
+</article><% }); %><% } %>
+</div></main><script src="/javascripts/milk-tea-footer.js"></script></body></html>

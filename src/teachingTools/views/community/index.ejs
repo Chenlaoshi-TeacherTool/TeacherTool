@@ -23,6 +23,8 @@
     <h1><%= t('community.title') %></h1>
     <p><%= t('community.intro') %></p>
     <a class="btn community-share-cta" href="/community/share"><%= t('community.shareCta') %></a>
+    <a class="btn btn-secondary community-share-cta" href="/community/websites/new"><%= lang === 'zh' ? '分享教学网站' : 'Share a website' %></a>
+    <a class="btn btn-secondary community-share-cta" href="/community/websites/mine"><%= lang === 'zh' ? '我的网站投稿' : 'My submissions' %></a>
   </div></header>
 
   <main class="content-section community-main"><div class="content-shell">
@@ -36,9 +38,9 @@
     <div class="community-filters">
       <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterType') %></span>
         <a class="chip<%= !result.kind ? ' is-on' : '' %>" href="<%- link({ kind: '' }) %>"><%= t('community.all') %></a>
-        <a class="chip<%= result.kind === 'wordlist' ? ' is-on' : '' %>" href="<%- link({ kind: 'wordlist' }) %>"><%= t('community.wordLists') %></a>
-        <a class="chip<%= result.kind === 'game' ? ' is-on' : '' %>" href="<%- link({ kind: 'game' }) %>"><%= t('community.games') %></a>
-        <% ['contest', 'website'].forEach(function (kind) { %><a class="chip<%= result.kind === kind ? ' is-on' : '' %>" href="<%- link({ kind: kind }) %>"><%= community.kindLabel(kind, lang) %></a><% }) %>
+        <% ['game', 'wordlist', 'website', 'contest'].forEach(function(kind) { %>
+        <a class="chip community-kind kind-<%= kind %><%= result.kind === kind ? ' is-on' : '' %>" href="<%- link({ kind: kind }) %>" <%- result.kind === kind ? 'aria-current="true"' : '' %>><%= community.kindLabel(kind, lang) %></a>
+        <% }); %>
       </div>
       <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterStage') %></span>
         <a class="chip<%= !result.stage ? ' is-on' : '' %>" href="<%- link({ stage: '' }) %>"><%= t('community.all') %></a>
@@ -60,7 +62,9 @@
       <% if (filtered) { %><a href="/community"><%= t('community.clearFilters') %></a><% } %>
     </div>
 
-    <% if (result.unavailable) { %>
+    <% if (resourcesUnavailable) { %><p role="status" class="hint"><%= lang === 'zh' ? '教学网站暂时无法加载，请稍后重试。' : 'Teaching websites are temporarily unavailable.' %></p><% } %>
+    <% if (!result.kind || result.kind === 'website') { %><p class="hint community-external-note"><%= lang === 'zh' ? '教学网站由第三方独立运营，与 CLS Teaching Tools 无隶属关系；付费推广、佣金或其他利益关系会在相应推荐中披露。' : 'Teaching websites are independently operated and are not affiliated with CLS Teaching Tools. Paid promotion, commissions or other interests are disclosed in each recommendation.' %></p><% } %>
+    <% if (result.unavailable && !result.posts.length) { %>
       <p class="community-empty"><%= t('community.unavailable') %></p>
     <% } else if (!result.posts.length) { %>
       <div class="community-empty">
@@ -70,11 +74,22 @@
     <% } else { %>
       <ul class="community-grid">
         <% result.posts.forEach(function (post) { var game = post.kind === 'game' ? community.GAME_TYPES[post.gameType] : null; %>
-        <li class="community-card">
+        <li class="community-card kind-<%= post.kind %>">
+          <% if (post.resource) { var item = post.resource; %>
+          <article class="resource-card">
+            <span class="community-card-type"><%= community.kindLabel('website', lang) %></span>
+            <div class="resource-disclosures"><% promotionBadges(item).forEach(function(badge) { %><span class="resource-disclosure<%= badge.commercial ? ' is-commercial' : '' %>"><%= badge.text %></span><% }); %></div>
+            <h3><%= item.name %></h3>
+            <% if (item.source === 'teacher') { %><p class="hint"><%= lang === 'zh' ? '老师投稿 · ' : 'Teacher submission · ' %><%= item.authorName %></p><% } %><p class="community-card-desc"><%= item.summary %></p>
+            <p class="community-tags"><span class="community-tag"><%= item.category %></span></p>
+            <p class="hint"><%= new URL(item.url).hostname %> · <%= lang === 'zh' ? '第三方网站' : 'Third-party website' %></p>
+            <button type="button" class="btn btn-secondary" data-resource-open="resource-<%= item.id %>"><%= lang === 'zh' ? '查看介绍' : 'Read introduction' %> →</button>
+          </article>
+          <% } else { %>
           <a href="/community/<%= post.id %>">
-            <span class="community-card-type <%= post.kind === 'game' ? 'is-game' : 'is-list' %>">
+            <span class="community-card-type">
               <span aria-hidden="true"><%= game ? game.icon : post.kind === 'contest' ? '🏆' : post.kind === 'website' ? '🌐' : '📝' %></span>
-              <%= game ? gameLabel(post.gameType) : community.kindLabel(post.kind, lang) %>
+              <%= community.kindLabel(post.kind, lang) %>
             </span>
             <h3><%= post.title %></h3>
             <% if (post.description) { %><p class="community-card-desc"><%= post.description %></p><% } %>
@@ -88,6 +103,7 @@
               <span><% if (post.kind === 'contest' || post.kind === 'website') { %><%= t('community.externalLink') %><% } else { %><%= post.itemCount %> <%= post.kind === 'game' ? t('community.itemsUnit') : t('community.wordsUnit') %><% if (post.useCount) { %> · <%= post.useCount %> <%= t('community.usesUnit') %><% } %><% } %></span>
             </p>
           </a>
+          <% } %>
         </li>
         <% }) %>
       </ul>
@@ -99,7 +115,9 @@
       </nav>
       <% } %>
     <% } %>
+    <%- include('teacher-resources') %>
   </div></main>
   <script src="/javascripts/milk-tea-footer.js"></script>
+  <script src="/community/teacher-resources.js"></script>
 </body>
 </html>

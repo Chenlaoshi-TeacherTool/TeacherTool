@@ -68,7 +68,7 @@ var SECTIONS = [
       };
     })
   },
-  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, comingSoon: true, admin: ['community'] },
+  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, comingSoon: true, admin: ['community', 'teacherResources'] },
   { key: 'finds', href: '/classroom-finds', en: 'Classroom Finds', zh: '教室好物', nav: true, admin: ['recommendations'] },
   {
     key: 'shop', href: '/shop', en: 'Chen Laoshi’s Shop', zh: '陈老师的商店', navEn: 'Shop', navZh: '商店', nav: false, redirect: '/classroom-finds', admin: [],
@@ -95,6 +95,7 @@ var UNLISTED = [
 
 // Admin editors. `href` must match a GET route in routes/admin.js.
 var ADMIN_EDITORS = {
+  teacherResources: { href: '/admin/teacher-resources', label: '教师资源分享', description: '第三方教学网站推荐、草稿和发布' },
   pages: { href: '/admin/pages', label: 'Site Pages', description: 'Home and About page content' },
   materials: { href: '/admin/materials', label: 'Activity Materials', description: 'Upload and edit theme materials and textbook lesson links' },
   toolguides: { href: '/admin/toolguides', label: 'Tool Guides', description: 'How-to guides shown on individual tool pages' },

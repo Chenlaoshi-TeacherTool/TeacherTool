@@ -5,5 +5,5 @@
 // checks that it matches the newest file. Admin pages warn while the
 // database is behind, i.e. the migration was not run before deploying.
 module.exports = {
-  requiredMigration: '0022_add-membership-adjustments'
+  requiredMigration: '0024_add-teacher-resource-review'
 };

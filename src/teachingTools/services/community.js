@@ -51,7 +51,7 @@ function cleanExternal(body) {
 }
 
 function kindLabel(kind, lang) {
-  var labels = { wordlist: ['Word list', '词表'], game: ['Game', '游戏'], contest: ['Competitions & events', '比赛与活动'], website: ['Recommended websites', '推荐网站'] };
+  var labels = { wordlist: ['Vocabulary & materials', '词汇与材料'], game: ['Classroom games', '课堂游戏'], contest: ['Competitions & events', '比赛与活动'], website: ['Teaching websites', '教学网站'] };
   return labels[kind] ? labels[kind][lang === 'zh' ? 1 : 0] : '';
 }
 

@@ -1,0 +1,14 @@
+<% var zh = lang === 'zh'; %>
+  <% teacherResources.forEach(function(item) { %>
+  <dialog class="resource-dialog" id="resource-<%= item.id %>" aria-labelledby="resource-title-<%= item.id %>">
+    <form method="dialog" class="resource-close"><button aria-label="<%= zh ? '关闭' : 'Close' %>">×</button></form>
+    <h2 id="resource-title-<%= item.id %>"><%= item.name %></h2><p class="hint"><%= new URL(item.url).hostname %> · <%= zh ? '第三方网站' : 'Third-party website' %></p>
+    <div class="resource-disclosures"><% promotionBadges(item).forEach(function(badge) { %><span class="resource-disclosure<%= badge.commercial ? ' is-commercial' : '' %>"><%= badge.text %></span><% }); %></div>
+    <% if (item.promotion && item.promotion.type === 'paid') { %><p class="hint"><%= zh ? '推广期间（洛杉矶时间）：' : 'Promotion dates (Los Angeles): ' %><%= item.promotion.start %> — <%= item.promotion.end %></p><p><%= zh ? '本项目存在付费推广关系，不代表陈老师已亲测或保证教学效果。' : 'This listing has a paid promotional relationship. It does not imply personal testing or guaranteed teaching results.' %></p><% } %>
+    <p><%= item.summary %></p>
+    <% if (item.source === 'teacher') { %><p class="hint"><%= zh ? '老师投稿 · ' : 'Teacher submission · ' %><%= item.authorName %></p><% } %>
+    <% [['features','用途与主要功能','Features'],['audience','适用对象与教学场景','Teaching scenarios'],['reason','推荐理由','Why consider it'],['limitations','使用前留意','Limitations'],['pricing','收费情况','Pricing'],['disclosure','利益关系说明','Disclosure']].forEach(function(field) { if (item[field[0]]) { %><h3><%= zh ? field[1] : field[2] %></h3><p class="resource-text"><%= item[field[0]] %></p><% } }); %>
+    <p class="hint"><%= zh ? '最近核查：' : 'Last checked: ' %><%= item.checkedAt %></p>
+    <p class="hint"><%= zh ? '这是独立第三方网站，与 CLS Teaching Tools 无隶属关系。功能、价格与使用条件以对方网站最新说明为准。' : 'An independent third-party website, not affiliated with CLS Teaching Tools. Check the provider for current features, pricing and terms.' %></p>
+    <a class="btn" href="<%= item.url %>" target="_blank" rel="<%= item.promotion && ['paid','affiliate','other'].includes(item.promotion.type) ? 'noopener noreferrer external sponsored' : 'noopener noreferrer external' %>"><%= zh ? '访问第三方网站' : 'Visit third-party website' %> ↗</a>
+  </dialog><% }); %>

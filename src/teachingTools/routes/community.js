@@ -8,6 +8,7 @@
 var express = require('express');
 var crypto = require('crypto');
 var community = require('../services/community');
+var promotion = require('../services/teacherResourcePromotion');
 
 var POSTS_PER_DAY = 20;
 var REPORTS_PER_HOUR = 10;
@@ -19,7 +20,7 @@ function create(options) {
   var activities = options.activities || require('../services/teacherActivitiesRepository');
   var registry = options.registry || require('../services/gameShareRegistry');
   var teacherLibrary = function () { return require('./teacherLibrary'); };
-  var accountsOn = options.accountsOn || function () { return process.env.TEACHER_ACCOUNTS_ENABLED === 'true'; };
+  var accountsOn = options.accountsOn || function () { return teacherLibrary().accountsAvailable(); };
   var getUser = options.getUser || function (req) { return teacherLibrary().trustedUser(req); };
   var ownerKey = options.ownerKey || function (user) { return teacherLibrary().ownerKey(user); };
   var loginProvider = options.loginProvider || function () { return teacherLibrary().accountProvider(); };
@@ -71,18 +72,33 @@ function create(options) {
     var lang = res.locals.lang;
     return {
       community: community,
+      promotionBadges: function(item) { return promotion.badges(item,lang,now()); },
       stageLabel: function (key) { return community.stageLabel(key, lang); },
       textbookLabel: function (key) { return community.textbookLabel(key, lang); },
       gameLabel: function (type) { return community.gameLabel(type, lang); }
     };
   }
 
+  router.use(require('./communityWebsites').create({
+    store: options.resourceStore || require('../services/teacherResources'), owner: owner, origin: origin,
+    loginUrl: loginUrl, allow: function(key) { return allow('website:' + key, POSTS_PER_DAY, DAY_MS); }
+  }));
+
   // ===== Pages =====
   router.get('/community', async function (req, res, next) {
-    var result;
-    try { result = community.search(await livePosts(), req.query); }
-    catch (error) { console.error('community list error:', error.message); result = Object.assign(community.search([], {}), { unavailable: true }); }
-    res.render('community/index', Object.assign({ title: 'Teacher Community', result: result }, viewHelpers(res)));
+    var posts = [], postsUnavailable = false;
+    try { posts = await livePosts(); }
+    catch (error) { postsUnavailable = true; console.error('community list error:', error.message); }
+    var resourceRows = [], resourcesUnavailable = false;
+    try { resourceRows = await (options.resourceStore || require('../services/teacherResources')).list(); }
+    catch (error) { resourcesUnavailable = true; console.error('teacher resources list error:', error.message); }
+    var resources = resourceRows.filter(function(row) { return row.published && promotion.state(row.published,now()).visible; }).map(function(row) {
+      var item = Object.assign({ id: row.id }, row.published);
+      return { id: 'resource-' + row.id, kind: 'website', title: item.name, description: [item.summary, item.category, item.features, item.audience].filter(Boolean).join(' '), promoted: promotion.state(item,now()).pinned, authorName: item.authorName || 'CLS Teaching Tools', stages: [], textbook: '', resource: item };
+    });
+    var result = community.search(posts.concat(resources).sort(function(a,b) { return Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)); }), req.query);
+    result.unavailable = postsUnavailable;
+    res.render('community/index', Object.assign({ title: 'Teacher Community', result: result, teacherResources: result.posts.filter(function(post) { return post.resource; }).map(function(post) { return post.resource; }), resourcesUnavailable: resourcesUnavailable }, viewHelpers(res)));
   });
 
   router.get('/community/share', function (req, res) {

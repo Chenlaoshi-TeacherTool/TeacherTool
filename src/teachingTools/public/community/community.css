@@ -86,3 +86,32 @@
   .community-actions .btn { flex: 1 1 100%; }
 }
 @media print { .community-actions, .community-post-foot, .community-back { display: none; } }
+
+/* Curated third-party website recommendations. */
+.resource-card { box-sizing: border-box; height: 100%; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: flex-start; gap: .6rem; }
+.resource-card h3, .resource-card p { margin: 0; }
+.resource-card .btn { margin-top: auto; }
+.resource-dialog { box-sizing: border-box; width: min(760px, calc(100% - 32px)); max-height: 85dvh; overflow-y: auto; border: 1px solid #ded8c8; border-radius: 24px; background: #fffdf5; color: #194f45; padding: clamp(20px, 5vw, 40px); }
+.resource-dialog::backdrop { background: rgb(22 58 50 / 65%); }
+.resource-dialog h2 { padding-right: 42px; }
+.resource-dialog h3 { margin-top: 1.5rem; }
+.resource-dialog p { line-height: 1.7; overflow-wrap: anywhere; }
+.resource-close { float: right; }
+.resource-close button { width: 40px; height: 40px; border-radius: 50%; background: transparent; color: inherit; border: 1px solid currentColor; font-size: 24px; cursor: pointer; }
+.resource-text { white-space: pre-line; }
+
+/* Category colors stay paired with visible text labels. */
+.kind-game { --kind-bg: #fbe5dc; --kind-ink: #883f2d; --kind-accent: #cd795b; }
+.kind-wordlist { --kind-bg: #e6eedf; --kind-ink: #365b3e; --kind-accent: #7d9b71; }
+.kind-website { --kind-bg: #e2edf5; --kind-ink: #305b78; --kind-accent: #739ab6; }
+.kind-contest { --kind-bg: #eee5f4; --kind-ink: #67457d; --kind-accent: #a186b4; }
+.community-kind { background: var(--kind-bg); color: var(--kind-ink); border-color: var(--kind-accent); }
+.community-kind.is-on { background: var(--kind-ink); color: #fff; border-color: var(--kind-ink); box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--kind-accent); }
+.community-kind:hover { border-color: var(--kind-ink); }
+.community-card.kind-game > a, .community-card.kind-wordlist > a, .community-card.kind-website > a, .community-card.kind-contest > a, .community-card > .resource-card { border-top: 5px solid var(--kind-accent); }
+.community-card .community-card-type { background: var(--kind-bg); color: var(--kind-ink); }
+.community-external-note { margin-bottom: 18px !important; }
+
+.resource-disclosures { display: flex; flex-wrap: wrap; gap: 6px; }
+.resource-disclosure { display: inline-flex; padding: 4px 10px; border: 1px solid #bccbbb; border-radius: 8px; background: #eef3e9; color: #365b3e; font-size: .8rem; font-weight: 800; }
+.resource-disclosure.is-commercial { background: #fff0cc; color: #704718; border-color: #b58b46; }

@@ -16,6 +16,10 @@ function accountProvider() {
   return provider;
 }
 
+function accountsAvailable() {
+  return process.env.TEACHER_ACCOUNTS_ENABLED === 'true' && Boolean(process.env.WEBSITE_INSTANCE_ID) && auth.azureAuthEnabled();
+}
+
 function trustedUser(req) {
   if (!process.env.WEBSITE_INSTANCE_ID || !auth.azureAuthEnabled()) return null;
   var user = auth.currentUser(req);
@@ -32,7 +36,7 @@ function create(options) {
   var store = options.repository || repository;
   var accounts = options.accounts || require('../services/teacherAccountsRepository');
   var getUser = options.getUser || trustedUser;
-  var accountsEnabled = options.accountsEnabled || options.enabled || function () { return process.env.TEACHER_ACCOUNTS_ENABLED === 'true' && Boolean(process.env.WEBSITE_INSTANCE_ID) && auth.azureAuthEnabled(); };
+  var accountsEnabled = options.accountsEnabled || options.enabled || accountsAvailable;
   var enabled = options.enabled || function () { return accountsEnabled() && process.env.LIBRARY_CLOUD_ENABLED === 'true'; };
   var origin = options.origin || process.env.SITE_URL || 'https://clsteachingtools.com';
   origin = new URL(origin).origin;
@@ -221,3 +225,5 @@ module.exports.create = create;
 module.exports.ownerKey = ownerKey;
 module.exports.trustedUser = trustedUser;
 module.exports.accountProvider = accountProvider;
+
+module.exports.accountsAvailable = accountsAvailable;

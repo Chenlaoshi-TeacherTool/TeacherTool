@@ -2,6 +2,7 @@
 
 var siteMap = require('./siteMap');
 var labels = {
+  teacherResources: ['教师资源分享', '整理第三方教学网站，编辑介绍、发布或下架'],
   materials: ['活动材料', '上传、编辑材料，关联主题与课本课文'],
   textbooks: ['课本管理', '按教材、册数和课文管理词汇与课堂内容'],
   wordlists: ['词汇表', '管理公共词汇表、拼音、英文与图片'],
@@ -18,7 +19,7 @@ var definitions = [
   ['resources', '教学资源', ['materials', 'textbooks', 'wordlists', 'questionbanks']],
   ['content', '教学与工具内容', ['articles', 'toolguides', 'toolvideos']],
   ['website', '网站内容', ['pages', 'recommendations']],
-  ['accounts', '账户与社区', ['memberships', 'community']]
+  ['accounts', '账户与社区', ['memberships', 'community', 'teacherResources']]
 ];
 function editor(key) {
   return Object.assign({ key: key }, siteMap.ADMIN_EDITORS[key], { label: labels[key][0], description: labels[key][1] });

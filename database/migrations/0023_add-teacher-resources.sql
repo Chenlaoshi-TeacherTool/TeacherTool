@@ -1,0 +1,21 @@
+SET XACT_ABORT ON;
+BEGIN TRANSACTION;
+IF OBJECT_ID(N'dbo.teacher_resources', N'U') IS NULL
+    CREATE TABLE dbo.teacher_resources (
+        id VARCHAR(40) NOT NULL PRIMARY KEY,
+        draft NVARCHAR(MAX) NOT NULL CHECK (ISJSON(draft)=1),
+        published NVARCHAR(MAX) NULL CHECK (published IS NULL OR ISJSON(published)=1)
+    );
+IF NOT EXISTS (SELECT 1 FROM dbo.teacher_resources WHERE id='zhanglaoshi')
+    INSERT INTO dbo.teacher_resources(id,draft,published) VALUES('zhanglaoshi',N'{"id": "zhanglaoshi", "name": "张老师中文课堂", "url": "https://zhanglaoshichinese.com/", "summary": "围绕中文识字、HSK 和课堂组织提供教学工具。", "category": "中文教学", "features": "公开首页列出识字游戏、HSK 分级教材、随机分组、积分与汉字笔顺练习。", "audience": "中文教师备课、生字复习和汉字书写练习。", "reason": "将识字、笔顺和课堂组织工具集中在一个入口，便于按教学任务查找。", "limitations": "完整功能需要 JavaScript；会员权限与收费范围尚未核实。", "pricing": "未核实，请以第三方网站最新说明为准。", "disclosure": "", "checkedAt": "2026-11-14"}',NULL);
+IF NOT EXISTS (SELECT 1 FROM dbo.teacher_resources WHERE id='kadou')
+    INSERT INTO dbo.teacher_resources(id,draft,published) VALUES('kadou',N'{"id": "kadou", "name": "卡兜课堂游戏", "url": "https://kadou.yuntika.com/", "summary": "一个课堂游戏网站，具体玩法和使用条件待进一步核实。", "category": "课堂互动", "features": "已读取到首页名称“卡兜课堂游戏”；具体功能待人工浏览确认。", "audience": "希望寻找课堂游戏的教师；适用学段尚待确认。", "reason": "", "limitations": "当前仅核实网页标题，尚未完整查看工具、注册要求与收费条件。", "pricing": "未核实，请以第三方网站最新说明为准。", "disclosure": "", "checkedAt": "2026-11-14"}',NULL);
+IF NOT EXISTS (SELECT 1 FROM dbo.teacher_resources WHERE id='quizpebble')
+    INSERT INTO dbo.teacher_resources(id,draft,published) VALUES('quizpebble',N'{"id": "quizpebble", "name": "QuizPebble", "url": "https://www.quizpebble.com/", "summary": "将学科练习组织成课堂答题游戏，并提供复习和作业工具。", "category": "课堂互动", "features": "公开首页介绍课堂答题游戏、朗读词卡、复习链接、作业、结果查看和可打印练习。", "audience": "语言及其他学科教师，可考虑用于课堂复习、小组练习或课后巩固。", "reason": "课堂游戏与后续复习放在同一平台，便于围绕同一组学习内容安排活动。", "limitations": "尚未亲测课堂流程；设备、网络、教师账户与收费范围应在使用前确认。", "pricing": "未核实，请以第三方网站最新说明为准。", "disclosure": "", "checkedAt": "2026-11-14"}',NULL);
+IF NOT EXISTS (SELECT 1 FROM dbo.teacher_resources WHERE id='lumiteach')
+    INSERT INTO dbo.teacher_resources(id,draft,published) VALUES('lumiteach',N'{"id": "lumiteach", "name": "LumiTeach", "url": "https://lumiteach.com/", "summary": "提供中文课堂游戏、课堂管理和教学材料生成工具。", "category": "中文教学", "features": "公开网站列出课堂管理、互动游戏、自主学习及字帖、词卡和游戏卡牌生成工具。", "audience": "中文教师的课前热身、生词复习与可打印材料准备。", "reason": "可以从互动活动和纸质材料两个方向选择教学形式。", "limitations": "网站同时列出免费与 PRO 工具；具体权限与价格以对方网站为准，尚未逐项试用。", "pricing": "未核实，请以第三方网站最新说明为准。", "disclosure": "", "checkedAt": "2026-11-14"}',NULL);
+IF NOT EXISTS (SELECT 1 FROM dbo.teacher_resources WHERE id='mandarin-studio')
+    INSERT INTO dbo.teacher_resources(id,draft,published) VALUES('mandarin-studio',N'{"id": "mandarin-studio", "name": "Mandarin Studio", "url": "https://themandarinstudio.com/", "summary": "帮助将课程内容制作成课堂游戏和学习单。", "category": "备课工具", "features": "公开首页介绍将课程内容转为课堂游戏及学习单；具体制作流程待核实。", "audience": "希望把已有课程内容改编成练习活动的中文教师。", "reason": "游戏与学习单围绕课程内容展开，适合进一步考察其备课用途。", "limitations": "尚未完成注册与实际制作测试；导出形式、权限和收费待核实。", "pricing": "未核实，请以第三方网站最新说明为准。", "disclosure": "", "checkedAt": "2026-11-14"}',NULL);
+IF NOT EXISTS (SELECT 1 FROM dbo.schema_migrations WHERE id=N'0023_add-teacher-resources')
+    INSERT INTO dbo.schema_migrations (id) VALUES (N'0023_add-teacher-resources');
+COMMIT;

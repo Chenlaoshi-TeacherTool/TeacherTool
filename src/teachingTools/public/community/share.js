@@ -12,6 +12,7 @@
 
   function updateKind() {
     var kind = $('shareKind').value;
+    if (kind === 'website') { window.location.href = '/community/websites/new'; return; }
     var external = kind === 'contest' || kind === 'website';
     $('shareWords').hidden = kind !== 'wordlist';
     $('shareGame').hidden = kind !== 'game' || !gameId;
@@ -104,7 +105,8 @@
       me = await response.json();
     } catch (error) { me = null; }
     $('shareLoading').hidden = true;
-    if (!me || !me.accountsOn) { $('shareClosed').hidden = false; return; }
+    if (!me) { showError(text.failed); return; }
+    if (!me.accountsOn) { $('shareClosed').hidden = false; return; }
     if (!me.signedIn) {
       $('shareSignInLink').href = me.loginUrl;
       $('shareSignIn').hidden = false;

@@ -51,6 +51,7 @@ router.use(async function (req, res, next) {
 
 router.use(require('./contentCatalog'));
 router.use(require('./adminPages'));
+router.use(require('./adminTeacherResources'));
 router.use(require('./adminMembershipAdjustments'));
 
 router.get('/', function (req, res) {
