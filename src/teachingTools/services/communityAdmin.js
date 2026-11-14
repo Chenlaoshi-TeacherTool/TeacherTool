@@ -32,7 +32,7 @@ function check(row, action, category) {
   try {
     if (action === 'publish') {
       if (row.status === 'published' && !row.task) return '已发布，无待发布内容。';
-      if (row.type === 'website') { var body = Object.assign(form(row.raw),{action:'publish',confirmed:'yes'}); resources.clean(body); promotion.clean(body,true); }
+      if (row.type === 'website') { var body = Object.assign(form(row.raw),{action:'publish',confirmed:'yes'}), teacher = Boolean(row.raw.review && row.raw.review.ownerKey); resources.checkPublish(resources.clean(body),body,teacher); resources.publishPromotion(body,teacher); }
     } else if (action === 'unpublish') {
       // Pending submissions can be rejected (kept hidden) before they ever go live.
       if (!row.raw.published && row.status !== 'published' && !row.pending) return '没有公开版本可下架。';

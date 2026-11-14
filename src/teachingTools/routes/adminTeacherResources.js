@@ -35,7 +35,7 @@ function create(options) {
         return (!q || (row.name+' '+row.summary+' '+row.author).toLowerCase().includes(q.toLowerCase())) && (!relation || row.type==='website' && ((row.raw.published || row.raw.draft).promotion || {type:'unknown'}).type===relation) && (!status || status==='pending' && row.pending || status==='published' && row.status==='published' || status==='unpublished' && row.status!=='published' || status==='reports' && row.reports>0 || status==='hidden' && row.status==='hidden' || status==='returned' && row.raw.review && row.raw.review.status==='returned');
       });
       var total=rows.length,page=Math.max(1,Math.min(Math.ceil(total/30)||1,parseInt(req.query.page,10)||1));
-      res.render('admin/community-manage',{title:'分享区管理',adminUser:req.adminUser,rows:rows.slice((page-1)*30,page*30),counts:counts,kinds:model.kinds,statusLabels:statusLabels,q:q,kind:kind,status:status,relation:relation,page:page,pages:Math.ceil(total/30)||1,total:total,done:req.query.done==='delete' ? '已永久删除该分享。' : ''});
+      res.render('admin/community-manage',{title:'分享区管理',currentUrl:req.originalUrl,promotionTypes:promotion.TYPES,adminUser:req.adminUser,rows:rows.slice((page-1)*30,page*30),counts:counts,kinds:model.kinds,statusLabels:statusLabels,q:q,kind:kind,status:status,relation:relation,page:page,pages:Math.ceil(total/30)||1,total:total,done:req.query.done==='delete' ? '已永久删除该分享。' : ''});
     } catch(error) { next(error); }
   });
   router.get('/community/websites/new',function(req,res,next) { editor(req,res,next); });
@@ -82,6 +82,21 @@ function create(options) {
       res.render('admin/community-bulk',{title:execute ? '批量处理结果' : '批量操作检查',adminUser:req.adminUser,results:results,action:action,category:category,execute:execute});
     } catch(error) {next(error);}
   }
+  // Change a website's commercial relationship straight from the list (not paid promotion, which needs dates).
+  router.post('/community/websites/:id/relationship',async function(req,res,next) {
+    if(!guard(req,res)) return;
+    if(!/^\d+$/.test(String(req.body.revision || ''))) return res.status(400).send('请刷新页面后再修改。');
+    try {
+      await store.save(req.params.id,{action:'relationship',relationshipType:req.body.relationshipType,revision:req.body.revision});
+      require('./community').invalidate();
+      var back=String(req.body.back || '');
+      res.redirect(303,/^\/admin\/community(\?[^#\s]*)?$/.test(back) ? back : '/admin/community');
+    } catch(error) {
+      if(error.status===409) return res.status(409).send('内容已更新，请刷新列表后再修改。');
+      if(error.status===400) return res.status(400).send(error.message);
+      next(error);
+    }
+  });
   router.post('/community/bulk/preview',function(req,res,next) {batch(req,res,next,false);});
   router.post('/community/bulk/execute',function(req,res,next) {batch(req,res,next,true);});
   return router;

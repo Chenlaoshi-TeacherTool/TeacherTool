@@ -27,7 +27,7 @@
 <% if (row.published) { var ps = promotionState(row.published); %><p>当前公开版本：<%= promotionTypes[ps.type] || '待核实' %><% if (ps.phase) { %> · <%= {scheduled:'未开始',active:'推广中',expired:'已到期'}[ps.phase] %><% } %><% if (!ps.visible) { %> · 到期后停止展示<% } %></p><% } %>
 </fieldset></details>
 <% if (row.review && row.review.ownerKey) { %><label for="<%= row.id %>-reviewNote">处理意见（退回时必填）</label><textarea id="<%= row.id %>-reviewNote" name="reviewNote" maxlength="1000" rows="2"><%= item.reviewNote || row.review.note || '' %></textarea><% } %>
-<label><input type="checkbox" name="confirmed" value="yes"> 我已核实介绍、推荐理由和商业关系；未把公开资料整理写成亲测体验。</label>
+<% if (row.review && row.review.ownerKey) { %><label><input type="checkbox" name="confirmed" value="yes"> 我已核实介绍、推荐理由和商业关系；未把公开资料整理写成亲测体验。</label><% } else { %><p class="sharing-help">陈老师整理的网站只需网站名称和网址即可发布；商业关系未选时按“无商业合作”发布。</p><% } %>
 <div class="actions"><button name="action" value="draft">保存草稿</button> <button name="action" value="publish"><%= row.review && row.review.ownerKey ? '批准并发布' : '发布内容' %></button><% if (row.review && row.review.ownerKey) { %> <button class="secondary" name="action" value="return" formnovalidate>退回补充</button><% } %><% if (row.published) { %> <button class="secondary" name="action" value="unpublish" formnovalidate>下架</button><% } %></div>
 </form></section><% }); %>
 

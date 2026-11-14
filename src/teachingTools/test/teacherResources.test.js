@@ -17,7 +17,17 @@ test('drafts, publishing and withdrawal survive reload; invalid publishing canno
     await store.save(id, Object.assign({}, body, { summary: 'Draft', action: 'draft' }));
     var row = (await resources.create({ file: file }).list()).find(function(row) { return row.id === id; });
     assert.equal(row.published.summary, 'Original'); assert.equal(row.draft.summary, 'Draft');
-    assert.throws(function() { store.save(id, Object.assign({}, body, { confirmed: '' })); }, /发布前/);
+    // Editor-curated sites publish with just a name and URL; unset relationship counts as none.
+    var quick = await store.save(null, { name: 'Quick site', url: 'https://quick.example.org/', action: 'publish' });
+    var quickRow = (await store.list()).find(function(row) { return row.id === quick; });
+    assert.equal(quickRow.published.name, 'Quick site'); assert.equal(quickRow.published.promotion.type, 'none');
+    await store.save(quick, { action: 'relationship', relationshipType: 'affiliate', revision: quickRow.revision });
+    quickRow = (await store.list()).find(function(row) { return row.id === quick; });
+    assert.equal(quickRow.published.promotion.type, 'affiliate'); assert.equal(quickRow.draft.promotion.type, 'affiliate');
+    await assert.rejects(store.save(quick, { action: 'relationship', relationshipType: 'paid', revision: quickRow.revision }), /付费推广/);
+    // Teacher submissions still need the full disclosure, and the message names what is missing.
+    var teacherId = await store.save(null, Object.assign({}, body, { authorName: 'T' }), 'teacher-owner');
+    await assert.rejects(store.save(teacherId, Object.assign({}, body, { disclosure: '', confirmed: '' })), /利益关系说明、底部的确认勾选/);
     await store.save(id, { action: 'unpublish' });
     row = (await store.list()).find(function(row) { return row.id === id; });
     assert.equal(row.published, null); assert.equal(row.draft.summary, 'Draft');
@@ -58,6 +68,6 @@ test('admin rejects cross-origin writes and preserves escaped input on validatio
     var html = await (await fetch(base + '/community')).text(); assert.ok(!html.includes('QuizPebble'));
     await store.save(null, values);
     html = await (await fetch(base + '/community')).text(); assert.ok(html.includes('Published summary')); assert.ok(html.includes('&lt;script&gt;')); assert.ok(!html.includes('<script>alert(1)</script>')); assert.ok(html.includes('rel="noopener noreferrer external"'));
-    response = await fetch(base + '/admin/teacher-resources', { method: 'POST', headers: { Origin: 'https://clsteachingtools.com', 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(Object.assign({},values,{ confirmed: '' })) }); assert.equal(response.status,400); assert.ok((await response.text()).includes('&lt;script&gt;'));
+    response = await fetch(base + '/admin/teacher-resources', { method: 'POST', headers: { Origin: 'https://clsteachingtools.com', 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(Object.assign({},values,{ url: 'http://not-https.example' })) }); assert.equal(response.status,400); assert.ok((await response.text()).includes('&lt;script&gt;'));
   } finally { await new Promise(function(resolve) { server.close(resolve); }); await fs.rm(dir, { recursive: true, force: true }); }
 });

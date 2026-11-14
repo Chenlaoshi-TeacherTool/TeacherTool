@@ -18,8 +18,20 @@ function clean(body) {
   if (url.protocol !== 'https:' || url.username || url.password || !url.hostname.includes('.') || /^(localhost|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/.test(url.hostname) || url.hostname.startsWith('[')) invalid('请填写公开 HTTPS 网址，不包含登录凭据。');
   value.url = url.href;
   if (value.checkedAt && (!/^\d{4}-\d{2}-\d{2}$/.test(value.checkedAt) || !Number.isFinite(Date.parse(value.checkedAt)) || new Date(value.checkedAt).toISOString().slice(0,10) !== value.checkedAt)) invalid('核查日期格式不正确。');
-  if (body.action === 'publish' && (!value.summary || !value.category || !value.disclosure || !value.checkedAt || body.confirmed !== 'yes')) invalid('发布前请填写简介、分类、利益关系和核查日期，并确认内容。');
   return value;
+}
+// Teacher submissions need the full disclosure before going live. Websites the
+// editor adds herself only need a name and URL (checked in clean).
+function checkPublish(value, body, teacher) {
+  if (!teacher) return;
+  var missing = [['summary','一句话简介'],['category','分类'],['disclosure','利益关系说明'],['checkedAt','最近核查日期']].filter(function(item) { return !value[item[0]]; }).map(function(item) { return item[1]; });
+  if (body.confirmed !== 'yes') missing.push('底部的确认勾选');
+  if (missing.length) invalid('老师投稿发布前还缺：' + missing.join('、') + '。');
+}
+// Editor-curated websites count as "no commercial relationship" unless set otherwise.
+function publishPromotion(body, teacher) {
+  if (!teacher && (body.relationshipType || 'unknown') === 'unknown') body = Object.assign({}, body, { relationshipType: 'none' });
+  return promotion.clean(body, true);
 }
 function create(options) {
   options = options || {};
@@ -35,7 +47,7 @@ function create(options) {
   function save(id, body, owner) {
     if (id && !/^[a-z0-9-]{1,40}$/.test(id)) invalid('资源编号无效。');
     var action = owner ? 'submit' : body.action;
-    var value = ['unpublish','return','category'].includes(action) ? null : clean(Object.assign({},body,{ action: action }));
+    var value = ['unpublish','return','category','relationship'].includes(action) ? null : clean(Object.assign({},body,{ action: action }));
     if (owner && (!value.summary || !value.category || !value.disclosure || typeof body.authorName !== 'string' || !body.authorName.trim() || String(body.authorName).length > 40)) invalid('请填写简介、分类、署名与利益关系说明。');
     var note = String(body.reviewNote || '').trim();
     if (note.length > 1000 || (action === 'return' && !note)) invalid('退回补充时请填写处理意见，最多1000字。');
@@ -43,7 +55,7 @@ function create(options) {
     var task = pending.then(async function() {
       var rows = await list();
       var row = rows.find(function(item) { return item.id === id; });
-      if (!row) { if (['unpublish','return','category'].includes(action)) invalid('资源不存在。'); row = { id: id, published: null, review: {}, revision: 0 }; rows.push(row); }
+      if (!row) { if (['unpublish','return','category','relationship'].includes(action)) invalid('资源不存在。'); row = { id: id, published: null, review: {}, revision: 0 }; rows.push(row); }
       row.review = row.review || {};
       var expected = row.revision || 0;
       if (owner && row.review.ownerKey && row.review.ownerKey !== owner) { var forbidden = new Error('无法编辑其他老师的投稿。'); forbidden.status = 404; throw forbidden; }
@@ -54,7 +66,14 @@ function create(options) {
         row.draft.category = body.category.trim();
         if (row.published) row.published.category = body.category.trim();
       }
-      if (value) value.promotion = owner ? (row.draft && row.draft.promotion || row.published && row.published.promotion || { type: 'unknown' }) : promotion.clean(body, action === 'publish');
+      if (action === 'relationship') {
+        var type = body.relationshipType;
+        if (typeof type !== 'string' || !['none','affiliate','other','unknown'].includes(type)) invalid('请选择商业关系类型；付费推广请在编辑页设置日期。');
+        row.draft.promotion = { type: type };
+        if (row.published) row.published.promotion = { type: type };
+      }
+      if (action === 'publish') checkPublish(value, body, Boolean(row.review.ownerKey));
+      if (value) value.promotion = owner ? (row.draft && row.draft.promotion || row.published && row.published.promotion || { type: 'unknown' }) : action === 'publish' ? publishPromotion(body, Boolean(row.review.ownerKey)) : promotion.clean(body, false);
       if (owner) row.review = Object.assign({}, row.review, { ownerKey: owner, authorName: body.authorName.trim(), status: 'pending', note: '', submittedAt: new Date().toISOString() });
       else if (action === 'return') { if (!row.review.ownerKey) invalid('此资源不是老师投稿。'); row.review.status = 'returned'; row.review.note = note; }
       else if (action === 'publish') { row.review.status = 'approved'; row.review.note = ''; }
@@ -76,4 +95,4 @@ function create(options) {
   }
   return { list: list, save: save };
 }
-module.exports = Object.assign(create(), { create: create, clean: clean, fields: fields });
+module.exports = Object.assign(create(), { create: create, clean: clean, checkPublish: checkPublish, publishPromotion: publishPromotion, fields: fields });

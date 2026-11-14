@@ -27,10 +27,10 @@ test('unified list separates live status from pending changes and filters all fo
 });
 test('batch preview performs no writes; confirmation publishes eligible entries, skips invalid rows and stale revisions',async function(){
   var id=await store.save(null,body({name:'可发布网站',action:'draft'}));
-  var bad=await store.save(null,body({name:'缺少披露',action:'draft',disclosure:''}));
+  var bad=await store.save(null,body({name:'缺少披露',authorName:'投稿老师'}),'teacher-owner');await store.save(bad,body({name:'缺少披露',action:'draft',disclosure:''}));
   var current=await rows(),goodRow=current.find(function(row){return row.id===id;}),badRow=current.find(function(row){return row.id===bad;});
   var values=new URLSearchParams({action:'publish'});values.append('selected',goodRow.key);values.append('selected',badRow.key);
-  var response=await send('/admin/community/bulk/preview',values);assert.equal(response.status,200);var html=await response.text();assert.ok(html.includes('可以执行'));assert.ok(html.includes('发布前'));assert.equal((await store.list()).find(function(row){return row.id===id;}).published,null);
+  var response=await send('/admin/community/bulk/preview',values);assert.equal(response.status,200);var html=await response.text();assert.ok(html.includes('可以执行'));assert.ok(html.includes('发布前还缺'));assert.equal((await store.list()).find(function(row){return row.id===id;}).published,null);
   response=await send('/admin/community/bulk/execute',values);assert.equal(response.status,400);
   values.set('confirmed','yes');response=await send('/admin/community/bulk/execute',values);assert.equal(response.status,200);assert.ok((await store.list()).find(function(row){return row.id===id;}).published);assert.equal((await store.list()).find(function(row){return row.id===bad;}).published,null);
   response=await send('/admin/community/bulk/execute',values);html=await response.text();assert.ok(html.includes('内容已变更'));
@@ -44,6 +44,18 @@ test('category edits preserve unapproved fields and live content; bulk hides bot
   var current=await rows(),values=new URLSearchParams({action:'unpublish',confirmed:'yes'});values.append('selected',current.find(function(row){return row.id===id;}).key);values.append('selected',current.find(function(row){return row.id==='game1234';}).key);
   response=await send('/admin/community/bulk/execute',values);assert.equal(response.status,200);assert.equal((await store.list()).find(function(row){return row.id===id;}).published,null);assert.equal(posts.find(function(post){return post.id==='game1234';}).status,'hidden');
   assert.equal((await store.list()).find(function(row){return row.id===id;}).draft.summary,'未审核的内容');
+});
+test('relationship dropdown saves from the list and returns to the same filter',async function(){
+  var id=await store.save(null,body({name:'关系网站',action:'draft',relationshipType:'unknown'}));
+  var html=await (await fetch(base+'/admin/community?kind=website')).text();assert.ok(html.includes('form="rel-'+id+'"'));assert.ok(html.includes('action="/admin/community/websites/'+id+'/relationship"'));
+  var item=(await store.list()).find(function(row){return row.id===id;});
+  var response=await send('/admin/community/websites/'+id+'/relationship',{relationshipType:'affiliate',revision:String(item.revision),back:'/admin/community?kind=website'});
+  assert.equal(response.status,303);assert.equal(response.headers.get('location'),'/admin/community?kind=website');
+  assert.equal((await store.list()).find(function(row){return row.id===id;}).draft.promotion.type,'affiliate');
+  response=await send('/admin/community/websites/'+id+'/relationship',{relationshipType:'none',revision:String(item.revision),back:'https://evil.example/'});assert.equal(response.status,409);
+  item=(await store.list()).find(function(row){return row.id===id;});
+  response=await send('/admin/community/websites/'+id+'/relationship',{relationshipType:'none',revision:String(item.revision),back:'https://evil.example/'});assert.equal(response.headers.get('location'),'/admin/community');
+  response=await send('/admin/community/websites/'+id+'/relationship',{relationshipType:'none',revision:'0'},'https://attacker.example');assert.equal(response.status,403);
 });
 test('pending posts can be rejected without going live; review page offers reject and permanent delete',async function(){
   posts.push({id:'pend1234',kind:'wordlist',title:'待审核词表',description:'待审核',authorName:'赵老师',status:'pending',payload:[{zh:'香蕉'}],reportCount:0});
