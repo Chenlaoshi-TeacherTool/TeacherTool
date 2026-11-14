@@ -117,3 +117,19 @@ body.gacha-page {
 @keyframes score-pop { 50% { transform: scale(1.15); } }
 @keyframes score-rise { 0% { opacity: 0; transform: translateY(10px); } 20%, 60% { opacity: 1; } 100% { opacity: 0; transform: translateY(-30px); } }
 @media (prefers-reduced-motion: reduce) { #gacha .score-bonus { display: none; } }
+
+#gacha #ending-hint { color: #4f7466; font-size: 14px; line-height: 1.6; }
+#gacha #timer { font-variant-numeric: tabular-nums; font-weight: 800; }
+#gacha #end-game, #gacha #end-answer { border-color: #d6a38c; color: #8a4128; }
+#gacha #end-answer { display: block; margin: 14px auto 0; }
+#gacha #celebration { width: min(600px, calc(100% - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: clamp(24px, 5vw, 48px); color: inherit; text-align: center; background: #fffaf0; overflow-y: auto; }
+#gacha #celebration::backdrop { background: #102c25b3; }
+#gacha #celebration[open] { animation: word-enter 240ms cubic-bezier(0.23, 1, 0.32, 1); }
+#gacha .trophy { width: min(220px, 65%); position: relative; animation: trophy-enter 280ms cubic-bezier(0.23, 1, 0.32, 1); }
+#gacha #winner-title { position: relative; font-size: clamp(28px, 5vw, 44px); overflow-wrap: anywhere; }
+#gacha #final-scores { position: relative; font-size: 20px; font-weight: 700; overflow-wrap: anywhere; }
+#gacha #confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: inherit; }
+#gacha #confetti i { position: absolute; top: -18px; width: 9px; height: 16px; border-radius: 2px; animation: confetti-fall 1600ms linear both; }
+@keyframes trophy-enter { from { opacity: 0; transform: translateY(24px) scale(.9) rotate(-8deg); } to { opacity: 1; transform: translateY(0) scale(1) rotate(0); } }
+@keyframes confetti-fall { from { transform: translateY(0) rotate(0); opacity: 1; } to { transform: translateY(650px) rotate(400deg); opacity: 0; } }
+@media(prefers-reduced-motion: reduce) { #gacha #confetti { display: none; } }

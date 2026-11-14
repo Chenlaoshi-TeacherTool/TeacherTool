@@ -4,6 +4,7 @@
   var zh = document.documentElement.lang === 'zh';
   var t = function (c,e) { return zh ? c : e; };
   var game, names, teams, busy = false, lists = [], selected = [];
+  var clock, deadline = 0, animationVersion = 0;
   function count() { $('error').textContent = ''; $('count').textContent = GachaCore.parse($('words').value).length + t(' 个词（相同词语自动合并）',' words (duplicates merged)'); }
   $('words').addEventListener('input', count); count();
   $('words').addEventListener('input', function () { $('generate-status').textContent = ''; });
@@ -84,20 +85,42 @@
       if (picker) picker.reset();
     }
   });
+  $('ending').onchange = function () { $('duration-label').hidden = $('ending').value !== 'timer'; };
+  function stopClock() { window.clearInterval(clock); clock = null; }
+  function endGame() {
+    if (!game || !game.end()) return;
+    stopClock(); animationVersion++; busy = false; render();
+  }
+  function tick() {
+    var seconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    $('timer').textContent = t('剩余时间 ', 'Time left ') + Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+    if (!seconds) endGame();
+  }
+  $('end-game').onclick = endGame; $('end-answer').onclick = endGame;
+  $('close-celebration').onclick = function () { $('celebration').close(); $('again').focus(); };
   function start() {
     var words = GachaCore.parse($('words').value), fixed = Number($('fixed').value);
     if (!words.length) { $('error').textContent = t('请先输入或导入词汇。','Enter or import some words first.'); return; }
     if (!$('random').checked && (!Number.isInteger(fixed) || fixed < 1 || fixed > 100)) { $('error').textContent = t('固定积分请输入 1–100 的整数。','Enter a whole number from 1 to 100.'); return; }
+    var minutes = Number($('duration').value);
+    if ($('ending').value === 'timer' && (!Number.isInteger(minutes) || minutes < 1 || minutes > 60)) {
+      $('error').textContent = t('游戏时长请输入 1–60 的整数分钟。', 'Enter a whole number from 1 to 60 minutes.'); return;
+    }
+    stopClock(); animationVersion++; busy = false;
+    if ($('celebration').open) $('celebration').close();
     $('error').textContent = ''; teams = $('mode').value === 'teams';
     names = teams ? [$('name-a').value.trim() || t('A 组','Team A'), $('name-b').value.trim() || t('B 组','Team B')] : [t('全班','Whole class')];
-    game = GachaCore.create(words, teams, fixed, $('random').checked);
+    game = GachaCore.create(words, teams, fixed, $('random').checked, undefined, $('ending').value);
+    $('timer').hidden = $('ending').value !== 'timer';
+    if ($('ending').value === 'timer') { deadline = Date.now() + minutes * 60000; tick(); clock = window.setInterval(tick, 250); }
     $('gacha').classList.add('playing'); $('setup').hidden = true; $('play').hidden = false; render();
   }
   $('start').onclick = start; $('again').onclick = start;
-  $('settings').onclick = function () { if (busy) return; $('gacha').classList.remove('playing'); $('play').hidden = true; $('setup').hidden = false; };
+  $('settings').onclick = function () { if (busy) return; stopClock(); animationVersion++; $('gacha').classList.remove('playing'); $('play').hidden = true; $('setup').hidden = false; };
   function render() {
     $('remaining').textContent = t('剩余 ','Remaining: ') + game.pool.length + t(' 个词',' words');
-    $('turn').textContent = game.phase === 'done' ? t('词汇全部抽完啦！','All words played!') : names[game.turn] + t(' · 轮到你啦',' · your turn');
+    $('turn').textContent = game.phase === 'done' ? t('游戏结束！','Game complete!') : names[game.turn] + t(' · 轮到你啦',' · your turn');
+    $('end-game').disabled = game.phase === 'done';
     $('undo').disabled = busy || !game.history.length || !['ready','done'].includes(game.phase);
     $('machines').replaceChildren();
     names.forEach(function (name,i) {
@@ -115,6 +138,7 @@
       card.append(heading,score,machine,hint); $('machines').append(card);
     });
     if (game.phase !== 'answer' && $('reveal').open) $('reveal').close(); $('finish').hidden = game.phase !== 'done';
+    if (game.phase !== 'done' && $('celebration').open) $('celebration').close();
     if (game.phase === 'answer') {
       $('term').textContent = game.current.word.term;
       $('points').textContent = '✦ ' + game.current.points + t(' 分',' POINTS');
@@ -136,15 +160,31 @@
       });
       if (!$('reveal').open) { $('reveal').showModal(); $('term').focus(); }
     }
-    if (game.phase === 'done') $('result').textContent = !teams ? names[0] + ' · ' + game.scores[0] + t(' 分！',' points!') : game.scores[0] === game.scores[1] ? t('平局！','It’s a tie!') : names[game.scores[0] > game.scores[1] ? 0 : 1] + t(' 获胜！',' wins!');
+    if (game.phase === 'done') {
+      stopClock();
+      $('result').textContent = !teams ? t('全班挑战完成！', 'Class challenge complete!') : game.scores[0] === game.scores[1] ? t('平局，大家都很棒！', 'A tie — well played, everyone!') : names[game.scores[0] > game.scores[1] ? 0 : 1] + t(' 获胜！', ' wins!');
+      $('winner-title').textContent = $('result').textContent;
+      $('final-scores').textContent = names.map(function (name, i) { return name + ' · ' + game.scores[i] + t(' 分', ' pts'); }).join('   /   ');
+      $('confetti').replaceChildren();
+      for (var c = 0; c < 28; c++) {
+        var piece = document.createElement('i');
+        piece.style.left = (c * 37 % 100) + '%';
+        piece.style.background = ['#efbf43', '#6eb6e9', '#ed9875', '#74b59b'][c % 4];
+        piece.style.animationDelay = (c % 7 * 60) + 'ms';
+        $('confetti').append(piece);
+      }
+      if (!$('celebration').open) $('celebration').showModal();
+    }
   }
   function support(id,value,visible,label) { $(id).hidden = !value; $(id).textContent = visible ? value : label; $(id).onclick = function () { $(id).textContent = value; }; }
   function draw() {
     if (busy || !game.draw()) return;
     busy = true; render();
+    var version = ++animationVersion;
     var machine = $('machines').children[game.turn].querySelector('.machine'); machine.classList.add('spinning');
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.setTimeout(function () {
+      if (version !== animationVersion || game.phase !== 'closed') return;
       var capsule = document.createElement('button'); capsule.className = 'capsule'; capsule.disabled = true;
       var color = Math.floor(Math.random() * 9);
       ['top', 'bottom'].forEach(function (half) {
@@ -157,7 +197,7 @@
       capsule.onclick = function () {
         if (game.phase !== 'closed' || capsule.disabled) return;
         capsule.disabled = true; capsule.classList.add('opening');
-        window.setTimeout(function () { game.open(); capsule.remove(); busy = false; render(); }, reduce ? 0 : 280);
+        window.setTimeout(function () { if (version !== animationVersion || game.phase !== 'closed') return; game.open(); capsule.remove(); busy = false; render(); }, reduce ? 0 : 280);
       };
       machine.parentNode.append(capsule);
       window.setTimeout(function () { capsule.disabled = false; }, reduce ? 0 : 650);
