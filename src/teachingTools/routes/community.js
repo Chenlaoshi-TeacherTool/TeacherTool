@@ -96,7 +96,8 @@ function create(options) {
       var item = Object.assign({ id: row.id }, row.published);
       return { id: 'resource-' + row.id, kind: 'website', title: item.name, description: [item.summary, item.category, item.features, item.audience].filter(Boolean).join(' '), promoted: promotion.state(item,now()).pinned, authorName: item.authorName || 'CLS Teaching Tools', stages: [], textbook: '', resource: item };
     });
-    var result = community.search(posts.concat(resources).sort(function(a,b) { return Number(Boolean(b.promoted)) - Number(Boolean(a.promoted)); }), req.query);
+    // Promoted first; competitions and grants past their deadline go last.
+    var result = community.search(posts.concat(resources).sort(function(a,b) { return (Number(Boolean(b.promoted)) - Number(Boolean(a.promoted))) || (Number(community.isClosed(a,now())) - Number(community.isClosed(b,now()))); }), req.query);
     result.unavailable = postsUnavailable;
     res.render('community/index', Object.assign({ title: 'Teacher Community', result: result, teacherResources: result.posts.filter(function(post) { return post.resource; }).map(function(post) { return post.resource; }), resourcesUnavailable: resourcesUnavailable }, viewHelpers(res)));
   });
@@ -159,7 +160,7 @@ function create(options) {
         var count = ['sentences', 'items', 'words', 'questions', 'rounds'].map(function (key) { return Array.isArray(payload[key]) ? payload[key].length : 0; })
           .reduce(function (a, b) { return Math.max(a, b); }, 0);
         Object.assign(post, { kind: 'game', gameType: adapter.type, gameVersion: adapter.version, payload: payload, itemCount: count });
-      } else if (body.kind === 'contest' || body.kind === 'website') {
+      } else if (community.EXTERNAL_KINDS.includes(body.kind)) {
         Object.assign(post, { kind: body.kind, payload: community.cleanExternal(body), itemCount: 0, status: 'pending' });
       } else {
         return res.status(400).json({ error: 'Choose a supported category to share.' });

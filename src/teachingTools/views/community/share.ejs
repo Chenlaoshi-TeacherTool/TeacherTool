@@ -5,7 +5,7 @@
   <meta name="robots" content="noindex">
   <title><%= t('community.shareTitle') %> - Chen Laoshi's Teaching Toolkit</title>
   <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
-  <link rel="stylesheet" href="/community/community.css">
+  <link rel="stylesheet" href="/community/community.css?v=grant1">
 </head>
 <body class="community-page">
   <main class="content-section community-share"><div class="content-shell">
@@ -34,6 +34,12 @@
         <div id="shareContestFields" hidden>
           <label for="shareAudience"><%= t('community.audience') %></label><input id="shareAudience" maxlength="120">
           <label for="shareDeadline"><%= t('community.deadline') %></label><input id="shareDeadline" type="date">
+        </div>
+        <div id="shareGrantFields" hidden>
+          <label for="shareFunder"><%= t('community.grantFunder') %></label><input id="shareFunder" maxlength="120">
+          <label for="shareAmount"><%= t('community.grantAmount') %></label><input id="shareAmount" maxlength="80">
+          <label for="shareEligibility"><%= t('community.grantEligibility') %></label><textarea id="shareEligibility" rows="2" maxlength="300"></textarea>
+          <label for="shareGrantDeadline"><%= t('community.grantDeadline') %></label><input id="shareGrantDeadline" type="date">
         </div>
         <p class="hint"><%= t('community.reviewHint') %></p>
       </fieldset>
@@ -88,7 +94,7 @@
     }).replace(/</g, '\\u003c') %>;
   </script>
   <script src="/shared/wordlist-core.js"></script>
-  <script src="/community/share.js"></script>
+  <script src="/community/share.js?v=grant1"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>

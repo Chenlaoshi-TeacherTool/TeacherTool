@@ -2,7 +2,7 @@
 var crypto = require('crypto');
 var resources = require('./teacherResources');
 var promotion = require('./teacherResourcePromotion');
-var kinds = { game: '课堂游戏', wordlist: '词汇与材料', website: '教学网站', contest: '比赛与活动' };
+var kinds = { game: '课堂游戏', wordlist: '词汇与材料', website: '教学网站', contest: '比赛与活动', grant: '教师资助' };
 function differences(row) {
   if(!row.published) return [];
   var result=Object.keys(resources.fields).filter(function(key){return (row.draft[key] || '') !== (row.published[key] || '');}).map(function(key){return {label:resources.fields[key],published:row.published[key] || '—',draft:row.draft[key] || '—'};});

@@ -67,3 +67,8 @@ test('pending posts can be rejected without going live; review page offers rejec
   html=await (await fetch(base+'/admin/community/posts/pend1234')).text();assert.ok(html.includes('value="publish"'));assert.ok(!html.includes('value="unpublish"'));
   html=await (await fetch(base+'/admin/community?done=delete')).text();assert.ok(html.includes('已永久删除该分享'));
 });
+test('grants appear as their own category in the admin list and review page',async function(){
+  posts.push({id:'grant123',kind:'grant',title:'资助测试',description:'教师资助',authorName:'钱老师',status:'pending',payload:{url:'https://example.org/grant',funder:'测试基金会',amount:'最高 $1,000',eligibility:'公立学校老师'},reportCount:0});
+  var html=await (await fetch(base+'/admin/community?kind=grant')).text();assert.ok(html.includes('资助测试'));assert.ok(html.includes('教师资助'));assert.ok(!html.includes('课堂游戏测试'));
+  html=await (await fetch(base+'/admin/community/posts/grant123')).text();assert.ok(html.includes('测试基金会'));assert.ok(html.includes('最高 $1,000'));assert.ok(html.includes('常年开放'));
+});

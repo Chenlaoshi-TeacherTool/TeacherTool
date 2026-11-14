@@ -5,7 +5,7 @@
   <title><%= post.title %> - <%= t('community.pageTitle') %></title>
   <%- include('../partials/seo', { pageDescription: (post.description || post.title) + ' · Shared by a teacher in the Chen Laoshi teacher community.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css"><link rel="stylesheet" href="/stylesheets/content-pages.css">
-  <link rel="stylesheet" href="/community/community.css">
+  <link rel="stylesheet" href="/community/community.css?v=grant1">
   <% if (game) { %><link rel="stylesheet" href="/shared/game-sharing.css"><% } %>
 </head>
 <body class="community-page">
@@ -16,7 +16,7 @@
       data-title="<%= post.title %>" data-game-type="<%= post.gameType || '' %>" data-game-version="<%= post.gameVersion || '' %>">
       <% if (post.status !== 'live') { %><p class="community-hidden-note"><%= t(post.status === 'pending' ? 'community.pendingNote' : 'community.hiddenNote') %></p><% } %>
       <span class="community-card-type <%= game ? 'is-game' : 'is-list' %>">
-        <span aria-hidden="true"><%= game ? game.icon : post.kind === 'contest' ? '🏆' : post.kind === 'website' ? '🌐' : '📝' %></span> <%= game ? gameLabel(post.gameType) : community.kindLabel(post.kind, lang) %>
+        <span aria-hidden="true"><%= game ? game.icon : post.kind === 'contest' ? '🏆' : post.kind === 'website' ? '🌐' : post.kind === 'grant' ? '💰' : '📝' %></span> <%= game ? gameLabel(post.gameType) : community.kindLabel(post.kind, lang) %>
       </span>
       <h1><%= post.title %></h1>
       <p class="community-post-meta">👩‍🏫 <%= post.authorName %> · <%= String(post.createdAt).slice(0, 10) %><% if (post.kind === 'wordlist' || game) { %> · <%= post.itemCount %> <%= game ? t('community.itemsUnit') : t('community.wordsUnit') %><% if (post.useCount) { %> · <%= post.useCount %> <%= t('community.usesUnit') %><% } %><% } %></p>
@@ -48,13 +48,19 @@
             <% }) %>
           </tbody>
         </table>
-      <% } else if (post.kind === 'contest' || post.kind === 'website') { %>
+      <% } else if (community.EXTERNAL_KINDS.includes(post.kind)) { %>
         <section class="community-use">
           <% if (post.kind === 'contest') { %>
             <% if (post.payload.audience) { %><p><strong><%= t('community.audience') %>:</strong> <%= post.payload.audience %></p><% } %>
             <% if (post.payload.deadline) { %><p><strong><%= t('community.deadline') %>:</strong> <%= post.payload.deadline %> <% if (post.payload.deadline < new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })) { %><span class="community-tag"><%= t('community.closed') %></span><% } %></p><% } %>
           <% } %>
-          <a class="btn" href="<%= post.payload.url %>" target="_blank" rel="noopener noreferrer"><%= t(post.kind === 'contest' ? 'community.visitContest' : 'community.visitWebsite') %> ↗</a>
+          <% if (post.kind === 'grant') { %>
+            <% if (post.payload.funder) { %><p><strong><%= t('community.grantFunderLabel') %>:</strong> <%= post.payload.funder %></p><% } %>
+            <% if (post.payload.amount) { %><p><strong><%= t('community.grantAmountLabel') %>:</strong> <%= post.payload.amount %></p><% } %>
+            <% if (post.payload.eligibility) { %><p><strong><%= t('community.grantEligibilityLabel') %>:</strong> <%= post.payload.eligibility %></p><% } %>
+            <p><strong><%= t('community.grantDeadlineLabel') %>:</strong> <%= post.payload.deadline || t('community.grantRolling') %> <% if (community.isClosed(post)) { %><span class="community-tag"><%= t('community.grantClosed') %></span><% } %></p>
+          <% } %>
+          <a class="btn" href="<%= post.payload.url %>" target="_blank" rel="noopener noreferrer"><%= t(post.kind === 'contest' ? 'community.visitContest' : post.kind === 'grant' ? 'community.visitGrant' : 'community.visitWebsite') %> ↗</a>
           <p class="hint"><%= t('community.externalHint') %></p>
           <p class="community-status" id="communityStatus" role="status" aria-live="polite"></p>
         </section>

@@ -1,5 +1,5 @@
 <%- include('layout-head') %>
-<link rel="stylesheet" href="/stylesheets/community-admin.css">
+<link rel="stylesheet" href="/stylesheets/community-admin.css?v=grant1">
 <% function link(change) { var params = new URLSearchParams({kind:kind,status:status,q:q,relation:relation}); Object.keys(change).forEach(function(key) {params.set(key,change[key]);}); return '/admin/community?'+params.toString(); } %>
 <div class="sharing-heading"><div><h1>分享区管理</h1><p>集中管理投稿、公开内容与网站推广。</p></div><a class="button" href="/admin/community/websites/new">＋ 新增教学网站</a></div>
 <nav class="sharing-tabs" aria-label="内容类型"><a href="<%= link({kind:'',page:''}) %>" <%- !kind ? 'aria-current="page"' : '' %>>全部内容</a><% Object.keys(kinds).forEach(function(key) { %><a class="kind-<%= key %>" href="<%= link({kind:key,page:''}) %>" <%- kind===key ? 'aria-current="page"' : '' %>><%= kinds[key] %></a><% }); %></nav>

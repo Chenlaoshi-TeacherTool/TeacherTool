@@ -1,4 +1,4 @@
-<%- include('layout-head') %><link rel="stylesheet" href="/stylesheets/community-admin.css">
+<%- include('layout-head') %><link rel="stylesheet" href="/stylesheets/community-admin.css?v=grant1">
 <p><a href="/admin/community">← 返回分享区管理</a></p><h1><%= title %></h1>
 <% var eligible = results.filter(function(row) {return !row.error;}); var actionLabel={publish:'发布',unpublish:'下架',category:'修改网站用途分类'}[action]; %>
 <p><%= execute ? '本次已处理' : '准备操作' %>：<strong><%= actionLabel %></strong><% if(action==='category') { %> → <%= category %><% } %></p>

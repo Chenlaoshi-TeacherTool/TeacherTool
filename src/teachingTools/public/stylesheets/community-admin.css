@@ -8,6 +8,7 @@
 .sharing-tabs .kind-wordlist,.sharing-kind.kind-wordlist { background:#e6eedf; color:#365b3e; }
 .sharing-tabs .kind-website,.sharing-kind.kind-website { background:#e2edf5; color:#305b78; }
 .sharing-tabs .kind-contest,.sharing-kind.kind-contest { background:#eee5f4; color:#67457d; }
+.sharing-tabs .kind-grant,.sharing-kind.kind-grant { background:#f6efd8; color:#6b5418; }
 .sharing-search,.sharing-bulk-bar { display:flex; align-items:end; flex-wrap:wrap; gap:12px; padding:16px; background:white; border:1px solid #dce3dd; border-radius:12px; margin:18px 0; }
 .sharing-search label,.sharing-bulk-bar label { margin:0; flex:1 1 170px; }
 .sharing-search input,.sharing-bulk-bar input { display:block; width:100%; box-sizing:border-box; padding:8px; border:1px solid #bdc9c5; border-radius:5px; }

@@ -13,12 +13,13 @@
   function updateKind() {
     var kind = $('shareKind').value;
     if (kind === 'website') { window.location.href = '/community/websites/new'; return; }
-    var external = kind === 'contest' || kind === 'website';
+    var external = kind === 'contest' || kind === 'website' || kind === 'grant';
     $('shareWords').hidden = kind !== 'wordlist';
     $('shareGame').hidden = kind !== 'game' || !gameId;
     $('shareGameHelp').hidden = kind !== 'game' || Boolean(gameId);
     $('shareExternal').hidden = !external;
     $('shareContestFields').hidden = kind !== 'contest';
+    $('shareGrantFields').hidden = kind !== 'grant';
     $('shareSubmit').textContent = external ? text.submitReview : text.publish;
   }
 
@@ -59,10 +60,17 @@
       stages: Array.prototype.map.call(document.querySelectorAll('input[name="stages"]:checked'), function (box) { return box.value; })
     };
     body.kind = $('shareKind').value;
-    if (body.kind === 'contest' || body.kind === 'website') {
+    if (body.kind === 'contest' || body.kind === 'website' || body.kind === 'grant') {
       body.url = $('shareUrl').value.trim();
-      body.audience = $('shareAudience').value.trim();
-      body.deadline = $('shareDeadline').value;
+      if (body.kind === 'grant') {
+        body.funder = $('shareFunder').value.trim();
+        body.amount = $('shareAmount').value.trim();
+        body.eligibility = $('shareEligibility').value.trim();
+        body.deadline = $('shareGrantDeadline').value;
+      } else {
+        body.audience = $('shareAudience').value.trim();
+        body.deadline = $('shareDeadline').value;
+      }
       try {
         var url = new URL(body.url);
         if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error();
@@ -125,7 +133,7 @@
       $('shareWordsText').addEventListener('input', updateCount);
       updateCount();
     }
-    if (!gameId && ['contest', 'website'].includes(params.get('kind'))) $('shareKind').value = params.get('kind');
+    if (!gameId && ['contest', 'website', 'grant'].includes(params.get('kind'))) $('shareKind').value = params.get('kind');
     $('shareKind').addEventListener('change', updateKind);
     updateKind();
     $('shareForm').addEventListener('submit', submit);

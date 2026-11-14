@@ -10,7 +10,7 @@ var path = require('path');
 var db = require('./sqlClient');
 
 var LOCAL_FILE = process.env.COMMUNITY_LOCAL_FILE || path.join(__dirname, '..', 'tmp', 'community-posts.json');
-var META_COLUMNS = "id, kind, owner_key, author_name, title, description, stages, textbook, game_type, game_version, item_count, status, report_count, use_count, created_at, CASE WHEN kind IN ('contest', 'website') THEN payload ELSE NULL END AS external_payload";
+var META_COLUMNS = "id, kind, owner_key, author_name, title, description, stages, textbook, game_type, game_version, item_count, status, report_count, use_count, created_at, CASE WHEN kind IN ('contest', 'website', 'grant') THEN payload ELSE NULL END AS external_payload";
 
 function useSql() { return Boolean(process.env.SQL_CONNECTION_STRING); }
 
@@ -22,7 +22,7 @@ function fromRow(row, withPayload) {
     status: row.status, reportCount: row.report_count || 0, useCount: row.use_count || 0,
     createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at
   };
-  if (row.kind === 'contest' || row.kind === 'website') {
+  if (row.kind === 'contest' || row.kind === 'website' || row.kind === 'grant') {
     var external = row.external_payload || row.payload;
     post.payload = typeof external === 'string' ? JSON.parse(external) : external;
   }

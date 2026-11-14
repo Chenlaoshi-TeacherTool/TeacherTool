@@ -208,3 +208,37 @@ test('external links reject unsafe URLs and invalid competition deadlines', asyn
   }
   assert.equal(posts.size, 0);
 });
+
+test('teacher grants wait for review, show funder, amount, eligibility and deadline, and closed grants sort last', async function () {
+  var response = await publish('grant-teacher', { kind: 'grant', title: 'Classroom library grant', authorName: 'Teacher', url: 'https://grants.example.org/apply',
+    funder: 'Example Foundation', amount: 'Up to $2,000', eligibility: 'K-12 public school teachers in the US', deadline: '2099-03-01' });
+  assert.equal(response.status, 201);
+  var open = await response.json();
+  var saved = posts.get(open.id);
+  assert.equal(saved.status, 'pending');
+  assert.deepEqual(saved.payload, { url: 'https://grants.example.org/apply', funder: 'Example Foundation', amount: 'Up to $2,000', eligibility: 'K-12 public school teachers in the US', deadline: '2099-03-01' });
+  assert.doesNotMatch(await (await fetch(origin + '/community?kind=grant')).text(), /Classroom library grant/);
+  // A rolling grant (no deadline) and one already closed.
+  var rolling = await (await publish('grant-teacher', { kind: 'grant', title: 'Rolling supplies grant', authorName: 'Teacher', url: 'https://grants.example.org/rolling' })).json();
+  var closed = await (await publish('grant-teacher', { kind: 'grant', title: 'Expired travel grant', authorName: 'Teacher', url: 'https://grants.example.org/old', deadline: '2020-01-01' })).json();
+  for (var id of [closed.id, open.id, rolling.id]) await repository.setStatus(id, 'live');
+  await publish('cache-grant', wordList());
+  var list = await (await fetch(origin + '/community?kind=grant')).text();
+  assert.match(list, /Up to \$2,000/);
+  assert.match(list, /Example Foundation/);
+  assert.match(list, /Rolling \/ open year-round/);
+  assert.match(list, /Applications closed/);
+  assert.ok(list.indexOf('Expired travel grant') > list.indexOf('Classroom library grant'), 'closed grant is listed after open ones');
+  assert.ok(list.indexOf('Expired travel grant') > list.indexOf('Rolling supplies grant'));
+  assert.doesNotMatch(list, /轻松学中文 3A 第一课/);
+  assert.match(await (await fetch(origin + '/community?q=example%20foundation')).text(), /Classroom library grant/);
+  var detail = await (await fetch(origin + open.url)).text();
+  assert.match(detail, /K-12 public school teachers in the US/);
+  assert.match(detail, /See grant details and apply/);
+  assert.match(detail, /target="_blank" rel="noopener noreferrer"/);
+  assert.doesNotMatch(detail, /Applications closed/);
+  for (var bad of [{ deadline: '2026-02-30' }, { url: 'javascript:alert(1)' }, { amount: 'x'.repeat(81) }]) {
+    response = await publish('grant-invalid', Object.assign({ kind: 'grant', title: 'Bad', authorName: 'T', url: 'https://example.org' }, bad));
+    assert.equal(response.status, 400, JSON.stringify(bad));
+  }
+});

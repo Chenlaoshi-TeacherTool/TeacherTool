@@ -105,10 +105,11 @@
 .kind-wordlist { --kind-bg: #e6eedf; --kind-ink: #365b3e; --kind-accent: #7d9b71; }
 .kind-website { --kind-bg: #e2edf5; --kind-ink: #305b78; --kind-accent: #739ab6; }
 .kind-contest { --kind-bg: #eee5f4; --kind-ink: #67457d; --kind-accent: #a186b4; }
+.kind-grant { --kind-bg: #f6efd8; --kind-ink: #6b5418; --kind-accent: #c4a24a; }
 .community-kind { background: var(--kind-bg); color: var(--kind-ink); border-color: var(--kind-accent); }
 .community-kind.is-on { background: var(--kind-ink); color: #fff; border-color: var(--kind-ink); box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--kind-accent); }
 .community-kind:hover { border-color: var(--kind-ink); }
-.community-card.kind-game > a, .community-card.kind-wordlist > a, .community-card.kind-website > a, .community-card.kind-contest > a, .community-card > .resource-card { border-top: 5px solid var(--kind-accent); }
+.community-card.kind-game > a, .community-card.kind-wordlist > a, .community-card.kind-website > a, .community-card.kind-contest > a, .community-card.kind-grant > a, .community-card > .resource-card { border-top: 5px solid var(--kind-accent); }
 .community-card .community-card-type { background: var(--kind-bg); color: var(--kind-ink); }
 .community-external-note { margin-bottom: 18px !important; }
 
