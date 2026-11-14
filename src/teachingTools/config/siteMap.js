@@ -68,7 +68,7 @@ var SECTIONS = [
       };
     })
   },
-  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, comingSoon: true, admin: ['community', 'teacherResources'] },
+  { key: 'community', href: '/community', en: 'Teacher Community', zh: '老师分享区', navEn: 'Community', navZh: '分享区', nav: true, admin: ['community', 'teacherResources'] },
   { key: 'finds', href: '/classroom-finds', en: 'Classroom Finds', zh: '教室好物', nav: true, admin: ['recommendations'] },
   {
     key: 'shop', href: '/shop', en: 'Chen Laoshi’s Shop', zh: '陈老师的商店', navEn: 'Shop', navZh: '商店', nav: false, redirect: '/classroom-finds', admin: [],
