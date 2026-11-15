@@ -7,7 +7,7 @@
 <% } else if (item.preview) { %><img class="material-preview" src="/materials/<%= item.id %>/preview" alt="<%= item.title %>"><% } %>
 <p><%= L('Choose a version to download:', '选择需要下载的版本：') %></p>
 <div class="material-downloads"><% item.files.forEach(function(file, index) { var copy = download(file, lang); %>
-<a class="material-download" target="_blank" rel="noopener" href="/materials/<%= item.id %>/files/<%= index %>"><strong><%= copy.title %></strong><span><%= copy.note %></span></a>
+<a class="material-download" target="_blank" rel="noopener" href="/materials/<%= item.id %>/files/<%= index %>"><strong><%= copy.title %><% if (file.membersOnly) { %> · 🔒 <%= L('Members only', '会员专享') %><% } %></strong><span><%= copy.note %></span></a>
 <% }) %></div>
 <% if (products.length) { %><section class="material-products"><h3><%= L('Classroom finds (optional)', '配套教学好物（选用）') %></h3>
 <% products.forEach(function(product) { %><article class="material-product">

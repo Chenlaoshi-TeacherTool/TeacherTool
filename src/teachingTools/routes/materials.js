@@ -21,6 +21,10 @@ function create(options) {
     return { key: require('./teacherLibrary').ownerKey(user), admin: admin };
   };
   var origin = new URL(options.origin || process.env.SITE_URL || 'https://clsteachingtools.com').origin;
+  var canUseMemberFiles = options.canUseMemberFiles || async function (req) {
+    var user = getUser(req);
+    return Boolean(user && (user.admin || await require('../services/teacherLibraryRepository').hasActiveAccess(user.key)));
+  };
   var router = express.Router();
   var contentCatalog = options.contentCatalog || require('../services/contentCatalog');
   router.use(async function (req, res, next) {
@@ -93,6 +97,10 @@ function create(options) {
       var item = await repository.get(req.params.id);
       var file = item && item.files[Number(req.params.index)];
       if (!file) return next();
+      if (file.membersOnly && !(await canUseMemberFiles(req))) {
+        if (!getUser(req)) return login(req, res);
+        return res.redirect(303, '/membership');
+      }
       if (file.url) return res.redirect(file.url);
       await require('./fileResponse').send(files, req, res, next, file);
     } catch (error) { next(error); }

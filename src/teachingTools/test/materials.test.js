@@ -44,7 +44,7 @@ var files = {
 test.before(async function () {
   var app = express(); app.set('views', path.join(__dirname, '../views')); app.set('view engine', 'ejs');
   app.use(function (req, res, next) { res.locals.lang = req.get('test-lang') || 'zh'; res.locals.t = function (key) { return key; }; next(); });
-  app.use(routes.create({ repository: repository, files: files, origin: 'https://teachers.example', getUser: function (req) {
+  app.use(routes.create({ repository: repository, files: files, origin: 'https://teachers.example', canUseMemberFiles: async function (req) { return req.get('test-user') === 'member'; }, getUser: function (req) {
     var key = req.get('test-user'); return key ? { key: key, admin: key === 'admin' } : null;
   } }));
   app.use('/admin', function (req, res, next) { req.adminUser = { id: 'admin', provider: 'aad', name: 'Admin' }; res.locals.adminNav = []; next(); }, routes.create({
@@ -62,6 +62,23 @@ test.before(async function () {
   base = 'http://127.0.0.1:' + server.address().port;
 });
 test.after(function () { server.close(); });
+test('member attachments reject anonymous and nonmember downloads before streaming or redirecting', async function () {
+  var item = items.get(seed.id);
+  item.files = [{ name: 'workbook.docx', blobName: '00000000-0000-0000-0000-000000000000.docx', contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', size: 11, membersOnly: true }, { name: 'workbook.pdf', url: 'https://example.com/workbook.pdf' }];
+  var url = base + '/materials/' + seed.id + '/files/0';
+  var anonymous = await fetch(url, { redirect: 'manual' });
+  assert.equal(anonymous.status, 302);
+  assert.match(anonymous.headers.get('location'), /^\/\.auth\/login\//);
+  var denied = await fetch(url, { redirect: 'manual', headers: { 'test-user': 'teacher' } });
+  assert.equal(denied.status, 303); assert.equal(denied.headers.get('location'), '/membership');
+  assert.equal((await fetch(url, { headers: { 'test-user': 'member' } })).status, 200);
+  item.files[0].url = 'https://example.com/private.docx';
+  assert.equal((await fetch(url, { redirect: 'manual', headers: { 'test-user': 'teacher' } })).status, 303);
+  assert.equal((await fetch(url, { redirect: 'manual', headers: { 'test-user': 'member' } })).headers.get('location'), item.files[0].url);
+  var free = await fetch(base + '/materials/' + seed.id + '/files/1', { redirect: 'manual' });
+  assert.equal(free.headers.get('location'), item.files[1].url);
+  assert.match(await (await fetch(base + '/materials/' + seed.id + '?dialog=1')).text(), /会员专享/);
+});
 test.beforeEach(function () { items = new Map([[seed.id, JSON.parse(JSON.stringify(seed))]]); uploaded = []; removed = []; });
 function form(change) {
   var data = new FormData();
