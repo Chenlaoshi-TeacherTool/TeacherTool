@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <% function copy(zh, en) { return lang === 'zh' ? zh : en; } %>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= copy('词卡配对', 'Word Match') %> · CLS Teaching Tools</title>
+  <%- include('../partials/seo', { pageDescription: 'Build Chinese words or match them with pinyin and English.' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/teaching-tools/word-match/match.css">
+  <script defer src="/teaching-tools/word-match/match.js"></script>
+</head>
+<body class="word-match-page">
+  <main id="word-match">
+    <nav>
+      <a href="/teaching-tools"><%= copy('← 教学工具', '← Teaching Tools') %></a>
+      <button id="fullscreen" type="button" aria-pressed="false"><%= copy('全屏', 'Fullscreen') %></button>
+    </nav>
+    <section id="setup">
+      <header>
+        <h1><%= copy('词卡配对', 'Word Match') %></h1>
+        <p><%= copy('点两张卡，配成一对，全班一起读。', 'Pick two cards, make a match, and read it together.') %></p>
+      </header>
+      <form id="settings" class="panel">
+        <div class="controls">
+          <label><%= copy('练习模式', 'Practice mode') %>
+            <select id="mode">
+              <option value="word"><%= copy('组词配对', 'Build a word') %></option>
+              <option value="py"><%= copy('拼音配对', 'Match pinyin') %></option>
+              <option value="en"><%= copy('中英配对', 'Match English') %></option>
+            </select>
+          </label>
+          <label><%= copy('每局最多几对', 'Maximum pairs per round') %>
+            <select id="limit">
+              <option>4</option><option selected>6</option><option>8</option>
+            </select>
+          </label>
+        </div>
+        <label for="words"><%= copy('词表', 'Vocabulary list') %></label>
+        <p id="format"><%= copy('每行填「中文 | 拼音 | 英文」。可用 Tab 或 | 分列。', 'One entry per line: Chinese | Pinyin | English. Use Tab or | between columns.') %></p>
+        <textarea id="words" rows="7" aria-describedby="format" spellcheck="false">学校 | xué xiào | school
+老师 | lǎo shī | teacher
+朋友 | péng you | friend
+铅笔 | qiān bǐ | pencil
+书包 | shū bāo | backpack
+教室 | jiào shì | classroom</textarea>
+        <label id="custom-label" class="checkbox">
+          <input id="custom" type="checkbox"> <%= copy('手动指定组词或搭配', 'Enter word parts or phrases manually') %>
+        </label>
+        <p id="preview" role="status"></p>
+        <button class="primary" type="submit"><%= copy('开始配对 →', 'Start matching →') %></button>
+      </form>
+    </section>
+    <section id="play" hidden>
+      <div class="toolbar">
+        <button id="settings-back" type="button"><%= copy('返回设置', 'Back to settings') %></button>
+        <p id="progress"></p>
+      </div>
+      <h1 id="prompt" tabindex="-1"></h1>
+      <div id="board"></div>
+      <div class="feedback">
+        <span id="applause" aria-hidden="true" hidden>👏</span>
+        <p id="answer" role="status"></p>
+        <button id="again" class="primary" type="button" hidden><%= copy('再玩一局', 'Play again') %></button>
+      </div>
+      <div id="confetti" aria-hidden="true" hidden></div>
+    </section>
+  </main>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

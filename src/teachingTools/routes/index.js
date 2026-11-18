@@ -87,6 +87,10 @@ router.get('/teaching-tools/vocabulary-gacha', function(req, res) {
   res.render('teaching-tools/vocabulary-gacha', { title: 'Vocabulary Gacha' });
 });
 
+router.get('/teaching-tools/word-match', function(req, res) {
+  res.render('teaching-tools/word-match', { title: 'Word Match' });
+});
+
 router.get('/teaching-tools/team-race', function(req, res) {
   res.render('teaching-tools/team-race', { title: 'Team Quiz Race' });
 });
@@ -329,6 +333,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
     '/teaching-tools/quiz-city',
     '/teaching-tools/qr-code-generator', '/teaching-tools/random-group-generator', '/teaching-tools/class-pet-points', '/teaching-tools/yu-duoyinzi-font', '/teaching-tools/time-machine', '/teaching-tools/lucky-wheel/', '/teaching-tools/team-race', '/teaching-tools/vocabulary-gacha',
     '/teaching-tools/word-list-library/word-list-library.html',
+    '/teaching-tools/word-match',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
     '/teaching-tools/missing-radicals',
     '/teaching-tools/fakebook-profile/fakebook-profile.html', '/teaching-tools/fake-wechat-moments/', '/teaching-tools/fake-wechat-single-post/', '/teaching-tools/social-media-classroom-tools/',
