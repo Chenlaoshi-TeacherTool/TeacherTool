@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
-  <link rel="stylesheet" href="/low-prep/bingo-generator/bingo-generator.css?v=call1">
+  <link rel="stylesheet" href="/low-prep/bingo-generator/bingo-generator.css?v=emoji5">
 </head>
 <body class="bingo-page">
   <main class="bingo-wrap">
@@ -113,7 +113,12 @@
       <section class="preview-panel" aria-label="Generated bingo sheets">
         <div class="preview-heading">
           <h2><%= t('bingoGenerator.previewHeading') %></h2>
-          <p><%= t('bingoGenerator.previewHelp') %></p>
+          <p>直接输入或粘贴 Emoji，或点击 ▾ 搜索选择；所有卡片同步更新。<br>Type or paste an emoji, or use ▾ to choose. Changes apply to all cards.</p>
+          <div id="preview-navigation" class="preview-navigation" hidden>
+            <button id="preview-previous" class="ghost-button" type="button" aria-label="Previous card">←</button>
+            <span id="preview-page" role="status"></span>
+            <button id="preview-next" class="ghost-button" type="button" aria-label="Next card">→</button>
+          </div>
         </div>
         <div id="preview-area" class="preview-area">
           <p class="preview-empty"><%= t('bingoGenerator.previewEmptyPrefix') %>“<%= t('bingoGenerator.generateButton') %>”<%= t('bingoGenerator.previewEmptySuffix') %></p>
@@ -129,7 +134,7 @@
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/library-picker.js?v=2"></script>
   <script src="/vendor/docx.iife.js" defer></script>
-  <script src="/low-prep/bingo-generator/bingo-generator.js?v=call2" defer></script>
+  <script src="/low-prep/bingo-generator/bingo-generator.js?v=emoji5" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

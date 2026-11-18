@@ -24,7 +24,7 @@
     return;
   }
 
-  var state = { cards: null, meta: null };
+  var state = { cards: null, meta: null, page: 0 };
 
   function shuffle(items) {
     if (CW && CW.shuffle) {
@@ -105,7 +105,15 @@
     }
     // 复用共享的 ChenEmoji 模块（/shared/emoji-core.js）做匹配。
     // translate: 只填中文、没填英文的词也会先经 ChenWordlist 翻成英文再配 emoji。
-    return CE.matchAll(items, { translate: true });
+    return CE.matchAll(items, { translate: true }).then(function (stats) {
+      emojiIndex = stats.index;
+      items.forEach(function (item) {
+        if (item.emoji && !stats.index.byEmoji[item.emoji.replace(/️/g, "")]) {
+          item.openmoji = { emoji: item.emoji, native: true };
+        }
+      });
+      return stats;
+    });
   }
 
   function termLineWithEmoji(item) {
@@ -118,7 +126,7 @@
   function emojiMatchText(stats) {
     if (!stats) return "";
     var text = " OpenMoji matched " + stats.matched + " of " + (stats.matched + stats.unmatched) + " terms.";
-    if (stats.unmatched) text += " Lines without a fourth field need a manual emoji.";
+    if (stats.unmatched) text += " Type or paste emojis directly in the preview, or use the dropdown.";
     return text;
   }
 
@@ -205,6 +213,9 @@
       document.body.appendChild(printRoot);
     }
     printRoot.innerHTML = previewArea.innerHTML;
+    printRoot.querySelectorAll(".bingo-sheet").forEach(function (sheet) { sheet.hidden = false; });
+    printRoot.querySelectorAll(".emoji-editor").forEach(function (editor) { editor.remove(); });
+    printRoot.querySelectorAll(".is-editing-emoji").forEach(function (cell) { cell.classList.remove("is-editing-emoji"); });
   }
 
   // Call-out sheet: the teacher's list of every term (the term only — no pinyin or English).
@@ -247,21 +258,41 @@
           if (showEmoji) {
             outerEl.classList.add("has-emoji");
             if (fields.length === 1) outerEl.classList.add("emoji-only");
-            if (cell.item.openmoji) {
+            var emojiEditor = document.createElement("div");
+            emojiEditor.className = "emoji-editor";
+            var emojiInput = document.createElement("input");
+            emojiInput.type = "text";
+            emojiInput.className = "emoji-input";
+            emojiInput.value = cell.item.emoji || (cell.item.openmoji && cell.item.openmoji.emoji) || "";
+            emojiInput.placeholder = "+";
+            emojiInput.setAttribute("aria-label", "Emoji: " + cell.item.zh);
+            emojiInput.title = "输入或粘贴 Emoji · Type or paste an emoji";
+            emojiInput.addEventListener("change", function () { applyEmoji(cell.item, emojiInput.value.trim()); });
+            emojiInput.addEventListener("keydown", function (event) {
+              if (event.key === "Enter") { event.preventDefault(); emojiInput.blur(); }
+            });
+            emojiEditor.appendChild(emojiInput);
+            var toggle = document.createElement("button");
+            toggle.type = "button";
+            toggle.className = "emoji-dropdown-toggle";
+            toggle.textContent = "▾";
+            toggle.setAttribute("aria-label", "Choose emoji: " + cell.item.zh);
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.addEventListener("click", function () { toggleEmojiChoices(outerEl, emojiEditor, toggle, cell.item); });
+            emojiEditor.appendChild(toggle);
+            cellEl.appendChild(emojiEditor);
+            var artwork = document.createElement("span");
+            artwork.className = "emoji-print-artwork";
+            if (cell.item.openmoji && !cell.item.openmoji.native) {
               var img = document.createElement("img");
               img.className = "cell-emoji";
               img.src = openMojiSvgUrl(cell.item.openmoji.hexcode);
-              img.alt = cell.item.openmoji.annotation || cell.item.en || cell.item.zh;
-              img.title = cell.item.openmoji.annotation || "OpenMoji emoji";
-              img.draggable = false;
-              cellEl.appendChild(img);
+              img.alt = cell.item.openmoji.annotation || cell.item.zh;
+              artwork.appendChild(img);
             } else {
-              var missing = document.createElement("span");
-              missing.className = "cell-emoji-missing";
-              missing.textContent = "?";
-              missing.setAttribute("aria-label", "No automatic emoji match");
-              cellEl.appendChild(missing);
+              artwork.textContent = emojiInput.value || "?";
             }
+            cellEl.appendChild(artwork);
           }
           cellLines(cell.item, fields).forEach(function (line, lineIndex) {
             var span = document.createElement("span");
@@ -325,6 +356,7 @@
       else entry.item.fit = fitCell(entry.el);
     });
     syncPrintRoot();
+    showPreviewPage();
   }
 
   function fileName(title) {
@@ -682,7 +714,7 @@
     }
 
     // Text is fitted by measuring it, so the pinyin web font must be loaded first.
-    if (hasField(fields, "py") && document.fonts && document.fonts.load) {
+    if ((hasField(fields, "py") || hasField(fields, "en")) && document.fonts && document.fonts.load) {
       try {
         await Promise.all([document.fonts.load("400 16px Andika", "āa"), document.fonts.load("700 16px Andika", "āa")]);
       } catch (error) {
@@ -690,6 +722,7 @@
       }
     }
 
+    state.page = 0;
     state.cards = buildCards(items, count, gridSize, includeFree);
     var callItems = callSheetCheckbox && callSheetCheckbox.checked ? items : null;
     state.meta = { gridSize: gridSize, fields: fields, title: title, includeFree: includeFree, callItems: callItems };
@@ -744,6 +777,101 @@
     if (!state.cards) return;
     window.print();
   }
+
+  var emojiIndex = null;
+
+  function sameTerm(a, b) {
+    return a.zh === b.zh && a.py === b.py && a.en === b.en;
+  }
+
+  function applyEmoji(item, value, entry) {
+    if (/[|｜\r\n]/.test(value)) return;
+    var lines = termsInput.value.split(/\r?\n/);
+    lines = lines.map(function (line) {
+      var parsed = parseTerms(line)[0];
+      if (!parsed || !sameTerm(parsed, item)) return line;
+      parsed.emoji = value;
+      return termLineWithEmoji(parsed);
+    });
+    termsInput.value = lines.join("\n");
+    var matched = entry || (emojiIndex && emojiIndex.byEmoji[value.replace(/️/g, "")]);
+    state.cards.forEach(function (grid) {
+      grid.forEach(function (cell) {
+        if (!cell.free && sameTerm(cell.item, item)) {
+          cell.item.emoji = value;
+          cell.item.openmoji = value ? (matched || { emoji: value, native: true }) : null;
+          delete cell.item.fit;
+        }
+      });
+    });
+    renderPreview(state.cards, state.meta.gridSize, state.meta.fields, state.meta.title, state.meta.callItems);
+  }
+
+  function closeEmojiChoices() {
+    previewArea.querySelectorAll(".emoji-dropdown").forEach(function (panel) { panel.remove(); });
+    previewArea.querySelectorAll(".is-editing-emoji").forEach(function (cell) { cell.classList.remove("is-editing-emoji"); });
+    previewArea.querySelectorAll(".emoji-dropdown-toggle").forEach(function (button) { button.setAttribute("aria-expanded", "false"); });
+  }
+
+  async function toggleEmojiChoices(cell, editor, toggle, item) {
+    var wasOpen = toggle.getAttribute("aria-expanded") === "true";
+    closeEmojiChoices();
+    if (wasOpen) return;
+    cell.classList.add("is-editing-emoji");
+    toggle.setAttribute("aria-expanded", "true");
+    var panel = document.createElement("div");
+    panel.className = "emoji-dropdown";
+    var query = document.createElement("input");
+    query.type = "text";
+    query.placeholder = "搜索 / Search emojis";
+    query.setAttribute("aria-label", "Search emojis");
+    panel.appendChild(query);
+    var results = document.createElement("div");
+    results.className = "emoji-results";
+    panel.appendChild(results);
+    editor.appendChild(panel);
+    query.focus();
+    function search() {
+      results.innerHTML = "";
+      var choices = query.value.trim() ? CE.search(query.value, emojiIndex, { limit: 80 }) : emojiIndex.entries.slice(0, 120);
+      if (!choices.length) results.textContent = "没有找到？直接在格子里粘贴 Emoji。 / Paste your own emoji in the cell.";
+      choices.forEach(function (entry) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "emoji-choice";
+        button.textContent = entry.emoji;
+        button.title = entry.annotation;
+        button.setAttribute("aria-label", entry.annotation);
+        button.addEventListener("click", function () { applyEmoji(item, entry.emoji, entry); });
+        results.appendChild(button);
+      });
+    }
+    query.addEventListener("input", search);
+    panel.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") { closeEmojiChoices(); toggle.focus(); }
+    });
+    try {
+      emojiIndex = emojiIndex || await CE.load();
+      if (panel.isConnected) search();
+    } catch (error) {
+      results.textContent = "无法加载，仍可直接粘贴 Emoji。 / You can still paste your own emoji.";
+    }
+  }
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest(".emoji-editor")) closeEmojiChoices();
+  });
+
+  function showPreviewPage() {
+    var sheets = previewArea.querySelectorAll(".bingo-sheet");
+    state.page = Math.max(0, Math.min(state.page, sheets.length - 1));
+    sheets.forEach(function (sheet, index) { sheet.hidden = index !== state.page; });
+    document.querySelector("#preview-navigation").hidden = !sheets.length;
+    document.querySelector("#preview-page").textContent = (state.page + 1) + " / " + sheets.length;
+    document.querySelector("#preview-previous").disabled = state.page === 0;
+    document.querySelector("#preview-next").disabled = state.page >= sheets.length - 1;
+  }
+  document.querySelector("#preview-previous").addEventListener("click", function () { state.page--; showPreviewPage(); });
+  document.querySelector("#preview-next").addEventListener("click", function () { state.page++; showPreviewPage(); });
 
   termsInput.addEventListener("input", updateTermCount);
   if (loadExampleBtn) loadExampleBtn.addEventListener("click", loadExample);

@@ -203,7 +203,8 @@ input:focus, select:focus, textarea:focus {
 /* Pinyin: Andika draws every a as the single-storey ɑ, like school textbooks. */
 .cell-line-py { color: var(--bingo-muted); font-family: "Andika", "Century Gothic", "Segoe UI", Arial, sans-serif; }
 .cell-line-py.is-primary { font-weight: 700; }
-.cell-line-en { color: #46615a; }
+.cell-line-en { color: #46615a; font-family: "Andika", "Segoe UI", Arial, sans-serif; font-weight: 400; }
+.cell-line-en.is-primary { font-weight: 700; }
 .openmoji-sheet-credit { margin: 7px 0 0; color: var(--bingo-muted); text-align: right; font-size: .58rem; line-height: 1.25; }
 /* Call-out sheet: the teacher's list of every term, to tick off or cut apart. */
 .call-sheet-field { margin-top: 14px; }
@@ -247,3 +248,18 @@ input:focus, select:focus, textarea:focus {
   .call-text .cell-line { font-size: 9pt; }
   .call-text .cell-line.is-primary { font-size: 15pt; }
 }
+
+
+.preview-navigation { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 16px 0; }
+.preview-navigation[hidden], .bingo-sheet[hidden] { display: none; }
+.emoji-editor { position: relative; display: flex; align-items: center; width: 100%; min-width: 0; }
+.emoji-editor .emoji-input { min-width: 0; width: 100%; margin: 0; padding: 2px; border: 1px dashed #b9cbc0; border-radius: 6px; text-align: center; font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif; font-size: 28px; font-size: 30cqw; line-height: 1.4; }
+.emoji-dropdown-toggle { padding: 2px; border: 0; background: transparent; color: var(--bingo-green); cursor: pointer; font-size: 14px; }
+.bingo-cell.is-editing-emoji { overflow: visible; position: relative; z-index: 3; }
+.emoji-dropdown { position: absolute; top: 100%; right: 0; width: 240px; max-width: 70vw; padding: 10px; border: 1px solid var(--bingo-line); border-radius: 10px; background: white; box-shadow: var(--bingo-shadow); text-align: left; }
+.emoji-dropdown input { margin: 0; font-size: 14px; }
+.emoji-results { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; max-height: 180px; overflow: auto; margin-top: 8px; font-size: 13px; }
+.emoji-choice { border: 1px solid var(--bingo-line); border-radius: 6px; background: white; padding: 4px; font-size: 24px; cursor: pointer; }
+.emoji-choice:hover, .emoji-choice:focus-visible { background: var(--bingo-mint); }
+.emoji-print-artwork { display: none; }
+#bingo-print-root .emoji-print-artwork { display: flex; justify-content: center; font-family: "Segoe UI Emoji", "Apple Color Emoji", sans-serif; font-size: 30cqw; }
