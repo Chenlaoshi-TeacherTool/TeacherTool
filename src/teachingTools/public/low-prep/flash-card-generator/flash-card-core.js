@@ -66,32 +66,34 @@
     return items;
   }
 
-  function makeSlots(entries) {
-    var slots = new Array(CARD_COUNT).fill(null);
-    (entries || []).slice(0, CARD_COUNT).forEach(function (item, index) {
+  function sheetLayout(count = CARD_COUNT) {
+    var columns = count <= 2 ? 1 : 2;
+    return { columns: columns, rows: count / columns };
+  }
+
+  function makeSlots(entries, count = CARD_COUNT) {
+    var slots = new Array(count).fill(null);
+    (entries || []).slice(0, count).forEach(function (item, index) {
       slots[index] = item;
     });
     return slots;
   }
 
-  // A long-edge duplex flip swaps the left and right physical positions.
-  // Mirroring each row keeps every pinyin back behind its matching front.
-  function mirrorBackSlots(entriesOrSlots) {
-    var source = entriesOrSlots && entriesOrSlots.length === CARD_COUNT
-      ? entriesOrSlots.slice()
-      : makeSlots(entriesOrSlots || []);
-    var mirrored = new Array(CARD_COUNT).fill(null);
-    for (var row = 0; row < 4; row++) {
-      mirrored[row * 2] = source[row * 2 + 1];
-      mirrored[row * 2 + 1] = source[row * 2];
+  // A long-edge duplex flip reverses the columns of each row.
+  function mirrorBackSlots(entries, count = CARD_COUNT) {
+    var slots = makeSlots(entries, count);
+    if (sheetLayout(count).columns === 2) {
+      for (var index = 0; index < count; index += 2) {
+        [slots[index], slots[index + 1]] = [slots[index + 1], slots[index]];
+      }
     }
-    return mirrored;
+    return slots;
   }
 
-  function paginate(entries) {
+  function paginate(entries, count = CARD_COUNT) {
     var pages = [];
-    for (var index = 0; index < (entries || []).length; index += CARD_COUNT) {
-      pages.push(entries.slice(index, index + CARD_COUNT));
+    for (var index = 0; index < (entries || []).length; index += count) {
+      pages.push(entries.slice(index, index + count));
     }
     return pages;
   }
@@ -137,6 +139,7 @@
   return {
     CARD_COUNT: CARD_COUNT,
     parseEntries: parseEntries,
+    sheetLayout: sheetLayout,
     makeSlots: makeSlots,
     mirrorBackSlots: mirrorBackSlots,
     paginate: paginate,

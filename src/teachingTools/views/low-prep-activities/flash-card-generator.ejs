@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#194f45">
   <title><%= lang === 'zh' ? '中文生词卡生成器' : 'Chinese Flash Card Generator' %> - Chen Laoshi's Teaching Toolkit</title>
-  <%- include('../partials/seo', { pageDescription: 'Paste Chinese vocabulary and automatically create a Letter-size 2-by-4 duplex-ready flash card PDF with matching pinyin backs and your choice of border color.' }) %>
+  <%- include('../partials/seo', { pageDescription: 'Paste Chinese vocabulary and automatically create a Letter-size duplex-ready flash card PDF with matching pinyin backs and your choice of border color.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/library-picker.css">
   <link rel="stylesheet" href="/low-prep/flash-card-generator/flash-card-generator.css">
@@ -18,10 +18,9 @@
       <div class="hero-copy">
         <p class="eyebrow"><%= isZh ? '剪好就能用的双面词卡' : 'Cut-and-go duplex vocabulary cards' %></p>
         <h1><span aria-hidden="true">🗂️</span> <%= isZh ? '中文生词卡生成器' : 'Chinese Flash Card Generator' %></h1>
-        <p><%= isZh ? '粘贴中文生词，自动配上拼音，生成每页 2×4 的 Letter 双面打印 PDF。' : 'Paste Chinese vocabulary, add pinyin automatically, and download a Letter-size 2×4 PDF ready for double-sided printing.' %></p>
+        <p><%= isZh ? '粘贴中文生词，自动配上拼音，生成可调整每页张数的 Letter 双面打印 PDF。' : 'Paste Chinese vocabulary, add pinyin automatically, and download a Letter-size PDF ready for double-sided printing.' %></p>
         <div class="hero-points" aria-label="Tool highlights">
           <span>Letter size</span>
-          <span>2 × 4</span>
           <span><%= isZh ? '正反面自动对齐' : 'Auto-aligned backs' %></span>
         </div>
       </div>
@@ -59,10 +58,12 @@
             <div>
               <span class="step-number">2</span>
               <p class="eyebrow"><%= isZh ? '检查内容' : 'Check the content' %></p>
-              <h2><%= isZh ? '确认拼音和英文' : 'Review pinyin and English' %></h2>
+              <h2><%= isZh ? '确认拼音、英文和配图' : 'Review pinyin, English, and pictures' %></h2>
             </div>
           </div>
           <p class="field-help"><%= isZh ? '拼音和英文都可以直接修改；没有自动释义的词可以手动补充英文。' : 'Pinyin and English are both editable. Add a meaning manually when one is not found.' %></p>
+          <button id="auto-emoji" class="ghost-button" type="button" disabled><%= isZh ? '自动配 Emoji' : 'Auto-match emoji' %></button>
+          <p id="auto-emoji-status" class="field-help" role="status"></p>
           <div id="detected-list" class="detected-list" aria-live="polite">
             <p class="empty-state"><%= isZh ? '输入生词后，这里会显示自动生成的拼音和英文。' : 'Your automatically generated pinyin and English will appear here.' %></p>
           </div>
@@ -122,6 +123,16 @@
             <h2 id="download-heading"><%= isZh ? '双面打印设置' : 'Double-sided print settings' %></h2>
             <p><%= isZh ? 'PDF 已按“正面、背面”交替排列。打印时请选择：双面打印、长边翻页、实际大小 100%。' : 'PDF pages alternate front, back. Print double-sided, flip on the long edge, at Actual Size (100%).' %></p>
           </div>
+          <div class="print-options">
+            <label><%= isZh ? '每页词卡张数' : 'Cards per sheet' %>
+              <select id="cards-per-sheet">
+                <% [1, 2, 4, 6, 8, 10].forEach(function (count) { %>
+                  <option value="<%= count %>" <%= count === 8 ? 'selected' : '' %>><%= count %></option>
+                <% }); %>
+              </select>
+            </label>
+            <label><input id="show-card-images" type="checkbox" checked> <%= isZh ? '整套卡片显示图片' : 'Show pictures on this set' %></label>
+          </div>
           <button id="download-pdf" class="download-button" type="button" disabled><%= isZh ? '下载双面打印 PDF' : 'Download duplex PDF' %></button>
           <p id="generation-status" class="generation-status" aria-live="polite"></p>
         </section>
@@ -139,8 +150,9 @@
           </div>
         </div>
         <div class="preview-note"><span aria-hidden="true">✦</span> <span id="preview-note-text"><%= isZh ? '背面会自动左右镜像，确保拼音和中文一一对应。' : 'Backs are mirrored automatically so every answer stays behind its matching word.' %></span></div>
-        <div id="sheet-preview" class="sheet-preview" style="--card-border:#2f6f5e">
-          <div id="preview-grid" class="preview-grid"></div>
+        <p id="kai-font-status" class="field-help" role="status" hidden></p>
+        <div id="sheet-preview" class="sheet-preview">
+          <div id="preview-grid"></div>
         </div>
         <div class="page-navigation">
           <button id="prev-sheet" type="button" aria-label="Previous sheet">←</button>
@@ -159,6 +171,7 @@
 
   <script>window.FLASH_CARD_LANG = '<%= isZh ? 'zh' : 'en' %>';</script>
   <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/emoji-core.js"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/library-picker.js?v=2"></script>
   <script src="/shared/deck-export.js"></script>

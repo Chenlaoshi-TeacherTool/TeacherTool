@@ -67,3 +67,23 @@ test('limits very long Chinese text to four lines with an ellipsis', function ()
   assert.ok(layout.lines[3].endsWith('…'));
   assert.equal(layout.truncated, true);
 });
+
+test('paginates and aligns duplex backs for every supported sheet size', function () {
+  var entries = Array.from({ length: 11 }, function (_, index) { return { zh: String(index) }; });
+  [1, 2, 4, 6, 8, 10].forEach(function (count) {
+    var layout = core.sheetLayout(count);
+    assert.equal(layout.columns, count <= 2 ? 1 : 2);
+    assert.equal(layout.rows * layout.columns, count);
+    var pages = core.paginate(entries, count);
+    assert.equal(pages.length, Math.ceil(entries.length / count));
+    assert.deepEqual(pages.flat(), entries);
+    pages.forEach(function (page) {
+      var front = core.makeSlots(page, count);
+      var back = core.mirrorBackSlots(page, count);
+      assert.equal(back.length, count);
+      assert.deepEqual(back, layout.columns === 1 ? front : front.map(function (_, index) {
+        return front[index ^ 1];
+      }));
+    });
+  });
+});
