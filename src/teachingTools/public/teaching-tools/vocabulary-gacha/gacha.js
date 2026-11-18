@@ -86,6 +86,48 @@
     }
   });
   $('ending').onchange = function () { $('duration-label').hidden = $('ending').value !== 'timer'; };
+  var templateTitle = t('词汇扭蛋机', 'Vocabulary Gacha');
+  if (window.TeacherGameTemplate) {
+    $('save-template').disabled = false;
+    window.TeacherGameTemplate.bind({
+      button: $('save-template'),
+      gameType: 'vocabulary-gacha',
+      getData: function () {
+        var words = GachaCore.parse($('words').value);
+        var fixed = Number($('fixed').value), minutes = Number($('duration').value);
+        var random = $('random').checked, ending = $('ending').value;
+        if (random && (!Number.isInteger(fixed) || fixed < 1 || fixed > 100)) fixed = 10;
+        if (ending !== 'timer' && (!Number.isInteger(minutes) || minutes < 1 || minutes > 60)) minutes = 5;
+        try {
+          return Object.assign(GachaCore.template({
+            words: words, mode: $('mode').value, nameA: $('name-a').value, nameB: $('name-b').value,
+            random: random, fixed: fixed, ending: ending, duration: minutes,
+            showPy: $('show-py').checked, showEn: $('show-en').checked
+          }), { title: templateTitle });
+        } catch (error) {
+          if (!zh) throw error;
+          throw new Error('请检查词卡和玩法设置。模板支持 1–300 张词卡、1–100 分的固定积分，以及 1–60 分钟的倒计时。');
+        }
+      },
+      restore: function (data) {
+        templateTitle = data.title || templateTitle;
+        $('words').value = data.words.map(function (word) { return [word.term, word.py, word.en].join('\t'); }).join('\n');
+        $('mode').value = data.mode;
+        $('name-a').value = data.nameA;
+        $('name-b').value = data.nameB;
+        $('random').checked = data.random;
+        $('fixed').value = data.fixed;
+        $('ending').value = data.ending;
+        $('duration').value = data.duration;
+        $('show-py').checked = data.showPy;
+        $('show-en').checked = data.showEn;
+        $('mode').onchange();
+        $('random').onchange();
+        $('ending').onchange();
+        count();
+      }
+    });
+  }
   function stopClock() { window.clearInterval(clock); clock = null; }
   function endGame() {
     if (!game || !game.end()) return;

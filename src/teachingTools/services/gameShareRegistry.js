@@ -3,7 +3,7 @@
 var adapters = new Map();
 
 function register(adapter) {
-  if (!adapter || !adapter.type || !adapter.version || !adapter.view || typeof adapter.sanitize !== 'function') {
+  if (!adapter || !adapter.type || !adapter.version || (!adapter.view && !adapter.templateOnly) || typeof adapter.sanitize !== 'function') {
     throw new Error('Invalid shared game adapter.');
   }
   adapters.set(adapter.type + '@' + adapter.version, adapter);
@@ -18,5 +18,6 @@ register(require('./games/wordSudokuGame'));
 register(require('./games/sentenceReorderGame'));
 register(require('./games/measureWordsGame'));
 register(require('./games/hanziWordChoiceGame'));
+register(require('./games/vocabularyGachaGame'));
 
 module.exports = { register: register, get: get };

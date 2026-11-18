@@ -6,6 +6,7 @@
   var G = window.MWGame;
   var STORAGE_KEY = 'measure-words:v1';
   var $ = function (id) { return document.getElementById(id); };
+  var templateTitle = '量词大挑战';
 
   var els = {
     setup: $('mw-setup'), header: $('mw-header'), host: $('mw-stage-host'),
@@ -14,7 +15,7 @@
     customSentences: $('mw-custom-sentences'), randomNumbers: $('mw-random-numbers'), customStatus: $('mw-custom-status'),
     duration: $('mw-duration'), rounds: $('mw-rounds'), target: $('mw-target'), battleType: $('mw-battle-type'),
     pinyin: $('mw-pinyin'), speak: $('mw-speak'), poolStatus: $('mw-pool-status'),
-    share: $('mw-share'), links: $('mw-links'), linkCount: $('mw-link-count')
+    share: $('mw-share'), template: $('mw-save-template'), links: $('mw-links'), linkCount: $('mw-link-count')
   };
 
   function esc(value) {
@@ -150,6 +151,7 @@
       b.disabled = !ready || (mode === 'catch' && counts.nouns === 0);
     });
     els.share.disabled = !ready;
+    els.template.disabled = !ready || !window.TeacherGameTemplate;
     matchCustomEmoji(custom);
     save();
     return config;
@@ -189,24 +191,25 @@
     els.linkCount.textContent = n ? '(' + n + ')' : '';
   }
 
+  function sharePayload(config) {
+    return {
+      title: '量词大挑战',
+      mws: config.mws,
+      items: config.items.slice(0, 300).map(function (it) {
+        return { noun: it.noun, mw: it.mw, alt: it.alt || [], emoji: it.emoji || '', kind: it.kind || 'thing', challenge: !!it.challenge };
+      }),
+      sentences: config.sentences.slice(0, 100),
+      options: config.options
+    };
+  }
+
   els.share.addEventListener('click', function () {
     if (!window.TeacherGameShare) return;
     window.TeacherGameShare.openPublisher({
       gameType: 'measure-words',
       version: 1,
       title: '量词大挑战 Measure Word Challenge',
-      getData: function () {
-        var config = buildConfig();
-        return {
-          title: '量词大挑战',
-          mws: config.mws,
-          items: config.items.slice(0, 300).map(function (it) {
-            return { noun: it.noun, mw: it.mw, alt: it.alt || [], emoji: it.emoji || '', kind: it.kind || 'thing', challenge: !!it.challenge };
-          }),
-          sentences: config.sentences.slice(0, 100),
-          options: config.options
-        };
-      },
+      getData: function () { return sharePayload(buildConfig()); },
       onPublished: updateLinkCount
     });
   });
@@ -238,4 +241,53 @@
   });
   refresh();
   updateLinkCount();
+
+  if (window.TeacherGameTemplate) {
+    window.TeacherGameTemplate.bind({
+      button: els.template,
+      gameType: 'measure-words',
+      getData: function () {
+        var config = buildConfig();
+        if (config.mws.length < 2 || (!config.items.length && !config.sentences.length)) {
+          throw new Error('请选择至少两个量词，并加入词语或句子。 · Choose at least 2 measure words and add words or sentences.');
+        }
+        if (config.mws.length > 30 || config.items.length > 300 || config.sentences.length > 100 ||
+            els.customWords.value.length > 8192 || els.customSentences.value.length > 12000) {
+          throw new Error('模板最多支持 30 个量词、300 个词和 100 个句子。 · Use up to 30 measure words, 300 nouns and 100 sentences, and keep custom text short.');
+        }
+        return Object.assign(sharePayload(config), {
+          title: templateTitle,
+          setup: {
+            mws: selectedMws(), onlyCustom: els.onlyCustom.checked,
+            customWords: els.customWords.value, customSentences: els.customSentences.value,
+            battleTarget: config.options.battleTarget, battleType: config.options.battleType
+          }
+        });
+      },
+      restore: function (data) {
+        templateTitle = data.title || '量词大挑战';
+        // Older game links store only the playable bank. Rebuild editable input
+        // from that bank when the original setup was never saved.
+        var setup = data.setup || {
+          mws: [], onlyCustom: true, battleTarget: 4, battleType: 'mix',
+          customWords: data.items.map(function (item) {
+            return [item.noun, [item.mw].concat(item.alt || []).join('/'), item.emoji].filter(Boolean).join(' ');
+          }).join('\n'),
+          customSentences: data.sentences.map(function (item) { return item.before + '（' + item.answer + '）' + item.after; }).join('\n')
+        };
+        renderGrid(setup.mws);
+        els.onlyCustom.checked = setup.onlyCustom;
+        els.customWords.value = setup.customWords;
+        els.customSentences.value = setup.customSentences;
+        ['challenge', 'randomNumbers', 'pinyin', 'speak'].forEach(function (key) {
+          els[key].checked = Boolean(data.options[key]) && !els[key].disabled;
+        });
+        els.duration.value = data.options.duration;
+        els.rounds.value = data.options.rounds;
+        els.target.value = setup.battleTarget;
+        els.battleType.value = setup.battleType;
+        refresh();
+      }
+    });
+  }
 })();

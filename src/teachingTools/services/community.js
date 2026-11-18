@@ -29,9 +29,11 @@ var TEXTBOOKS = [
 
 // Games that can be shared (services/gameShareRegistry.js) and the tool page that makes them.
 var GAME_TYPES = {
-  'measure-words': { zh: '量词大挑战', en: 'Measure Word Challenge', icon: '🍎', tool: '/teaching-tools/measure-words' },
-  'sentence-reorder': { zh: '句子排序', en: 'Sentence Reorder', icon: '🧩', tool: '/teaching-tools/sentence-reorder' },
-  'word-sudoku': { zh: '词语数独', en: 'Word Sudoku', icon: '🔢', tool: '/low-prep/word-sudoku/word-sudoku-widget.html' }
+  'measure-words': { zh: '量词大挑战', en: 'Measure Word Challenge', icon: '🍎', tool: '/teaching-tools/measure-words', templateEditor: true },
+  'sentence-reorder': { zh: '句子排序', en: 'Sentence Reorder', icon: '🧩', tool: '/teaching-tools/sentence-reorder', templateEditor: true },
+  'word-sudoku': { zh: '词语数独', en: 'Word Sudoku', icon: '🔢', tool: '/low-prep/word-sudoku/word-sudoku-widget.html', templateEditor: true },
+  'hanzi-word-choice': { zh: '形近字选词', en: 'Hanzi Word Choice', icon: '🀄', tool: '/teaching-tools/hanzi-word-choice', templateEditor: true },
+  'vocabulary-gacha': { zh: '词汇扭蛋机', en: 'Vocabulary Gacha', icon: '🎲', tool: '/teaching-tools/vocabulary-gacha', templateEditor: true, templateOnly: true }
 };
 
 var KINDS = ['wordlist', 'game', 'contest', 'website', 'grant'];

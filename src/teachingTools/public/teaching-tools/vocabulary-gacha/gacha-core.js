@@ -10,6 +10,43 @@
       seen.add(word.term); return true;
     });
   }
+  function template(data) {
+    function fail(message) {
+      var error = new Error(message);
+      error.status = 400;
+      throw error;
+    }
+    function clean(value, limit, separators) {
+      if (typeof value !== 'string' || value.length > limit || separators.test(value)) fail('A template field is too long or contains an unsupported separator.');
+      return value.trim();
+    }
+    function number(value, max, message) {
+      if (!Number.isInteger(value) || value < 1 || value > max) fail(message);
+      return value;
+    }
+    if (!Array.isArray(data?.words) || !data.words.length || data.words.length > 300) fail('A vocabulary template needs 1–300 words.');
+    if (!['class', 'teams'].includes(data.mode) || !['cards', 'manual', 'timer'].includes(data.ending)) fail('Choose a valid game mode and ending.');
+    var words = data.words.map(function (word) {
+      var term = clean(word?.term, 120, /[\t\r\n|]/);
+      if (!term) fail('Every vocabulary card needs a word.');
+      return { term: term, py: clean(word.py, 120, /[\t\r\n|]/), en: clean(word.en, 240, /[\t\r\n]/) };
+    });
+    if (new Set(words.map(function (word) { return word.term; })).size !== words.length) fail('Vocabulary cards must have different words.');
+    var result = {
+      words: words,
+      mode: data.mode,
+      nameA: clean(data.nameA, 30, /[\r\n]/),
+      nameB: clean(data.nameB, 30, /[\r\n]/),
+      random: data.random === true,
+      fixed: number(data.fixed, 100, 'Enter fixed points from 1 to 100.'),
+      ending: data.ending,
+      duration: number(data.duration, 60, 'Enter a duration from 1 to 60 minutes.'),
+      showPy: data.showPy === true,
+      showEn: data.showEn === true
+    };
+    if (new TextEncoder().encode(JSON.stringify(result)).length > 64 * 1024) fail('This vocabulary template is too large.');
+    return result;
+  }
   function create(words, teams, fixed, random, rng, ending) {
     rng = rng || Math.random;
     ending = ending || 'cards';
@@ -52,7 +89,7 @@
     };
     return game;
   }
-  var api = { parse: parse, create: create };
+  var api = { parse: parse, create: create, template: template };
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.GachaCore = api;
 })(typeof window === 'undefined' ? globalThis : window);

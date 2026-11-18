@@ -818,6 +818,18 @@
     window.print();
   });
 
+  function buildSharePayload() {
+    if (!validWords()) throw new Error("Please enter 9 different words first.");
+    return {
+      title: state.title,
+      items: state.items.map((item) => ({ word: item.word, icon: item.icon })),
+      level: state.level,
+      seed: state.seed,
+      puzzle: state.puzzle.slice(),
+      solution: state.solution.slice()
+    };
+  }
+
   elements.shareButton.addEventListener("click", () => {
     if (!validWords() || !window.TeacherGameShare) {
       showToast("Please enter 9 different words first");
@@ -827,14 +839,7 @@
       gameType: "word-sudoku",
       version: 1,
       title: () => state.title,
-      getData: () => ({
-        title: state.title,
-        items: state.items.map((item) => ({ word: item.word, icon: item.icon })),
-        level: state.level,
-        seed: state.seed,
-        puzzle: state.puzzle.slice(),
-        solution: state.solution.slice()
-      }),
+      getData: buildSharePayload,
       onPublished: () => {
         updateManagedLinkCount();
         showToast("Student game link created");
@@ -853,6 +858,27 @@
   renderLegends();
   generatePuzzle();
   initLibraryPicker();
+  if (window.TeacherGameTemplate) {
+    window.TeacherGameTemplate.bind({
+      button: document.getElementById("saveTemplate"),
+      gameType: "word-sudoku",
+      getData: buildSharePayload,
+      restore(data) {
+        state.title = data.title;
+        state.items = data.items.map((item) => ({ ...item, manual: true }));
+        state.level = data.level;
+        state.seed = data.seed;
+        state.puzzle = data.puzzle;
+        state.solution = data.solution;
+        state.clueCount = data.puzzle.filter(Boolean).length;
+        state.showAnswer = false;
+        renderInputs();
+        renderLegends();
+        renderPuzzle();
+        renderControls();
+      }
+    });
+  }
   updateManagedLinkCount();
 
   // 重新匹配并重绘（emoji 索引或中文词典就绪后调用）。

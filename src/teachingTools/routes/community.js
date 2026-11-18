@@ -10,6 +10,7 @@ var crypto = require('crypto');
 var community = require('../services/community');
 var promotion = require('../services/teacherResourcePromotion');
 
+var TEMPLATE_ID = /^template-[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/;
 var POSTS_PER_DAY = 20;
 var REPORTS_PER_HOUR = 10;
 var DAY_MS = 24 * 60 * 60 * 1000;
@@ -21,6 +22,8 @@ function create(options) {
   var registry = options.registry || require('../services/gameShareRegistry');
   var teacherLibrary = function () { return require('./teacherLibrary'); };
   var accountsOn = options.accountsOn || function () { return teacherLibrary().accountsAvailable(); };
+  var hasActiveAccess = options.hasActiveAccess || require('../services/teacherLibraryRepository').hasActiveAccess;
+  var templatesOn = options.templatesOn || function () { return process.env.LIBRARY_CLOUD_ENABLED === 'true'; };
   var getUser = options.getUser || function (req) { return teacherLibrary().trustedUser(req); };
   var ownerKey = options.ownerKey || function (user) { return teacherLibrary().ownerKey(user); };
   var loginProvider = options.loginProvider || function () { return teacherLibrary().accountProvider(); };
@@ -86,20 +89,27 @@ function create(options) {
 
   // ===== Pages =====
   router.get('/community', async function (req, res, next) {
+    var mine = req.query.mine === '1';
+    var me = owner(req);
+    if (mine) {
+      res.set('Cache-Control', 'private, no-store');
+      if (!me) return res.redirect(loginUrl('/community?mine=1') || '/community');
+    }
     var posts = [], postsUnavailable = false;
     try { posts = await livePosts(); }
     catch (error) { postsUnavailable = true; console.error('community list error:', error.message); }
     var resourceRows = [], resourcesUnavailable = false;
-    try { resourceRows = await (options.resourceStore || require('../services/teacherResources')).list(); }
+    try { if (!mine) resourceRows = await (options.resourceStore || require('../services/teacherResources')).list(); }
     catch (error) { resourcesUnavailable = true; console.error('teacher resources list error:', error.message); }
     var resources = resourceRows.filter(function(row) { return row.published && promotion.state(row.published,now()).visible; }).map(function(row) {
       var item = Object.assign({ id: row.id }, row.published);
       return { id: 'resource-' + row.id, kind: 'website', title: item.name, description: [item.summary, item.category, item.features, item.audience].filter(Boolean).join(' '), promoted: promotion.state(item,now()).pinned, authorName: item.authorName || 'CLS Teaching Tools', stages: [], textbook: '', resource: item };
     });
     // Promoted first; competitions and grants past their deadline go last.
+    if (mine) posts = posts.filter(function (post) { return post.ownerKey === me; });
     var result = community.search(posts.concat(resources).sort(function(a,b) { return (Number(Boolean(b.promoted)) - Number(Boolean(a.promoted))) || (Number(community.isClosed(a,now())) - Number(community.isClosed(b,now()))); }), req.query);
     result.unavailable = postsUnavailable;
-    res.render('community/index', Object.assign({ title: 'Teacher Community', result: result, teacherResources: result.posts.filter(function(post) { return post.resource; }).map(function(post) { return post.resource; }), resourcesUnavailable: resourcesUnavailable }, viewHelpers(res)));
+    res.render('community/index', Object.assign({ title: 'Teacher Community', result: result, teacherResources: result.posts.filter(function(post) { return post.resource; }).map(function(post) { return post.resource; }), resourcesUnavailable: resourcesUnavailable, myShares: mine, signedIn: Boolean(me) }, viewHelpers(res)));
   });
 
   router.get('/community/share', function (req, res) {
@@ -129,7 +139,18 @@ function create(options) {
     var me = owner(req);
     var displayName = '';
     if (me) { try { displayName = await repository.lastAuthorName(me); } catch (error) { displayName = ''; } }
-    res.json({ accountsOn: accountsOn(), signedIn: Boolean(me), displayName: displayName,
+    var tool = community.GAME_TYPES[req.query.tool];
+    var canSave = false;
+    if (tool && tool.templateEditor && me && templatesOn()) {
+      try { canSave = await hasActiveAccess(me); } catch (error) { /* Local saving remains available. */ }
+    }
+    var template = tool && tool.templateEditor ? {
+      stages: community.STAGES,
+      textbooks: community.TEXTBOOKS,
+      canSave: canSave,
+      loginUrl: loginUrl(tool.tool)
+    } : null;
+    res.json({ template: template, accountsOn: accountsOn(), signedIn: Boolean(me), displayName: displayName,
       loginUrl: loginUrl(/^\/community(\/[\w?=&%.-]*)?$/.test(String(req.query.back || '')) ? String(req.query.back) : '/community/share') });
   });
 
@@ -140,23 +161,78 @@ function create(options) {
     return me;
   }
 
+  api.put('/templates/:id', express.json({ limit: '80kb' }), async function (req, res) {
+    var me = writeGuard(req, res);
+    if (!me) return;
+    if (!templatesOn()) return res.status(503).json({ error: 'Account template storage is unavailable.' });
+    var body = req.body || {};
+    var id = req.params.id;
+    var adapter = registry.get(body.gameType, body.version);
+    var tool = adapter && community.GAME_TYPES[adapter.type];
+    if (!TEMPLATE_ID.test(id) || !tool || !tool.templateEditor) {
+      return res.status(400).json({ error: 'This template type or ID is invalid.' });
+    }
+    var title = typeof body.title === 'string' ? body.title.trim() : '';
+    if (!title || title.length > 120) return res.status(400).json({ error: 'Enter a title of up to 120 characters.' });
+    try {
+      if (!(await hasActiveAccess(me))) return res.status(403).json({ error: 'Cloud template saving requires active membership.' });
+      var payload = adapter.sanitize(body.data && { ...body.data, title: title });
+      await activities.add(me, { kind: 'game', id: id, gameType: adapter.type, version: adapter.version, title: title, payload: payload });
+      res.json({ id: id });
+    } catch (error) {
+      if (error.status === 400 || error.status === 413) return res.status(error.status).json({ error: error.message });
+      res.status(503).json({ error: 'Your template could not be saved. Please try again.' });
+    }
+  });
+
+  api.get('/templates/:id', async function (req, res) {
+    var id = req.params.id;
+    try {
+      var saved;
+      if (TEMPLATE_ID.test(id)) {
+        var me = owner(req);
+        if (!me) return res.status(401).json({ error: 'Sign in to open your saved template.' });
+        saved = await activities.getGame(me, id);
+      } else if (community.validId(id)) {
+        var post = await repository.get(id);
+        if (post && post.kind === 'game' && post.status === 'live') saved = { gameType: post.gameType, version: post.gameVersion, title: post.title, payload: post.payload };
+      }
+      var tool = saved && community.GAME_TYPES[saved.gameType];
+      if (!tool || !tool.templateEditor) return res.status(404).json({ error: 'This template is unavailable.' });
+      res.json(saved);
+    } catch (error) {
+      res.status(503).json({ error: 'This template could not be opened. Please try again.' });
+    }
+  });
+
   api.post('/posts', express.json({ limit: '200kb' }), async function (req, res) {
     var me = writeGuard(req, res);
     if (!me) return;
     var body = req.body || {};
     var post;
+    var templatePostId;
     try {
       post = community.cleanPost(body);
       if (body.kind === 'wordlist') {
         var words = community.cleanWords(body.words);
         Object.assign(post, { kind: 'wordlist', payload: words, itemCount: words.length });
       } else if (body.kind === 'game') {
-        if (!/^[a-zA-Z0-9-]{1,64}$/.test(String(body.activityId || ''))) return res.status(400).json({ error: 'Choose a game from My activities.' });
-        var saved = await activities.getGame(me, body.activityId);
+        var draft = body.template;
+        var sourceId = draft ? draft.id : body.activityId;
+        if (typeof sourceId !== 'string' || !/^[a-zA-Z0-9-]{1,64}$/.test(sourceId) || (draft && !TEMPLATE_ID.test(sourceId))) {
+          return res.status(400).json({ error: 'Choose a valid game template to share.' });
+        }
+        var saved = draft || await activities.getGame(me, sourceId);
         if (!saved) return res.status(404).json({ error: 'This game has no saved content. Make it again in the tool, then share it.' });
         var adapter = registry.get(saved.gameType, saved.version);
-        if (!adapter || !community.GAME_TYPES[adapter.type]) return res.status(400).json({ error: 'This kind of game cannot be shared yet.' });
-        var payload = adapter.sanitize(saved.payload);
+        var game = adapter && community.GAME_TYPES[adapter.type];
+        if (!game || (draft && !game.templateEditor)) return res.status(400).json({ error: 'This kind of game cannot be shared yet.' });
+        var payload = adapter.sanitize(draft && saved.payload ? { ...saved.payload, title: post.title } : saved.payload);
+        if (TEMPLATE_ID.test(sourceId)) {
+          templatePostId = crypto.createHash('sha256').update(me + ':' + sourceId).digest('hex').slice(0, 16);
+          var existing = await repository.get(templatePostId);
+          if (existing && existing.ownerKey === me) return res.json({ id: existing.id, url: '/community/' + existing.id });
+        }
         var count = ['sentences', 'items', 'words', 'questions', 'rounds'].map(function (key) { return Array.isArray(payload[key]) ? payload[key].length : 0; })
           .reduce(function (a, b) { return Math.max(a, b); }, 0);
         Object.assign(post, { kind: 'game', gameType: adapter.type, gameVersion: adapter.version, payload: payload, itemCount: count });
@@ -172,7 +248,7 @@ function create(options) {
     }
     if (!allow('post:' + me, POSTS_PER_DAY, DAY_MS)) return res.status(429).json({ error: 'You have shared a lot today. Please try again tomorrow.' });
     try {
-      post.id = community.newId();
+      post.id = templatePostId || community.newId();
       post.ownerKey = me;
       var created = await repository.create(post);
       changed();

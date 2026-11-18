@@ -33,6 +33,8 @@
   var celebrationTimer = null;
 
   sentenceInput.addEventListener('input', updateSetupStatus);
+  var templateButton = document.getElementById('save-template');
+  var templateTitle = 'Sentence Reorder';
   relaxedCheckbox.addEventListener('change', updateSetupStatus);
   updateSetupStatus();
   initLibraryPicker();
@@ -84,6 +86,7 @@
 
   function updateSetupStatus() {
     var count = parseSentences(sentenceInput.value).length;
+    if (templateButton) templateButton.disabled = !count || !window.TeacherGameTemplate;
     if (shareButton) shareButton.disabled = !count || !window.TeacherGameShare;
     if (!count) {
       setupStatus.textContent = 'Enter at least one sentence to begin.';
@@ -169,6 +172,21 @@
           setupStatus.textContent = 'Student link and QR code are ready.';
         }
       });
+    });
+  }
+
+  if (templateButton && window.TeacherGameTemplate) {
+    window.TeacherGameTemplate.bind({
+      button: templateButton,
+      gameType: 'sentence-reorder',
+      getData: function () { return { ...buildSharePayload(), title: templateTitle }; },
+      restore: function (data) {
+        templateTitle = data.title;
+        sentenceInput.value = data.sentences.map(function (sentence) { return sentence.words.join(' '); }).join('\n');
+        relaxedCheckbox.checked = data.relaxed;
+        updateSetupStatus();
+        generateButton.click();
+      }
     });
   }
 

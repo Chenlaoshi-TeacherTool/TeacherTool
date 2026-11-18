@@ -29,7 +29,7 @@ function checkPassword(password) {
 async function publish(options) {
   checkPassword(options.password);
   var adapter = registry.get(options.gameType, options.version);
-  if (!adapter) fail('This game type or version is not supported.');
+  if (!adapter || !adapter.view) fail('This game type or version is not supported.');
   if (Buffer.byteLength(JSON.stringify(options.data || null), 'utf8') > MAX_GAME_DATA_BYTES) fail('Game data is too large to share.', 413);
 
   var payload = adapter.sanitize(options.data);

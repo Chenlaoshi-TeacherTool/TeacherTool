@@ -7,7 +7,7 @@
   <title>量词大挑战 · Measure Word Challenge - Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'A Chinese measure word game for the whole class or Chromebooks: Catch It (60-second speed round with combos), Fill the Sentence (randomised numbers), and a red-vs-blue tug-of-war Team Battle. Color-coded measure words, pinyin toggle, read-aloud, challenge words, a results screen that shows which measure words get mixed up, and your own word list.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/shared/game-sharing.css?v=2">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
   <link rel="stylesheet" href="/low-prep/measure-words/measure-words.css?v=1">
 </head>
 <body class="mw-page">
@@ -53,6 +53,7 @@
         </div>
         <p class="mw-pool-status" id="mw-pool-status" role="status"></p>
         <div class="mw-share-row">
+          <button type="button" class="mw-secondary" id="mw-save-template" disabled>保存与分享模板 · Save template</button>
           <button type="button" class="mw-secondary" id="mw-share"><span aria-hidden="true">🔗</span> 学生链接 Share with students</button>
           <button type="button" class="mw-secondary" id="mw-links"><span aria-hidden="true">🗂️</span> My Links <span id="mw-link-count"></span></button>
           <small>Students get Catch It and Fill the Sentence with this word list.</small>
@@ -130,7 +131,8 @@
   <script src="/shared/game-sharing.js?v=2"></script>
   <script src="/low-prep/measure-words/measure-words-data.js?v=1"></script>
   <script src="/low-prep/measure-words/measure-words-game.js?v=1"></script>
-  <script src="/low-prep/measure-words/measure-words.js?v=1"></script>
+  <script src="/shared/game-template.js?v=3"></script>
+  <script src="/low-prep/measure-words/measure-words.js?v=2"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

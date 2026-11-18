@@ -10,7 +10,7 @@
 <body class="community-page">
 <%
   function link(change) {
-    var params = { q: result.q, kind: result.kind, stage: result.stage, textbook: result.textbook, page: '' };
+    var params = { q: result.q, kind: result.kind, stage: result.stage, textbook: result.textbook, page: '', mine: myShares ? '1' : '' };
     Object.keys(change).forEach(function (key) { params[key] = change[key]; });
     var query = Object.keys(params).filter(function (key) { return params[key]; })
       .map(function (key) { return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]); }).join('&');
@@ -22,6 +22,11 @@
     <p class="content-kicker"><%= t('community.kicker') %></p>
     <h1><%= t('community.title') %></h1>
     <p><%= t('community.intro') %></p>
+    <% if (myShares) { %>
+      <a class="btn community-share-cta" href="/community"><%= lang === 'zh' ? '查看全部分享' : 'All community posts' %></a>
+    <% } else if (signedIn) { %>
+      <a class="btn btn-secondary community-share-cta" href="/community?mine=1"><%= lang === 'zh' ? '我的分享' : 'My shares' %></a>
+    <% } %>
     <a class="btn community-share-cta" href="/community/share"><%= t('community.shareCta') %></a>
     <a class="btn btn-secondary community-share-cta" href="/community/websites/new"><%= lang === 'zh' ? '分享教学网站' : 'Share a website' %></a>
     <a class="btn btn-secondary community-share-cta" href="/community/websites/mine"><%= lang === 'zh' ? '我的网站投稿' : 'My submissions' %></a>
@@ -29,6 +34,7 @@
 
   <main class="content-section community-main"><div class="content-shell">
     <form class="community-search" method="get" action="/community" role="search">
+      <% if (myShares) { %><input type="hidden" name="mine" value="1"><% } %>
       <label class="visually-hidden" for="communityQ"><%= t('community.searchLabel') %></label>
       <input id="communityQ" name="q" type="search" maxlength="60" value="<%= result.q %>" placeholder="<%= t('community.searchPlaceholder') %>">
       <% ['kind', 'stage', 'textbook'].forEach(function (key) { if (result[key]) { %><input type="hidden" name="<%= key %>" value="<%= result[key] %>"><% } }) %>
@@ -57,13 +63,13 @@
     </div>
 
     <div class="community-list-head">
-      <h2><%= filtered ? t('community.results') : t('community.latest') %></h2>
+      <h2><%= myShares ? (lang === 'zh' ? '我的分享' : 'My shares') : filtered ? t('community.results') : t('community.latest') %></h2>
       <span><%= result.total %> <%= t('community.postsCount') %></span>
-      <% if (filtered) { %><a href="/community"><%= t('community.clearFilters') %></a><% } %>
+      <% if (filtered) { %><a href="<%= myShares ? '/community?mine=1' : '/community' %>"><%= t('community.clearFilters') %></a><% } %>
     </div>
 
     <% if (resourcesUnavailable) { %><p role="status" class="hint"><%= lang === 'zh' ? '教学网站暂时无法加载，请稍后重试。' : 'Teaching websites are temporarily unavailable.' %></p><% } %>
-    <% if (!result.kind || result.kind === 'website') { %><p class="hint community-external-note"><%= lang === 'zh' ? '教学网站由第三方独立运营，与 CLS Teaching Tools 无隶属关系；付费推广、佣金或其他利益关系会在相应推荐中披露。' : 'Teaching websites are independently operated and are not affiliated with CLS Teaching Tools. Paid promotion, commissions or other interests are disclosed in each recommendation.' %></p><% } %>
+    <% if (!myShares && (!result.kind || result.kind === 'website')) { %><p class="hint community-external-note"><%= lang === 'zh' ? '教学网站由第三方独立运营，与 CLS Teaching Tools 无隶属关系；付费推广、佣金或其他利益关系会在相应推荐中披露。' : 'Teaching websites are independently operated and are not affiliated with CLS Teaching Tools. Paid promotion, commissions or other interests are disclosed in each recommendation.' %></p><% } %>
     <% if (result.unavailable && !result.posts.length) { %>
       <p class="community-empty"><%= t('community.unavailable') %></p>
     <% } else if (!result.posts.length) { %>

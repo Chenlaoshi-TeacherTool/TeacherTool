@@ -58,7 +58,7 @@ function sanitize(payload) {
   if (!items.length && !sentences.length) fail('Add some words or sentences first.');
 
   var options = payload.options && typeof payload.options === 'object' ? payload.options : {};
-  return {
+  var result = {
     title: cleanText(payload.title, 120) || '量词大挑战',
     mws: mws,
     items: items,
@@ -72,6 +72,18 @@ function sanitize(payload) {
       rounds: cleanNumber(options.rounds, [5, 10, 15, 20], 10)
     }
   };
+  if (payload.setup && typeof payload.setup === 'object') {
+    var setup = payload.setup;
+    result.setup = {
+      mws: (Array.isArray(setup.mws) ? setup.mws : []).map(cleanMw).filter(Boolean).slice(0, 30),
+      onlyCustom: Boolean(setup.onlyCustom),
+      customWords: cleanText(setup.customWords, 8192),
+      customSentences: cleanText(setup.customSentences, 12000),
+      battleTarget: cleanNumber(setup.battleTarget, [3, 4, 5, 6, 8], 4),
+      battleType: ['mix', 'noun', 'sentence'].includes(setup.battleType) ? setup.battleType : 'mix'
+    };
+  }
+  return result;
 }
 
 module.exports = {

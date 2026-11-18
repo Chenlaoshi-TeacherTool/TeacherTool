@@ -150,7 +150,16 @@ function create(options) {
   router.get('/activities', async function (req, res) {
     try {
       var member = await limits.canUseMyActivities(req);
-      res.json({ activities: await activities.list(req.libraryOwner), member: Boolean(member) });
+      var rows = await activities.list(req.libraryOwner);
+      var gameTypes = require('../services/community').GAME_TYPES;
+      rows.forEach(function (row) {
+        var game = gameTypes[row.gameType];
+        if (row.kind === 'game' && row.id.startsWith('template-') && game && game.templateEditor) {
+          row.editor = game.tool + '?template=' + encodeURIComponent(row.id);
+          row.gameLabel = game;
+        }
+      });
+      res.json({ activities: rows, member: Boolean(member) });
     } catch (error) { res.status(503).json({ error: 'Your activities could not be loaded right now.' }); }
   });
 

@@ -68,13 +68,13 @@
         <section class="community-use">
           <h2><%= t('community.useTitle') %></h2>
           <div class="community-actions">
-            <button class="btn" type="button" data-action="link"><%= t('community.makeStudentLink') %></button>
-            <a class="btn btn-secondary" href="<%= game.tool %>"><%= t('community.openTool') %></a>
+            <% if (!game.templateOnly) { %><button class="btn" type="button" data-action="link"><%= t('community.makeStudentLink') %></button><% } %>
+            <a class="btn btn-secondary" href="<%= game.tool + (game.templateEditor && post.status === 'live' ? '?template=' + encodeURIComponent(post.id) : '') %>"><%= t('community.openTool') %></a>
           </div>
-          <p class="community-use-help"><%= t('community.gameHelp') %></p>
+          <p class="community-use-help"><%= game.templateOnly ? (lang === 'zh' ? '打开模板后，可调整设置并开始新一局。' : 'Open the template to adjust the settings and start a new game.') : t('community.gameHelp') %></p>
           <p class="community-status" id="communityStatus" role="status" aria-live="polite"></p>
         </section>
-        <script type="application/json" id="communityGame"><%- JSON.stringify(post.payload).replace(/</g, '\\u003c') %></script>
+        <% if (!game.templateOnly) { %><script type="application/json" id="communityGame"><%- JSON.stringify(post.payload).replace(/</g, '\\u003c') %></script><% } %>
       <% } %>
 
       <footer class="community-post-foot">
@@ -92,7 +92,7 @@
       deleteFailed: t('community.jsDeleteFailed'), failed: t('community.jsFailed')
     }).replace(/</g, '\\u003c') %>;
   </script>
-  <% if (game) { %><script src="/shared/game-sharing.js"></script><% } else { %><script src="/shared/wordlist-core.js"></script><script src="/shared/wordlist-handoff.js?v=1"></script><% } %>
+  <% if (game && !game.templateOnly) { %><script src="/shared/game-sharing.js"></script><% } else if (!game) { %><script src="/shared/wordlist-core.js"></script><script src="/shared/wordlist-handoff.js?v=1"></script><% } %>
   <script src="/community/detail.js?v=games1"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

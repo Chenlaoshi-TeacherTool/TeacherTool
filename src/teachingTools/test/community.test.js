@@ -41,6 +41,10 @@ var repository = {
 };
 
 var activities = {
+  add: async function (owner, item) {
+    var key = owner + ':' + item.id;
+    if (!games.has(key)) games.set(key, item);
+  },
   getGame: async function (owner, id) { return games.get(owner + ':' + id) || null; }
 };
 
@@ -70,6 +74,8 @@ test.before(async function () {
   app.use('/', communityRoutes.create({
     repository: repository, activities: activities, origin: SITE,
     accountsOn: function () { return accountsOn; },
+    templatesOn: function () { return true; },
+    hasActiveAccess: async function (owner) { return owner === 'owner-alice'; },
     getUser: function (req) { return req.get('test-user') ? { id: req.get('test-user'), provider: 'teachers' } : null; },
     ownerKey: function (user) { return 'owner-' + user.id; },
     loginProvider: function () { return 'teachers'; }
@@ -136,6 +142,71 @@ test('only the author can delete; hidden posts disappear for everyone else', asy
   assert.equal((await fetch(origin + created.url, { headers: { 'test-user': 'alice' } })).status, 200);
   assert.equal((await del('alice')).status, 200);
   assert.equal(posts.size, 0);
+});
+
+test('templates save privately, publish once, and reopen from the community', async function () {
+  var id = 'template-' + require('node:crypto').randomUUID();
+  var endpoint = origin + '/api/community/templates/' + id;
+  var draft = { gameType: 'sentence-reorder', version: 1, title: 'Template lesson',
+    data: { relaxed: true, sentences: [{ words: ['我是', '老师'] }] } };
+  var save = function (user, data, extra) {
+    return fetch(endpoint, { method: 'PUT', headers: headers(user, extra), body: JSON.stringify(data) });
+  };
+  assert.equal((await save(null, draft)).status, 401);
+  assert.equal((await save('bob', draft)).status, 403);
+  assert.equal((await save('alice', draft, { origin: 'https://elsewhere.example' })).status, 403);
+  assert.equal((await save('alice', { ...draft, data: {} })).status, 400);
+  assert.equal((await save('alice', draft)).status, 200);
+  assert.equal((await save('alice', draft)).status, 200);
+  assert.equal(games.size, 1);
+  assert.equal(posts.size, 0);
+  assert.equal((await fetch(endpoint)).status, 401);
+  assert.equal((await fetch(endpoint, { headers: headers('bob') })).status, 404);
+  var privateCopy = await (await fetch(endpoint, { headers: headers('alice') })).json();
+  assert.deepEqual(privateCopy.payload.sentences, draft.data.sentences);
+
+  var post = { kind: 'game', activityId: id, title: draft.title, authorName: 'Alice' };
+  assert.equal((await publish('bob', post)).status, 404);
+  var created = await (await publish('alice', post)).json();
+  assert.deepEqual(await (await publish('alice', post)).json(), created);
+  assert.equal(posts.size, 1);
+  var other = await (await publish('bob', wordList({ title: 'Another teacher post' }))).json();
+  var mine = await fetch(origin + '/community?mine=1', { headers: headers('alice') });
+  assert.match(mine.headers.get('cache-control'), /private/);
+  var html = await mine.text();
+  assert.match(html, /Template lesson/);
+  assert.doesNotMatch(html, /Another teacher post/);
+  assert.equal((await fetch(origin + '/community?mine=1', { redirect: 'manual' })).status, 302);
+  var publicCopy = await (await fetch(origin + '/api/community/templates/' + created.id)).json();
+  assert.deepEqual(publicCopy.payload, privateCopy.payload);
+  assert.match(await (await fetch(origin + created.url)).text(), new RegExp('template=' + created.id));
+  assert.equal((await fetch(origin + '/api/community/templates/' + other.id)).status, 404);
+  posts.get(created.id).status = 'hidden';
+  assert.equal((await fetch(origin + '/api/community/templates/' + created.id)).status, 404);
+});
+
+test('free teachers publish browser templates without saving a private cloud copy', async function () {
+  var template = { id: 'template-' + require('node:crypto').randomUUID(), gameType: 'sentence-reorder', version: 1,
+    payload: { sentences: [{ words: ['我', '来了'] }] } };
+  var body = { kind: 'game', title: 'Browser lesson', authorName: 'Bob', template: template };
+  var session = function (user) {
+    return fetch(origin + '/api/community/me?tool=sentence-reorder', { headers: headers(user) }).then(function (res) { return res.json(); });
+  };
+  assert.equal((await session()).template.canSave, false);
+  assert.equal((await session('bob')).template.canSave, false);
+  assert.equal((await session('alice')).template.canSave, true);
+  assert.equal((await publish(null, body)).status, 401);
+  assert.equal((await publish('bob', { ...body, template: { ...template, payload: {} } })).status, 400);
+  var published = await publish('bob', body);
+  assert.equal(published.status, 201);
+  var created = await published.json();
+  assert.deepEqual(await (await publish('bob', body)).json(), created);
+  assert.equal(games.size, 0);
+  assert.equal(posts.size, 1);
+  var mine = await (await fetch(origin + '/community?mine=1', { headers: headers('bob') })).text();
+  assert.match(mine, /Browser lesson/);
+  var reused = await (await fetch(origin + '/api/community/templates/' + created.id)).json();
+  assert.deepEqual(reused.payload.sentences, template.payload.sentences);
 });
 
 test('reports and uses are counted once per visitor', async function () {

@@ -4,6 +4,17 @@ const core = require('../public/teaching-tools/vocabulary-gacha/gacha-core');
 test('gacha parses spreadsheet rows and merges duplicate terms', () => {
  assert.deepEqual(core.parse('苹果\tpíng guǒ\tapple\n香蕉 | | banana\n苹果\n'),[{term:'苹果',py:'píng guǒ',en:'apple'},{term:'香蕉',py:'',en:'banana'}]);
 });
+test('gacha templates retain configuration and discard classroom progress', () => {
+ const setup = {
+  words: core.parse('苹果 | píng guǒ | apple'), mode: 'teams', nameA: '红队', nameB: '蓝队',
+  random: false, fixed: 12, ending: 'timer', duration: 7, showPy: true, showEn: false
+ };
+ assert.deepEqual(core.template({ ...setup, scores: [12, 5], remaining: 0 }), setup);
+ assert.throws(() => core.template({ ...setup, duration: 0 }), /duration/);
+ assert.throws(() => core.template({ ...setup, words: [setup.words[0], setup.words[0]] }), /different words/);
+ const publisher = require('../services/gameSharePublisher');
+ return assert.rejects(publisher.publish({ gameType: 'vocabulary-gacha', data: setup, password: 'example' }), { status: 400 });
+});
 test('gacha alternates teams, prevents repeat draws and scores, and undoes final round', () => {
  const g=core.create(core.parse('一\n二'),true,10,false,()=>0);
  g.draw();const first=g.current.word.term;assert.equal(g.draw(),false);assert.equal(g.answer(true),false);

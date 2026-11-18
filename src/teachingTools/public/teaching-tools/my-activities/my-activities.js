@@ -14,6 +14,7 @@
     'hanzi-word-choice': { icon: '🀄', label: '形近字选词', tool: '/teaching-tools/hanzi-word-choice' },
     'word-sudoku': { icon: '🔢', label: 'Word Sudoku', tool: '/low-prep/word-sudoku/word-sudoku-widget.html' },
     'measure-words': { icon: '🍎', label: 'Measure Word Challenge', tool: '/teaching-tools/measure-words' },
+    'vocabulary-gacha': { icon: '🎲', label: chinese ? '词汇扭蛋机' : 'Vocabulary Gacha', tool: '/teaching-tools/vocabulary-gacha' },
     book: { icon: '📖', label: 'Book', tool: '/teaching-tools/book-generator' }
   };
   var find = function (id) { return document.getElementById(id); };
@@ -45,7 +46,12 @@
       .map(function (item) { return { kind: 'game', id: item.shareId, type: TYPES[item.gameType] ? item.gameType : 'sentence-reorder', title: item.title, url: item.url, token: item.deleteToken, createdAt: item.createdAt, expiresAt: item.expiresAt }; });
     var books = read(BOOKS_KEY).filter(function (item) { return item && item.bookId && item.deleteToken; })
       .map(function (item) { return { kind: 'book', id: item.bookId, type: 'book', title: item.title, url: new URL(item.url, location.origin).href, token: item.deleteToken, createdAt: item.createdAt, expiresAt: null }; });
-    return games.concat(books).sort(function (left, right) { return String(right.createdAt || '').localeCompare(String(left.createdAt || '')); });
+    var templates = window.TeacherGameTemplate ? window.TeacherGameTemplate.listLocal().map(function (item) {
+      var url = new URL(item.editor, location.origin);
+      url.searchParams.set('localTemplate', item.id);
+      return { kind: 'game', id: item.id, type: item.gameType, title: item.title, editor: url.href, localTemplate: true, createdAt: item.createdAt };
+    }) : [];
+    return games.concat(books, templates).sort(function (left, right) { return String(right.createdAt || '').localeCompare(String(left.createdAt || '')); });
   }
 
   async function post(url, body) {
@@ -61,7 +67,7 @@
 
   // Asks the server which links still exist, when they expire, and how many students submitted.
   async function loadStatus(list) {
-    var games = list.filter(function (item) { return item.kind === 'game'; });
+    var games = list.filter(function (item) { return item.kind === 'game' && !item.editor; });
     var books = list.filter(function (item) { return item.kind === 'book'; });
     var byId = Object.create(null);
     var requests = [];
@@ -143,9 +149,9 @@
   }
 
   function card(item) {
-    var type = TYPES[item.type];
+    var type = item.gameLabel ? { icon: item.gameLabel.icon, label: chinese ? item.gameLabel.zh : item.gameLabel.en } : TYPES[item.type] || { icon: '🎲', label: item.type };
     var status = item.status;
-    var gone = status && !status.exists;
+    var gone = !item.editor && status && !status.exists;
     var li = element('li', '', 'activity-card' + (gone ? ' is-gone' : ''));
     li.appendChild(element('div', type.icon, 'activity-icon'));
     var body = element('div', '', 'activity-body');
@@ -156,6 +162,10 @@
     body.appendChild(element('p', meta.join(' · '), 'activity-meta'));
     var expires = status && status.expiresAt ? status.expiresAt : item.expiresAt;
     var badges = element('p', '', 'activity-badges');
+    if (item.editor) {
+      var storage = item.localTemplate ? (chinese ? '本机' : 'On this device') : (chinese ? '云端' : 'Cloud');
+      badges.appendChild(element('span', storage, 'activity-badge'));
+    }
     if (gone) badges.appendChild(element('span', t('Expired or deleted'), 'activity-badge is-gone'));
     else if (expires) {
       var left = daysLeft(expires);
@@ -166,7 +176,27 @@
     li.appendChild(body);
 
     var actions = element('div', '', 'activity-actions');
-    if (gone) {
+    if (item.editor) {
+      var edit = element('a', chinese ? '打开模板' : 'Open template', 'small-button is-primary');
+      edit.href = item.editor;
+      var removeTemplate = button(t('Remove from list'), 'small-button');
+      var share = shareLink(item);
+      if (item.localTemplate) {
+        var shareUrl = new URL(item.editor);
+        shareUrl.searchParams.set('share', '1');
+        share.href = shareUrl.href;
+      }
+      removeTemplate.addEventListener('click', function () {
+        if (!item.localTemplate) return forget(item);
+        try {
+          window.TeacherGameTemplate.removeLocal(item.id);
+          forget(item);
+        } catch (error) {
+          find('activitiesStatus').textContent = chinese ? '无法删除本机模板，请重试。' : 'Could not remove the local template. Please try again.';
+        }
+      });
+      actions.append(edit, share, removeTemplate);
+    } else if (gone) {
       if (item.canRelink) {
         var again = button(t('Create new link'), 'small-button is-primary');
         again.addEventListener('click', function () { relink(item, again); });
@@ -226,19 +256,19 @@
     if (session.cloudAvailable === false) return;
     find('activitiesEyebrow').textContent = t('Your teacher account and this browser');
     var response = await fetch('/api/teacher-library/activities', { credentials: 'same-origin', cache: 'no-store' });
-    if (response.status === 403 && (await response.json().catch(function () { return {}; })).membersOnly) { membersOnlyView = true; return; }
+    if (response.status === 403 && (await response.json().catch(function () { return {}; })).membersOnly) { membersOnlyView = !activities.some(function (item) { return item.localTemplate; }); return; }
     if (!response.ok) return;
     var account = await response.json();
     // Not a member: only the account's own list (browser-only links need membership).
-    if (account.member === false) { basicView = true; activities = []; }
+    if (account.member === false) { basicView = true; activities = activities.filter(function (item) { return item.localTemplate; }); }
     var byId = Object.create(null);
     activities.forEach(function (item) { byId[item.kind + ':' + item.id] = item; });
     account.activities.forEach(function (row) {
       var key = row.kind + ':' + row.id;
       if (byId[key]) { byId[key].inAccount = true; byId[key].canRelink = Boolean(row.canRelink); return; }
-      var type = row.kind === 'book' ? 'book' : (TYPES[row.gameType] ? row.gameType : 'sentence-reorder');
+      var type = row.kind === 'book' ? 'book' : (row.editor || TYPES[row.gameType] ? row.gameType : 'sentence-reorder');
       activities.push({ kind: row.kind, id: row.id, type: type, title: row.title, url: location.origin + (row.kind === 'book' ? '/book/' : '/play/') + row.id, token: null, createdAt: row.createdAt,
-        expiresAt: row.expiresAt || null, inAccount: true, canRelink: Boolean(row.canRelink) });
+        editor: row.editor, gameLabel: row.gameLabel, expiresAt: row.expiresAt || null, inAccount: true, canRelink: Boolean(row.canRelink) });
     });
     if (basicView) {
       if (!activities.length) { membersOnlyView = true; return; }
@@ -293,7 +323,10 @@
       find('activitiesStatus').textContent = activities.length + (accountReady ? t(' activities.') : t(' activities shared from this browser.'));
       offerClaim();
     } catch (error) {
-      if (error.membersOnly) return showMembersOnly();
+      if (error.membersOnly) {
+        activities = activities.filter(function (item) { return item.localTemplate || item.editor; });
+        if (!activities.length) return showMembersOnly();
+      }
       find('activitiesStatus').textContent = t('Link status could not be checked right now. Your list is still shown.');
     }
     render();
