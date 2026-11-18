@@ -33,10 +33,14 @@
     find('resultsExpiry').textContent = results.expiresAt ? t('Link open until ') + new Date(results.expiresAt).toLocaleDateString(chinese ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
     find('statSubmitted').textContent = submitted;
     find('statAverage').textContent = submitted ? (results.submissions.reduce(function (sum, item) { return sum + item.score; }, 0) / submitted).toFixed(1) + ' / ' + count : '–';
+    if (results.prompts) {
+      find('ratesTitle').textContent = chinese ? '每题正确率' : 'Correct rate by question';
+      find('studentAnswerNote').textContent = chinese ? '点击学生姓名查看每题选了哪个字。' : 'Select a student to see the character they chose for each question.';
+    }
     find('sentenceRates').replaceChildren.apply(find('sentenceRates'), results.sentences.map(function (words, index) {
       var rate = percent(results.submissions.filter(function (item) { return item.correct[index]; }).length, submitted);
       var li = element('li', '', 'sentence-rate' + (submitted && rate < 50 ? ' is-low' : ''));
-      var label = element('span', words.join(' '), 'sentence-rate-text');
+      var label = element('span', results.prompts ? results.prompts[index] : words.join(' '), 'sentence-rate-text');
       var bar = element('span', '', 'sentence-rate-bar');
       var fill = element('span'); fill.style.width = rate + '%';
       bar.appendChild(fill);
@@ -47,7 +51,7 @@
 
   function renderTable() {
     var count = results.sentences.length;
-    var head = [t('Student'), t('Score'), t('Submitted')].concat(results.sentences.map(function (_words, index) { return 'S' + (index + 1); }));
+    var head = [t('Student'), t('Score'), t('Submitted')].concat(results.sentences.map(function (_words, index) { return (results.prompts ? 'Q' : 'S') + (index + 1); }));
     find('resultsHead').replaceChildren.apply(find('resultsHead'), head.map(function (label, index) {
       var th = element('th', label); th.scope = 'col'; if (index > 2) th.className = 'is-mark'; return th;
     }));
@@ -75,8 +79,9 @@
         results.sentences.forEach(function (words, index) {
           var right = submission.correct[index];
           var item = element('li', '', right ? 'is-right' : 'is-wrong');
-          item.appendChild(element('strong', (right ? '✓ ' : '✗ ') + (submission.answers[index] || []).join(' ')));
-          if (!right) item.appendChild(element('span', t('Correct order: ') + words.join(' ')));
+          var prefix = results.prompts ? results.prompts[index] + ' · ' : '';
+          item.appendChild(element('strong', prefix + (right ? '✓ ' : '✗ ') + (submission.answers[index] || []).join(' ')));
+          if (!right) item.appendChild(element('span', (results.prompts ? t('Correct') + ' · ' : t('Correct order: ')) + words.join(' ')));
           list.appendChild(item);
         });
         cell.appendChild(list);

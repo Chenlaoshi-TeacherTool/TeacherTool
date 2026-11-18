@@ -148,6 +148,62 @@ test('publishes and opens a shared Sentence Reorder game', async function () {
   assert.match(playerHtml, /sentence-reorder-player\.js/);
 });
 
+test('Hanzi Word Choice shares practice and grades assignments with member-only results', async function () {
+  var limits = require('../services/membershipLimits');
+  var canView = limits.canViewQuizResults;
+  var questions = [
+    { word: '晴天', position: 0, alternatives: ['清', '睛'], hint: '今天是个大[ ]天。' },
+    { word: '眼睛', position: 1, alternatives: ['晴', '情'] }
+  ];
+  function post(url, body, cookie) {
+    return fetch(baseUrl + url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(cookie ? { Cookie: cookie } : {}) },
+      body: JSON.stringify(body),
+      redirect: 'manual'
+    });
+  }
+  try {
+    for (var mode of ['practice', 'assessment']) {
+      var created = await post('/api/game-shares', { gameType: 'hanzi-word-choice', password: 'choice-test', data: { mode, questions } });
+      assert.equal(created.status, 201);
+      var share = await created.json();
+      assert.equal((await post(share.url + '/submit', {})).status, 401);
+      var unlock = await post(share.url + '/unlock', { password: 'choice-test' });
+      assert.equal(unlock.status, 302);
+      var cookie = unlock.headers.get('set-cookie').split(';')[0];
+      var page = await fetch(baseUrl + share.url, { headers: { Cookie: cookie } });
+      assert.equal(page.status, 200);
+      var data = JSON.parse((await page.text()).match(/id="shared-game" type="application\/json">(.*?)<\/script>/s)[1]).data;
+      assert.equal(data.mode, mode);
+      if (mode === 'practice') {
+        assert.equal(data.questions[0].word, '晴天');
+        assert.equal((await post(share.url + '/submit', { studentName: '小林', answers: [['晴'], ['睛']] }, cookie)).status, 400);
+        continue;
+      }
+      assert.deepEqual(data.questions[0], { prompt: '今天是个大[ ]天。', options: ['晴', '清', '睛'].sort() });
+      assert.equal((await post(share.url + '/submit', { studentName: '小林', answers: [['晴'], ['字']] }, cookie)).status, 400);
+      var submitted = await post(share.url + '/submit', { studentName: '小林', answers: [['晴'], ['情']] }, cookie);
+      assert.equal(submitted.status, 201);
+      assert.equal((await submitted.json()).submission.score, 1);
+      assert.equal((await post(share.url + '/submit', { studentName: ' 小林 ', answers: [['晴'], ['睛']] }, cookie)).status, 409);
+      var resultsUrl = '/api/game-shares/' + share.shareId + '/results';
+      assert.equal((await post(resultsUrl, {})).status, 404);
+      limits.canViewQuizResults = async function () { return false; };
+      assert.equal((await post(resultsUrl, { deleteToken: share.deleteToken })).status, 403);
+      limits.canViewQuizResults = async function () { return true; };
+      var report = await post(resultsUrl, { deleteToken: share.deleteToken });
+      assert.equal(report.status, 200);
+      var results = await report.json();
+      assert.deepEqual(results.prompts, ['晴天', '眼睛']);
+      assert.deepEqual(results.submissions[0].correct, [true, false]);
+      assert.equal((await post(resultsUrl + '.xlsx', { deleteToken: share.deleteToken })).status, 200);
+    }
+  } finally {
+    limits.canViewQuizResults = canView;
+  }
+});
+
 test('rejects unsupported game types and malformed Sudoku data', async function () {
   var unsupported = await fetch(baseUrl + '/api/game-shares', {
     method: 'POST',

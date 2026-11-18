@@ -11,6 +11,7 @@
   var chinese = Boolean(window.LibraryI18n && window.LibraryI18n.chinese);
   var TYPES = {
     'sentence-reorder': { icon: '🧩', label: 'Sentence Reorder', tool: '/teaching-tools/sentence-reorder' },
+    'hanzi-word-choice': { icon: '🀄', label: '形近字选词', tool: '/teaching-tools/hanzi-word-choice' },
     'word-sudoku': { icon: '🔢', label: 'Word Sudoku', tool: '/low-prep/word-sudoku/word-sudoku-widget.html' },
     'measure-words': { icon: '🍎', label: 'Measure Word Challenge', tool: '/teaching-tools/measure-words' },
     book: { icon: '📖', label: 'Book', tool: '/teaching-tools/book-generator' }

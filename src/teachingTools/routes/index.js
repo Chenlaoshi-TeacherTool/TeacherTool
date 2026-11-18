@@ -231,6 +231,9 @@ router.get('/teaching-tools/flash-card-generator', function(req, res, next) {
 router.get('/teaching-tools/sentence-reorder', function(req, res, next) {
   res.render('low-prep-activities/sentence-reorder', { title: 'Sentence Reorder', toolGuide: siteContentStore.get().toolGuides['sentence-reorder'] });
 });
+router.get(['/teaching-tools/hanzi-word-choice', '/teaching-tools/hanzi-word-choice/index.html'], function(req, res) {
+  res.render('hanzi-word-choice', { title: '形近字选词' });
+});
 
 router.get('/teaching-tools/witchs-poison', function(req, res, next) {
   res.render('low-prep-activities/witchs-poison', { title: "Witch's Poison" });
@@ -335,7 +338,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
     '/teaching-tools/character-race', '/teaching-tools/maze-generator', '/teaching-tools/tarsia-puzzle',
     '/teaching-tools/bingo-generator', '/teaching-tools/emoji-search', '/teaching-tools/image-revealer', '/teaching-tools/zoom-reveal',
     '/teaching-tools/name-tent-generator', '/teaching-tools/flash-card-generator', '/teaching-tools/sentence-reorder', '/teaching-tools/witchs-poison',
-    '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary',
+    '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary', '/teaching-tools/hanzi-word-choice',
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator', '/teaching-tools/secret-message',
     '/teaching-tools/character-unscrambler', '/teaching-tools/measure-words', '/teaching-tools/vocab-games', '/teaching-tools/whats-missing',
     '/teaching-tools/hanzi-batch/index.html'

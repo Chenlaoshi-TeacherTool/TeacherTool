@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= title %> · CLS Teaching Tools</title>
+<% const studentView = typeof gameDataJson === 'string'; %>
+<meta name="theme-color" content="#194f45">
+<%- include('partials/seo', { pageDescription: 'Create Chinese fill-in-the-blank games with look-alike characters for classroom play, independent practice, and homework.', noindex: studentView }) %>
+<link rel="stylesheet" href="/stylesheets/site-theme.css">
+<link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder.css?v=6">
+<% if (!studentView) { %>
+<link rel="stylesheet" href="/shared/game-sharing.css?v=4">
+<script src="/shared/game-sharing.js?v=6" defer></script>
+<% } else { %>
+<link rel="stylesheet" href="/shared/game-share.css?v=1">
+<% } %>
+<style>
+@font-face{font-family:"LXGW WenKai";src:url("/fonts/LXGWWenKai-Regular.ttf") format("truetype");font-display:swap}
+[hidden]{display:none!important}
+.word-choice-page{margin:0}
+.word-choice-page.game-share-page{--site-nav-height:0px}
+.word-choice{max-width:1160px;margin:auto;padding:22px clamp(16px,3vw,32px) 60px}
+.word-choice .reorder-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+.word-choice .reorder-header .back-btn{position:static;margin-bottom:12px}
+.word-choice #edit{position:relative;z-index:1}
+.word-choice h2{margin:0 0 12px;color:var(--chalk-deep)}
+.word-choice p{margin:8px 0}
+.word-choice :is(button,textarea,input,select){font:inherit}
+.word-choice button{border:1px solid #d5dfce;border-radius:12px;padding:10px 16px;background:#edf3e6;color:var(--chalk-deep);font-weight:800;cursor:pointer}
+.word-choice button.primary{background:var(--chalk);color:var(--paper);border-color:var(--chalk)}
+.word-choice button:disabled{opacity:.5;cursor:default}
+.word-choice :focus-visible{outline:3px solid var(--sun-deep);outline-offset:3px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:20px;align-items:start}
+.word-choice .panel{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:clamp(16px,3vw,28px);box-shadow:var(--shadow)}
+.word-choice :is(textarea,input,select){width:100%;border:1px solid var(--line);border-radius:8px;background:#fff;color:inherit;padding:8px}
+.word-choice textarea{display:block;margin:12px 0;resize:vertical}
+#student-name{margin:4px 0 12px}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.word-choice :is(.muted,small){color:var(--muted)}
+.word-choice fieldset{min-width:0;border:1px solid var(--line);border-radius:12px;margin:0 0 12px;padding:10px 12px}
+legend{font-weight:bold;padding:0 6px;overflow-wrap:anywhere}
+.fields{display:grid;grid-template-columns:1fr 1.6fr;gap:8px}
+.fields label:last-child{grid-column:1/-1}
+label span{display:block;font-size:.85rem;margin-bottom:3px}
+.word-choice .warning{color:#9a3f17}
+.game{background:var(--paper);text-align:center;border-radius:26px;border:1px solid var(--line);padding:clamp(20px,5vw,54px);min-height:420px;box-shadow:var(--shadow)}
+.game:fullscreen{display:grid;align-content:center;overflow:auto}
+.track{width:min(500px,100%);height:8px;accent-color:var(--leaf)}
+.word-choice .prompt{font-size:clamp(24px,5vw,50px);font-weight:bold;overflow-wrap:anywhere;margin:26px 0}
+.word-choice :is(.prompt,.options button,#feedback,#words,fieldset input,fieldset select,fieldset legend){font-family:KaiTi,STKaiti,"LXGW WenKai",serif}
+.blank{display:inline-block;color:var(--chalk);background:#fff2c4;border-bottom:3px solid var(--sun-deep);border-radius:10px;min-width:1.35em;padding:0 .1em}
+.blank.filled{background:#d5f5e1;border-color:#4b9466;color:#14552d}
+.options{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:20px 0}
+.word-choice .options button{font-size:clamp(26px,5vw,44px);min-width:1.75em;border:2px solid #d5dfce;background:#f3f6ed}
+.options button.correct{background:#d5f5e1;border-color:#4b9466;color:#14552d;opacity:1}
+.options button.incorrect{background:#fff0e8;border-color:#db9f83;opacity:1}
+.options button[aria-pressed="true"]{background:#fff2c4;border-color:var(--sun-deep)}
+.blank.filled{animation:fill-answer 240ms cubic-bezier(.23,1,.32,1)}
+.options button.incorrect{animation:wrong-answer 240ms cubic-bezier(.23,1,.32,1)}
+@keyframes fill-answer{0%{transform:scale(.95)}45%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes wrong-answer{25%{transform:translateX(-8%)}55%{transform:translateX(7%)}78%{transform:translateX(-3%)}}
+@media(prefers-reduced-motion:reduce){.blank.filled,.options button.incorrect{animation:none}}
+.celebration{width:min(380px,calc(100% - 32px));padding:25px;border:1px solid var(--line);border-radius:24px;background:var(--paper);color:var(--ink);text-align:center;box-shadow:var(--shadow)}
+.celebration::backdrop{background:#103e3766}
+.celebration[open]{animation:celebrate-in 230ms cubic-bezier(.23,1,.32,1)}
+.celebration-icon{font-size:clamp(44px,12vw,72px);line-height:1.2}
+.celebration-word{font-family:KaiTi,STKaiti,"LXGW WenKai",serif;font-size:clamp(30px,8vw,48px);overflow-wrap:anywhere;margin:4px 0 18px}
+@keyframes celebrate-in{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes celebrate-fade{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.celebration[open]{animation:celebrate-fade 160ms ease}}
+.game .actions{justify-content:center}
+#feedback{min-height:1.5em;font-weight:bold}
+@media(max-width:680px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="word-choice-page <%= studentView ? 'game-share-page' : '' %>">
+<main class="word-choice">
+<header class="reorder-header">
+<div class="reorder-header-content">
+<% if (!studentView) { %><a href="/teaching-tools#low-prep-activities" class="back-btn"><%= t('sentenceReorder.backBtn') %></a><% } %>
+<h1><%= title %></h1>
+<p><%= studentView ? '选一个字，补全词语。' : '输入本课词汇，自动生成形近字选项。' %></p>
+</div>
+<button id="edit" type="button" hidden>返回编辑</button>
+</header>
+<div id="setup" class="layout" <%= studentView ? 'hidden' : '' %>>
+<section class="panel">
+<h2>输入词汇</h2>
+<label for="words" class="muted">换行、空格、逗号或顿号分隔</label>
+<textarea id="words" rows="7"><% if (!studentView) { %>晴天
+眼睛
+请问
+休息
+已经<% } %></textarea>
+<div class="actions"><button id="generate" class="primary" type="button">生成题目</button></div>
+<p id="input-status" role="status"></p>
+</section>
+<section class="panel">
+<h2>题目预览</h2>
+<p class="muted">可以换挖空位置、改干扰字，或加一句提示。</p>
+<div class="actions">
+<button id="start" class="primary" type="button">开始游戏</button>
+<button id="share" type="button">生成学生链接</button>
+<button id="manage-links" type="button">管理学生链接</button>
+</div>
+<p id="setup-status" role="status"></p>
+<div id="preview"></div>
+</section>
+</div>
+<form id="student-form" class="panel" hidden>
+<h2>形近字选词作业</h2>
+<p>每题选一个字，全部完成后交卷。每个姓名可提交一次。</p>
+<label for="student-name">学生姓名</label>
+<input id="student-name" name="studentName" maxlength="80" required>
+<button id="begin-assignment" class="primary" type="submit">开始作业</button>
+<p id="student-status" role="status"></p>
+</form>
+<section id="game" class="game" hidden>
+<p id="progress"></p>
+<progress id="track" class="track" aria-label="答题进度"></progress>
+<h2 id="prompt" class="prompt" tabindex="-1"></h2>
+<div id="options" class="options"></div>
+<p id="feedback" role="status"></p>
+<div class="actions">
+<button id="listen" type="button">听词语</button>
+<button id="fullscreen" type="button">全屏</button>
+<button id="next" class="primary" type="button" hidden></button>
+</div>
+<dialog id="celebration" class="celebration" aria-labelledby="celebration-title" aria-describedby="celebration-word">
+<div class="celebration-icon" aria-hidden="true">👏</div>
+<h2 id="celebration-title">答对了！</h2>
+<p id="celebration-word" class="celebration-word"></p>
+<div class="actions">
+<button id="close-celebration" type="button" autofocus>关闭</button>
+<button id="celebration-next" class="primary" type="button"></button>
+</div>
+</dialog>
+</section>
+</main>
+<% if (studentView) { %>
+<script id="shared-game" type="application/json"><%- gameDataJson %></script>
+<% } %>
+<script>
+'use strict';
+const byId = id => document.getElementById(id);
+const shared = byId('shared-game') ? JSON.parse(byId('shared-game').textContent) : null;
+const assignment = shared?.data.mode === 'assessment';
+const answers = [];
+let studentName = '';
+const groups = [
+  '清晴睛情请蜻精', '青清晴睛情请蜻精静', '己已巳记纪', '休体本木禾末未', '土士上止', '日目曰白百自',
+  '人入八大太犬天夫', '王玉主生全', '午牛年千干', '田由甲申电', '口回日四囚',
+  '刀力刃勿方万', '乌鸟马与写', '贝见页员', '今令含念', '石右后左古',
+  '住注柱往主', '跑泡抱饱炮袍', '喝渴揭竭', '买卖实头', '侯候猴',
+  '在再存', '晌响向尚', '常堂党掌', '近进远运园圆', '找我钱线浅',
+  '很跟根恨狠', '待持诗寺特', '相想箱霜', '同洞铜桐', '明朋月用',
+  '问间闻闪闭闷', '诚城成盛', '河何呵可', '放房访防仿', '作昨炸怎',
+  '样洋羊详', '话活刮括', '沸佛拂费', '息思恩志', '经轻径劲',
+  '学觉党尝', '课棵颗裸', '语悟梧五', '笔笑竿答', '书丰干井',
+  '孩该咳刻', '爱受友发', '吃气乞汽', '饭返板反', '漂飘票标',
+  '春看着奉', '单早草章', '虚虎虑虏', '拾给合哈', '换唤焕涣',
+  '骗偏编遍', '镜境竟竞', '辨辩辫瓣', '拨拔泼波坡', '练炼拣陈',
+  '游泳永咏', '骑奇椅倚', '猫描苗瞄', '星醒腥猩', '带戴代袋', '渴喝褐揭竭',
+  '赠增曾僧', '块快决诀', '忙忘芒盲', '飘漂瓢票', '历厉励沥', '祈折拆析诉',
+  '站战占粘沾', '读续卖犊', '抄炒吵钞秒沙', '净静争筝', '球求救逑',
+  '评坪苹平萍', '祖组租阻', '院完玩园', '抢枪苍仓', '检捡脸险剑',
+  '很狠恨痕', '苹萍瓶屏', '孩骇该咳', '味妹昧未', '悄消稍梢肖',
+  '密蜜宓', '竖坚紧肾', '拔拨泼波', '桃挑跳逃眺兆', '铃领岭龄零'
+];
+const commonAlternatives = new Set('青天 清明 晴空 太空 天空 大学 小学 放学 开学 上学 下学 早上 早安 午安 晚安 木头 石头 头发 白发 花草 花鸟 花园 公园 果园 校园'.split(' '));
+const blankPattern = /\[\s*\]|□/gu;
+const hanzi = /^\p{Script=Han}$/u;
+let questions = [];
+let index = 0;
+let queue = [];
+let solved = false;
+let firstTry = 0;
+let missed = false;
+let finished = false;
+
+function updateStartButtons() {
+  const disabled = !questions.some(item => item.alternatives.length);
+  byId('start').disabled = disabled;
+  byId('share').disabled = disabled;
+}
+
+function shuffle(items) {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function distractors(letters, position, vocabulary) {
+  const answer = letters[position];
+  const candidates = new Set(groups.filter(group => group.includes(answer)).flatMap(group => [...group]));
+  candidates.delete(answer);
+  return [...candidates].filter(char => {
+    const replacement = letters.map((letter, i) => i === position ? char : letter).join('');
+    return !vocabulary.has(replacement) && !commonAlternatives.has(replacement);
+  });
+}
+
+function generate() {
+  const words = [...new Set(byId('words').value.trim().split(/[\s,，、;；]+/u).filter(Boolean))];
+  const vocabulary = new Set(words.filter(word => [...word].every(char => hanzi.test(char))));
+  const ignored = words.length - vocabulary.size;
+  byId('input-status').textContent = ignored ? `已跳过 ${ignored} 项含非汉字的内容。` : '';
+  questions = [...vocabulary].map(word => {
+    const letters = [...word];
+    const choices = letters.map((_, i) => distractors(letters, i, vocabulary));
+    const position = choices.reduce((best, options, i) => options.length > choices[best].length ? i : best, 0);
+    return { word, letters, choices, position, alternatives: choices[position].slice(0, 3), hint: '' };
+  });
+  preview();
+}
+
+function preview() {
+  const list = byId('preview');
+  list.replaceChildren();
+  for (const [i, question] of questions.entries()) {
+    const row = document.createElement('fieldset');
+    row.innerHTML = '<legend></legend><div class="fields"><label><span>挖空位置</span><select></select></label><label><span>干扰字（1–3 个）</span><input></label><label><span>提示句（可选，用 [ ] 标出空格）</span><input placeholder="今天是个大[ ]天。"></label></div><small class="warning"></small>';
+    row.querySelector('legend').textContent = `${i + 1}. ${question.word}`;
+    const position = row.querySelector('select');
+    const [alternatives, hint] = row.querySelectorAll('input');
+    const warning = row.querySelector('small');
+    question.letters.forEach((letter, j) => position.add(new Option(`第 ${j + 1} 字 · ${letter}`, j)));
+    position.value = question.position;
+    alternatives.value = question.alternatives.join(' ');
+    hint.value = question.hint;
+    function refresh() {
+      warning.textContent = !question.alternatives.length ? '请补一个干扰字，否则本题将跳过。'
+        : question.hint && question.hint.split(blankPattern).length !== 2 ? '提示句需要正好一个 [ ]。' : '';
+      updateStartButtons();
+      byId('setup-status').textContent = '';
+    }
+    position.onchange = () => {
+      question.position = Number(position.value);
+      question.alternatives = question.choices[question.position].slice(0, 3);
+      alternatives.value = question.alternatives.join(' ');
+      refresh();
+    };
+    alternatives.oninput = () => {
+      question.alternatives = [...new Set([...alternatives.value].filter(char =>
+        hanzi.test(char) && char !== question.letters[question.position]))].slice(0, 3);
+      refresh();
+    };
+    alternatives.onchange = () => { alternatives.value = question.alternatives.join(' '); };
+    hint.oninput = () => { question.hint = hint.value.trim(); refresh(); };
+    list.append(row);
+    refresh();
+  }
+  updateStartButtons();
+  byId('setup-status').textContent = questions.length ? '' : '请输入至少一个汉字词语。';
+}
+
+function showQuestion() {
+  const question = queue[index];
+  solved = false;
+  missed = false;
+  finished = false;
+  byId('progress').textContent = `第 ${index + 1} / ${queue.length} 题`;
+  byId('track').value = index;
+  byId('feedback').textContent = '';
+  byId('next').hidden = true;
+  byId('listen').hidden = assignment || !('speechSynthesis' in window);
+  const prompt = assignment ? question.prompt : question.hint ||
+    question.letters.map((letter, i) => i === question.position ? '[ ]' : letter).join('');
+  const [before, after] = prompt.split(blankPattern);
+  const blank = document.createElement('span');
+  blank.className = 'blank';
+  blank.textContent = '[ ]';
+  blank.setAttribute('aria-label', '缺字');
+  byId('prompt').replaceChildren(before, blank, after);
+  const answer = assignment ? null : question.letters[question.position];
+  const options = byId('options');
+  options.replaceChildren();
+  for (const char of shuffle(assignment ? question.options : [answer, ...question.alternatives])) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = char;
+    if (assignment) button.setAttribute('aria-pressed', 'false');
+    button.onclick = () => {
+      if (assignment) {
+        answers[index] = [char];
+        for (const option of options.children) option.setAttribute('aria-pressed', String(option === button));
+        blank.textContent = char;
+        blank.removeAttribute('aria-label');
+        byId('track').value = index + 1;
+        byId('next').textContent = index + 1 === queue.length ? '交卷' : '下一题';
+        byId('next').hidden = false;
+        return;
+      }
+      if (solved) return;
+      if (char !== answer) {
+        missed = true;
+        button.classList.add('incorrect');
+        button.disabled = true;
+        byId('feedback').textContent = '再试一次。';
+        options.querySelector('button:enabled').focus();
+        return;
+      }
+      solved = true;
+      if (!missed) firstTry++;
+      button.classList.add('correct');
+      for (const option of options.children) option.disabled = true;
+      blank.textContent = answer;
+      blank.classList.add('filled');
+      blank.removeAttribute('aria-label');
+      byId('track').value = index + 1;
+      byId('feedback').textContent = `答对了！${question.word}`;
+      byId('next').textContent = index + 1 === queue.length ? '查看结果' : '下一题';
+      byId('next').hidden = false;
+      byId('celebration-word').textContent = question.word;
+      byId('celebration-next').textContent = byId('next').textContent;
+      byId('celebration').showModal();
+    };
+    options.append(button);
+  }
+  byId('prompt').focus();
+}
+
+byId('generate').onclick = generate;
+byId('words').oninput = () => {
+  questions = [];
+  updateStartButtons();
+  byId('preview').replaceChildren();
+  byId('input-status').textContent = '词表已修改，请重新生成题目。';
+  byId('setup-status').textContent = '';
+};
+function checkedQuestions() {
+  const ready = questions.filter(question => question.alternatives.length);
+  const invalid = ready.find(question => question.hint && question.hint.split(blankPattern).length !== 2);
+  if (invalid) {
+    byId('setup-status').textContent = `请检查「${invalid.word}」的提示句。`;
+    return [];
+  }
+  return ready;
+}
+
+function begin(items) {
+  queue = items;
+  index = 0;
+  firstTry = 0;
+  byId('setup').hidden = true;
+  byId('game').hidden = false;
+  byId('edit').hidden = Boolean(shared);
+  byId('track').max = queue.length;
+  showQuestion();
+}
+
+byId('start').onclick = () => {
+  const ready = checkedQuestions();
+  if (ready.length) begin(ready);
+};
+byId('share').onclick = () => {
+  const ready = checkedQuestions();
+  if (!ready.length) return;
+  if (!window.TeacherGameShare) {
+    byId('setup-status').textContent = '分享功能暂时无法使用，请刷新页面。';
+    return;
+  }
+  window.TeacherGameShare.openPublisher({
+    gameType: 'hanzi-word-choice',
+    title: '形近字选词',
+    getData: () => ({
+      questions: ready.map(({ word, position, alternatives, hint }) => ({ word, position, alternatives, hint }))
+    }),
+    onPublished: () => { byId('setup-status').textContent = '学生链接和二维码已生成。'; }
+  });
+};
+byId('manage-links').onclick = () => window.TeacherGameShare?.openManager();
+
+async function assignmentRequest(action, data) {
+  const response = await fetch('/play/' + encodeURIComponent(shared.shareId) + '/' + action, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const result = await response.json();
+  if (!response.ok && !(response.status === 409 && result.submission)) {
+    throw new Error(result.error || '请求失败，请重试。');
+  }
+  return result;
+}
+
+function showSubmission(submission) {
+  byId('student-form').hidden = true;
+  byId('game').hidden = false;
+  byId('track').max = queue.length;
+  byId('track').value = queue.length;
+  byId('progress').textContent = `${submission.studentName} · 已交卷`;
+  byId('prompt').textContent = '作业已提交！';
+  byId('options').replaceChildren();
+  byId('feedback').textContent = `答对 ${submission.score} / ${queue.length} 题`;
+  byId('listen').hidden = true;
+  byId('next').hidden = true;
+  byId('prompt').focus();
+}
+
+byId('student-form').onsubmit = async event => {
+  event.preventDefault();
+  const button = byId('begin-assignment');
+  button.disabled = true;
+  byId('student-status').textContent = '';
+  try {
+    const result = await assignmentRequest('attempt', { studentName: byId('student-name').value });
+    studentName = result.studentName;
+    byId('student-form').hidden = true;
+    if (result.submission) {
+      queue = shared.data.questions;
+      showSubmission(result.submission);
+    } else {
+      begin(shared.data.questions);
+    }
+  } catch (error) {
+    byId('student-status').textContent = error instanceof SyntaxError ? '链接已失效，或暂时无法打开。' : error.message;
+  } finally {
+    button.disabled = false;
+  }
+};
+
+byId('next').onclick = async () => {
+  if (assignment) {
+    if (index + 1 < queue.length) {
+      index++;
+      showQuestion();
+      return;
+    }
+    const button = byId('next');
+    button.disabled = true;
+    try {
+      const result = await assignmentRequest('submit', { studentName, answers });
+      showSubmission(result.submission);
+    } catch (error) {
+      byId('feedback').textContent = error instanceof SyntaxError ? '暂时无法交卷，请重试。' : error.message;
+    } finally {
+      button.disabled = false;
+    }
+    return;
+  }
+  window.speechSynthesis?.cancel();
+  if (finished) {
+    index = 0;
+    firstTry = 0;
+    showQuestion();
+  } else if (++index < queue.length) {
+    showQuestion();
+  } else {
+    finished = true;
+    byId('progress').textContent = `已完成 ${queue.length} 题`;
+    byId('prompt').textContent = '练习完成！';
+    byId('options').replaceChildren();
+    byId('feedback').textContent = `一次答对 ${firstTry} / ${queue.length} 题`;
+    byId('listen').hidden = true;
+    byId('next').textContent = '再玩一次';
+    byId('prompt').focus();
+  }
+};
+byId('close-celebration').onclick = () => byId('celebration').close();
+byId('celebration-next').onclick = () => {
+  byId('celebration').close();
+  byId('next').click();
+};
+byId('celebration').onclose = () => {
+  if (solved && !byId('next').hidden && !finished) byId('next').focus();
+};
+byId('edit').onclick = () => {
+  window.speechSynthesis?.cancel();
+  byId('game').hidden = true;
+  byId('edit').hidden = true;
+  byId('setup').hidden = false;
+  byId('words').focus();
+};
+byId('listen').onclick = () => {
+  const utterance = new SpeechSynthesisUtterance(queue[index].word);
+  utterance.lang = 'zh-CN';
+  utterance.onerror = event => {
+    if (event.error !== 'interrupted' && event.error !== 'canceled') {
+      byId('feedback').textContent = '当前浏览器无法朗读。';
+    }
+  };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+};
+byId('fullscreen').onclick = async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await byId('game').requestFullscreen();
+  } catch {
+    byId('feedback').textContent = '当前浏览器无法进入全屏。';
+  }
+};
+document.addEventListener('fullscreenchange', () => {
+  byId('fullscreen').textContent = document.fullscreenElement ? '退出全屏' : '全屏';
+});
+byId('fullscreen').hidden = !document.fullscreenEnabled;
+if (assignment) {
+  byId('student-form').hidden = false;
+  byId('student-name').focus();
+} else if (shared) {
+  begin(shared.data.questions.map(question => ({ ...question, letters: [...question.word] })));
+} else {
+  generate();
+}
+</script>
+<% if (!studentView) { %><script src="/javascripts/milk-tea-footer.js"></script><% } %>
+</body>
+</html>

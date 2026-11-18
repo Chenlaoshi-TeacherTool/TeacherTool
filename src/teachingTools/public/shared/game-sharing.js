@@ -322,7 +322,14 @@
     titleInput.value = typeof options.title === 'function' ? options.title() : (options.title || 'Shared Classroom Game');
     passwordInput.value = '';
     const modeInput = dialog.querySelector('[name="shareMode"]');
-    dialog.querySelector('[data-share-mode]').hidden = options.gameType !== 'sentence-reorder';
+    const wordChoice = options.gameType === 'hanzi-word-choice';
+    const supportsAssessment = wordChoice || options.gameType === 'sentence-reorder';
+    dialog.querySelector('[data-share-mode]').hidden = !supportsAssessment;
+    modeInput.options[0].textContent = wordChoice ? '自由练习 — 即时反馈' : 'Practice / 练习版 — instant feedback';
+    modeInput.options[1].textContent = wordChoice ? '作业 — 交卷后看成绩' : 'Quiz / 测验版 — score after submission';
+    modeInput.nextElementSibling.innerHTML = wordChoice
+      ? '自由练习可以重玩。作业需要填写姓名，会员老师可以在「我的活动」查看结果。'
+      : 'Quiz: no hints while working. Submit all sentences to see the total score.<br>测验版：做题时不提示对错，全部提交后显示答对题数。';
     modeInput.value = 'practice';
 
     submit.onclick = async () => {
@@ -336,16 +343,18 @@
           version: options.version || 1,
           title: titleInput.value,
           password: passwordInput.value,
-          data: options.gameType === 'sentence-reorder'
+          data: supportsAssessment
             ? { ...options.getData(), mode: modeInput.value }
             : options.getData()
         });
         urlInput.value = published.absoluteUrl;
         passwordResultInput.value = passwordInput.value;
         dialog.querySelector('[data-share-expiry]').textContent = published.expiresAt ? 'Link open until ' + formatDate(published.expiresAt) + ' / 链接有效至 ' + formatDate(published.expiresAt) : '';
-        dialog.querySelector('.game-share-dialog-success').textContent = options.gameType === 'sentence-reorder'
-          ? (modeInput.value === 'assessment' ? '✓ Quiz link created / 测验版链接已创建' : '✓ Practice link created / 练习版链接已创建')
-          : '✓ Student link created';
+        dialog.querySelector('.game-share-dialog-success').textContent = wordChoice
+          ? (modeInput.value === 'assessment' ? '✓ 作业链接已创建' : '✓ 自由练习链接已创建')
+          : supportsAssessment
+            ? (modeInput.value === 'assessment' ? '✓ Quiz link created / 测验版链接已创建' : '✓ Practice link created / 练习版链接已创建')
+            : '✓ Student link created';
         renderQrCode(qrTarget, qrWrap, published.absoluteUrl);
         dialog.querySelector('[data-open-link]').href = published.absoluteUrl;
         dialog.querySelector('[data-copy-link]').onclick = async (event) => {

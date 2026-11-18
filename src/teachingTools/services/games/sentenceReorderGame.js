@@ -52,9 +52,22 @@ function sanitize(payload) {
   };
 }
 
+function grade(data, answers) {
+  if (!Array.isArray(answers) || answers.length !== data.sentences.length || answers.some(function (answer, index) {
+    return !Array.isArray(answer) || answer.some(function (word) { return typeof word !== 'string'; }) ||
+      JSON.stringify(answer.slice().sort()) !== JSON.stringify(data.sentences[index].words.slice().sort());
+  })) fail('Complete every sentence before submitting.');
+  function normalize(word) { return data.relaxed ? word.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '') : word; }
+  return answers.map(function (answer, index) {
+    return answer.every(function (word, wordIndex) { return normalize(word) === normalize(data.sentences[index].words[wordIndex]); });
+  });
+}
+
 module.exports = {
   type: TYPE,
   version: VERSION,
   view: 'game-share/sentence-reorder-player',
-  sanitize: sanitize
+  sanitize: sanitize,
+  grade: grade,
+  answerKey: function (data) { return data.sentences.map(function (sentence) { return sentence.words; }); }
 };

@@ -112,7 +112,7 @@ function requireAssessment(req, res, next) {
   if (!req.signedCookies || req.signedCookies[cookieName(manifest.shareId)] !== '1') {
     return res.status(401).json({ error: 'Enter the game password first.' });
   }
-  if (manifest.gameType !== 'sentence-reorder' || manifest.payload.mode !== 'assessment') {
+  if (!isQuiz(manifest)) {
     return res.status(400).json({ error: 'This link is not a quiz.' });
   }
   var name = typeof req.body.studentName === 'string' ? req.body.studentName.normalize('NFKC').trim().replace(/\s+/g, ' ') : '';
@@ -133,22 +133,18 @@ router.post('/play/:id/submit', loadManifest, requireAssessment, async function 
   try {
     var existing = await storage.getSubmission(req.params.id, req.studentName);
     if (existing) return res.status(409).json({ error: 'This name has already submitted this quiz.', submission: existing });
-    var data = req.gameShareManifest.payload;
+    var manifest = req.gameShareManifest;
     var answers = req.body.answers;
-    if (!Array.isArray(answers) || answers.length !== data.sentences.length || answers.some(function (answer, index) {
-      return !Array.isArray(answer) || answer.some(function (word) { return typeof word !== 'string'; }) ||
-        JSON.stringify(answer.slice().sort()) !== JSON.stringify(data.sentences[index].words.slice().sort());
-    })) return res.status(400).json({ error: 'Complete every sentence before submitting.' });
-    function normalize(word) { return data.relaxed ? word.toLowerCase().replace(/[^\p{L}\p{N}]/gu, '') : word; }
-    var correct = answers.map(function (answer, index) {
-      return answer.every(function (word, wordIndex) { return normalize(word) === normalize(data.sentences[index].words[wordIndex]); });
-    });
+    var correct = registry.get(manifest.gameType, manifest.version).grade(manifest.payload, answers);
     var submission = { studentName: req.studentName, answers: answers, correct: correct, score: correct.filter(Boolean).length, submittedAt: new Date().toISOString() };
     if (!(await storage.saveSubmission(req.params.id, req.studentName, submission))) {
       return res.status(409).json({ error: 'This name has already submitted this quiz.', submission: await storage.getSubmission(req.params.id, req.studentName) });
     }
     res.status(201).json({ submission: submission });
-  } catch (error) { next(error); }
+  } catch (error) {
+    if (error.status === 400) return res.status(400).json({ error: error.message });
+    next(error);
+  }
 });
 
 router.get('/play/:id', loadManifest, function (req, res, next) {
@@ -158,12 +154,13 @@ router.get('/play/:id', loadManifest, function (req, res, next) {
 
   var adapter = registry.get(manifest.gameType, manifest.version);
   if (!adapter) return next();
+  if (isQuiz(manifest)) res.set('Cache-Control', 'private, no-store');
   var safeJson = JSON.stringify({
     shareId: manifest.shareId,
     gameType: manifest.gameType,
     version: manifest.version,
     title: manifest.title,
-    data: manifest.payload
+    data: adapter.studentData ? adapter.studentData(manifest.payload) : manifest.payload
   }).replace(/</g, '\\u003c');
   res.render(adapter.view, { title: manifest.title, gameDataJson: safeJson });
 });
@@ -204,7 +201,7 @@ router.post('/play/:id/unlock', loadManifest, async function (req, res, next) {
 // signed-in teacher account recorded on the share. =====
 
 function isQuiz(manifest) {
-  return manifest.gameType === 'sentence-reorder' && manifest.payload && manifest.payload.mode === 'assessment';
+  return manifest.payload?.mode === 'assessment' && typeof registry.get(manifest.gameType, manifest.version)?.grade === 'function';
 }
 
 async function ownedManifest(req, shareId, deleteToken) {
@@ -239,7 +236,9 @@ async function loadResults(req, res) {
   return {
     title: manifest.title,
     expiresAt: manifest.expiresAt,
-    sentences: manifest.payload.sentences.map(function (sentence) { return sentence.words; }),
+    gameType: manifest.gameType,
+    prompts: manifest.gameType === 'hanzi-word-choice' ? manifest.payload.questions.map(function (question) { return question.word; }) : undefined,
+    sentences: registry.get(manifest.gameType, manifest.version).answerKey(manifest.payload),
     submissions: await storage.listSubmissions(req.params.id)
   };
 }
@@ -257,8 +256,9 @@ router.post('/api/game-shares/:id/results.xlsx', async function (req, res, next)
     if (!results) return;
     var workbook = new ExcelJS.Workbook();
     var count = results.sentences.length;
+    var wordChoice = results.gameType === 'hanzi-word-choice';
     var sheet = workbook.addWorksheet('Results 结果');
-    sheet.addRow(['Student 学生', 'Score 得分', 'Percent 百分比', 'Submitted 提交时间'].concat(results.sentences.map(function (_words, index) { return 'S' + (index + 1); })));
+    sheet.addRow(['Student 学生', 'Score 得分', 'Percent 百分比', 'Submitted 提交时间'].concat(results.sentences.map(function (_words, index) { return (wordChoice ? 'Q' : 'S') + (index + 1); })));
     results.submissions.forEach(function (submission) {
       sheet.addRow([submission.studentName, submission.score + ' / ' + count, count ? Math.round(submission.score / count * 100) / 100 : 0, submission.submittedAt ? new Date(submission.submittedAt) : '']
         .concat(results.sentences.map(function (_words, index) { return submission.correct[index] ? '✓' : '✗'; })));
@@ -274,10 +274,10 @@ router.post('/api/game-shares/:id/results.xlsx', async function (req, res, next)
     for (var column = 5; column < 5 + count; column += 1) { sheet.getColumn(column).width = 7; sheet.getColumn(column).alignment = { horizontal: 'center' }; sheet.getCell(sheet.rowCount, column).numFmt = '0%'; }
     sheet.views = [{ state: 'frozen', xSplit: 1, ySplit: 1 }];
     var answers = workbook.addWorksheet('Answers 答案');
-    answers.addRow(['Student 学生', 'Sentence 句子', 'Result 结果', 'Student answer 学生答案', 'Correct answer 正确答案']);
+    answers.addRow(['Student 学生', wordChoice ? 'Question 题目' : 'Sentence 句子', 'Result 结果', 'Student answer 学生答案', 'Correct answer 正确答案']);
     results.submissions.forEach(function (submission) {
       results.sentences.forEach(function (words, index) {
-        answers.addRow([submission.studentName, index + 1, submission.correct[index] ? '✓' : '✗', (submission.answers[index] || []).join(' '), words.join(' ')]);
+        answers.addRow([submission.studentName, wordChoice ? (index + 1) + '. ' + results.prompts[index] : index + 1, submission.correct[index] ? '✓' : '✗', (submission.answers[index] || []).join(' '), words.join(' ')]);
       });
     });
     answers.getRow(1).font = { bold: true };
