@@ -103,6 +103,30 @@ function listLink(page, teacher) { var q = new URLSearchParams({ tab: 'teachers'
 <p id="email-copy-status" role="status" aria-live="polite"></p>
 </section>
 <section <%= tab !== 'codes' ? 'hidden' : '' %>>
+<h2 style="font-size:1.1rem;margin-top:28px;">查激活码</h2>
+<p>输入激活码，看它是否被兑换、被哪位老师兑换。</p>
+<form method="POST" action="/admin/memberships/lookup">
+  <label for="lookupCode">激活码</label>
+  <input id="lookupCode" name="code" type="text" maxlength="30" placeholder="CLS-XXXX-XXXX-XXXX" autocomplete="off" required style="font-family:monospace;">
+  <div class="actions"><button type="submit">查询</button></div>
+</form>
+<% if (typeof codeLookup !== 'undefined' && codeLookup) { var found = codeLookup.found; var ymd = function (value) { return value ? new Date(value).toISOString().slice(0, 16).replace('T', ' ') : '—'; }; %>
+  <div style="border:2px solid <%= found ? '#2563eb' : '#dc2626' %>;border-radius:6px;padding:14px;margin:16px 0;">
+    <% if (!found) { %>
+      <p>没有找到这个激活码。请检查是否输入正确。</p>
+    <% } else { %>
+      <p><strong><%= found.days %> 天</strong><%= found.label ? ' · ' + found.label : '' %> · 生成于 <%= ymd(found.createdAt) %> UTC<%= found.createdBy ? '（' + found.createdBy + '）' : '' %></p>
+      <% if (found.redeemedAt) { %>
+        <p>已于 <%= ymd(found.redeemedAt) %> UTC 被兑换：<strong><%= found.email || found.name || '（账户未记录邮箱）' %></strong>
+          <% if (found.ownerKey) { %> · <a href="/admin/memberships?<%= new URLSearchParams({ tab: 'teachers', email: found.email || '', teacher: found.ownerKey }).toString() %>#teacher-details">查看这位老师</a><% } %></p>
+      <% } else { %>
+        <p>还没有被兑换。</p>
+      <% } %>
+      <% if (found.revokedAt) { %><p style="color:#b91c1c;">已于 <%= ymd(found.revokedAt) %> UTC 停用。</p><% } %>
+    <% } %>
+  </div>
+<% } %>
+
 <h2 style="font-size:1.1rem;margin-top:28px;">Create codes</h2>
 <form method="POST" action="/admin/memberships/codes">
   <label for="days">Plan</label>
@@ -138,6 +162,27 @@ function listLink(page, teacher) { var q = new URLSearchParams({ tab: 'teachers'
       <% }) %>
     </tbody>
   </table></div>
+<% } %>
+<% if (typeof codeList !== 'undefined' && codeList) { var stamp = function (value) { return value ? new Date(value).toISOString().slice(0, 10) : '—'; }; %>
+<h2 style="font-size:1.1rem;margin-top:28px;">每个激活码的兑换情况（最近 100 个）</h2>
+<p>激活码本身不保存（只存加密后的值），所以这里按生成时间和备注区分。要确认某一个码，请到“激活码管理”里输入它查询。</p>
+<% if (!codeList.length) { %><p>No codes yet.</p><% } else { %>
+  <div class="table-scroll"><table>
+    <thead><tr><th>生成日期</th><th>备注</th><th>天数</th><th>状态</th><th>兑换老师</th><th>兑换日期</th></tr></thead>
+    <tbody>
+      <% codeList.forEach(function (code) { %>
+        <tr>
+          <td><%= stamp(code.createdAt) %></td>
+          <td><%= code.label || '' %></td>
+          <td><%= code.days %></td>
+          <td><%= code.revokedAt ? '已停用' : code.redeemedAt ? '已兑换' : '未使用' %></td>
+          <td><% if (code.ownerKey) { %><a href="/admin/memberships?<%= new URLSearchParams({ tab: 'teachers', email: code.email || '', teacher: code.ownerKey }).toString() %>#teacher-details"><%= code.email || code.name || '（未记录邮箱）' %></a><% } else { %>—<% } %></td>
+          <td><%= stamp(code.redeemedAt) %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table></div>
+<% } %>
 <% } %>
 </section>
 <script src="/javascripts/admin-memberships.js" defer></script>

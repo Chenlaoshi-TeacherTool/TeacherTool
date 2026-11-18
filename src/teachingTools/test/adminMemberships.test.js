@@ -103,3 +103,20 @@ test('teacher rows link to adjustment and show manual audit reasons safely', asy
   assert.match(html,/原因：&lt;script&gt;test/);
   assert.ok(!html.includes('<script>test</script>'));
 });
+
+test('a code lookup says who used it, and the batches tab lists every code with its teacher', async function() {
+  var owner = 'f'.repeat(64);
+  var used = { days: 365, label: 'order 42', createdAt: new Date('2026-11-01T00:00:00Z'), createdBy: 'Admin', redeemedAt: new Date('2026-11-02T03:04:00Z'), revokedAt: null, ownerKey: owner, email: 'amy@example.org' };
+  var html = await render({ membershipTab: 'codes', codeLookup: { found: used } });
+  assert.match(html, /action="\/admin\/memberships\/lookup"/);
+  assert.match(html, /已于 2026-11-02 03:04 UTC 被兑换：<strong>amy@example\.org<\/strong>/);
+  assert.ok(html.includes('teacher=' + owner));
+  assert.match(await render({ membershipTab: 'codes', codeLookup: { found: Object.assign({}, used, { redeemedAt: null, ownerKey: null }) } }), /还没有被兑换/);
+  assert.match(await render({ membershipTab: 'codes', codeLookup: { found: Object.assign({}, used, { revokedAt: new Date('2026-11-03T00:00:00Z') }) } }), /已于 2026-11-03 00:00 UTC 停用/);
+  assert.match(await render({ membershipTab: 'codes', codeLookup: { found: null } }), /没有找到这个激活码/);
+  var list = await render({ membershipTab: 'batches', codeList: [used, { days: 30, label: '<b>x</b>', createdAt: new Date(), redeemedAt: null, revokedAt: null }] });
+  assert.match(list, /每个激活码的兑换情况/);
+  assert.match(list, /<td>已兑换<\/td>\s*<td><a href="[^"]*teacher=f{64}[^"]*">amy@example\.org<\/a>/);
+  assert.match(list, /<td>未使用<\/td>\s*<td>—<\/td>/);
+  assert.doesNotMatch(list, /<b>x<\/b>/);
+});

@@ -1241,8 +1241,22 @@ router.get('/memberships', async function (req, res, next) {
     var selected = directory.teachers.find(function(teacher) { return teacher.ownerKey === req.query.teacher; });
     if (selected) selected.events = await teacherLibraryRepository.listEvents([selected.ownerKey]);
     res.set('Cache-Control', 'private, no-store');
+    var tab = ['codes', 'batches'].includes(req.query.tab) ? req.query.tab : 'teachers';
     res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser,
-      directory: directory, selectedTeacher: selected ? selected.ownerKey : '', membershipTab: ['codes', 'batches'].includes(req.query.tab) ? req.query.tab : 'teachers' });
+      directory: directory, selectedTeacher: selected ? selected.ownerKey : '', membershipTab: tab,
+      codeList: tab === 'batches' ? await teacherLibraryRepository.listCodes() : null });
+  } catch (err) { next(err); }
+});
+
+// Who used a code: the admin enters the code and sees whether and by whom it was used.
+router.post('/memberships/lookup', async function (req, res, next) {
+  try {
+    if (req.get('origin') && new URL(req.get('origin')).host !== req.get('host')) return res.status(403).send('Look up codes from the admin page.');
+    var hash = activationCodes.hash(req.body.code);
+    var found = hash ? await teacherLibraryRepository.listCodes(hash) : [];
+    res.set('Cache-Control', 'private, no-store');
+    res.render('admin/memberships', { title: 'Memberships', batches: await teacherLibraryRepository.listCodeBatches(), created: null, membershipTab: 'codes', planDays: activationCodes.PLAN_DAYS, adminUser: req.adminUser,
+      codeLookup: { found: found[0] || null } });
   } catch (err) { next(err); }
 });
 

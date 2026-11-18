@@ -98,6 +98,20 @@ async function redeem(owner, codeHash) {
   return row.outcome === 'redeemed' ? { outcome: 'redeemed', days: row.days, writeUntil: row.write_until } : { outcome: 'invalid' };
 }
 
+// Single codes with who used them, newest first; pass a hash to look up one code.
+async function listCodes(codeHash) {
+  var pool = await db.getPool();
+  var result = await pool.request().input('code', db.sql.Char(64), codeHash || null).query(
+    'SELECT TOP 100 c.code_hash, c.days, c.batch_label, c.created_at, c.created_by, c.redeemed_at, c.revoked_at, a.owner_key, a.email, a.display_name ' +
+    'FROM dbo.teacher_activation_codes c LEFT JOIN dbo.teacher_accounts a ON a.owner_key = c.redeemed_by ' +
+    'WHERE @code IS NULL OR c.code_hash = @code ORDER BY c.created_at DESC;'
+  );
+  return result.recordset.map(function (row) {
+    return { codeHash: row.code_hash, days: row.days, label: row.batch_label, createdAt: row.created_at, createdBy: row.created_by, redeemedAt: row.redeemed_at, revokedAt: row.revoked_at,
+      ownerKey: row.owner_key, email: row.email, name: row.display_name };
+  });
+}
+
 async function createCodes(codes, createdBy) {
   var pool = await db.getPool();
   var transaction = new db.sql.Transaction(pool);
@@ -145,4 +159,4 @@ async function revokeCode(codeHash, revokedBy) {
   return row.outcome === 'revoked' ? { outcome: 'revoked', days: row.days, wasUsed: Boolean(row.was_used), writeUntil: row.write_until } : { outcome: row.outcome };
 }
 
-module.exports = { listEvents: listEvents, revokeCode: revokeCode, load: load, hasActiveAccess: hasActiveAccess, save: save, ensureTrial: ensureTrial, redeem: redeem, createCodes: createCodes, listCodeBatches: listCodeBatches };
+module.exports = { listEvents: listEvents, revokeCode: revokeCode, load: load, hasActiveAccess: hasActiveAccess, save: save, ensureTrial: ensureTrial, redeem: redeem, listCodes: listCodes, createCodes: createCodes, listCodeBatches: listCodeBatches };
