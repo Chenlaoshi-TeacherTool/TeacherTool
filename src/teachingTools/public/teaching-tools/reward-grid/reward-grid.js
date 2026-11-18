@@ -361,20 +361,49 @@ function renderBoard() {
       caption.textContent = t(`格子 ${index + 1} · 已揭晓`, `Tile ${index + 1} · Revealed`);
       tile.append(caption);
     } else {
-      tile.onclick = () => {
-        cell.revealed = true;
-        save();
-        renderBoard();
-        $('reward-number').textContent = t(`格子 ${index + 1}`, `Tile ${index + 1}`);
-        $('reward-question').textContent = cell.question;
-        $('reward-content').replaceChildren(createReward(cell, index));
-        $('reward-dialog').showModal();
-        showerEmoji();
-      };
+      tile.onclick = () => openTile(cell, index);
     }
     $('board').append(tile);
   });
 }
+// Step 1: show only the question with a closed gift. The tile stays open until the teacher reveals it.
+let openCell = null;
+function openTile(cell, index) {
+  openCell = { cell, index };
+  const dialog = $('reward-dialog');
+  dialog.classList.add('asking');
+  dialog.querySelector('.emoji-shower')?.remove();
+  $('reward-number').textContent = t(`格子 ${index + 1}`, `Tile ${index + 1}`);
+  $('reward-title').textContent = t('请回答问题', 'Answer the question');
+  $('reward-question').textContent = cell.question;
+  const gift = document.createElement('span');
+  gift.className = 'closed-gift';
+  gift.setAttribute('aria-hidden', 'true');
+  gift.textContent = currentTheme().icon;
+  $('reward-content').replaceChildren(gift);
+  $('back-to-board').hidden = $('reveal-reward').hidden = false;
+  $('close-reward').hidden = true;
+  dialog.showModal();
+  $('reveal-reward').focus();
+}
+
+// Step 2: the teacher clicks reveal; only now is the tile locked and saved.
+function revealOpenTile() {
+  if (!openCell) return;
+  const { cell, index } = openCell;
+  openCell = null;
+  cell.revealed = true;
+  save();
+  renderBoard();
+  $('reward-dialog').classList.remove('asking');
+  $('reward-title').textContent = t('奖励揭晓！', 'Reward revealed!');
+  $('reward-content').replaceChildren(createReward(cell, index));
+  $('back-to-board').hidden = $('reveal-reward').hidden = true;
+  $('close-reward').hidden = false;
+  $('close-reward').focus();
+  showerEmoji();
+}
+
 function showMode() {
   const playing = state.mode === 'classroom';
   $('setup').hidden = playing;
@@ -449,6 +478,8 @@ $('reset').onclick = () => {
   save(); renderBoard();
 };
 $('close-reward').onclick = () => $('reward-dialog').close();
+$('back-to-board').onclick = () => $('reward-dialog').close();
+$('reveal-reward').onclick = revealOpenTile;
 $('reward-dialog').addEventListener('close', () => {
   const next = $('board').querySelector('button:not(:disabled)');
   if (next) next.focus();

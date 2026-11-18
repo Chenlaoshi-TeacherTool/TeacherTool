@@ -54,3 +54,10 @@ button { background: var(--rg-accent); }
 @keyframes emoji-fall { to { transform: translateY(95vh) rotate(var(--spin, 90deg)); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .emoji-shower { display: none; } body { transition: none; } }
 @media (max-width: 560px) { #theme-options { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); } }
+
+/* Question step: big question, closed gift; the reward only appears after "Reveal". */
+#reward-dialog.asking #reward-question { font-size: clamp(26px, 3.4vw, 42px); line-height: 1.5; color: var(--ink, #193d38); }
+.closed-gift { display: inline-block; font-size: clamp(64px, 10vw, 104px); line-height: 1; animation: gift-wiggle 1.6s ease-in-out infinite; }
+#reveal-reward { font-size: 18px; padding: 14px 28px; }
+@keyframes gift-wiggle { 0%, 70%, 100% { transform: rotate(0); } 78% { transform: rotate(-9deg) scale(1.05); } 86% { transform: rotate(8deg) scale(1.05); } 94% { transform: rotate(-4deg); } }
+@media (prefers-reduced-motion: reduce) { .closed-gift { animation: none; } }
