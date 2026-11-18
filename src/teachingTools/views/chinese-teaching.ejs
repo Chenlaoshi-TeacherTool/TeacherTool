@@ -4,65 +4,60 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= lang === 'zh' ? '中文教学专区' : 'Chinese Teaching' %> · CLS Teaching Tools</title>
-  <%- include('partials/seo', { pageDescription: lang === 'zh' ? '按汉字与书写、词汇与句型、阅读与表达、教材配套查找已有中文教学资源。' : 'Find existing Chinese teaching resources by classroom task.' }) %>
+  <%- include('partials/seo', { pageDescription: lang === 'zh' ? '中文课堂专用的汉字、拼音、词汇和句型工具，以及教材配套资源。' : 'Tools made for Chinese classes: characters, pinyin, vocabulary and sentence patterns, plus textbook resources.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <style>.task-section { margin-bottom: 40px; scroll-margin-top: 24px; } .task-nav { display:flex; flex-wrap:wrap; gap:16px; margin-top:24px; } .task-section h2 { color:#194f45; } .resource-card__link { display:inline-block; margin-top:12px; }</style>
 </head>
 <body>
+  <%
+    // Tools come from config/tools.js (subject: 'chinese'); nothing is listed by hand here.
+    var zh = lang === 'zh';
+    var headings = {
+      characters: zh ? '汉字与拼音' : 'Characters & pinyin',
+      vocabulary: zh ? '词汇与句型' : 'Vocabulary & sentence patterns',
+      textbooks: zh ? '教材配套' : 'Textbook companion'
+    };
+    function names(list) { return list.map(function(series) { return zh ? series.zh : series.en; }).join(zh ? '、' : ', '); }
+    var ready = textbookSeries.filter(function(series) { return series.books; });
+    var upcoming = textbookSeries.filter(function(series) { return !series.books; });
+  %>
   <header class="content-hero"><div class="content-shell">
-    <a href="/" class="text-link">← <%= lang === 'zh' ? '首页' : 'Home' %></a>
-    <h1><%= lang === 'zh' ? '中文教学专区' : 'Chinese Teaching' %></h1>
-    <p><%= lang === 'zh' ? '为中文课堂准备的识字、书写、词汇、句型和教材配套资源。' : 'Character recognition, writing, vocabulary, sentence patterns, and textbook resources for Chinese classrooms.' %></p>
-    <% var groups = [
-      { id:'characters', zh:'汉字与书写', en:'Characters & writing', items:[
-        'stroke-order-worksheet',
-        'missing-radicals',
-        'hanzi-batch/index.html',
-        'yu-duoyinzi-font'
-      ] },
-      { id:'vocabulary', zh:'词汇与句型', en:'Vocabulary & sentence patterns', items:[
-        'word-list-library/word-list-library.html',
-        'flash-card-generator',
-        'sentence-reorder',
-        'vocabulary-booklet/vocabulary-booklet.html'
-      ] },
-      { id:'reading', zh:'阅读与表达', en:'Reading & expression', items:[
-        'independent-reading',
-        'book-generator',
-        'social-media-classroom-tools/',
-        'question-bank-library/question-bank-library.html'
-      ] },
-      { id:'textbooks', zh:'教材配套', en:'Textbook companion', items:[] }
-    ]; %>
-    <nav class="task-nav" aria-label="<%= lang === 'zh' ? '教学任务' : 'Teaching tasks' %>">
-      <% groups.forEach(function(group) { %><a class="text-link" href="#<%= group.id %>"><%= lang === 'zh' ? group.zh : group.en %></a><% }); %>
+    <a href="/" class="text-link">← <%= zh ? '首页' : 'Home' %></a>
+    <h1><%= zh ? '中文教学专区' : 'Chinese Teaching' %></h1>
+    <p><%= zh ? '只有中文课才用得上的工具：汉字、拼音、词汇、句型，还有教材配套。' : 'Tools made only for Chinese classes: characters, pinyin, vocabulary, sentence patterns, and textbook resources.' %></p>
+    <nav class="task-nav" aria-label="<%= zh ? '教学任务' : 'Teaching tasks' %>">
+      <% Object.keys(headings).forEach(function(id) { %><a class="text-link" href="#<%= id %>"><%= headings[id] %></a><% }); %>
     </nav>
   </div></header>
   <main class="content-section"><div class="content-shell">
     <% groups.forEach(function(group) { %>
-    <section class="task-section" id="<%= group.id %>" aria-labelledby="<%= group.id %>-title">
-      <h2 id="<%= group.id %>-title"><%= lang === 'zh' ? group.zh : group.en %></h2>
+    <section class="task-section" id="<%= group.key %>" aria-labelledby="<%= group.key %>-title">
+      <h2 id="<%= group.key %>-title"><%= headings[group.key] %></h2>
       <div class="resource-grid">
-        <% group.items.forEach(function(item) { var tool = toolByHref('/teaching-tools/' + item); %>
+        <% group.tools.forEach(function(tool) { %>
         <article class="resource-card">
-          <h3><%= t(tool.titleKey) %></h3>
+          <h3><%= tool.icon %> <%= t(tool.titleKey) %></h3>
           <p><%= t(tool.descKey) %></p>
-          <a class="resource-card__link" href="<%= tool.href %>"><%= lang === 'zh' ? '打开资源' : 'Open resource' %> →</a>
+          <a class="resource-card__link" href="<%= tool.href %>"><%= t(tool.actionKey) %> →</a>
         </article>
         <% }); %>
-        <% if (group.id === 'textbooks') { %>
-        <article class="resource-card">
-          <h3><%= lang === 'zh' ? '暨南大学《中文》教材配套' : 'Jinan University “中文” companion' %></h3>
-          <p><%= lang === 'zh' ? '现有第一至三册目录，专属配套材料尚未添加。可先用上方通用工具，配合课本词汇和句型自建活动。' : 'Directories for levels 1–3 are available; dedicated materials have not been added yet. Use the tools above with your textbook vocabulary and sentence patterns.' %></p>
-          <a class="resource-card__link" href="/textbook-companion"><%= lang === 'zh' ? '查看教材栏目' : 'View textbook section' %> →</a>
-        </article>
-        <% } %>
       </div>
     </section>
     <% }); %>
+    <section class="task-section" id="textbooks" aria-labelledby="textbooks-title">
+      <h2 id="textbooks-title"><%= headings.textbooks %></h2>
+      <div class="resource-grid">
+        <article class="resource-card">
+          <h3><%= names(ready) %></h3>
+          <p><%= zh ? '按册、按课查找生词、句型和课堂活动。' : 'Find words, sentence patterns, and classroom activities by book and lesson.' %><% if (upcoming.length) { %> <%= zh ? '即将推出：' + names(upcoming) + '。' : 'Coming soon: ' + names(upcoming) + '.' %><% } %></p>
+          <a class="resource-card__link" href="/textbook-companion"><%= zh ? '查看教材栏目' : 'View textbook section' %> →</a>
+        </article>
+      </div>
+    </section>
     <% if (typeof articles !== 'undefined' && articles.length) { %>
     <section class="task-section" aria-labelledby="articles-title"><h2 id="articles-title"><%= lang === 'zh' ? '教学文章' : 'Teaching articles' %></h2><div class="resource-grid"><% articles.forEach(function(article) { %><article class="resource-card"><h3><a href="/resources/<%= encodeURIComponent(article.slug) %>"><%= article.title %></a></h3><p><%= article.description %></p></article><% }); %></div></section>
     <% } %>
+    <p><%= zh ? '课堂游戏、分组、打印材料等通用工具同样适用于中文课。' : 'Classroom games, grouping tools, and printables for any subject work in Chinese classes too.' %> <a class="text-link" href="/teaching-tools"><%= zh ? '查看全部教学工具' : 'Browse all teaching tools' %> →</a></p>
   </div></main>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body></html>

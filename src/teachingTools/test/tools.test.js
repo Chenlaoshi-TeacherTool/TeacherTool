@@ -30,6 +30,9 @@ test('every catalog entry is complete and translated in both languages', functio
       ['heading', 'desc'].forEach(function(part) { assert.ok(translated(lang, 'teachingToolsIndex.groups.' + section.key + '.' + part), section.key + ' ' + lang + ' ' + part); });
     });
   });
+  tools.TOOLS.forEach(function(tool) { assert.ok(tool.subject === undefined || tool.subject === 'chinese', (tool.href || tool.titleKey) + ' subject'); });
+  var chinese = tools.chineseGroups().reduce(function(all, group) { assert.ok(group.tools.length > 0, group.key + ' is empty'); return all.concat(group.tools); }, []);
+  assert.deepEqual(chinese.map(function(tool) { return tool.href; }).sort(), tools.LIVE.filter(function(tool) { return tool.subject === 'chinese'; }).map(function(tool) { return tool.href; }).sort());
   var hrefs = tools.LIVE.map(function(tool) { return tool.href; });
   assert.equal(new Set(hrefs).size, hrefs.length);
 });

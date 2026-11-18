@@ -131,6 +131,7 @@
         .tool-card p {
             margin-bottom: 20px;
         }
+        .tool-subject { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #fde8e4; color: #a63f34; font-size: .75rem; font-weight: 800; vertical-align: middle; }
         .tool-scope { display: inline-block; margin: 0 0 12px !important; padding: 4px 9px; border-radius: 999px; background: #edf5df; color: #356e57; font-size: .75rem; font-weight: 800; }
         .btn {
             background-color: #667eea;
@@ -221,7 +222,7 @@
                 <% var searchText = [tool.titleKey, tool.scopeKey, tool.descKey].map(function(key) { return key ? t(key) + ' ' + tOther(key) : ''; }).join(' '); %>
                 <div data-search="<%= searchText %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %><%= index >= 8 ? ' tool-card--extra' : '' %>">
                     <% if (tool.href) { %><%- include('../partials/tool-snapshot', { previewHref: tool.href }) %><% } %>
-                    <h3><% if (tool.icon) { %><%= tool.icon %> <% } %><%= t(tool.titleKey) %><% if (tool.limitedFree) { %> <span class="tool-limited-free"><%= t('teachingToolsIndex.limitedFree') %></span><% } %></h3>
+                    <h3><% if (tool.icon) { %><%= tool.icon %> <% } %><%= t(tool.titleKey) %><% if (tool.subject === 'chinese') { %> <span class="tool-subject"><%= t('teachingToolsIndex.chineseOnly') %></span><% } %><% if (tool.limitedFree) { %> <span class="tool-limited-free"><%= t('teachingToolsIndex.limitedFree') %></span><% } %></h3>
                     <p class="tool-scope"><%= t(tool.scopeKey) %></p>
                     <p><%= t(tool.descKey) %></p>
                     <% if (tool.href) { %>

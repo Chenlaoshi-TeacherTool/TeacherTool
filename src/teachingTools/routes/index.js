@@ -96,7 +96,7 @@ router.get('/teaching-tools/lucky-wheel', function(req, res) {
 });
 
 router.get('/chinese-teaching', function(req, res) {
-  res.render('chinese-teaching', { title: 'Chinese Teaching', articles: siteContentStore.get().articles, toolByHref: tools.byHref });
+  res.render('chinese-teaching', { title: 'Chinese Teaching', groups: tools.chineseGroups(), textbookSeries: require('../config/textbooks').SERIES, articles: siteContentStore.get().articles });
 });
 
 router.get('/teaching-tools', function(req, res, next) {
