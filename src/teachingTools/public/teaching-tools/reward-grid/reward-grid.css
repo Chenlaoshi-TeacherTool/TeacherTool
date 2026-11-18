@@ -18,3 +18,39 @@ body > main { min-height: 55vh; }
 #reward-content .reward-value { font-size: clamp(48px, 9vw, 88px); color: #76531c; }
 #reward-content img { display: block; max-width: 100%; max-height: 40vh; object-fit: contain; margin: auto; }
 #reward-dialog { max-height: 90vh; overflow: auto; }
+/* Holiday themes: reward-grid.js sets these variables from THEMES; the values here are the classic look. */
+:root { --rg-tile: #245c4c; --rg-tile-border: #3c7662; --rg-tile-shadow: #173e34; --rg-tile-ink: #fff; --rg-revealed: #fff4d4; --rg-revealed-ink: #614b22; --rg-revealed-border: #ebd390; --rg-accent: #205848; --rg-page: #fff9e9; }
+body, :fullscreen { background-color: var(--rg-page); transition: background-color .3s ease; }
+.bottom-bar { background: color-mix(in srgb, var(--rg-page) 95%, transparent); }
+button { background: var(--rg-accent); }
+.secondary { background: #fff; color: var(--rg-accent); }
+.tile { position: relative; overflow: hidden; background: var(--rg-tile); color: var(--rg-tile-ink); border-color: var(--rg-tile-border); box-shadow: 0 5px 0 var(--rg-tile-shadow); }
+.tile.revealed { background: var(--rg-revealed); color: var(--rg-revealed-ink); border-color: var(--rg-revealed-border); box-shadow: 0 3px 0 var(--rg-revealed-border); }
+.tile .reward-value { border-top-color: var(--rg-revealed-border); }
+#reward-content .reward-value { color: var(--rg-revealed-ink); }
+.tile[data-mark]::after { content: attr(data-mark); position: absolute; right: 8px; bottom: 4px; font-size: clamp(26px, 3vw, 40px); line-height: 1; opacity: .22; transform: rotate(-12deg); pointer-events: none; }
+.tile.revealed[data-mark]::after { opacity: .12; }
+.tile > * { position: relative; z-index: 1; }
+
+.theme-panel { margin-bottom: 20px; }
+.theme-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.shower-toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #4c6058; cursor: pointer; }
+.shower-toggle input { width: 18px; height: 18px; accent-color: var(--rg-accent); }
+#theme-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; margin: 16px 0 6px; }
+.theme-option { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 8px 12px; background: #fff; color: #2c4a42; border: 2px solid #dfe5d9; border-radius: 14px; font-weight: 700; font-size: 14px; }
+.theme-option:hover { filter: none; border-color: #b9c8bd; }
+.theme-option[aria-checked="true"] { border-color: var(--rg-accent); background: color-mix(in srgb, var(--rg-accent) 8%, #fff); box-shadow: 0 0 0 2px color-mix(in srgb, var(--rg-accent) 25%, transparent); }
+.theme-option-icon { font-size: 32px; line-height: 1.1; }
+.theme-swatch { width: 44px; height: 8px; border-radius: 4px; }
+.theme-tag { position: absolute; top: -9px; right: 6px; padding: 1px 8px; border-radius: 999px; background: #c78c27; color: #fff; font-size: 11px; font-weight: 800; }
+
+.emoji-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.emoji-chip { padding: 4px 6px; min-width: 38px; background: #f6f7f2; border: 1px solid #dfe5d9; border-radius: 8px; font-size: 20px; line-height: 1.2; }
+.emoji-chip:hover { filter: none; background: #eef1e8; }
+.emoji-chip[aria-pressed="true"] { background: color-mix(in srgb, var(--rg-accent) 14%, #fff); border-color: var(--rg-accent); }
+
+.emoji-shower { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
+.emoji-shower span { position: absolute; top: -50px; line-height: 1; animation: emoji-fall var(--duration, 2.2s) ease-in var(--delay, 0s) forwards; }
+@keyframes emoji-fall { to { transform: translateY(95vh) rotate(var(--spin, 90deg)); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .emoji-shower { display: none; } body { transition: none; } }
+@media (max-width: 560px) { #theme-options { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); } }

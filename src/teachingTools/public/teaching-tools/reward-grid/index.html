@@ -11,11 +11,17 @@
 <body>
   <header class="reward-grid-header">
     <a href="/teaching-tools" data-en="← Teaching Tools">← 教学工具</a>
-    <div class="heading"><div><p class="eyebrow">READ · CHOOSE · REVEAL</p><h1 data-en="Classroom Reward Grid">课堂抽奖格子</h1><p data-en="Read the questions, make your choice, and click to reveal a surprise.">先看题，再选择，点击题目揭晓惊喜。</p></div><span class="gift" aria-hidden="true">🎁</span></div>
+    <div class="heading"><div><p class="eyebrow">READ · CHOOSE · REVEAL</p><h1 id="tool-title" data-en="Classroom Reward Grid">课堂抽奖格子</h1><p data-en="Read the questions, make your choice, and click to reveal a surprise.">先看题，再选择，点击题目揭晓惊喜。</p></div><span class="gift" id="theme-icon" aria-hidden="true">🎁</span></div>
   </header>
   <main>
     <p id="status" role="status" aria-live="polite"></p>
     <section id="setup">
+      <section class="panel theme-panel" aria-labelledby="theme-title">
+        <div class="theme-head"><div><h2 id="theme-title" data-en="Choose a holiday theme">选择节日主题</h2><p data-en="Changes the colors, tile decorations, and the emoji rewards you can pick from.">会换掉配色、格子装饰和可选的 Emoji 奖励。</p></div>
+          <label class="shower-toggle"><input type="checkbox" id="shower" checked> <span data-en="Emoji shower when a reward is revealed">揭晓时撒 Emoji</span></label></div>
+        <div id="theme-options" role="radiogroup" aria-labelledby="theme-title"></div>
+        <div class="controls"><button id="random-emoji" class="secondary" data-en="🎲 Random theme emoji rewards">🎲 一键随机主题奖励</button><p data-en="Gives every points or emoji tile a theme emoji. Image rewards stay.">把分数和 Emoji 格子都换成主题 Emoji，图片奖励保留。</p></div>
+      </section>
       <section class="panel bulk-questions" aria-labelledby="bulk-title">
         <h2 id="bulk-title" data-en="Add all your questions">一次放入所有题目</h2>
         <label for="bulk-questions" data-en="One question per line. Blank lines are skipped. You can edit each tile after generating.">每行一道题，空行会自动跳过。生成后仍可在各格中单独修改。</label>
@@ -30,7 +36,7 @@
       <div class="bottom-bar"><p data-en="🔒 Questions, images, and progress stay in this browser">🔒 题目、图片和进度仅保存在此浏览器</p><button id="start" data-en="Start classroom mode →">进入课堂模式 →</button></div>
     </section>
     <section id="classroom" hidden>
-      <div class="toolbar classroom-toolbar"><div><h2 data-en="Today's reward grid">今天的幸运格</h2><p id="progress" aria-live="polite"></p></div><div class="controls"><button id="edit" class="secondary" data-en="Back to setup">返回设置</button><button id="reset" class="secondary" data-en="Restart">重新开始</button><button id="fullscreen" class="secondary" data-en="Full screen">全屏投影</button></div></div>
+      <div class="toolbar classroom-toolbar"><div><h2 id="board-title" data-en="Today's reward grid">今天的幸运格</h2><p id="progress" aria-live="polite"></p></div><div class="controls"><button id="edit" class="secondary" data-en="Back to setup">返回设置</button><button id="reset" class="secondary" data-en="Restart">重新开始</button><button id="fullscreen" class="secondary" data-en="Full screen">全屏投影</button></div></div>
       <div class="board-scroll"><div id="board" data-en-aria-label="Reward grid" aria-label="奖励格子"></div></div>
     </section>
   </main>
