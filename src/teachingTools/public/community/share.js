@@ -57,6 +57,7 @@
       description: $('shareDescription').value.trim(),
       authorName: $('shareAuthor').value.trim(),
       textbook: $('shareTextbook').value,
+      customTextbook: $('shareCustomTextbook').value,
       stages: Array.prototype.map.call(document.querySelectorAll('input[name="stages"]:checked'), function (box) { return box.value; })
     };
     body.kind = $('shareKind').value;
@@ -136,6 +137,9 @@
     if (!gameId && ['contest', 'website', 'grant'].includes(params.get('kind'))) $('shareKind').value = params.get('kind');
     $('shareKind').addEventListener('change', updateKind);
     updateKind();
+    $('shareTextbook').addEventListener('change', function () {
+      $('shareCustomTextbookRow').hidden = $('shareTextbook').value !== 'other';
+    });
     $('shareForm').addEventListener('submit', submit);
   }
 

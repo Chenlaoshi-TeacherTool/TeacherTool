@@ -124,12 +124,13 @@ function cleanWords(items) {
 // Shared fields of every post. Content (words or game data) is checked by the caller.
 function cleanPost(body) {
   body = body || {};
+  var custom = body.textbook === 'other' ? text(body.customTextbook, 80, 'Textbook name', false) : '';
   return {
     authorName: text(body.authorName, 40, 'Your display name', true),
     title: text(body.title, 120, 'Title', true),
     description: text(body.description, 500, 'Description', false),
     stages: cleanStages(body.stages),
-    textbook: cleanTextbook(body.textbook)
+    textbook: custom ? 'custom:' + custom : cleanTextbook(body.textbook)
   };
 }
 
@@ -137,19 +138,32 @@ function cleanPost(body) {
 function search(posts, query) {
   query = query || {};
   var q = String(query.q || '').trim().toLowerCase().slice(0, 60);
-  var stage = cleanStages([query.stage])[0] || '';
-  var textbook = cleanTextbook(query.textbook);
+  function stageFor(group, key) {
+    return STAGES.find(function (stage) { return stage.group === group && stage.key === key; })?.key || '';
+  }
+  var learner = stageFor('learner', query.learner) || stageFor('learner', query.stage);
+  var grade = stageFor('grade', query.grade) || stageFor('grade', query.stage);
+  var customTextbooks = new Map();
+  posts.forEach(function (post) {
+    if (post.textbook?.startsWith('custom:')) {
+      var key = post.textbook.toLowerCase();
+      if (!customTextbooks.has(key)) customTextbooks.set(key, post.textbook.slice(7));
+    }
+  });
+  var requestedBook = typeof query.textbook === 'string' ? query.textbook.toLowerCase() : '';
+  var textbook = customTextbooks.has(requestedBook) ? requestedBook : cleanTextbook(requestedBook);
   var kind = KINDS.indexOf(query.kind) !== -1 ? query.kind : '';
   var matches = posts.filter(function (post) {
-    if (stage && post.stages.indexOf(stage) === -1) return false;
-    if (textbook && post.textbook !== textbook) return false;
+    if (learner && !post.stages.includes(learner)) return false;
+    if (grade && !post.stages.includes(grade)) return false;
+    if (textbook && post.textbook?.toLowerCase() !== textbook) return false;
     if (kind && post.kind !== kind) return false;
-    if (q && (post.title + ' ' + post.description + ' ' + post.authorName + ' ' + (post.kind === 'grant' && post.payload ? post.payload.funder || '' : '')).toLowerCase().indexOf(q) === -1) return false;
+    if (q && (post.title + ' ' + post.description + ' ' + post.authorName + ' ' + (post.textbook || '') + ' ' + (post.kind === 'grant' && post.payload ? post.payload.funder || '' : '')).toLowerCase().indexOf(q) === -1) return false;
     return true;
   });
   var pages = Math.max(1, Math.ceil(matches.length / PAGE_SIZE));
   var page = Math.min(pages, Math.max(1, parseInt(query.page, 10) || 1));
-  return { q: q, stage: stage, textbook: textbook, kind: kind, page: page, pages: pages, total: matches.length,
+  return { q: q, learner: learner, grade: grade, textbook: textbook, customTextbooks: customTextbooks, kind: kind, page: page, pages: pages, total: matches.length,
     posts: matches.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) };
 }
 
@@ -167,6 +181,6 @@ module.exports = {
   KINDS: KINDS, EXTERNAL_KINDS: EXTERNAL_KINDS, isClosed: isClosed, today: today, cleanExternal: cleanExternal, kindLabel: kindLabel, STAGES: STAGES, TEXTBOOKS: TEXTBOOKS, GAME_TYPES: GAME_TYPES, MAX_WORDS: MAX_WORDS, PAGE_SIZE: PAGE_SIZE,
   newId: newId, validId: validId, cleanPost: cleanPost, cleanWords: cleanWords, search: search, wordsAsText: wordsAsText,
   stageLabel: function (key, lang) { return label(STAGES, key, lang); },
-  textbookLabel: function (key, lang) { return label(TEXTBOOKS, key, lang); },
+  textbookLabel: function (key, lang) { return key?.startsWith('custom:') ? key.slice(7) : label(TEXTBOOKS, key, lang); },
   gameLabel: function (type, lang) { var game = GAME_TYPES[type]; return game ? game[lang === 'zh' ? 'zh' : 'en'] : ''; }
 };

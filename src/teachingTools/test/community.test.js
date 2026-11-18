@@ -119,6 +119,22 @@ test('publishing needs an account, a same-site request, and real content', async
   assert.equal(posts.size, 0);
 });
 
+test('custom textbook names are searchable and combine with learner and grade filters', async function () {
+  var book = '快乐读中文 Reader';
+  var first = await publish('alice', wordList({ title: 'Matching post', textbook: 'other', customTextbook: '  ' + book, stages: ['heritage', 'primary'] }));
+  assert.equal(first.status, 201);
+  var created = await first.json();
+  await publish('bob', wordList({ title: 'Different grade', textbook: 'other', customTextbook: book.toLowerCase(), stages: ['heritage', 'middle'] }));
+  await publish('bob', wordList({ title: 'Different learner', textbook: 'other', customTextbook: book, stages: ['non-native', 'primary'] }));
+  var query = new URLSearchParams({ learner: 'heritage', grade: 'primary', textbook: 'custom:' + book, q: 'Reader' });
+  var html = await (await fetch(origin + '/community?' + query)).text();
+  assert.match(html, /Matching post/);
+  assert.match(html, /快乐读中文 Reader/);
+  assert.doesNotMatch(html, /Different grade|Different learner/);
+  assert.match(await (await fetch(origin + created.url)).text(), /快乐读中文 Reader/);
+  assert.equal((await publish('alice', wordList({ textbook: 'other', customTextbook: '字'.repeat(81) }))).status, 400);
+});
+
 test('a game is shared from the teacher\'s own saved activity only', async function () {
   games.set('owner-alice:game-1', { gameType: 'sentence-reorder', version: 1, title: 'Lesson 3',
     payload: { title: 'Lesson 3', sentences: ['我 喜欢 吃 苹果', '他 是 老师'] } });

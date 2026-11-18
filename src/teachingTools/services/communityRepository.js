@@ -100,7 +100,7 @@ async function create(post) {
     .input('id', db.sql.VarChar(16), row.id).input('kind', db.sql.VarChar(10), row.kind)
     .input('owner', db.sql.Char(64), row.owner_key).input('author', db.sql.NVarChar(40), row.author_name)
     .input('title', db.sql.NVarChar(120), row.title).input('description', db.sql.NVarChar(500), row.description)
-    .input('stages', db.sql.VarChar(200), row.stages).input('textbook', db.sql.VarChar(40), row.textbook)
+    .input('stages', db.sql.VarChar(200), row.stages).input('textbook', db.sql.NVarChar(87), row.textbook)
     .input('gameType', db.sql.VarChar(40), row.game_type).input('gameVersion', db.sql.Int, row.game_version)
     .input('status', db.sql.VarChar(10), row.status).input('count', db.sql.Int, row.item_count).input('payload', db.sql.NVarChar(db.sql.MAX), row.payload)
     .query('INSERT INTO dbo.community_posts (id, kind, owner_key, author_name, title, description, stages, textbook, game_type, game_version, item_count, payload, status) ' +

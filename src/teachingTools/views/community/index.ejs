@@ -10,13 +10,13 @@
 <body class="community-page">
 <%
   function link(change) {
-    var params = { q: result.q, kind: result.kind, stage: result.stage, textbook: result.textbook, page: '', mine: myShares ? '1' : '' };
+    var params = { q: result.q, kind: result.kind, learner: result.learner, grade: result.grade, textbook: result.textbook, page: '', mine: myShares ? '1' : '' };
     Object.keys(change).forEach(function (key) { params[key] = change[key]; });
     var query = Object.keys(params).filter(function (key) { return params[key]; })
       .map(function (key) { return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]); }).join('&');
     return '/community' + (query ? '?' + query : '');
   }
-  var filtered = result.q || result.kind || result.stage || result.textbook;
+  var filtered = result.q || result.kind || result.learner || result.grade || result.textbook;
 %>
   <header class="content-hero community-hero"><div class="content-shell">
     <p class="content-kicker"><%= t('community.kicker') %></p>
@@ -37,7 +37,7 @@
       <% if (myShares) { %><input type="hidden" name="mine" value="1"><% } %>
       <label class="visually-hidden" for="communityQ"><%= t('community.searchLabel') %></label>
       <input id="communityQ" name="q" type="search" maxlength="60" value="<%= result.q %>" placeholder="<%= t('community.searchPlaceholder') %>">
-      <% ['kind', 'stage', 'textbook'].forEach(function (key) { if (result[key]) { %><input type="hidden" name="<%= key %>" value="<%= result[key] %>"><% } }) %>
+      <% ['kind', 'learner', 'grade', 'textbook'].forEach(function (key) { if (result[key]) { %><input type="hidden" name="<%= key %>" value="<%= result[key] %>"><% } }) %>
       <button class="btn" type="submit"><%= t('community.searchButton') %></button>
     </form>
 
@@ -48,16 +48,21 @@
         <a class="chip community-kind kind-<%= kind %><%= result.kind === kind ? ' is-on' : '' %>" href="<%- link({ kind: kind }) %>" <%- result.kind === kind ? 'aria-current="true"' : '' %>><%= community.kindLabel(kind, lang) %></a>
         <% }); %>
       </div>
-      <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterStage') %></span>
-        <a class="chip<%= !result.stage ? ' is-on' : '' %>" href="<%- link({ stage: '' }) %>"><%= t('community.all') %></a>
-        <% community.STAGES.forEach(function (stage) { %>
-          <a class="chip<%= result.stage === stage.key ? ' is-on' : '' %>" href="<%- link({ stage: stage.key }) %>"><%= stageLabel(stage.key) %></a>
+      <% ['learner', 'grade'].forEach(function (group) { %>
+      <div class="community-filter-row"><span class="community-filter-label"><%= group === 'learner' ? (lang === 'zh' ? '学习者类型' : 'Learner type') : (lang === 'zh' ? '年级' : 'Grade level') %></span>
+        <a class="chip<%= !result[group] ? ' is-on' : '' %>" href="<%- link({ [group]: '' }) %>"><%= t('community.all') %></a>
+        <% community.STAGES.filter(function (stage) { return stage.group === group; }).forEach(function (stage) { %>
+          <a class="chip<%= result[group] === stage.key ? ' is-on' : '' %>" href="<%- link({ [group]: stage.key }) %>"><%= stageLabel(stage.key) %></a>
         <% }) %>
       </div>
+      <% }) %>
       <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterTextbook') %></span>
         <a class="chip<%= !result.textbook ? ' is-on' : '' %>" href="<%- link({ textbook: '' }) %>"><%= t('community.all') %></a>
         <% community.TEXTBOOKS.forEach(function (book) { %>
           <a class="chip<%= result.textbook === book.key ? ' is-on' : '' %>" href="<%- link({ textbook: book.key }) %>"><%= textbookLabel(book.key) %></a>
+        <% }) %>
+        <% result.customTextbooks.forEach(function (name, key) { %>
+          <a class="chip<%= result.textbook === key ? ' is-on' : '' %>" href="<%- link({ textbook: key }) %>"><%= name %></a>
         <% }) %>
       </div>
     </div>

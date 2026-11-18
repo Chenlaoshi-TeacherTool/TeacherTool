@@ -61,8 +61,10 @@
           <p class="game-share-dialog-note">${tr('勾选后，其他老师可以打开并使用这份模板。', 'Sharing lets other teachers open and reuse this template.')}</p>
           <fieldset hidden>
             <label>${tr('简介', 'Description')}<textarea name="description" maxlength="500" rows="3"></textarea></label>
-            <label>${tr('适用阶段', 'Learning stage')}<select name="stage"><option value="">${tr('请选择', 'Choose a stage')}</option></select></label>
+            <label>${tr('学习者类型', 'Learner type')}<select name="learner"><option value="">${tr('请选择', 'Choose a learner type')}</option></select></label>
+            <label>${tr('年级', 'Grade level')}<select name="grade"><option value="">${tr('请选择', 'Choose a grade level')}</option></select></label>
             <label>${tr('教材（选填）', 'Textbook (optional)')}<select name="textbook"><option value="">${tr('请选择', 'Choose a textbook')}</option></select></label>
+            <label data-custom-textbook hidden>${tr('自定义教材名称', 'Custom textbook name')}<input name="customTextbook" maxlength="80"></label>
             <label>${tr('公开署名', 'Public display name')}<input name="authorName" maxlength="40"></label>
           </fieldset>
           <button class="game-share-dialog-submit" type="submit"></button>
@@ -102,7 +104,10 @@
       details.disabled = !sharing || busy;
       fields.publish.disabled = busy;
       fields.title.readOnly = busy || Boolean(saved);
-      for (const name of ['authorName', 'description', 'stage']) fields[name].required = sharing;
+      for (const name of ['authorName', 'description', 'learner', 'grade']) fields[name].required = sharing;
+      const customBook = sharing && fields.textbook.value === 'other';
+      form.querySelector('[data-custom-textbook]').hidden = !customBook;
+      fields.customTextbook.disabled = !customBook;
       const needsLogin = sharing && !session?.signedIn;
       const loginUrl = session?.template?.loginUrl;
       signIn.hidden = !needsLogin || !loginUrl || !ready;
@@ -119,7 +124,7 @@
     async function open(draft) {
       if (dialog.open) return;
       form.reset();
-      fields.stage.options.length = fields.textbook.options.length = 1;
+      fields.learner.options.length = fields.grade.options.length = fields.textbook.options.length = 1;
       editor.hidden = false;
       result.hidden = true;
       signIn.hidden = true;
@@ -144,13 +149,19 @@
         if (!dialog.open || opening !== current) return;
         session = account;
         if (!session.template) throw new Error(tr('此工具尚未启用模板保存。', 'Template saving is unavailable for this tool.'));
-        addOptions(fields.stage, session.template.stages);
+        for (const group of ['learner', 'grade']) {
+          addOptions(fields[group], session.template.stages.filter((stage) => stage.group === group));
+        }
         addOptions(fields.textbook, session.template.textbooks);
         fields.authorName.value = draft?.authorName || session.displayName || '';
         if (draft) {
           fields.publish.checked = draft.publish;
           fields.description.value = draft.description || '';
-          fields.stage.value = draft.stage || '';
+          const stages = draft.stages || [draft.stage];
+          for (const group of ['learner', 'grade']) {
+            fields[group].value = [...fields[group].options].find((option) => stages.includes(option.value))?.value || '';
+          }
+          fields.customTextbook.value = draft.customTextbook || '';
           fields.textbook.value = draft.textbook || '';
         }
       } catch (failure) {
@@ -169,18 +180,20 @@
         description: fields.description.value.trim(),
         authorName: fields.authorName.value.trim(),
         textbook: fields.textbook.value,
-        stages: fields.stage.value ? [fields.stage.value] : []
+        customTextbook: fields.textbook.value === 'other' ? fields.customTextbook.value.trim() : '',
+        stages: [fields.learner.value, fields.grade.value].filter(Boolean)
       };
     }
 
     signIn.addEventListener('click', (event) => {
       try {
-        sessionStorage.setItem(draftKey, JSON.stringify({ data, ...metadata(), localId: saved?.id, stage: fields.stage.value, publish: fields.publish.checked }));
+        sessionStorage.setItem(draftKey, JSON.stringify({ data, ...metadata(), localId: saved?.id, publish: fields.publish.checked }));
       } catch {
         event.preventDefault();
         showError(tr('浏览器无法暂存模板，请先另开页面登录。', 'Your browser cannot keep this draft. Sign in in another tab first.'));
       }
     });
+    fields.textbook.addEventListener('change', update);
     fields.publish.addEventListener('change', () => {
       showError(fields.publish.checked && !session?.signedIn && !session?.template?.loginUrl
         ? tr('当前无法登录发布。取消勾选后仍可保存到本机。', 'Sign-in is unavailable. Uncheck sharing to save in this browser.')

@@ -63,18 +63,25 @@
         <label for="shareDescription"><%= t('community.fieldDescription') %></label>
         <textarea id="shareDescription" rows="3" maxlength="500" placeholder="<%= t('community.fieldDescriptionPlaceholder') %>"></textarea>
 
-        <p class="community-form-label"><%= t('community.filterStage') %></p>
+        <% ['learner', 'grade'].forEach(function (group) { %>
+        <p class="community-form-label"><%= group === 'learner' ? (lang === 'zh' ? '学习者类型' : 'Learner type') : (lang === 'zh' ? '年级' : 'Grade level') %></p>
         <div class="community-checks">
-          <% community.STAGES.forEach(function (stage) { %>
+          <% community.STAGES.filter(function (stage) { return stage.group === group; }).forEach(function (stage) { %>
             <label class="chip-check"><input type="checkbox" name="stages" value="<%= stage.key %>"> <%= stageLabel(stage.key) %></label>
           <% }) %>
         </div>
+        <% }) %>
 
         <label for="shareTextbook"><%= t('community.filterTextbook') %></label>
         <select id="shareTextbook">
           <option value=""><%= t('community.noTextbook') %></option>
           <% community.TEXTBOOKS.forEach(function (book) { %><option value="<%= book.key %>"><%= textbookLabel(book.key) %></option><% }) %>
         </select>
+
+        <div id="shareCustomTextbookRow" hidden>
+          <label for="shareCustomTextbook"><%= lang === 'zh' ? '自定义教材名称' : 'Custom textbook name' %></label>
+          <input id="shareCustomTextbook" maxlength="80">
+        </div>
 
         <label for="shareAuthor"><%= t('community.fieldAuthor') %></label>
         <input id="shareAuthor" maxlength="40" required placeholder="<%= t('community.fieldAuthorPlaceholder') %>">
@@ -94,7 +101,7 @@
     }).replace(/</g, '\\u003c') %>;
   </script>
   <script src="/shared/wordlist-core.js"></script>
-  <script src="/community/share.js?v=grant1"></script>
+  <script src="/community/share.js?v=textbook1"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>
