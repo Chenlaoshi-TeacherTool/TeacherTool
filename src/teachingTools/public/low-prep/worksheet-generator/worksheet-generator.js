@@ -328,6 +328,30 @@
     });
   }
 
+  // Blanks marked in a sentence with [ ], ［ ］ or 【 】: returns the sentence with
+  // the brackets removed plus each blank's {start, end} character indices.
+  // Empty brackets are just dropped.
+  var BLANK_MARK = /[\[［【]([^\]］】\[［【]*)[\]］】]/g;
+  function parseBlanks(raw) {
+    var text = '';
+    var blanks = [];
+    var last = 0;
+    var m;
+    BLANK_MARK.lastIndex = 0;
+    while ((m = BLANK_MARK.exec(raw))) {
+      text += raw.slice(last, m.index);
+      var inner = m[1].trim();
+      if (inner) {
+        var start = Array.from(text).length;
+        text += inner;
+        blanks.push({ start: start, end: Array.from(text).length });
+      }
+      last = m.index + m[0].length;
+    }
+    text += raw.slice(last);
+    return { text: text, blanks: blanks };
+  }
+
   function parseWords(text) {
     var seen = {};
     var items = [];
@@ -599,31 +623,62 @@
     },
 
     fill: function (ctx) {
+      var byHz = {};
+      ctx.items.forEach(function (it) { byHz[it.hz] = it; });
+      // Each row: the clean sentence, its per-character pinyin, and the blanks
+      // ({start, end} character indices + the bank word that fills it).
       var rows = [];
-      ctx.sentences.forEach(function (s) {
-        var hits = ctx.items.filter(function (it) { return s.indexOf(it.hz) !== -1; });
-        if (!hits.length) return;
-        hits.sort(function (a, b) { return b.hz.length - a.hz.length; });
-        rows.push({ sentence: s, word: hits[0] });
+      ctx.rawSentences.forEach(function (raw) {
+        var parsed = parseBlanks(raw);
+        var chars = Array.from(parsed.text);
+        var pys = sentencePinyin(parsed.text);
+        var blanks = [];
+        if (parsed.blanks.length) {
+          // Teacher marked the blanks with [ ]: use exactly those.
+          parsed.blanks.forEach(function (b) {
+            var hz = chars.slice(b.start, b.end).join('');
+            var word = byHz[hz] || { hz: hz, py: pys.slice(b.start, b.end).filter(Boolean).join(' ') };
+            blanks.push({ start: b.start, end: b.end, word: word });
+          });
+        } else {
+          // No brackets: blank the longest vocab word the sentence contains.
+          var s = parsed.text;
+          var hits = ctx.items.filter(function (it) { return s.indexOf(it.hz) !== -1; });
+          if (!hits.length) return;
+          hits.sort(function (a, b) { return b.hz.length - a.hz.length; });
+          var startIdx = Array.from(s.slice(0, s.indexOf(hits[0].hz))).length;
+          blanks.push({ start: startIdx, end: startIdx + Array.from(hits[0].hz).length, word: hits[0] });
+        }
+        rows.push({ chars: chars, pys: pys, blanks: blanks });
       });
-      if (!rows.length) return ctx.note('填空题需要包含生词的例句。Add example sentences that use your words.');
+      if (!rows.length) return ctx.note('填空题需要包含生词的例句，或用 [ ] 框出要挖空的词。Add sentences that use your words, or mark blanks with [ ].');
       rows = pick(rows, ctx.count, ctx.rng);
-      var bank = shuffle(rows.map(function (r) { return r.word; }).filter(function (w, i, a) { return a.indexOf(w) === i; }), ctx.rng);
+      // The same word blanked in several places shows up once in the bank.
+      var seen = {};
+      var bankWords = [];
+      rows.forEach(function (r) {
+        r.blanks.forEach(function (b) {
+          if (seen[b.word.hz]) return;
+          seen[b.word.hz] = true;
+          bankWords.push(b.word);
+        });
+      });
+      var bank = shuffle(bankWords, ctx.rng);
       var html = '<div class="wg-bank"><span class="wg-bank-label">词库 Word bank</span>' + bank.map(function (w) {
         return '<span class="wg-bank-word">' + rubyWord(w.hz, w.py, ctx.pinyin) + '</span>';
       }).join('') + '</div><ol class="wg-list">';
       rows.forEach(function (r) {
-        var chars = Array.from(r.sentence);
-        var pys = sentencePinyin(r.sentence);
-        var start = chars.join('').indexOf(r.word.hz);
-        var startIdx = Array.from(r.sentence.slice(0, start)).length;
-        var endIdx = startIdx + Array.from(r.word.hz).length;
-        var blank = ctx.answers
-          ? '<span class="wg-blank is-filled"><span class="wg-answer">' + esc(r.word.hz) + '</span></span>'
-          : '<span class="wg-blank" style="min-width:' + (endIdx - startIdx + 1.5) + 'em"></span>';
-        html += '<li class="wg-item wg-sentence">' +
-          rubyChars(chars.slice(0, startIdx), pys.slice(0, startIdx), ctx.pinyin) + blank +
-          rubyChars(chars.slice(endIdx), pys.slice(endIdx), ctx.pinyin) + '</li>';
+        var out = '';
+        var pos = 0;
+        r.blanks.forEach(function (b) {
+          out += rubyChars(r.chars.slice(pos, b.start), r.pys.slice(pos, b.start), ctx.pinyin);
+          out += ctx.answers
+            ? '<span class="wg-blank is-filled"><span class="wg-answer">' + esc(b.word.hz) + '</span></span>'
+            : '<span class="wg-blank" style="min-width:' + (b.end - b.start + 1.5) + 'em"></span>';
+          pos = b.end;
+        });
+        out += rubyChars(r.chars.slice(pos), r.pys.slice(pos), ctx.pinyin);
+        html += '<li class="wg-item wg-sentence">' + out + '</li>';
       });
       return html + '</ol>';
     },
@@ -776,7 +831,10 @@
 
     var items = parseWords(s.words);
     items.forEach(function (it) { it.mean = meaning(it, s.qlang); });
-    var sentences = s.sentences.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+    var rawSentences = s.sentences.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+    // Only 选词填空 reads the [ ] blank marks; every other type gets clean sentences.
+    var sentences = rawSentences.map(function (l) { return parseBlanks(l).text; }).filter(Boolean);
+    sentences.raw = rawSentences;
 
     if (!items.length) {
       el.output.innerHTML = '<div class="wg-sheet wg-empty"><p>在左边输入生词，练习单会出现在这里。<br>Type some words on the left and your worksheet appears here.</p></div>';
@@ -829,6 +887,7 @@
       var ctx = {
         items: items,
         sentences: sentences,
+        rawSentences: sentences.raw,
         count: s.types[type.key].count || items.length,
         pinyin: s.pinyin,
         answers: answers,
