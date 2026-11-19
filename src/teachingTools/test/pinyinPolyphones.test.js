@@ -62,3 +62,17 @@ test('remembers a teacher pinyin fix for the same word', function () {
   core.rememberPinyin('数一数', '');
   assert.equal(py(core, '数一数'), 'shù yí shù');
 });
+
+test('reads 弹 as tán when playing an instrument, and keeps dàn for bullets and bombs', function () {
+  var core = loadWordlistCore();
+  assert.equal(py(core, '弹钢琴'), 'tán gāng qín');
+  assert.equal(py(core, '弹吉他'), 'tán jí tā');
+  assert.equal(py(core, '我会弹'), 'wǒ huì tán');
+  assert.equal(py(core, '弹一首歌'), 'tán yì shǒu gē');
+  assert.equal(py(core, '学弹古筝'), 'xué tán gǔ zhēng');
+  assert.equal(py(core, '子弹'), 'zǐ dàn');
+  assert.equal(py(core, '炸弹'), 'zhà dàn');
+  assert.equal(py(core, '弹弓'), 'dàn gōng');
+  assert.equal(py(core, '化学弹药'), 'huà xué dàn yào');
+  assert.equal(py(core, '两弹一星'), 'liǎng dàn yì xīng');
+});

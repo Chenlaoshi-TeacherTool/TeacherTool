@@ -115,6 +115,11 @@
   var DE_NOT_AFTER = '不取获赢求难值懂舍晓免';
   // 「长」跟在单位 / 机构后面是首长的 zhǎng：区长、列车长、秘书长
   var ZHANG_TITLE_BEFORE = '校院部局处科市省县州区镇乡村组班队团营连排师军舰船车站所厅司馆会社议家首族官总事书园亭社课室';
+  // 「弹」单字默认 dàn（子弹、炸弹在词组表里也靠这个）。弹乐器、弹起来这类动作读 tán：
+  // 后面是乐器 / 动作补语，或者前面是会、想、喜欢这类词：弹钢琴、弹吉他、弹一首、我会弹。
+  var TAN_BEFORE_WORDS = ['钢琴', '吉他', '琵琶', '古筝', '尤克里里', '竖琴', '风琴', '电子琴', '月琴', '三弦', '冬不拉', '乐器', '曲子', '音乐', '一首', '一曲', '一下', '一会', '一遍'];
+  var TAN_NEXT = '琴筝奏唱拨跳出回起开走掉指舌窗球了着过得几首曲给完';
+  var TAN_AFTER = '会能要想在去爱欢再来正';
 
   function applyParticles(chars, syls, single) {
     for (var i = 0; i < chars.length; i++) {
@@ -133,6 +138,12 @@
         else if (DE_COMPLEMENT_NEXT.indexOf(next) >= 0 && DE_NOT_AFTER.indexOf(prev) < 0) syls[i] = 'de';  // 跑得快、写得好
       } else if (ch === '长' && prev && ZHANG_TITLE_BEFORE.indexOf(prev) >= 0) {
         syls[i] = 'zhǎng';                                                          // 区长、列车长
+      } else if (ch === '弹') {
+        var after = chars.slice(i + 1, i + 5).join('');
+        if ((next && TAN_NEXT.indexOf(next) >= 0) || (prev && TAN_AFTER.indexOf(prev) >= 0) ||
+            TAN_BEFORE_WORDS.some(function (w) { return after.indexOf(w) === 0; })) {
+          syls[i] = 'tán';                                                          // 弹钢琴、弹吉他、我会弹
+        }
       }
     }
     return syls;
