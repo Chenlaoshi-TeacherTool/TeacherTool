@@ -74,7 +74,8 @@ router.post('/api/game-shares', async function (req, res) {
     var owner = teacherActivities.ownerKeyFor(req);
     var manifest = await publisher.publish({
       gameType: body.gameType, version: body.version, title: body.title, data: body.data, password: body.password,
-      owner: owner, lifetimeMs: await membershipLimits.shareLifetimeMs(req)
+      owner: owner, lifetimeMs: await membershipLimits.shareLifetimeMs(req),
+      allowMembersOnly: await membershipLimits.canCollectStudentWork(req)
     });
     await teacherActivities.record(owner, { kind: 'game', id: manifest.shareId, gameType: manifest.gameType, version: manifest.version, title: manifest.title,
       createdAt: manifest.createdAt, expiresAt: manifest.expiresAt, payload: manifest.payload });
@@ -85,6 +86,7 @@ router.post('/api/game-shares', async function (req, res) {
       expiresAt: manifest.expiresAt
     });
   } catch (error) {
+    if (error.membersOnly) return res.status(403).json({ error: error.message, membersOnly: true });
     if (error.status === 400 || error.status === 413) return res.status(error.status).json({ error: error.message });
     console.error('game-share publish error:', error);
     res.status(500).json({ error: 'Could not create the game link.' });
@@ -112,7 +114,7 @@ function requireAssessment(req, res, next) {
   if (!req.signedCookies || req.signedCookies[cookieName(manifest.shareId)] !== '1') {
     return res.status(401).json({ error: 'Enter the game password first.' });
   }
-  if (!isQuiz(manifest)) {
+  if (!takesSubmissions(manifest)) {
     return res.status(400).json({ error: 'This link is not a quiz.' });
   }
   var name = typeof req.body.studentName === 'string' ? req.body.studentName.normalize('NFKC').trim().replace(/\s+/g, ' ') : '';
@@ -134,9 +136,15 @@ router.post('/play/:id/submit', loadManifest, requireAssessment, async function 
     var existing = await storage.getSubmission(req.params.id, req.studentName);
     if (existing) return res.status(409).json({ error: 'This name has already submitted this quiz.', submission: existing });
     var manifest = req.gameShareManifest;
-    var answers = req.body.answers;
-    var correct = registry.get(manifest.gameType, manifest.version).grade(manifest.payload, answers);
-    var submission = { studentName: req.studentName, answers: answers, correct: correct, score: correct.filter(Boolean).length, submittedAt: new Date().toISOString() };
+    var adapter = registry.get(manifest.gameType, manifest.version);
+    var submission;
+    if (adapter.collectsWork) {
+      submission = Object.assign({ studentName: req.studentName }, adapter.cleanWork(manifest.payload, req.body.work), { submittedAt: new Date().toISOString() });
+    } else {
+      var answers = req.body.answers;
+      var correct = adapter.grade(manifest.payload, answers);
+      submission = { studentName: req.studentName, answers: answers, correct: correct, score: correct.filter(Boolean).length, submittedAt: new Date().toISOString() };
+    }
     if (!(await storage.saveSubmission(req.params.id, req.studentName, submission))) {
       return res.status(409).json({ error: 'This name has already submitted this quiz.', submission: await storage.getSubmission(req.params.id, req.studentName) });
     }
@@ -154,7 +162,7 @@ router.get('/play/:id', loadManifest, function (req, res, next) {
 
   var adapter = registry.get(manifest.gameType, manifest.version);
   if (!adapter) return next();
-  if (isQuiz(manifest)) res.set('Cache-Control', 'private, no-store');
+  if (takesSubmissions(manifest)) res.set('Cache-Control', 'private, no-store');
   var safeJson = JSON.stringify({
     shareId: manifest.shareId,
     gameType: manifest.gameType,
@@ -204,6 +212,15 @@ function isQuiz(manifest) {
   return manifest.payload?.mode === 'assessment' && typeof registry.get(manifest.gameType, manifest.version)?.grade === 'function';
 }
 
+// Links whose students hand in work (pixel art) rather than answer a quiz.
+function collectsWork(manifest) {
+  return Boolean(registry.get(manifest.gameType, manifest.version)?.collectsWork);
+}
+
+function takesSubmissions(manifest) {
+  return isQuiz(manifest) || collectsWork(manifest);
+}
+
 async function ownedManifest(req, shareId, deleteToken) {
   if (!storage.validShareId(shareId)) return null;
   var manifest = await storage.getManifest(shareId);
@@ -220,8 +237,8 @@ router.post('/api/game-shares/summary', async function (req, res, next) {
       var shareId = String(share && share.shareId || '');
       var manifest = await ownedManifest(req, shareId, share && share.deleteToken);
       if (!manifest) return { shareId: shareId, exists: false };
-      var summary = { shareId: shareId, exists: true, title: manifest.title, gameType: manifest.gameType, expiresAt: manifest.expiresAt, quiz: isQuiz(manifest) };
-      if (summary.quiz) summary.submissions = (await storage.listSubmissions(shareId)).length;
+      var summary = { shareId: shareId, exists: true, title: manifest.title, gameType: manifest.gameType, expiresAt: manifest.expiresAt, quiz: isQuiz(manifest), gallery: collectsWork(manifest) };
+      if (summary.quiz || summary.gallery) summary.submissions = (await storage.listSubmissions(shareId)).length;
       return summary;
     }));
     res.set('Cache-Control', 'private, no-store').json({ shares: results });
@@ -242,6 +259,19 @@ async function loadResults(req, res) {
     submissions: await storage.listSubmissions(req.params.id)
   };
 }
+
+// The class gallery for a pixel-art link: the word list plus every drawing.
+router.post('/api/game-shares/:id/gallery', async function (req, res, next) {
+  try {
+    var manifest = await ownedManifest(req, req.params.id, req.body && req.body.deleteToken);
+    if (!manifest || !collectsWork(manifest)) return res.status(404).json({ error: 'This class gallery was not found. It may have expired.' });
+    if (!(await membershipLimits.canCollectStudentWork(req))) return res.status(403).json({ error: 'The class gallery is part of the teacher membership.', membersOnly: true });
+    res.set('Cache-Control', 'private, no-store').json({
+      shareId: manifest.shareId, title: manifest.title, expiresAt: manifest.expiresAt, payload: manifest.payload,
+      submissions: await storage.listSubmissions(manifest.shareId)
+    });
+  } catch (error) { next(error); }
+});
 
 router.post('/api/game-shares/:id/results', async function (req, res, next) {
   try {

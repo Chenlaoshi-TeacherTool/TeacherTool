@@ -176,7 +176,7 @@ function create(options) {
       var current = stores.game.validShareId(req.params.id) ? await stores.game.getManifest(req.params.id) : null;
       if (current && !expired(current)) return res.status(409).json({ error: 'This link still works. Copy it instead of making a new one.' });
       var manifest = await publisher.publish({ gameType: saved.gameType, version: saved.version, title: saved.title, data: saved.payload, password: password,
-        owner: req.libraryOwner, lifetimeMs: await limits.shareLifetimeMs(req) });
+        owner: req.libraryOwner, lifetimeMs: await limits.shareLifetimeMs(req), allowMembersOnly: limits.canCollectStudentWork ? await limits.canCollectStudentWork(req) : false });
       if (current) await stores.game.deleteShare(req.params.id);
       if (!(await activities.relink(req.libraryOwner, req.params.id, manifest.shareId, manifest.expiresAt))) {
         await stores.game.deleteShare(manifest.shareId);
@@ -184,6 +184,7 @@ function create(options) {
       }
       res.status(201).json({ id: manifest.shareId, url: '/play/' + manifest.shareId, deleteToken: manifest.deleteToken, expiresAt: manifest.expiresAt, createdAt: manifest.createdAt });
     } catch (error) {
+      if (error.membersOnly) return res.status(403).json({ error: error.message, membersOnly: true });
       if (error.status === 400 || error.status === 413) return res.status(400).json({ error: 'This saved activity can no longer be shared. Create it again from the tool.' });
       res.status(503).json({ error: 'A new link could not be created right now. Please try again.' });
     }

@@ -1,0 +1,149 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>像素画猜猜看 · Pixel Art Guessing - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Students draw a Chinese vocabulary word as pixel art and write about it. Show the drawings on the projector or print a gallery and the class guesses each word.' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
+  <link rel="stylesheet" href="/low-prep/pixel-art/pixel-art.css?v=3">
+</head>
+<body class="px-page" data-lang="<%= lang %>">
+  <main class="px-wrap">
+    <header class="px-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="px-eyebrow"><%= L('Draw · write · guess', '画一画 · 写一写 · 猜一猜') %></p>
+      <h1>👾 <%= L('Pixel Art Guessing', '像素画猜猜看') %></h1>
+      <p><%= L('Each student picks one word, draws it as pixel art and finishes a few sentences. Then show the drawings one at a time and the class guesses: “我觉得他/她喜欢……”.', '每个学生选一个词，画成像素画，再完成几个句子。老师一幅一幅地投屏，全班用“我觉得他/她喜欢……”来猜。') %></p>
+    </header>
+
+    <section class="px-panel" aria-labelledby="pxSetupHeading">
+      <p class="px-kicker"><%= L('Step 1', '第一步') %></p>
+      <h2 id="pxSetupHeading"><%= L('Words and sentences', '词表和句子') %></h2>
+      <div class="px-setup">
+        <div class="px-field-row">
+          <label class="px-field"><span><%= L('Title', '标题') %></span><input id="pxTitle" class="px-input" maxlength="120"></label>
+          <label class="px-field px-field-small"><span><%= L('Grid', '格子') %></span>
+            <select id="pxGrid" class="px-input">
+              <option value="12">12 × 12</option>
+              <option value="16">16 × 16</option>
+              <option value="20">20 × 20</option>
+              <option value="24">24 × 24</option>
+            </select>
+          </label>
+        </div>
+        <div class="px-columns">
+          <label class="px-field">
+            <span><%= L('Words students choose from', '学生可以选的词') %></span>
+            <textarea id="pxWords" class="px-input" rows="14" spellcheck="false"></textarea>
+            <small><%= L('One word per line. Pinyin and English are filled in for you. To set them yourself:', '每行一个词，拼音和英文会自动加上。也可以自己写：') %> <code>看书 | kàn shū | read books</code>. <%= L('A line starting with # starts a group:', '以 # 开头的一行是分组标题：') %> <code># 球类运动</code></small>
+            <small id="pxWordCount" class="px-count" role="status"></small>
+          </label>
+          <div class="px-field">
+            <span><%= L('What students see', '学生看到的词') %></span>
+            <div class="px-show-options">
+              <span class="px-kai"><%= L('Chinese', '中文') %> ✓</span>
+              <label class="px-check"><input id="pxShowPy" type="checkbox" checked> <%= L('Pinyin', '拼音') %></label>
+              <label class="px-check"><input id="pxShowEn" type="checkbox" checked> <%= L('English', '英文') %></label>
+            </div>
+            <div id="pxWordPreview" class="px-preview" aria-live="polite"></div>
+          </div>
+          <label class="px-field">
+            <span><%= L('Sentences to finish (optional, up to 6)', '要完成的句子（可不写，最多 6 句）') %></span>
+            <textarea id="pxPrompts" class="px-input" rows="6" spellcheck="false"></textarea>
+            <small><%= L('Mark each blank with ____ (two or more underscores). Leave empty for drawing only.', '用 ____（两个以上下划线）表示空格。清空就只画画。') %></small>
+          </label>
+        </div>
+        <button id="pxReset" class="px-btn px-btn-ghost" type="button"><%= L('Use the hobby list again', '恢复默认的爱好词表') %></button>
+      </div>
+    </section>
+
+    <section class="px-panel" aria-labelledby="pxStudentsHeading">
+      <p class="px-kicker"><%= L('Step 2', '第二步') %></p>
+      <h2 id="pxStudentsHeading"><%= L('Students draw', '学生画画') %></h2>
+      <div class="px-options">
+        <article class="px-option">
+          <h3>🔗 <%= L('Student link that collects drawings', '学生链接，自动收作品') %> <span class="px-badge"><%= L('Members', '会员') %></span></h3>
+          <p><%= L('Students open the link, enter the password and press Submit. Every drawing appears in your gallery below.', '学生打开链接、输入密码，画完点“交给老师”。所有作品会自动出现在下面的画廊里。') %></p>
+          <button id="pxShare" class="px-btn px-btn-primary" type="button"><%= L('Create student link', '生成学生链接') %></button>
+          <p class="px-note"><%= L('Collecting student work is part of the', '收集学生作品是') %> <a href="/membership"><%= L('teacher membership', '会员功能') %></a>.</p>
+          <div id="pxLinks" class="px-links"></div>
+        </article>
+        <article class="px-option">
+          <h3>💾 <%= L('Free: students download their picture', '免费：学生下载图片') %></h3>
+          <p><%= L('Students draw on this page and download a picture, then send you the file (Google Classroom, email…). Import the files below — the answers are saved inside each picture.', '学生在这个页面画画，下载图片后把文件发给你（Google Classroom、邮件……）。在下面导入这些图片，答案已经藏在图片里。') %></p>
+          <label class="px-field"><span><%= L('Student drawing page', '学生画画页面') %></span><input id="pxFreeLink" class="px-input" readonly></label>
+          <div class="px-actions">
+            <button id="pxCopyFree" class="px-btn" type="button"><%= L('Copy link', '复制链接') %></button>
+            <a id="pxOpenFree" class="px-btn" target="_blank" rel="noopener"><%= L('Open', '打开') %></a>
+            <button id="pxQrFree" class="px-btn" type="button"><%= L('Show QR code', '显示二维码') %></button>
+          </div>
+          <div id="pxQr" class="px-qr" hidden></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="px-panel" aria-labelledby="pxGalleryHeading">
+      <p class="px-kicker"><%= L('Step 3', '第三步') %></p>
+      <h2 id="pxGalleryHeading"><%= L('Gallery · guess!', '画廊 · 猜一猜') %></h2>
+      <div id="pxDrop" class="px-drop">
+        <p><%= L('Drop students’ pictures here, or', '把学生的图片拖到这里，或者') %>
+          <label class="px-btn"><input id="pxImport" type="file" accept="image/png" multiple hidden><%= L('choose files', '选择文件') %></label>
+        </p>
+        <p id="pxGalleryStatus" class="px-status" role="status"></p>
+      </div>
+      <div class="px-toolbar">
+        <button id="pxPresent" class="px-btn px-btn-primary" type="button">📽️ <%= L('Present', '投屏猜一猜') %></button>
+        <button id="pxPrint" class="px-btn" type="button">🖨️ <%= L('Print gallery', '打印画廊') %></button>
+        <button id="pxShuffle" class="px-btn" type="button">🔀 <%= L('Shuffle', '打乱顺序') %></button>
+        <label class="px-check"><input id="pxShowAnswers" type="checkbox"> <%= L('Show answers', '显示答案') %></label>
+        <button id="pxClear" class="px-btn px-btn-ghost" type="button"><%= L('Clear gallery', '清空画廊') %></button>
+      </div>
+      <div class="px-print-options">
+        <label><%= L('Per page', '每页') %>
+          <select id="pxPerPage" class="px-input"><option value="4">4</option><option value="6" selected>6</option><option value="9">9</option></select>
+        </label>
+        <label class="px-check"><input id="pxPrintNames" type="checkbox"> <%= L('Print names', '打印名字') %></label>
+        <label class="px-check"><input id="pxPrintKey" type="checkbox" checked> <%= L('Add answer key page', '加一页答案') %></label>
+      </div>
+      <p id="pxEmpty" class="px-empty"><%= L('No drawings yet. Load them from a student link or import pictures.', '还没有作品。从学生链接载入，或者导入图片。') %></p>
+      <ol id="pxGallery" class="px-gallery"></ol>
+    </section>
+  </main>
+
+  <div id="pxShow" class="px-show" hidden>
+    <div class="px-show-top">
+      <span id="pxShowCount"></span>
+      <span class="px-show-frame">他/她喜欢什么？ <strong>我觉得他/她喜欢……</strong></span>
+      <span class="px-show-buttons">
+        <button id="pxShowFull" class="px-btn" type="button" title="<%= L('Full screen', '全屏') %>">⛶</button>
+        <button id="pxShowClose" class="px-btn" type="button" title="<%= L('Close (Esc)', '关闭 (Esc)') %>">✕</button>
+      </span>
+    </div>
+    <div id="pxShowStage" class="px-show-stage">
+      <img id="pxShowArt" class="px-show-art" alt="">
+      <div id="pxShowAnswer" class="px-show-answer" hidden></div>
+    </div>
+    <div id="pxShowSummary" class="px-show-summary" hidden></div>
+    <div class="px-show-nav">
+      <button id="pxShowPrev" class="px-btn" type="button">← <%= L('Back', '上一幅') %></button>
+      <button id="pxShowReveal" class="px-btn px-btn-primary" type="button"><%= L('Reveal (space)', '揭晓（空格）') %></button>
+      <button id="pxShowNext" class="px-btn" type="button"><%= L('Next', '下一幅') %> →</button>
+    </div>
+  </div>
+
+  <div id="pxPrintArea" class="px-print-area" aria-hidden="true"></div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/wordlist-core.js?v=cedict-1"></script>
+  <script src="/shared/game-sharing.js?v=6" defer></script>
+  <script src="/low-prep/pixel-art/pixel-core.js?v=3"></script>
+  <script src="/low-prep/pixel-art/pixel-art.js?v=3" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

@@ -19,5 +19,6 @@ register(require('./games/sentenceReorderGame'));
 register(require('./games/measureWordsGame'));
 register(require('./games/hanziWordChoiceGame'));
 register(require('./games/vocabularyGachaGame'));
+register(require('./games/pixelArtGame'));
 
 module.exports = { register: register, get: get };

@@ -32,6 +32,10 @@ function create(options) {
     canUseMyActivities: async function (req) {
       return !enabled() || isMember(req);
     },
+    // Student links that collect work (pixel art drawings) and the class gallery.
+    canCollectStudentWork: async function (req) {
+      return !enabled() || isMember(req);
+    },
     // Members-only textbook companion material (words, patterns, activities, files).
     canUseTextbookMaterials: async function (req) {
       return !enabled() || isMember(req);

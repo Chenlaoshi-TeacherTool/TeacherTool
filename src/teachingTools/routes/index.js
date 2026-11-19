@@ -255,6 +255,15 @@ router.get('/teaching-tools/vocab-glossary', function(req, res, next) {
   res.render('low-prep-activities/vocab-glossary', { title: '生词表生成器 · Article Vocabulary Builder', toolGuide: siteContentStore.get().toolGuides['vocab-glossary'] });
 });
 
+router.get('/teaching-tools/pixel-art', function(req, res, next) {
+  res.render('low-prep-activities/pixel-art', { title: '像素画猜猜看 · Pixel Art Guessing', toolGuide: siteContentStore.get().toolGuides['pixel-art'] });
+});
+
+// Free student drawing page: the word list travels in the URL hash, nothing is stored.
+router.get('/teaching-tools/pixel-art/draw', function(req, res, next) {
+  res.render('low-prep-activities/pixel-art-draw', { title: '像素画 · Pixel Art' });
+});
+
 router.get('/teaching-tools/vocab-puzzle', function(req, res, next) {
   res.render('low-prep-activities/vocab-puzzle', { title: '生词拼图生成器 · PDF Puzzle Maker', toolGuide: siteContentStore.get().toolGuides['vocab-puzzle'] });
 });
@@ -296,7 +305,7 @@ router.get('/low-prep-activities', function(req, res) {
   'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle',
   'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary',
   'stroke-order-worksheet', 'vocab-puzzle', 'worksheet-generator', 'secret-message',
-  'character-unscrambler', 'measure-words', 'vocab-games', 'whats-missing'
+  'character-unscrambler', 'measure-words', 'vocab-games', 'whats-missing', 'pixel-art'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -346,7 +355,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary', '/teaching-tools/hanzi-word-choice',
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator', '/teaching-tools/secret-message',
     '/teaching-tools/character-unscrambler', '/teaching-tools/measure-words', '/teaching-tools/vocab-games', '/teaching-tools/whats-missing',
-    '/teaching-tools/hanzi-batch/index.html'
+    '/teaching-tools/pixel-art', '/teaching-tools/hanzi-batch/index.html'
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
   paths = paths.concat(catalog.themes.map(function (theme) { return theme.href; }));

@@ -30,6 +30,12 @@ async function publish(options) {
   checkPassword(options.password);
   var adapter = registry.get(options.gameType, options.version);
   if (!adapter || !adapter.view) fail('This game type or version is not supported.');
+  if (adapter.membersOnly && !options.allowMembersOnly) {
+    var error = new Error('Collecting student work is part of the teacher membership. 收集学生作品是会员功能。');
+    error.status = 403;
+    error.membersOnly = true;
+    throw error;
+  }
   if (Buffer.byteLength(JSON.stringify(options.data || null), 'utf8') > MAX_GAME_DATA_BYTES) fail('Game data is too large to share.', 413);
 
   var payload = adapter.sanitize(options.data);

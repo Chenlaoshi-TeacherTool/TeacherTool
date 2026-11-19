@@ -14,6 +14,7 @@
     'hanzi-word-choice': { icon: '🀄', label: '形近字选词', tool: '/teaching-tools/hanzi-word-choice' },
     'word-sudoku': { icon: '🔢', label: 'Word Sudoku', tool: '/low-prep/word-sudoku/word-sudoku-widget.html' },
     'measure-words': { icon: '🍎', label: 'Measure Word Challenge', tool: '/teaching-tools/measure-words' },
+    'pixel-art': { icon: '👾', label: chinese ? '像素画猜猜看' : 'Pixel Art Guessing', tool: '/teaching-tools/pixel-art' },
     'vocabulary-gacha': { icon: '🎲', label: chinese ? '词汇扭蛋机' : 'Vocabulary Gacha', tool: '/teaching-tools/vocabulary-gacha' },
     book: { icon: '📖', label: 'Book', tool: '/teaching-tools/book-generator' }
   };
@@ -171,7 +172,7 @@
       var left = daysLeft(expires);
       badges.appendChild(element('span', left <= 1 ? t('Expires within a day') : t('Expires in ') + left + t(' days'), 'activity-badge' + (left <= 7 ? ' is-soon' : '')));
     }
-    if (status && status.quiz) badges.appendChild(element('span', status.submissions + t(' submitted'), 'activity-badge is-count'));
+    if (status && (status.quiz || status.gallery)) badges.appendChild(element('span', status.submissions + t(' submitted'), 'activity-badge is-count'));
     if (badges.childNodes.length) body.appendChild(badges);
     li.appendChild(body);
 
@@ -218,6 +219,11 @@
         var results = element('a', t('View results'), 'small-button is-primary');
         results.href = '/teaching-tools/my-activities/quiz-results.html?id=' + encodeURIComponent(item.id);
         actions.appendChild(results);
+      }
+      if (status && status.gallery) {
+        var gallery = element('a', chinese ? '查看作品' : 'View drawings', 'small-button is-primary');
+        gallery.href = '/teaching-tools/pixel-art?gallery=' + encodeURIComponent(item.id);
+        actions.appendChild(gallery);
       }
       if (item.kind === 'game' && item.inAccount && item.canRelink) actions.appendChild(shareLink(item));
       var del = button(t('Delete'), 'small-button danger');
