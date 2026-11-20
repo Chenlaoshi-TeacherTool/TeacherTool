@@ -1248,6 +1248,17 @@ router.get('/memberships', async function (req, res, next) {
   } catch (err) { next(err); }
 });
 
+// Founding member marker: on=1 marks the teacher, on=0 removes the mark.
+router.post('/memberships/:owner/founding', async function (req, res, next) {
+  try {
+    if (req.get('origin') && new URL(req.get('origin')).host !== req.get('host')) return res.status(403).send('Change members from the admin page.');
+    var found = await teacherAccountsRepository.setFounding(req.params.owner, req.body.on === '1', req.adminUser.name);
+    if (!found) return res.sendStatus(404);
+    var back = new URLSearchParams({ tab: 'teachers', email: String(req.body.email || '').slice(0, 320), status: 'all', teacher: req.params.owner });
+    res.redirect(303, '/admin/memberships?' + back.toString() + '#teacher-details');
+  } catch (err) { next(err); }
+});
+
 // Who used a code: the admin enters the code and sees whether and by whom it was used.
 router.post('/memberships/lookup', async function (req, res, next) {
   try {

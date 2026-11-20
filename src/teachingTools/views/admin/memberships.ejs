@@ -42,7 +42,7 @@ function listLink(page, teacher) { var q = new URLSearchParams({ tab: 'teachers'
 <form method="GET" action="/admin/memberships">
   <label for="teacherEmail">邮箱或姓名</label>
   <input id="teacherEmail" name="email" type="search" maxlength="320" value="<%= lookup.email %>" autocomplete="off">
-  <label for="membershipStatus">权限状态</label><select id="membershipStatus" name="status"><% [['all','全部'],['trial','试用中'],['active','权限有效'],['expired','已到期 / 无有效权限']].forEach(function(option) { %><option value="<%= option[0] %>" <%= listing && listing.status === option[0] ? 'selected' : '' %>><%= option[1] %></option><% }); %></select>
+  <label for="membershipStatus">权限状态</label><select id="membershipStatus" name="status"><% [['all','全部'],['trial','试用中'],['active','权限有效'],['expired','已到期 / 无有效权限'],['founding','⭐ 创始会员']].forEach(function(option) { %><option value="<%= option[0] %>" <%= listing && listing.status === option[0] ? 'selected' : '' %>><%= option[1] %></option><% }); %></select>
   <div class="actions"><button type="submit">搜索</button><a href="/admin/memberships">清除筛选</a></div>
 </form>
 <% if (listing) { %><p>共 <%= listing.total %> 位老师 · 第 <%= listing.page %> / <%= listing.pages %> 页 · 每页 25 位</p><% } %>
@@ -61,12 +61,19 @@ function listLink(page, teacher) { var q = new URLSearchParams({ tab: 'teachers'
             <td><%= day(teacher.createdAt) %></td>
             <td><%= day(teacher.lastSeenAt) %></td>
             <td><strong style="color:<%= active ? '#15803d' : '#b91c1c' %>"><%= day(teacher.writeUntil) %><%= teacher.writeUntil ? (active ? ' (active)' : ' (ended)') : '' %></strong></td>
-            <td><%= { trial: '试用中', active: '权限有效', expired: '已到期 / 无有效权限' }[teacher.status] || (active ? '权限有效' : '已到期') %></td>
+            <td><%= { trial: '试用中', active: '权限有效', expired: '已到期 / 无有效权限' }[teacher.status] || (active ? '权限有效' : '已到期') %><% if (teacher.foundingMemberAt) { %><br><strong class="founding-badge" style="color:#a16207;">⭐ 创始会员</strong><% } %></td>
             <td><a href="<%= listLink(listing ? listing.page : 1, teacher.ownerKey) %>#teacher-details">查看详情</a><br><a href="/admin/memberships/<%= teacher.ownerKey %>/adjust">调整会员</a></td>
           </tr>
           <% if (!listing || selectedKey === teacher.ownerKey) { %>
           <tr id="teacher-details">
             <td colspan="7" style="background:#f8fafc;">
+              <form method="POST" action="/admin/memberships/<%= teacher.ownerKey %>/founding" style="margin:0 0 10px;">
+                <input type="hidden" name="on" value="<%= teacher.foundingMemberAt ? '0' : '1' %>">
+                <input type="hidden" name="email" value="<%= lookup.email %>">
+                <% if (teacher.foundingMemberAt) { %>⭐ 创始会员（标记于 <%= day(teacher.foundingMemberAt) %>）
+                  <button type="submit" class="secondary">取消创始会员标记</button>
+                <% } else { %><button type="submit" class="secondary">⭐ 标记为创始会员</button><% } %>
+              </form>
               <% var events = teacher.events || []; %>
               <% if (!events.length) { %>
                 <span style="color:#64748b;">No membership changes recorded.</span>

@@ -120,3 +120,42 @@ test('a code lookup says who used it, and the batches tab lists every code with 
   assert.match(list, /<td>未使用<\/td>\s*<td>—<\/td>/);
   assert.doesNotMatch(list, /<b>x<\/b>/);
 });
+
+test('founding members get a badge, a filter and a mark / unmark button', async function() {
+  var owner = 'c'.repeat(64);
+  var marked = { ownerKey: owner, email: 'school@example.org', status: 'active', createdAt: new Date(), foundingMemberAt: new Date('2026-11-20T00:00:00Z'), events: [] };
+  var plain = { ownerKey: 'd'.repeat(64), email: 'other@example.org', status: 'trial', createdAt: new Date(), events: [] };
+  var html = await render({ directory: { email: 'school', status: 'founding', page: 1, pages: 1, total: 1, teachers: [marked] }, selectedTeacher: owner });
+  assert.match(html, /value="founding" selected/);
+  assert.match(html, /class="founding-badge"[^>]*>⭐ 创始会员/);
+  assert.ok(html.includes('action="/admin/memberships/' + owner + '/founding"'));
+  assert.match(html, /name="on" value="0"/);
+  assert.match(html, /标记于 2026-11-20/);
+  assert.match(html, /name="email" value="school"/);
+  html = await render({ directory: { email: '', status: 'all', page: 1, pages: 1, total: 1, teachers: [plain] }, selectedTeacher: plain.ownerKey });
+  assert.doesNotMatch(html, /class="founding-badge"/);
+  assert.match(html, /name="on" value="1"/);
+  assert.match(html, /⭐ 标记为创始会员/);
+});
+
+test('founding filter and marker queries', async function() {
+  var inputs = {}, query, affected = 1;
+  var client = { sql: { NVarChar: function() {}, VarChar: function() {}, Int: 'Int', Char: function() {}, Bit: 'Bit' }, getPool: async function() {
+    return { request: function() { return { input: function(key,type,value) { inputs[key]=value; return this; }, query: async function(sql) { query=sql; return { rowsAffected: [affected], recordsets: [[{ total: 1, page: 1, pages: 1 }], [{ owner_key: 'c'.repeat(64), founding_member_at: new Date('2026-11-20T00:00:00Z') }]] }; } }; } };
+  } };
+  var repo = require('../services/teacherAccountsRepository');
+  var result = await repo.list({ status: 'founding' }, client);
+  assert.equal(inputs.status, 'founding');
+  assert.match(query, /@status='founding' AND founding_member_at IS NULL/);
+  assert.equal(result.teachers[0].foundingMemberAt.toISOString().slice(0, 10), '2026-11-20');
+  assert.equal(await repo.setFounding('not-a-key', true, 'Admin', client), false);
+  assert.equal(await repo.setFounding('c'.repeat(64), true, 'Admin', client), true);
+  assert.equal(inputs.on, 1);
+  assert.equal(inputs.actor, 'Admin');
+  assert.match(query, /COALESCE\(founding_member_at, SYSUTCDATETIME\(\)\)/);
+  await repo.setFounding('c'.repeat(64), false, 'Admin', client);
+  assert.equal(inputs.on, 0);
+  assert.equal(inputs.actor, null);
+  affected = 0;
+  assert.equal(await repo.setFounding('c'.repeat(64), true, 'Admin', client), false);
+});
