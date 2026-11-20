@@ -141,6 +141,13 @@ function clientNav() {
   function link(section) {
     var item = { href: section.href, en: navLabel(section, 'en'), zh: navLabel(section, 'zh') };
     if (section.comingSoon) item.comingSoon = true;
+    if (section.key === 'tools') {
+      var i18n = require('../services/i18n');
+      item.categories = require('./tools').directoryKeys.map(function(key) {
+        var label = 'teachingToolsIndex.groups.' + key + '.heading';
+        return { href: section.href + '#' + key, en: i18n.t('en', label), zh: i18n.t('zh', label) };
+      });
+    }
     return item;
   }
   return {

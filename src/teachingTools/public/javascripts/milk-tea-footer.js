@@ -85,6 +85,66 @@
     return '<a href="' + item.href + '">' + item[lang] + '</a>';
   }
 
+  function navItemHtml(item, lang) {
+    if (!item.categories) return '<li>' + linkHtml(item, lang) + '</li>';
+    var label = lang === 'zh' ? '教学工具分类' : 'Teaching Tools categories';
+    return '<li class="site-tool-nav">' + linkHtml(item, lang) +
+      '<button type="button" aria-expanded="false" aria-controls="siteToolCategories" aria-label="' + label + '">▾</button>' +
+      '<ul id="siteToolCategories" class="site-tool-categories" aria-label="' + label + '" hidden>' +
+      item.categories.map(function(category) { return '<li>' + linkHtml(category, lang) + '</li>'; }).join('') +
+      '</ul></li>';
+  }
+
+  function wireToolCategories(nav) {
+    var item = nav.querySelector('.site-tool-nav');
+    if (!item) return;
+    var toggle = item.querySelector('button');
+    var menu = item.querySelector('.site-tool-categories');
+
+    function setOpen(open) {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) {
+        var rect = item.getBoundingClientRect();
+        menu.style.left = Math.max(8, Math.min(rect.left, document.documentElement.clientWidth - menu.offsetWidth - 8)) + 'px';
+        menu.style.top = rect.bottom + 'px';
+        menu.style.maxHeight = Math.max(0, window.innerHeight - rect.bottom - 8) + 'px';
+      }
+    }
+
+    toggle.addEventListener('click', function() { setOpen(menu.hidden); });
+    item.addEventListener('pointerenter', function(event) {
+      if (event.pointerType === 'mouse') setOpen(true);
+    });
+    item.addEventListener('pointerleave', function(event) {
+      if (event.pointerType === 'mouse' && !menu.contains(document.activeElement)) setOpen(false);
+    });
+    item.addEventListener('focusout', function(event) {
+      if (!item.contains(event.relatedTarget)) setOpen(false);
+    });
+    item.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && !menu.hidden) {
+        event.preventDefault();
+        toggle.focus();
+        setOpen(false);
+      }
+    });
+    menu.addEventListener('click', function(event) {
+      if (event.target.closest('a')) {
+        toggle.focus({ preventScroll: true });
+        setOpen(false);
+      }
+    });
+    document.addEventListener('pointerdown', function(event) {
+      if (!item.contains(event.target) && !menu.hidden) setOpen(false);
+    });
+    window.addEventListener('resize', function() { if (!menu.hidden) setOpen(true); });
+    window.addEventListener('scroll', function() { if (!menu.hidden) setOpen(false); });
+    nav.querySelector('.site-main-nav-links').addEventListener('scroll', function() {
+      if (!menu.hidden) setOpen(true);
+    });
+  }
+
   function buildLangSwitchHtml(lang) {
     var redirect = encodeURIComponent(window.location.pathname + window.location.search);
     return '<div class="site-lang-switch" role="group" aria-label="Language / 语言">' +
@@ -175,7 +235,7 @@
         '<div class="site-main-nav-inner">',
         '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" width="42" height="42" alt=""><span>' + t.brand + '<small>' + t.tagline + '</small></span></a>',
         '  <ul class="site-main-nav-links">',
-        SITE_NAV.nav.map(function(item) { return '    <li>' + linkHtml(item, lang) + '</li>'; }).join(''),
+        SITE_NAV.nav.map(function(item) { return navItemHtml(item, lang); }).join(''),
         '  </ul>',
         '  ' + buildLangSwitchHtml(lang),
         '</div>'
@@ -189,6 +249,7 @@
         if (active) link.setAttribute('aria-current', 'page');
       });
       document.body.prepend(nav);
+      wireToolCategories(nav);
     }
     watchNavFit(document.getElementById('siteMainNav'));
 

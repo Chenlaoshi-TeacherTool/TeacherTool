@@ -37,6 +37,27 @@ test('every catalog entry is complete and translated in both languages', functio
   assert.equal(new Set(hrefs).size, hrefs.length);
 });
 
+test('the directory groups share tool entries and keep every tool discoverable', function() {
+  var sections = tools.sections();
+  assert.deepEqual(sections.map(function(section) { return section.key; }), tools.directoryKeys.concat('coming-soon'));
+  assert.deepEqual(new Set(sections.flatMap(function(section) { return section.tools; })), new Set(tools.TOOLS));
+  sections.forEach(function(section) {
+    assert.equal(new Set(section.tools).size, section.tools.length, section.key);
+    section.groups.forEach(function(group) {
+      if (group.key === 'main') return;
+      ['en', 'zh'].forEach(function(lang) {
+        assert.ok(translated(lang, 'teachingToolsIndex.groups.' + group.key + '.heading'), group.key + ' ' + lang);
+      });
+    });
+  });
+  var placement = function(title) {
+    var tool = tools.TOOLS.find(function(entry) { return entry.titleKey === 'teachingToolsIndex.' + title; });
+    return sections.filter(function(section) { return section.tools.includes(tool); }).map(function(section) { return section.key; });
+  };
+  assert.deepEqual(placement('nameTentTitle'), ['manage', 'printables']);
+  assert.deepEqual(placement('pixelArtTitle'), ['classroom-games', 'online-practice', 'printables']);
+});
+
 test('every /teaching-tools/<slug> page is in the catalog or deliberately unlisted', function() {
   var listed = tools.LIVE.map(function(tool) { return slugForPath(tool.href); });
   var routed = [require('../routes/index'), require('../routes/bookGenerator')].reduce(function(all, router) {

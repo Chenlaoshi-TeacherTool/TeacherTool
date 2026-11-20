@@ -104,7 +104,7 @@ router.get('/chinese-teaching', function(req, res) {
 });
 
 router.get('/teaching-tools', function(req, res, next) {
-  res.render('teaching-tools/index', { title: 'Teaching Tools', toolSections: tools.sections() });
+  res.render('teaching-tools/index', { title: 'Teaching Tools', toolSections: tools.sections(), socialTools: tools.socialTools });
 });
 
 router.get('/teaching-tools/qr-code-generator', function(req, res, next) {

@@ -126,6 +126,38 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
 .site-main-nav-links a:hover,
 .site-main-nav-links a[aria-current="page"] { background: #edf5df; color: #194f45; }
 
+.site-tool-nav { display: flex; align-items: stretch; }
+.site-tool-nav > button {
+  flex: none;
+  min-width: 32px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #194f45;
+  font: inherit;
+  cursor: pointer;
+}
+.site-tool-nav > button:hover,
+.site-tool-nav > button[aria-expanded="true"] { background: #edf5df; }
+.site-tool-nav > button:focus-visible,
+.site-tool-categories a:focus-visible { outline: 2px solid #356e57; outline-offset: -2px; }
+.site-tool-categories {
+  position: fixed;
+  z-index: 1;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  margin: 0;
+  padding: 6px;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid #d7e3c7;
+  border-radius: 12px;
+  background: #fffdf7;
+  box-shadow: 0 10px 26px rgba(33, 74, 55, .18);
+}
+.site-main-nav .site-tool-categories a { padding: 9px 12px; border-radius: 7px; white-space: normal; }
+
 .site-main-nav-links .site-nav-coming-soon { color: #858585; cursor: not-allowed; }
 
 .site-lang-switch {

@@ -76,13 +76,17 @@
         .tool-jump { display: flex; flex-wrap: wrap; gap: 8px; max-width: 1200px; margin: 0 auto 30px; }
         .tool-jump a { padding: 8px 14px; border: 1px solid #cbdac2; border-radius: 22px; background: #fffdf7; color: #194f45; font-weight: 700; text-decoration: none; }
         .tool-jump a:hover { background: #edf5df; }
-        .tool-jump a:focus-visible, .tool-section-toggle:focus-visible { outline: 3px solid #bf7f35; outline-offset: 3px; }
+        .tool-jump a:focus-visible { outline: 3px solid #bf7f35; outline-offset: 3px; }
         .tool-jump a[hidden] { display: none; }
         .tool-jump span { margin-left: 4px; color: #5d7168; font-weight: 400; }
-        /* Long groups fold after eight cards; searching or filtering shows every match. */
-        .tool-sections:not(.is-filtering) .tool-section.is-collapsed .tool-card--extra { display: none; }
-        .tool-section-toggle { display: block; margin: 20px auto 0; padding: 10px 20px; border: 1px solid #356e57; border-radius: 22px; background: white; color: #194f45; font: inherit; font-weight: 700; cursor: pointer; }
-        .tool-sections.is-filtering .tool-section-toggle { display: none; }
+        .tool-group + .tool-group { margin-top: 28px; }
+        .tool-group, .tool-anchor { scroll-margin-top: 24px; }
+        .tool-anchor { height: 1px; }
+        .tool-group-heading { margin: 0 0 12px; color: #194f45; }
+        .tool-social-links { padding-left: 20px; margin-bottom: 12px; }
+        .tool-social-links a { color: #194f45; }
+        .tool-card .tool-categories { display: none; color: #356e57; font-weight: 700; }
+        .is-filtering .tool-card .tool-categories { display: block; }
         .tool-section-heading {
             max-width: 760px;
             margin-bottom: 18px;
@@ -204,27 +208,51 @@
         </div>
     </section>
 
+    <% var categoryNames = new Map();
+       toolSections.forEach(function(section) {
+           if (section.key === 'coming-soon') return;
+           section.tools.forEach(function(tool) {
+               var names = categoryNames.get(tool) || [];
+               names.push(t('teachingToolsIndex.groups.' + section.key + '.heading'));
+               categoryNames.set(tool, names);
+           });
+       }); %>
     <%# id: older links and tool pages' back buttons point at #low-prep-activities. %>
     <main class="tool-sections" id="low-prep-activities">
         <nav class="tool-jump" aria-label="<%= t('teachingToolsIndex.jumpLabel') %>">
-            <% toolSections.forEach(function(section) { %>
+            <% toolSections.filter(function(section) { return section.key !== 'coming-soon'; }).forEach(function(section) { %>
             <a href="#<%= section.key %>"><%= t('teachingToolsIndex.groups.' + section.key + '.heading') %><span><%= section.tools.length %></span></a>
             <% }); %>
         </nav>
-        <% toolSections.forEach(function(section) { var folds = section.tools.length > 8; %>
-        <section class="tool-section<%= folds ? ' is-collapsed' : '' %>" id="<%= section.key %>" aria-labelledby="<%= section.key %>-heading">
+        <% toolSections.forEach(function(section) { %>
+        <section class="tool-section" id="<%= section.key %>" aria-labelledby="<%= section.key %>-heading">
+            <% if (section.key === 'online-practice') { %><div class="tool-anchor" id="reading"></div><% } %>
             <div class="tool-section-heading">
                 <h2 id="<%= section.key %>-heading"><%= t('teachingToolsIndex.groups.' + section.key + '.heading') %></h2>
                 <p><%= t('teachingToolsIndex.groups.' + section.key + '.desc') %></p>
             </div>
+            <% section.groups.forEach(function(group) { %>
+            <div class="tool-group"<% if (group.key !== 'main') { %> id="<%= group.key %>"<% } %>>
+            <% if (group.key === 'chinese-materials') { %><div class="tool-anchor" id="hanzi"></div><% } %>
+            <% if (group.key !== 'main') { %><h3 class="tool-group-heading"><%= t('teachingToolsIndex.groups.' + group.key + '.heading') %></h3><% } %>
             <div class="tools-grid">
-                <% section.tools.forEach(function(tool, index) { %>
-                <% var searchText = [tool.titleKey, tool.scopeKey, tool.descKey].map(function(key) { return key ? t(key) + ' ' + tOther(key) : ''; }).join(' '); %>
-                <div data-search="<%= searchText %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %><%= index >= 8 ? ' tool-card--extra' : '' %>">
+                <% group.tools.forEach(function(tool) {
+                    var links = tool.titleKey === 'teachingToolsIndex.socialMediaHubTitle' ? socialTools : [];
+                    var searchKeys = [tool.titleKey, tool.scopeKey, tool.descKey].concat(links.map(function(link) { return link.titleKey; }));
+                    var searchText = searchKeys.map(function(key) { return t(key) + ' ' + tOther(key); }).join(' ');
+                    var categories = categoryNames.get(tool);
+                %>
+                <div data-tool="<%= tool.titleKey %>" data-search="<%= searchText %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %>">
                     <% if (tool.href) { %><%- include('../partials/tool-snapshot', { previewHref: tool.href }) %><% } %>
                     <h3><% if (tool.icon) { %><%= tool.icon %> <% } %><%= t(tool.titleKey) %><% if (tool.subject === 'chinese') { %> <span class="tool-subject"><%= t('teachingToolsIndex.chineseOnly') %></span><% } %><% if (tool.limitedFree) { %> <span class="tool-limited-free"><%= t('teachingToolsIndex.limitedFree') %></span><% } %></h3>
                     <p class="tool-scope"><%= t(tool.scopeKey) %></p>
                     <p><%= t(tool.descKey) %></p>
+                    <% if (categories) { %><p class="tool-categories"><%= categories.join(lang === 'zh' ? '、' : ' · ') %></p><% } %>
+                    <% if (links.length) { %>
+                    <ul class="tool-social-links">
+                        <% links.forEach(function(link) { %><li><a href="<%= link.href %>"><%= t(link.titleKey) %></a></li><% }); %>
+                    </ul>
+                    <% } %>
                     <% if (tool.href) { %>
                     <a href="<%= tool.href %>" class="btn"><%= t(tool.actionKey) %></a>
                     <% } else { %>
@@ -233,9 +261,8 @@
                 </div>
                 <% }); %>
             </div>
-            <% if (folds) { %>
-            <button class="tool-section-toggle" type="button" aria-expanded="false" data-more="<%= t('teachingToolsIndex.showAll').replace('{count}', section.tools.length) %>" data-less="<%= t('teachingToolsIndex.showFewer') %>"><%= t('teachingToolsIndex.showAll').replace('{count}', section.tools.length) %></button>
-            <% } %>
+            </div>
+            <% }); %>
         </section>
         <% }); %>
     </main>
@@ -258,19 +285,23 @@
 
             function updateToolResults() {
                 var query = search.value.trim().toLocaleLowerCase();
-                var matches = 0;
+                var seen = new Set();
 
                 cards.forEach(function (card) {
-                    var isMatch = !query || (card.dataset.search || card.textContent).toLocaleLowerCase().indexOf(query) !== -1;
+                    var isMatch = !query || (!seen.has(card.dataset.tool) && card.dataset.search.toLocaleLowerCase().includes(query));
                     card.hidden = !isMatch;
-                    if (isMatch) matches += 1;
+                    if (isMatch && !card.classList.contains('coming-soon')) seen.add(card.dataset.tool);
                 });
 
-                sections.forEach(function (section) {
-                    var sectionCards = Array.prototype.slice.call(section.querySelectorAll('.tool-card'));
-                    section.hidden = sectionCards.every(function (card) { return card.hidden; });
-                    document.querySelector('.tool-jump a[href="#' + section.id + '"]').hidden = section.hidden;
+                document.querySelectorAll('.tool-group').forEach(function(group) {
+                    group.hidden = !group.querySelector('.tool-card:not([hidden])');
                 });
+                sections.forEach(function (section) {
+                    section.hidden = !section.querySelector('.tool-group:not([hidden])');
+                    var jump = document.querySelector('.tool-jump a[href="#' + section.id + '"]');
+                    if (jump) jump.hidden = section.hidden;
+                });
+                var matches = query ? document.querySelectorAll('.tool-card:not([hidden])').length : seen.size;
                 document.querySelector('.tool-sections').classList.toggle('is-filtering', Boolean(query));
 
                 emptyActions.hidden = matches !== 0;
@@ -283,12 +314,12 @@
                 updateToolResults();
                 search.focus();
             });
-            Array.prototype.forEach.call(document.querySelectorAll('.tool-section-toggle'), function(toggle) {
-                toggle.addEventListener('click', function() {
-                    var collapsed = toggle.parentNode.classList.toggle('is-collapsed');
-                    toggle.setAttribute('aria-expanded', String(!collapsed));
-                    toggle.textContent = collapsed ? toggle.dataset.more : toggle.dataset.less;
-                });
+            document.addEventListener('click', function(event) {
+                var link = event.target.closest('.site-tool-categories a, .tool-jump a');
+                if (link && link.pathname === window.location.pathname && search.value) {
+                    search.value = '';
+                    updateToolResults();
+                }
             });
             search.addEventListener('input', updateToolResults);
             updateToolResults();

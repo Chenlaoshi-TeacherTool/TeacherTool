@@ -109,11 +109,45 @@ function chineseGroups() {
   ];
 }
 
-// Sections with their tools, for the directory page.
+// Shared tools keep the same catalog entry in every directory group.
+var DIRECTORY = {
+  manage: { main: 'home.luckyWheelTitle groupTitle noiseMonitorTitle petTitle nameTentTitle' },
+  'classroom-games': {
+    'review-games': 'quizCityTitle teamRaceTitle jeopardyTitle rewardGridTitle poisonGameTitle gachaTitle',
+    'warmup-games': 'home.luckyWheelTitle wordMatchTitle pixelArtTitle whatsMissingTitle imageRevealerTitle zoomRevealTitle termRaceTitle hanziWordChoiceTitle missingPartsTitle',
+    'paper-games': 'tearPaperBingoTitle'
+  },
+  'online-practice': {
+    practice: 'wordMatchTitle pixelArtTitle sentenceReorderTitle hanziWordChoiceTitle timeMachineTitle measureWordsTitle wouldYouRatherTitle',
+    creation: 'bookGenTitle socialMediaHubTitle'
+  },
+  printables: {
+    'classroom-supplies': 'nameTentTitle qrTitle',
+    'printable-games': 'sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle vocabPuzzleTitle pixelArtTitle',
+    'chinese-materials': 'decodeTitle worksheetTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle charUnscramblerTitle independentReadingTitle glossaryTitle'
+  },
+  prep: { main: 'libraryTitle questionBankTitle emojiSearchTitle glossaryTitle fontTitle' }
+};
+
+var byTitle = new Map(TOOLS.map(function(tool) { return [tool.titleKey, tool]; }));
+
+var socialTools = [
+  { href: '/teaching-tools/fake-wechat-moments/', titleKey: 'teachingToolsIndex.fakeWechatTitle' },
+  { href: '/teaching-tools/fake-wechat-single-post/', titleKey: 'teachingToolsIndex.fakeWechatSingleTitle' },
+  { href: '/teaching-tools/fakebook-profile/fakebook-profile.html', titleKey: 'teachingToolsIndex.fakebookTitle' }
+];
+
 function sections() {
-  return SECTIONS.map(function(key) {
-    return { key: key, tools: TOOLS.filter(function(tool) { return tool.section === key; }) };
+  var sections = Object.entries(DIRECTORY).map(function(entry) {
+    var groups = Object.entries(entry[1]).map(function(group) {
+      return { key: group[0], tools: group[1].split(' ').map(function(title) {
+        return byTitle.get(title.startsWith('home.') ? title : 'teachingToolsIndex.' + title);
+      }) };
+    });
+    return { key: entry[0], groups: groups, tools: groups.flatMap(function(group) { return group.tools; }) };
   });
+  var upcoming = TOOLS.filter(function(tool) { return tool.comingSoon; });
+  return sections.concat({ key: 'coming-soon', groups: [{ key: 'main', tools: upcoming }], tools: upcoming });
 }
 
 module.exports = {
@@ -122,5 +156,7 @@ module.exports = {
   LIVE: LIVE,
   UNLISTED: UNLISTED,
   chineseGroups: chineseGroups,
+  directoryKeys: Object.keys(DIRECTORY),
+  socialTools: socialTools,
   sections: sections
 };
