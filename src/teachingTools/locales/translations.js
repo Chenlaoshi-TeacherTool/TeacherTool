@@ -530,7 +530,7 @@ module.exports = {
     teachingToolsIndex: {
       backToHomepage: 'Back to Homepage',
       title: 'Teaching Tools',
-      intro: 'Add your own names, links, terms, and questions. General-purpose tools work across subjects, while language-focused tools are clearly labeled.',
+      intro: 'Make groups, run a review game, set up online practice, or turn your own vocabulary and questions into flashcards and worksheets. Browse by category or search for the tool you need.',
       findToolLabel: 'Find a tool',
       searchPlaceholder: 'Search by tool name or keyword',
       searchStatusDefault: 'Search all tools and activities.',
@@ -2093,7 +2093,7 @@ module.exports = {
     teachingToolsIndex: {
       backToHomepage: '返回首页',
       title: '教学工具',
-      intro: '添加您自己的姓名、链接、词汇和问题。通用工具适用于各个学科，语言相关工具会有明确标注。',
+      intro: '快速分组、带全班玩复习游戏、让学生在线练习，或用自己的词汇和题目生成闪卡和练习单。按分类浏览，也可以直接搜索你要用的工具。',
       findToolLabel: '查找工具',
       searchPlaceholder: '按工具名称或关键词搜索',
       searchStatusDefault: '搜索所有工具与活动。',
