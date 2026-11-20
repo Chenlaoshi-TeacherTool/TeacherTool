@@ -179,6 +179,21 @@ test('admin manages uploads directly and links one material to multiple themes a
   assert.deepEqual(items.get(seed.id).files, seed.files);
 });
 
+test('admin can lock and unlock one attachment for members', async function () {
+  var revision = items.get(seed.id).revision;
+  var lock = form({ revision: String(revision), label_0: '', membersOnly_0: 'on', label_1: '' });
+  assert.equal((await save(lock, 'admin')).status, 200);
+  assert.equal(items.get(seed.id).files[0].membersOnly, true);
+  assert.equal(items.get(seed.id).files[1].membersOnly, undefined);
+  var editor = await (await fetch(base + '/admin/materials/' + seed.id + '/edit', { headers: { 'test-user': 'admin' } })).text();
+  assert.match(editor, /name="membersOnly_0" checked/);
+  var download = await fetch(base + '/materials/' + seed.id + '/files/0', { redirect: 'manual' });
+  assert.equal(download.status, 302);
+  var unlock = form({ revision: String(revision + 1), label_0: '' });
+  assert.equal((await save(unlock, 'admin')).status, 200);
+  assert.equal(items.get(seed.id).files[0].membersOnly, undefined);
+});
+
 test('admin material pages require admin access and invalid or empty themes cannot save', async function () {
   for (var url of ['/admin/materials', '/admin/materials/new', '/admin/materials/' + seed.id + '/edit']) {
     assert.equal((await fetch(base + url)).status, 403);

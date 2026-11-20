@@ -165,6 +165,9 @@ function create(options) {
         ['label', 'labelEn', 'note', 'noteEn'].forEach(function (key) {
           if (body[key + '_' + index] !== undefined) copy[key] = text(body[key + '_' + index], 120, false);
         });
+        // Unchecked boxes are not sent, so only an admin save of the full form may clear the lock.
+        if (user.admin && body['label_' + index] !== undefined) copy.membersOnly = body['membersOnly_' + index] === 'on';
+        if (!copy.membersOnly) delete copy.membersOnly;
         return copy;
       });
       var remove = array(body.removeFiles).map(Number);
