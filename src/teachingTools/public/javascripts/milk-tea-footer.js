@@ -87,17 +87,16 @@
 
   function navItemHtml(item, lang) {
     if (!item.categories) return '<li>' + linkHtml(item, lang) + '</li>';
-    var label = lang === 'zh' ? '教学工具分类' : 'Teaching Tools categories';
+    var label = item[lang] + (lang === 'zh' ? '分类' : ' categories');
+    var menuId = item.href === '/teaching-tools' ? 'siteToolCategories' : 'siteThemeCategories';
     return '<li class="site-tool-nav">' + linkHtml(item, lang) +
-      '<button type="button" aria-expanded="false" aria-controls="siteToolCategories" aria-label="' + label + '">▾</button>' +
-      '<ul id="siteToolCategories" class="site-tool-categories" aria-label="' + label + '" hidden>' +
+      '<button type="button" aria-expanded="false" aria-controls="' + menuId + '" aria-label="' + label + '">▾</button>' +
+      '<ul id="' + menuId + '" class="site-tool-categories" aria-label="' + label + '" hidden>' +
       item.categories.map(function(category) { return '<li>' + linkHtml(category, lang) + '</li>'; }).join('') +
       '</ul></li>';
   }
 
-  function wireToolCategories(nav) {
-    var item = nav.querySelector('.site-tool-nav');
-    if (!item) return;
+  function wireCategories(item) {
     var toggle = item.querySelector('button');
     var menu = item.querySelector('.site-tool-categories');
 
@@ -140,7 +139,7 @@
     });
     window.addEventListener('resize', function() { if (!menu.hidden) setOpen(true); });
     window.addEventListener('scroll', function() { if (!menu.hidden) setOpen(false); });
-    nav.querySelector('.site-main-nav-links').addEventListener('scroll', function() {
+    item.parentElement.addEventListener('scroll', function() {
       if (!menu.hidden) setOpen(true);
     });
   }
@@ -249,7 +248,7 @@
         if (active) link.setAttribute('aria-current', 'page');
       });
       document.body.prepend(nav);
-      wireToolCategories(nav);
+      nav.querySelectorAll('.site-tool-nav').forEach(wireCategories);
     }
     watchNavFit(document.getElementById('siteMainNav'));
 

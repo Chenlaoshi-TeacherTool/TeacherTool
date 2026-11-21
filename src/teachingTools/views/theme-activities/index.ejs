@@ -54,13 +54,31 @@
             font-size: 16px;
         }
 
+        .theme-directory {
+            margin: 0 auto;
+            max-width: 1240px;
+            padding: 0 20px 40px;
+        }
+
+        .theme-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+        .theme-jump a {
+            padding: 8px 14px;
+            border: 1px solid #cbdac2;
+            border-radius: 22px;
+            color: #194f45;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .theme-jump a:hover { background: #edf5df; }
+        .theme-group { margin: 0 0 32px; scroll-margin-top: 24px; }
+        .theme-group h2 { margin: 0 0 14px; color: #194f45; }
+        .theme-group[hidden], .tool-card[hidden] { display: none; }
+
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 20px;
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
         .tool-card {
@@ -136,55 +154,77 @@
         <p><%= t('themeActivities.intro') %></p>
     </section>
 
-    <!-- 🔍 SEARCH BOX -->
     <div class="search-container">
-        <input
-            type="text"
-            id="searchBox"
-            placeholder="🔍 <%= t('themeActivities.searchPlaceholder') %>"
-            onkeyup="filterThemes()"
-        >
+        <input type="search" id="searchBox" aria-label="<%= t('themeActivities.searchPlaceholder') %>"
+            placeholder="🔍 <%= t('themeActivities.searchPlaceholder') %>">
     </div>
 
-    <section class="tools-grid">
-        <% (typeof themes === 'undefined' ? [] : themes).forEach(function (theme) { %>
-        <div class="tool-card" data-tags="<%= theme.key %> <%= theme.en %> <%= theme.zh %> <%= theme.tags || '' %>">
-            <h3><%= theme.icon ? theme.icon + ' ' : '' %><%= lang === 'zh' ? theme.zh : theme.en %></h3>
-            <p><%= lang === 'zh' ? (theme.descZh || '主题课堂活动与可打印材料。') : (theme.descEn || 'Themed classroom activities and printable materials.') %></p>
-            <a href="<%= theme.href %>" class="btn"><%= t('themeActivities.openTheme') %></a>
-        </div>
-        <% }) %>
+    <main class="theme-directory">
+        <nav class="theme-jump" aria-label="<%= lang === 'zh' ? '主题分类' : 'Theme categories' %>">
+            <% categories.forEach(function(category) { %>
+            <a href="#<%= category.key %>"><%= category[lang] %></a>
+            <% }); %>
+        </nav>
 
-        <div class="tool-card" data-tags="festivals holidays mid autumn 中秋节 节日">
-            <h3>🥮 <%= t('themeActivities.midAutumnTitle') %></h3>
-            <p><%= t('themeActivities.midAutumnDesc') %></p>
-            <a href="/resources/teaching-mid-autumn-festival-grade-one" class="btn"><%= t('themeActivities.readLesson') %></a>
-        </div>
+        <% var groups = otherThemes.length ? categories.concat({ key: 'other-themes', en: 'Other Themes', zh: '其他主题', themes: otherThemes }) : categories;
+        groups.forEach(function(category) { %>
+        <section class="theme-group" id="<%= category.key %>" aria-labelledby="<%= category.key %>-heading">
+            <h2 id="<%= category.key %>-heading"><%= category[lang] %></h2>
+            <div class="tools-grid">
+                <% category.themes.forEach(function(theme) { %>
+                <div class="tool-card" data-tags="<%= category.en %> <%= category.zh %> <%= theme.key %> <%= theme.en %> <%= theme.zh %> <%= theme.tags || '' %>">
+                    <h3><%= theme.icon ? theme.icon + ' ' : '' %><%= theme[lang] %></h3>
+                    <p><%= lang === 'zh' ? (theme.descZh || '主题课堂活动与可打印材料。') : (theme.descEn || 'Themed classroom activities and printable materials.') %></p>
+                    <a href="<%= theme.href %>" class="btn"><%= t('themeActivities.openTheme') %></a>
+                </div>
+                <% }); %>
+                <% if (category.key === 'festivals-culture' && showMidAutumnLesson) { %>
+                <div class="tool-card" data-tags="festivals culture holidays mid autumn 中秋节 节日 文化">
+                    <h3>🥮 <%= t('themeActivities.midAutumnTitle') %></h3>
+                    <p><%= t('themeActivities.midAutumnDesc') %></p>
+                    <a href="/resources/teaching-mid-autumn-festival-grade-one" class="btn"><%= t('themeActivities.readLesson') %></a>
+                </div>
+                <% } %>
+            </div>
+        </section>
+        <% }); %>
 
-        <div class="tool-card" data-tags="games vocabulary classroom 中文 游戏 词汇">
-            <h3>🎲 <%= t('themeActivities.gameIdeasTitle') %></h3>
-            <p><%= t('themeActivities.gameIdeasDesc') %></p>
-            <a href="/resources/ten-games-for-chinese-beginners" class="btn"><%= t('themeActivities.readGameGuide') %></a>
-        </div>
-    </section>
+        <section class="theme-group" aria-labelledby="theme-guide-heading">
+            <h2 id="theme-guide-heading"><%= lang === 'zh' ? '通用活动指南' : 'General Activity Guide' %></h2>
+            <div class="tools-grid">
+                <div class="tool-card" data-tags="games vocabulary classroom 中文 游戏 词汇">
+                    <h3>🎲 <%= t('themeActivities.gameIdeasTitle') %></h3>
+                    <p><%= t('themeActivities.gameIdeasDesc') %></p>
+                    <a href="/resources/ten-games-for-chinese-beginners" class="btn"><%= t('themeActivities.readGameGuide') %></a>
+                </div>
+            </div>
+        </section>
+    </main>
 
-    <!-- 🔍 JS SEARCH FUNCTION -->
     <script>
-        function filterThemes() {
-            let input = document.getElementById("searchBox").value.toLowerCase();
-            let cards = document.querySelectorAll(".tool-card");
+        (function () {
+            var search = document.getElementById('searchBox');
+            var groups = document.querySelectorAll('.theme-group');
 
-            cards.forEach(card => {
-                let tags = card.getAttribute("data-tags").toLowerCase();
-                let text = card.innerText.toLowerCase();
+            function filterThemes() {
+                var query = search.value.trim().toLowerCase();
+                groups.forEach(function(group) {
+                    group.querySelectorAll('.tool-card').forEach(function(card) {
+                        card.hidden = !(card.dataset.tags + ' ' + card.textContent).toLowerCase().includes(query);
+                    });
+                    group.hidden = Boolean(query) && !group.querySelector('.tool-card:not([hidden])');
+                });
+            }
 
-                if (tags.includes(input) || text.includes(input)) {
-                    card.style.display = "block";
-                } else {
-                    card.style.display = "none";
+            search.addEventListener('input', filterThemes);
+            document.addEventListener('click', function(event) {
+                var link = event.target.closest('.theme-jump a, .site-tool-categories a');
+                if (link && link.pathname.replace(/\/$/, '') === '/theme-activities' && search.value) {
+                    search.value = '';
+                    filterThemes();
                 }
             });
-        }
+        })();
     </script>
     <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>

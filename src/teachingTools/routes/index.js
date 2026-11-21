@@ -314,7 +314,19 @@ router.get('/low-prep-activities', function(req, res) {
 
 // Theme Activities Routes
 router.get('/theme-activities', function(req, res, next) {
-  res.render('theme-activities/index', { title: 'Theme Activities', themes: req.contentCatalog ? req.contentCatalog.themes : siteMap.children('activities') });
+  var themes = req.contentCatalog ? req.contentCatalog.themes : siteMap.children('activities');
+  var categories = require('../config/themeCategories').map(function(category) {
+    return Object.assign({}, category, {
+      themes: themes.filter(function(theme) { return category.themes.includes(theme.key); })
+    });
+  });
+  var assigned = new Set(categories.flatMap(function(category) { return category.themes; }));
+  res.render('theme-activities/index', {
+    title: 'Theme Activities',
+    categories: categories,
+    otherThemes: themes.filter(function(theme) { return !assigned.has(theme); }),
+    showMidAutumnLesson: !themes.some(function(theme) { return theme.key === 'mid-autumn'; })
+  });
 });
 
 router.get('/theme-activities/weather', function(req, res, next) {

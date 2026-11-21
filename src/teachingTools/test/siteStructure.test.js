@@ -45,6 +45,21 @@ test('new section pages render in both languages with the required categories', 
   }
 });
 
+test('theme category menu links match the directory sections in both languages', async function() {
+  var nav = require('../config/siteMap').clientNav().nav.find(function(item) { return item.href === '/theme-activities'; });
+  assert.equal(nav.categories.length, 4);
+  for (var lang of ['en', 'zh']) {
+    var response = await fetch(base + '/theme-activities', { headers: { Cookie: 'lang=' + lang } });
+    var html = await response.text();
+    for (var category of nav.categories) {
+      var id = category.href.split('#')[1];
+      assert.ok(html.includes('<h2 id="' + id + '-heading">' + category[lang].replace('&', '&amp;') + '</h2>'));
+    }
+    assert.match(html, /id="festivals-culture"[\s\S]*?\/resources\/teaching-mid-autumn-festival-grade-one[\s\S]*?<\/section>/);
+    assert.match(html, /id="theme-guide-heading"[\s\S]*?\/resources\/ten-games-for-chinese-beginners/);
+  }
+});
+
 test('legacy URLs redirect to the reorganized content', async function() {
   var response = await fetch(base + '/recommendations', { redirect: 'manual' });
   assert.equal(response.status, 301);

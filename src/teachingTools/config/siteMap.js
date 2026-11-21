@@ -148,6 +148,11 @@ function clientNav() {
         return { href: section.href + '#' + key, en: i18n.t('en', label), zh: i18n.t('zh', label) };
       });
     }
+    if (section.key === 'activities') {
+      item.categories = require('./themeCategories').map(function(category) {
+        return { href: section.href + '#' + category.key, en: category.en, zh: category.zh };
+      });
+    }
     return item;
   }
   return {
