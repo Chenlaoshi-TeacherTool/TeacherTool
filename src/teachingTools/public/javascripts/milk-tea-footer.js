@@ -82,13 +82,21 @@
     if (item.comingSoon) {
       return '<span class="site-nav-coming-soon" aria-disabled="true">' + item[lang] + ' · ' + (lang === 'zh' ? '即将推出' : 'Coming soon') + '</span>';
     }
-    return '<a href="' + item.href + '">' + item[lang] + '</a>';
+    var label = item[lang].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return '<a href="' + item.href + '">' + label + '</a>';
   }
 
   function navItemHtml(item, lang) {
-    if (!item.categories) return '<li>' + linkHtml(item, lang) + '</li>';
-    var label = item[lang] + (lang === 'zh' ? '分类' : ' categories');
-    var menuId = item.href === '/teaching-tools' ? 'siteToolCategories' : 'siteThemeCategories';
+    if (!item.categories || !item.categories.length) return '<li>' + linkHtml(item, lang) + '</li>';
+    var menuIds = {
+      '/teaching-tools': 'siteToolCategories',
+      '/theme-activities': 'siteThemeCategories',
+      '/textbook-companion': 'siteTextbookSeries'
+    };
+    var menuId = menuIds[item.href];
+    var label = item.href === '/textbook-companion'
+      ? (lang === 'zh' ? '教材系列' : 'Textbook series')
+      : item[lang] + (lang === 'zh' ? '分类' : ' categories');
     return '<li class="site-tool-nav">' + linkHtml(item, lang) +
       '<button type="button" aria-expanded="false" aria-controls="' + menuId + '" aria-label="' + label + '">▾</button>' +
       '<ul id="' + menuId + '" class="site-tool-categories" aria-label="' + label + '" hidden>' +

@@ -53,11 +53,25 @@ test('each section page links to all of its sub-pages', async function() {
 test('navigation and footer links come from the site map', async function() {
   var script = await (await fetch(base + '/javascripts/milk-tea-footer.js')).text();
   assert.ok(!script.includes('/*SITE_NAV*/'), 'nav data was not injected');
-  var injected = JSON.stringify(siteMap.clientNav());
-  assert.ok(script.includes(injected));
-  var nav = siteMap.clientNav();
+  var catalog = await require('../services/contentCatalog').load();
+  var nav = siteMap.clientNav(catalog.textbooks.SERIES);
+  assert.ok(script.includes(JSON.stringify(nav)));
   assert.deepEqual(nav.nav.map(function(item) { return item.href; }), siteMap.SECTIONS.filter(function(s) { return s.nav; }).map(function(s) { return s.href; }));
   for (var item of nav.nav.concat(nav.footer)) assert.ok(item.en && item.zh, item.href + ' needs en and zh labels');
+});
+
+test('the textbook menu includes only series with books, using the catalog order and labels', function() {
+  var series = [
+    { key: 'yct', en: 'YCT Standard Course', zh: 'YCT 标准教程', books: [{ slug: 'yct-1' }] },
+    { key: 'hsk', en: 'HSK', zh: 'HSK 教材', books: [] },
+    { key: 'bubian', en: 'PEP Chinese', zh: '人教版部编教材' },
+    { key: 'custom', en: 'Custom textbook', zh: '自定义教材', books: [{ slug: 'book-1' }] }
+  ];
+  var textbook = siteMap.clientNav(series).nav.find(function(item) { return item.href === '/textbook-companion'; });
+  assert.deepEqual(textbook.categories, [
+    { href: '/textbook-companion/yct', en: 'YCT Standard Course', zh: 'YCT 标准教程' },
+    { href: '/textbook-companion/custom', en: 'Custom textbook', zh: '自定义教材' }
+  ]);
 });
 
 test('sitemap.xml lists every page in the site map', async function() {

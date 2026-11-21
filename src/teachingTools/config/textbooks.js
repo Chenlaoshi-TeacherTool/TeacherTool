@@ -31,4 +31,8 @@ function findBook(series, slug) {
   return (series && series.books || []).find(function (book) { return book.slug === slug; });
 }
 
-module.exports = { SERIES: SERIES, findSeries: findSeries, findBook: findBook };
+function availableSeries(series) {
+  return series.filter(function(item) { return item.books && item.books.length > 0; });
+}
+
+module.exports = { SERIES: SERIES, findSeries: findSeries, findBook: findBook, availableSeries: availableSeries };

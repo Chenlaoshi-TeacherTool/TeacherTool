@@ -78,10 +78,14 @@ app.use('/teaching-tools/sunflower-spinner', function(req, res, next) {
 
 // The shared nav script gets its links from config/siteMap.js, so the menu,
 // footer, sitemap, and admin dashboard all follow the same structure.
-var navScript = fs.readFileSync(path.join(__dirname, 'public/javascripts/milk-tea-footer.js'), 'utf8')
-  .replace('/*SITE_NAV*/{ nav: [], footer: [] }', JSON.stringify(siteMap.clientNav()));
-app.get('/javascripts/milk-tea-footer.js', function(req, res) {
-  res.type('application/javascript').send(navScript);
+var navScript = fs.readFileSync(path.join(__dirname, 'public/javascripts/milk-tea-footer.js'), 'utf8');
+var contentCatalog = require('./services/contentCatalog');
+app.get('/javascripts/milk-tea-footer.js', async function(req, res) {
+  var catalog = await contentCatalog.load().catch(function() { return null; });
+  var nav = siteMap.clientNav(catalog && catalog.textbooks.SERIES);
+  res.type('application/javascript').send(navScript.replace('/*SITE_NAV*/{ nav: [], footer: [] }', function() {
+    return JSON.stringify(nav);
+  }));
 });
 
 app.use(function(req, res, next) {

@@ -137,7 +137,8 @@ function allPaths() {
 }
 
 // Compact data for the client-side nav/footer in milk-tea-footer.js.
-function clientNav() {
+function clientNav(textbookSeries) {
+  var textbooks = require('./textbooks');
   function link(section) {
     var item = { href: section.href, en: navLabel(section, 'en'), zh: navLabel(section, 'zh') };
     if (section.comingSoon) item.comingSoon = true;
@@ -151,6 +152,11 @@ function clientNav() {
     if (section.key === 'activities') {
       item.categories = require('./themeCategories').map(function(category) {
         return { href: section.href + '#' + category.key, en: category.en, zh: category.zh };
+      });
+    }
+    if (section.key === 'textbook') {
+      item.categories = textbooks.availableSeries(textbookSeries || textbooks.SERIES).map(function(series) {
+        return { href: section.href + '/' + encodeURIComponent(series.key), en: series.en, zh: series.zh };
       });
     }
     return item;

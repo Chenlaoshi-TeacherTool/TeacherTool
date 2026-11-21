@@ -54,7 +54,7 @@ function create(options) {
   }
 
   router.get('/textbook-companion', async function (req, res) {
-    var available = req.textbooks.SERIES.filter(function (series) { return series.books; }).map(function (series) {
+    var available = textbooks.availableSeries(req.textbooks.SERIES).map(function (series) {
       return { heading: name(res, series), href: '/textbook-companion/' + series.key, membersOnly: Boolean(series.membersOnly),
         description: pick(res, series.books.map(function (book) { return book.en; }).join(' · ') + ' — vocabulary, patterns, activities and printable files for every lesson.',
           series.books.map(function (book) { return book.zh; }).join('、') + '：每一课的生词、句型、活动和可打印材料。') };
