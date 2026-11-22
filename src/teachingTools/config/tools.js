@@ -63,6 +63,7 @@ var TOOLS = [
   { href: '/teaching-tools/maze-generator', icon: '🧭', titleKey: 'teachingToolsIndex.mazeTitle', scopeKey: 'teachingToolsIndex.tenToFifteenPrintable', descKey: 'teachingToolsIndex.mazeDesc', actionKey: 'teachingToolsIndex.openActivity', section: 'printables', uses: ['print'] },
   { href: '/teaching-tools/tarsia-puzzle', icon: '🧩', titleKey: 'teachingToolsIndex.tarsiaTitle', scopeKey: 'teachingToolsIndex.tenToFifteenPrintable', descKey: 'teachingToolsIndex.tarsiaDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'] },
   { href: '/teaching-tools/secret-message', icon: '🔐', titleKey: 'teachingToolsIndex.secretMessageTitle', scopeKey: 'teachingToolsIndex.secretMessageScope', descKey: 'teachingToolsIndex.secretMessageDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'] },
+  { href: '/teaching-tools/spin-wheel', icon: '🎡', titleKey: 'teachingToolsIndex.spinWheelTitle', scopeKey: 'teachingToolsIndex.spinWheelScope', descKey: 'teachingToolsIndex.spinWheelDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'project'] },
   { href: '/teaching-tools/vocab-puzzle', icon: '🧩', titleKey: 'teachingToolsIndex.vocabPuzzleTitle', scopeKey: 'teachingToolsIndex.vocabPuzzleScope', descKey: 'teachingToolsIndex.vocabPuzzleDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'] },
   { href: '/teaching-tools/decode-practice', icon: '🔡', titleKey: 'teachingToolsIndex.decodeTitle', scopeKey: 'teachingToolsIndex.decodeScope', descKey: 'teachingToolsIndex.decodeDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/worksheet-generator', icon: '📝', titleKey: 'teachingToolsIndex.worksheetTitle', scopeKey: 'teachingToolsIndex.worksheetScope', descKey: 'teachingToolsIndex.worksheetDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'], subject: 'chinese' },
@@ -123,7 +124,7 @@ var DIRECTORY = {
   },
   printables: {
     'classroom-supplies': 'nameTentTitle qrTitle',
-    'printable-games': 'sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle vocabPuzzleTitle pixelArtTitle',
+    'printable-games': 'sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle spinWheelTitle vocabPuzzleTitle pixelArtTitle',
     'chinese-materials': 'decodeTitle worksheetTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle charUnscramblerTitle independentReadingTitle glossaryTitle'
   },
   prep: { main: 'libraryTitle questionBankTitle emojiSearchTitle glossaryTitle fontTitle' }

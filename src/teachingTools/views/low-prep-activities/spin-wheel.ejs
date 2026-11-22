@@ -1,0 +1,162 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>转盘手工 · Spin Wheel Craft - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Printable spin wheel craft for Chinese class. Type a sentence pattern and words, add emoji pictures and pinyin, print two circles to cut out and pin together, or spin the wheel on the projector.' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/spin-wheel/spin-wheel.css?v=2">
+  <style id="swPageSize"></style>
+</head>
+<body class="sw-page">
+  <main class="sw-wrap">
+    <header class="sw-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="sw-eyebrow"><%= L('Printable craft · Sentence practice', '手工打印 · 句型练习') %></p>
+      <h1>🎡 <%= L('Spin Wheel Craft', '转盘手工') %></h1>
+      <p><%= L('Print two circles. The top circle has a window and your sentence pattern; the bottom circle has your words with emoji pictures. Students pin them together, turn the wheel, and say a sentence with the word in the window.', '打印两个圆：上面的圆有一个窗口和句型，下面的圆写着词语并配 emoji。学生用双脚钉把两个圆钉在一起，转动转盘，用窗口里的词说句子。') %></p>
+    </header>
+
+    <div class="sw-layout">
+      <section class="sw-panel sw-builder" aria-labelledby="swContentHeading">
+        <p class="sw-kicker"><%= L('Step 1', '第一步') %></p>
+        <h2 id="swContentHeading"><%= L('Content', '输入内容') %></h2>
+
+        <label for="swTitle" class="sw-label"><%= L('Title (optional)', '标题（可不填）') %></label>
+        <input id="swTitle" class="sw-input" type="text" maxlength="40" autocomplete="off" placeholder="<%= L('e.g. 我喜欢吃……', '比如：我喜欢吃……') %>">
+
+        <label for="swSentences" class="sw-label"><%= L('Sentence pattern (top circle)', '句型（上面的圆）') %></label>
+        <p class="sw-hint"><%= L('One sentence per line. Use ____ for the blank. Thai, Vietnamese, Russian, Spanish and French translations are filled in for you. For English, or to write your own, put it after a |:', '每行一句，用 ____ 表示空格。泰语、越南语、俄语、西班牙语、法语会自动翻译；英文或自己的翻译写在 | 后面，比如：') %> <code>我喜欢吃____。 | I like to eat ____.</code></p>
+        <textarea id="swSentences" class="sw-input" rows="3" spellcheck="false" placeholder="你喜欢吃什么？&#10;我喜欢吃____。"></textarea>
+
+        <label for="swWords" class="sw-label"><%= L('Words (bottom circle)', '词语（下面的圆）') %></label>
+        <p class="sw-hint"><%= L('One word per line. The first word is at the top, the rest go clockwise. Pinyin and pictures are filled in for you. To set them yourself:', '每行一个词，第一个在最上面，其余按顺时针排。拼音和图片会自动配好。也可以自己写：') %> <code>猫 | māo | cat</code></p>
+        <textarea id="swWords" class="sw-input" rows="7" spellcheck="false" placeholder="苹果&#10;香蕉&#10;西瓜&#10;草莓&#10;葡萄&#10;面条"></textarea>
+        <p id="swCount" class="sw-count" role="status" aria-live="polite"></p>
+
+        <div id="swPreviewBox" hidden>
+          <h3><%= L('Pictures', '配图') %></h3>
+          <p class="sw-hint"><%= L('Click a word to choose a different picture, add one, or remove it.', '点一下词语，可以换一张图片、自己选一张，或者不用图片。') %></p>
+          <div id="swChips" class="sw-chips"></div>
+          <div id="swPicker" class="sw-picker" hidden>
+            <div class="sw-picker-head">
+              <strong id="swPickerTitle"></strong>
+              <button id="swPickerClose" class="sw-btn sw-btn-ghost" type="button"><%= L('Close', '关闭') %></button>
+            </div>
+            <label for="swPickerSearch" class="sw-hint"><%= L('Search in Chinese or English:', '用中文或英文搜索：') %></label>
+            <input id="swPickerSearch" class="sw-input" type="search" autocomplete="off" placeholder="<%= L('e.g. fruit, 学校, happy', '比如：水果、school、开心') %>">
+            <div id="swPickerResults" class="sw-picker-results" role="listbox" aria-label="<%= L('Pictures to choose from', '可选的图片') %>"></div>
+            <button id="swPickerNone" class="sw-btn sw-btn-ghost" type="button"><%= L('No picture for this word', '这个词不用图片') %></button>
+          </div>
+        </div>
+
+        <p class="sw-kicker sw-step2"><%= L('Step 2', '第二步') %></p>
+        <h2><%= L('Settings', '设置') %></h2>
+
+        <fieldset class="sw-field">
+          <legend><%= L('Show', '显示') %></legend>
+          <label class="sw-check"><input type="checkbox" id="swEmoji" checked> <span><%= L('Emoji pictures', 'emoji 图片') %></span></label>
+          <label class="sw-check"><input type="checkbox" id="swPinyin" checked> <span><%= L('Pinyin', '拼音') %></span></label>
+          <label class="sw-check"><input type="checkbox" id="swEnglish"> <span><%= L('Translation', '翻译') %></span></label>
+          <div class="sw-lang-row">
+            <label for="swLang" class="sw-hint"><%= L('Translation language:', '翻译语言：') %></label>
+            <select id="swLang" class="sw-input sw-select">
+              <option value="en">English 英文</option>
+              <option value="th">ภาษาไทย 泰语</option>
+              <option value="vi">Tiếng Việt 越南语</option>
+              <option value="ru">Русский 俄语</option>
+              <option value="es">Español 西班牙语</option>
+              <option value="fr">Français 法语</option>
+            </select>
+          </div>
+          <p id="swTrStatus" class="sw-hint" role="status" aria-live="polite"></p>
+        </fieldset>
+
+        <fieldset class="sw-field">
+          <legend><%= L('Colour', '颜色') %></legend>
+          <div class="sw-options">
+            <label><input type="radio" name="swColor" value="color" checked> <span><%= L('Colour', '彩色') %></span></label>
+            <label><input type="radio" name="swColor" value="bw"> <span><%= L('Black & white (students colour it in)', '黑白（学生自己涂色）') %></span></label>
+          </div>
+        </fieldset>
+
+        <div class="sw-field">
+          <span class="sw-label" id="swSectorsLabel"><%= L('Number of sections', '等份数量') %></span>
+          <div class="sw-stepper" role="group" aria-labelledby="swSectorsLabel">
+            <button id="swMinus" class="sw-btn sw-btn-ghost" type="button" aria-label="<%= L('Fewer sections', '减少') %>">−</button>
+            <output id="swSectors" aria-live="polite">6</output>
+            <button id="swPlus" class="sw-btn sw-btn-ghost" type="button" aria-label="<%= L('More sections', '增加') %>">＋</button>
+            <span class="sw-hint">2–12</span>
+          </div>
+          <p id="swSectorHint" class="sw-hint"></p>
+        </div>
+
+        <fieldset class="sw-field">
+          <legend><%= L('Print layout', '打印排版') %></legend>
+          <div class="sw-options sw-options-col">
+            <label><input type="radio" name="swLayout" value="same" checked> <span><%= L('Both circles on one page (landscape, saves paper)', '两个圆打印在同一张纸上（横向，省纸）') %></span></label>
+            <label><input type="radio" name="swLayout" value="separate"> <span><%= L('Each circle on its own page (bigger, easier to cut)', '每个圆单独一页（更大，更好剪）') %></span></label>
+          </div>
+          <label for="swPaper" class="sw-label sw-label-inline"><%= L('Paper', '纸张') %></label>
+          <select id="swPaper" class="sw-input sw-select">
+            <option value="a4">A4</option>
+            <option value="letter">Letter</option>
+          </select>
+        </fieldset>
+      </section>
+
+      <section class="sw-panel sw-preview-panel" aria-labelledby="swPreviewHeading">
+        <div class="sw-preview-toolbar">
+          <div>
+            <p class="sw-kicker"><%= L('Step 3', '第三步') %></p>
+            <h2 id="swPreviewHeading"><%= L('Preview', '预览') %></h2>
+          </div>
+          <div class="sw-actions">
+            <button id="swSpin" class="sw-btn sw-btn-ghost" type="button">🎡 <%= L('Spin on screen', '投影转一转') %></button>
+            <button id="swPrint" class="sw-btn" type="button">🖨️ <%= L('Print / Save as PDF', '打印 / 存成 PDF') %></button>
+          </div>
+        </div>
+        <p class="sw-hint sw-print-hint"><%= L('In the print window choose "Save as PDF" to download a PDF. Print at 100% scale.', '在打印窗口里选“另存为 PDF”就能下载 PDF。打印时请选 100% 缩放。') %></p>
+        <div id="swStage" class="sw-stage">
+          <div id="swSheets" class="sw-sheets"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="swSpinStage" class="sw-spin-stage" hidden>
+    <div class="sw-spin-top">
+      <h2 id="swSpinTitle"></h2>
+      <div class="sw-spin-tools">
+        <label class="sw-check sw-check-light"><input type="checkbox" id="swRemove"> <span><%= L('Remove after spin', '抽过的词不再抽') %></span></label>
+        <button id="swReset" class="sw-btn sw-btn-ghost" type="button"><%= L('Reset', '重新开始') %></button>
+        <button id="swFullscreen" class="sw-btn sw-btn-ghost" type="button"><%= L('Full screen', '全屏') %></button>
+        <button id="swExit" class="sw-btn sw-btn-ghost" type="button"><%= L('Close', '关闭') %></button>
+      </div>
+    </div>
+    <div class="sw-spin-body">
+      <div id="swWheelBox" class="sw-wheel-box">
+        <div id="swWheelBase" class="sw-wheel-base"></div>
+        <div id="swWheelTop" class="sw-wheel-top"></div>
+      </div>
+      <div class="sw-spin-side">
+        <div id="swResult" class="sw-result" aria-live="polite"></div>
+        <button id="swGo" class="sw-btn sw-btn-big" type="button">🎡 <%= L('Spin', '转一转') %></button>
+        <p class="sw-spin-key"><%= L('Space bar also spins.', '按空格键也可以转。') %></p>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/wordlist-core.js?v=cedict-1"></script>
+  <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/low-prep/spin-wheel/spin-wheel.js?v=2" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

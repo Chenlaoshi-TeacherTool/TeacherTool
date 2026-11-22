@@ -296,6 +296,10 @@ router.get('/teaching-tools/whats-missing', function(req, res, next) {
   res.render('low-prep-activities/whats-missing', { title: '什么不见了 · What\'s Missing', toolGuide: siteContentStore.get().toolGuides['whats-missing'] });
 });
 
+router.get('/teaching-tools/spin-wheel', function(req, res, next) {
+  res.render('low-prep-activities/spin-wheel', { title: '转盘手工 · Spin Wheel Craft', toolGuide: siteContentStore.get().toolGuides['spin-wheel'] });
+});
+
 router.get('/low-prep-activities', function(req, res) {
   res.redirect(301, '/teaching-tools#low-prep-activities');
 });
@@ -305,7 +309,8 @@ router.get('/low-prep-activities', function(req, res) {
   'would-you-rather', 'jeopardy', 'character-race', 'maze-generator', 'tarsia-puzzle',
   'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary',
   'stroke-order-worksheet', 'vocab-puzzle', 'worksheet-generator', 'secret-message',
-  'character-unscrambler', 'measure-words', 'vocab-games', 'whats-missing', 'pixel-art'
+  'character-unscrambler', 'measure-words', 'vocab-games', 'whats-missing', 'pixel-art',
+  'spin-wheel'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -367,7 +372,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary', '/teaching-tools/hanzi-word-choice',
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator', '/teaching-tools/secret-message',
     '/teaching-tools/character-unscrambler', '/teaching-tools/measure-words', '/teaching-tools/vocab-games', '/teaching-tools/whats-missing',
-    '/teaching-tools/pixel-art', '/teaching-tools/hanzi-batch/index.html'
+    '/teaching-tools/pixel-art', '/teaching-tools/spin-wheel', '/teaching-tools/hanzi-batch/index.html'
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
   paths = paths.concat(catalog.themes.map(function (theme) { return theme.href; }));
