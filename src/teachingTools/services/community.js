@@ -33,7 +33,8 @@ var GAME_TYPES = {
   'sentence-reorder': { zh: '句子排序', en: 'Sentence Reorder', icon: '🧩', tool: '/teaching-tools/sentence-reorder', templateEditor: true },
   'word-sudoku': { zh: '词语数独', en: 'Word Sudoku', icon: '🔢', tool: '/low-prep/word-sudoku/word-sudoku-widget.html', templateEditor: true },
   'hanzi-word-choice': { zh: '形近字选词', en: 'Hanzi Word Choice', icon: '🀄', tool: '/teaching-tools/hanzi-word-choice', templateEditor: true },
-  'vocabulary-gacha': { zh: '词汇扭蛋机', en: 'Vocabulary Gacha', icon: '🎲', tool: '/teaching-tools/vocabulary-gacha', templateEditor: true, templateOnly: true }
+  'vocabulary-gacha': { zh: '词汇扭蛋机', en: 'Vocabulary Gacha', icon: '🎲', tool: '/teaching-tools/vocabulary-gacha', templateEditor: true, templateOnly: true },
+  'dice-story': { zh: '骰子故事', en: 'Dice Story', icon: '🎲', tool: '/teaching-tools/dice-story', templateEditor: true, templateOnly: true }
 };
 
 var KINDS = ['wordlist', 'game', 'contest', 'website', 'grant'];

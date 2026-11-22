@@ -1,0 +1,166 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>骰子故事 · Dice Story - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Roll-a-story worksheets for Chinese class. Make a sentence-pattern table or a story grid with dice 1–6, words, pinyin and emoji pictures (colour or line art, or your own images). Print with a word bank, story map and writing page.' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
+  <link rel="stylesheet" href="/low-prep/dice-story/dice-story.css?v=1">
+  <style id="dsPageSize"></style>
+</head>
+<body class="ds-page">
+  <main class="ds-wrap">
+    <header class="ds-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="ds-eyebrow"><%= L('Printable · Sentences and story writing', '可打印 · 句型练习和写故事') %></p>
+      <h1>🎲 <%= L('Dice Story', '骰子故事') %></h1>
+      <p><%= L('Students roll a die and use the option under that number to say a sentence or build a story. Fill the grid with times, characters, words or short phrases. Words get pinyin and emoji pictures automatically.', '学生掷骰子，用掷到的点数对应的内容说句子、编故事。格子里可以填时间、字、词或短语，词语会自动配拼音和 emoji 图片。') %></p>
+    </header>
+
+    <div class="ds-layout">
+      <section class="ds-panel ds-builder" aria-labelledby="dsContentHeading">
+        <div class="ds-builder-top">
+          <div>
+            <p class="ds-kicker"><%= L('Step 1', '第一步') %></p>
+            <h2 id="dsContentHeading"><%= L('Content', '输入内容') %></h2>
+          </div>
+          <button id="dsSaveTemplate" class="ds-btn ds-btn-ghost" type="button" disabled>💾 <%= L('Save template', '保存模板') %></button>
+        </div>
+
+        <div class="ds-preset-row">
+          <label for="dsPreset" class="ds-hint"><%= L('Start from:', '从模板开始：') %></label>
+          <select id="dsPreset" class="ds-input ds-select"></select>
+          <button id="dsApplyPreset" class="ds-btn ds-btn-ghost" type="button"><%= L('Use', '套用') %></button>
+        </div>
+
+        <div class="ds-options ds-mode" role="radiogroup" aria-label="<%= L('Layout', '版式') %>">
+          <label><input type="radio" name="dsLayout" value="table" checked> <span>📋 <%= L('Sentence table', '句型表') %></span></label>
+          <label><input type="radio" name="dsLayout" value="story"> <span>🖼️ <%= L('Story grid', '故事格') %></span></label>
+        </div>
+        <p id="dsLayoutHint" class="ds-hint"></p>
+
+        <label for="dsTitle" class="ds-label"><%= L('Title', '标题') %></label>
+        <input id="dsTitle" class="ds-input" type="text" maxlength="60" autocomplete="off" placeholder="<%= L('e.g. 掷骰子编故事', '比如：掷骰子编故事') %>">
+
+        <label for="dsPrompt" class="ds-label"><%= L('Sentence pattern (optional, up to 3 lines)', '目标句型（可不填，最多 3 行）') %></label>
+        <p class="ds-hint"><%= L('Use （ ） where students fill in what they rolled.', '用（ ）表示学生要填的地方。') %></p>
+        <textarea id="dsPrompt" class="ds-input" rows="2" spellcheck="false" placeholder="你几点起床？&#10;我（ ）起床。"></textarea>
+
+        <span class="ds-label" id="dsGridLabel"><%= L('Grid', '表格内容') %></span>
+        <p class="ds-hint"><%= L('Times, characters, words or short phrases. You can paste a block straight from Excel or a Word table. To set pinyin yourself:', '可以填时间、字、词或短语，也可以从 Excel 或 Word 表格整块粘贴。自己指定拼音：') %> <code>长大|zhǎng dà</code></p>
+        <div class="ds-grid-scroll">
+          <table id="dsGrid" class="ds-grid-editor" aria-labelledby="dsGridLabel"></table>
+        </div>
+        <div class="ds-grid-actions">
+          <button id="dsAddCat" class="ds-btn ds-btn-ghost" type="button"></button>
+          <button id="dsClear" class="ds-btn ds-btn-ghost" type="button"><%= L('Clear grid', '清空表格') %></button>
+        </div>
+        <p id="dsCount" class="ds-count" role="status" aria-live="polite"></p>
+
+        <div id="dsPicBox" hidden>
+          <h3><%= L('Pictures', '配图') %></h3>
+          <p class="ds-hint"><%= L('Click a word to choose a different picture, upload your own, or remove it.', '点一下词语，可以换一张图、上传自己的图，或者不用图。') %></p>
+          <div id="dsChips" class="ds-chips"></div>
+          <div id="dsPicker" class="ds-picker" hidden>
+            <div class="ds-picker-head">
+              <strong id="dsPickerTitle"></strong>
+              <button id="dsPickerClose" class="ds-btn ds-btn-ghost" type="button"><%= L('Close', '关闭') %></button>
+            </div>
+            <label for="dsPickerSearch" class="ds-hint"><%= L('Search in Chinese or English:', '用中文或英文搜索：') %></label>
+            <input id="dsPickerSearch" class="ds-input" type="search" autocomplete="off" placeholder="<%= L('e.g. cake, 熊猫, happy', '比如：蛋糕、panda、开心') %>">
+            <div id="dsPickerResults" class="ds-picker-results" role="listbox" aria-label="<%= L('Pictures to choose from', '可选的图片') %>"></div>
+            <div class="ds-picker-actions">
+              <label class="ds-btn ds-btn-ghost ds-upload">📁 <%= L('Upload my own picture', '上传自己的图片') %><input id="dsUpload" type="file" accept="image/*"></label>
+              <button id="dsPickerNone" class="ds-btn ds-btn-ghost" type="button"><%= L('No picture', '不用图片') %></button>
+            </div>
+            <p class="ds-hint"><%= L('Uploaded pictures are kept with your current work in this browser. Saved templates keep the emoji choices only, so upload them again after opening a template.', '上传的图片会跟着当前内容保存在这个浏览器里。保存成模板时只保留 emoji 选择，打开模板后需要重新上传。') %></p>
+          </div>
+        </div>
+
+        <p class="ds-kicker ds-step2"><%= L('Step 2', '第二步') %></p>
+        <h2><%= L('Settings', '设置') %></h2>
+
+        <fieldset class="ds-field">
+          <legend><%= L('Show', '显示') %></legend>
+          <label class="ds-check"><input type="checkbox" id="dsPinyin" checked> <span><%= L('Pinyin', '拼音') %></span></label>
+          <label class="ds-check"><input type="checkbox" id="dsColor" checked> <span><%= L('Colour columns and dice', '彩色骰子和格子') %></span></label>
+        </fieldset>
+
+        <fieldset class="ds-field">
+          <legend><%= L('In each box', '格子里显示') %></legend>
+          <div class="ds-options">
+            <label><input type="radio" name="dsPicMode" value="both" checked> <span><%= L('Word + picture', '词 + 图') %></span></label>
+            <label><input type="radio" name="dsPicMode" value="pic"> <span><%= L('Picture only', '只有图') %></span></label>
+            <label><input type="radio" name="dsPicMode" value="text"> <span><%= L('Word only', '只有字') %></span></label>
+          </div>
+          <div class="ds-options ds-sub" id="dsPicStyleRow">
+            <label><input type="radio" name="dsPicStyle" value="color" checked> <span><%= L('Colour pictures', '彩色图') %></span></label>
+            <label><input type="radio" name="dsPicStyle" value="line"> <span><%= L('Line art (students colour in)', '线稿（学生自己涂色）') %></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="ds-field">
+          <legend><%= L('Writing space under the grid', '表格下方的书写区') %></legend>
+          <div class="ds-options">
+            <label><input type="radio" name="dsWriting" value="lines" checked> <span><%= L('Lines', '横线') %></span></label>
+            <label><input type="radio" name="dsWriting" value="grid"> <span><%= L('Character grid', '田字格') %></span></label>
+            <label><input type="radio" name="dsWriting" value="none"> <span><%= L('None', '不要') %></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="ds-field">
+          <legend><%= L('Paper', '纸张') %></legend>
+          <div class="ds-options">
+            <label><input type="radio" name="dsOrient" value="landscape" checked> <span><%= L('Landscape', '横向') %></span></label>
+            <label><input type="radio" name="dsOrient" value="portrait"> <span><%= L('Portrait', '竖向') %></span></label>
+          </div>
+          <select id="dsPaper" class="ds-input ds-select ds-paper" aria-label="<%= L('Paper size', '纸张大小') %>">
+            <option value="a4">A4</option>
+            <option value="letter">Letter</option>
+          </select>
+        </fieldset>
+
+        <fieldset class="ds-field">
+          <legend><%= L('Pages to print', '要打印的页面') %></legend>
+          <label class="ds-check ds-check-block"><input type="checkbox" checked disabled> <span><%= L('Dice sheet', '掷骰子表') %></span></label>
+          <label class="ds-check ds-check-block"><input type="checkbox" id="dsPageVocab"> <span><%= L('Word bank (pictures, pinyin, English)', '词汇参考页（图、拼音、英文）') %></span></label>
+          <label class="ds-check ds-check-block ds-indent"><input type="checkbox" id="dsEnglish" checked> <span><%= L('Show English on the word bank', '词汇页显示英文') %></span></label>
+          <label class="ds-check ds-check-block"><input type="checkbox" id="dsPageOrganizer"> <span><%= L('Story map (one box per category)', '故事构思图（每个类别一个框）') %></span></label>
+          <label class="ds-check ds-check-block"><input type="checkbox" id="dsPageWriting"> <span><%= L('Writing page (title, picture, writing space)', '写作页（题目、画图框、书写区）') %></span></label>
+        </fieldset>
+      </section>
+
+      <section class="ds-panel ds-preview-panel" aria-labelledby="dsPreviewHeading">
+        <div class="ds-preview-toolbar">
+          <div>
+            <p class="ds-kicker"><%= L('Step 3', '第三步') %></p>
+            <h2 id="dsPreviewHeading"><%= L('Preview', '预览') %></h2>
+          </div>
+          <div class="ds-actions">
+            <button id="dsPrint" class="ds-btn" type="button">🖨️ <%= L('Print / Save as PDF', '打印 / 存成 PDF') %></button>
+          </div>
+        </div>
+        <p class="ds-hint ds-print-hint"><%= L('In the print window choose "Save as PDF" to download a PDF. Print at 100% scale.', '在打印窗口里选“另存为 PDF”就能下载 PDF。打印时请选 100% 缩放。') %></p>
+        <p id="dsFitNote" class="ds-hint ds-fit-note" role="status" aria-live="polite"></p>
+        <div id="dsStage" class="ds-stage">
+          <div id="dsSheets" class="ds-sheets"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/wordlist-core.js?v=cedict-1"></script>
+  <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
+  <script src="/shared/game-template.js?v=4" defer></script>
+  <script src="/low-prep/dice-story/dice-story-core.js?v=1"></script>
+  <script src="/low-prep/dice-story/dice-story.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

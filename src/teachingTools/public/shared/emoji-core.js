@@ -241,7 +241,7 @@
     birthday: 'birthday cake', tea: 'teacup without handle', milk: 'glass of milk', moon: 'crescent moon', exercise: 'person lifting weights',
     park: 'national park', river: 'water wave', lake: 'water wave', sky: 'sun behind cloud', grass: 'herb', fire: 'fire',
     car: 'automobile', boat: 'sailboat', ship: 'ship', football: 'soccer ball', soccer: 'soccer ball', rice: 'cooked rice',
-    computer: 'laptop', phone: 'mobile phone', cell: 'mobile phone'
+    computer: 'laptop', phone: 'mobile phone', cell: 'mobile phone', dinosaur: 'sauropod', hat: 'billed cap'
   };
   var preferredIndexCache = null;
   function preferredEntry(query, index) {
