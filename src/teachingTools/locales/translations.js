@@ -1624,7 +1624,7 @@ module.exports = {
       affiliateCta: '打开 Amazon 清单 →',
       shopEyebrow: '🧲 教室好物',
       shopHeading: '几个让人开心的教室小帮手。',
-      shopIntro: '偏企化的教学好物，介绍详实，随时可以开始新的教室旅程。首件产品：用于展示、故事讲述和语言练习的彩色磁性人偶。',
+      shopIntro: '不定期分享老师用得上的教学好物，每件都附详细介绍，拿到就能用在课堂上。第一件：彩色磁性小人，可用于展示、讲故事和语言练习。',
       shopCta: '陈老师的商店 →',
       shopNote: '拆盒好物 · 包邮',
       deskHeading: '来自陈老师书桌',
@@ -1636,7 +1636,7 @@ module.exports = {
       desk3Desc: '利用时下主题，让每个单元与外面的世界产生联结。',
       feedbackEyebrow: '💌 您的声音很重要',
       feedbackHeading: '帮助这个工具包不断成长。',
-      feedbackIntro: '什么能让您的教学日常更轻松？分享一个功能建议、建议或发现的问题，每一条消息我都会阅读。',
+      feedbackIntro: '什么能让您的教学日常更轻松？欢迎提出新功能的想法、改进建议，或告诉我您发现的问题。每一条消息我都会认真阅读。',
       feedbackCta: '🌻 反馈将直接发给陈老师'
     },
     about: {
