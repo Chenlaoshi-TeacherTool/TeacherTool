@@ -210,3 +210,10 @@ textarea.sw-input { resize: vertical; }
 .sw-lang-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
 .sw-lang-row .sw-hint { margin: 0; }
 .sw-tr-error { color: #b3261e; }
+
+.sw-mode { margin: 4px 0 6px; }
+.sw-mode span { font-size: 16px; padding: 10px 18px; }
+.sw-fixed-input { width: 5em; font-size: 26px; text-align: center; font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", serif; }
+.sw-t-part { font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", serif; fill: #1b1b1b; }
+.sw-result-parts { color: var(--sw-muted); font-size: clamp(20px, 3.4vh, 38px); font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", serif; }
+.sw-result-char { font-size: clamp(64px, 14vh, 160px); font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", serif; font-weight: 700; line-height: 1.15; }

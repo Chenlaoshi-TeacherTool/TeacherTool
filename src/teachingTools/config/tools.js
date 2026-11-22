@@ -72,6 +72,7 @@ var TOOLS = [
   { href: '/teaching-tools/stroke-order-worksheet', icon: '✍️', titleKey: 'teachingToolsIndex.strokeOrderTitle', scopeKey: 'teachingToolsIndex.strokeOrderScope', descKey: 'teachingToolsIndex.strokeOrderDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'hanzi', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/hanzi-batch/index.html', icon: '🎨', titleKey: 'teachingToolsIndex.hanziBatchTitle', scopeKey: 'teachingToolsIndex.hanziBatchScope', descKey: 'teachingToolsIndex.hanziBatchDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'hanzi', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/missing-radicals', icon: '✍️', titleKey: 'teachingToolsIndex.missingPartsTitle', scopeKey: 'teachingToolsIndex.missingPartsScope', descKey: 'teachingToolsIndex.missingPartsDesc', actionKey: 'teachingToolsIndex.openActivity', section: 'hanzi', uses: ['print', 'project'], subject: 'chinese' },
+  { href: '/teaching-tools/spin-wheel?mode=hanzi', icon: '🀄', titleKey: 'teachingToolsIndex.hanziWheelTitle', scopeKey: 'teachingToolsIndex.hanziWheelScope', descKey: 'teachingToolsIndex.hanziWheelDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'hanzi', uses: ['print', 'project'], subject: 'chinese' },
   { href: '/teaching-tools/character-unscrambler', icon: '✂️', titleKey: 'teachingToolsIndex.charUnscramblerTitle', scopeKey: 'teachingToolsIndex.charUnscramblerScope', descKey: 'teachingToolsIndex.charUnscramblerDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'hanzi', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/yu-duoyinzi-font', icon: '🈶', titleKey: 'teachingToolsIndex.fontTitle', scopeKey: 'teachingToolsIndex.fontScope', descKey: 'teachingToolsIndex.fontDesc', actionKey: 'teachingToolsIndex.viewAndDownload', section: 'hanzi', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/independent-reading', icon: '📖', titleKey: 'teachingToolsIndex.independentReadingTitle', scopeKey: 'teachingToolsIndex.independentReadingScope', descKey: 'teachingToolsIndex.independentReadingDesc', actionKey: 'teachingToolsIndex.openActivity', section: 'reading', uses: ['print'] },
@@ -125,7 +126,7 @@ var DIRECTORY = {
   printables: {
     'classroom-supplies': 'nameTentTitle qrTitle',
     'printable-games': 'sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle spinWheelTitle vocabPuzzleTitle pixelArtTitle',
-    'chinese-materials': 'decodeTitle worksheetTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle charUnscramblerTitle independentReadingTitle glossaryTitle'
+    'chinese-materials': 'decodeTitle worksheetTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle charUnscramblerTitle hanziWheelTitle independentReadingTitle glossaryTitle'
   },
   prep: { main: 'libraryTitle questionBankTitle emojiSearchTitle glossaryTitle fontTitle' }
 };

@@ -34,6 +34,18 @@
   var LANGS = ['en', 'th', 'vi', 'ru', 'es', 'fr'];
   var TRANSLATE_MAX_LENGTH = 40;  // the server skips longer text
 
+  // Character wheel: where the changing radical sits, as an angle (clockwise from 12 o'clock).
+  // The window is cut there, and section 0 of the bottom circle starts there.
+  var SIDE_ANGLE = { top: 0, right: 90, bottom: 180, left: 270 };
+  var SIDE_KEY = { left: 'l', right: 'r', top: 't', bottom: 'b' };
+  // Full forms a teacher may type for a radical, tried when the typed form finds no character.
+  var PART_ALIASES = {
+    '水': '氵', '金': '钅', '人': '亻', '手': '扌', '心': '忄', '言': '讠', '糸': '纟', '絲': '纟',
+    '食': '饣', '示': '礻', '衣': '衤', '犬': '犭', '草': '艹', '艸': '艹', '刀': '刂', '足': '⻊',
+    '玉': '王', '竹': '⺮', '肉': '月', '邑': '阝', '阜': '阝', '火': '灬'
+  };
+  var COMPOSE_URL = '/low-prep/spin-wheel/data/compose.json.gz';
+
   var core = window.ChenWordlist;
   var emojiCore = window.ChenEmoji;
 
@@ -47,6 +59,8 @@
   var trCache = {};      // lang -> { chinese text -> translation }, kept with the draft
   var trTimer = 0;
   var trFailed = {};     // lang|text -> true, so a failed text is not asked for again and again
+  var compose = null;    // "<side><part><fixed>" -> [characters], built from Make Me a Hanzi
+  var composePromise = null;
 
   // ---------- helpers ----------
   function esc(value) {
@@ -82,6 +96,9 @@
   }
   function readSettings() {
     return {
+      mode: radioValue('swMode') === 'hanzi' ? 'hanzi' : 'word',
+      fixed: $('swFixed').value.trim(),
+      side: SIDE_ANGLE.hasOwnProperty(radioValue('swSide')) ? radioValue('swSide') : 'left',
       title: $('swTitle').value.trim(),
       emoji: $('swEmoji').checked,
       pinyin: $('swPinyin').checked,
@@ -98,6 +115,7 @@
       var data = readSettings();
       data.sentences = $('swSentences').value;
       data.words = $('swWords').value;
+      data.parts = $('swParts').value;
       data.sectors = sectors;
       data.sectorsTouched = sectorsTouched;
       data.picOff = picOff;
@@ -114,6 +132,10 @@
     if (typeof data.title === 'string') $('swTitle').value = data.title;
     if (typeof data.sentences === 'string') $('swSentences').value = data.sentences;
     if (typeof data.words === 'string') $('swWords').value = data.words;
+    if (typeof data.parts === 'string') $('swParts').value = data.parts;
+    if (typeof data.fixed === 'string') $('swFixed').value = data.fixed;
+    if (data.side) setRadio('swSide', data.side);
+    if (data.mode) setRadio('swMode', data.mode);
     ['emoji', 'pinyin', 'english'].forEach(function (key) {
       var id = 'sw' + key.charAt(0).toUpperCase() + key.slice(1);
       if (typeof data[key] === 'boolean') $(id).checked = data[key];
@@ -148,6 +170,66 @@
     });
   }
 
+  // ---------- character wheel rows ----------
+  function loadCompose() {
+    if (composePromise) return composePromise;
+    composePromise = fetch(COMPOSE_URL).then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (typeof DecompressionStream === 'undefined' || !res.body) return res.text();
+      return new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).text();
+    }).then(function (text) {
+      compose = JSON.parse(text);
+      return compose;
+    }).catch(function () {
+      compose = {};  // the teacher can still type each character
+      return compose;
+    });
+    return composePromise;
+  }
+
+  // The character made by putting the part on one side of the fixed part, e.g. 钅 left of 十 -> 针.
+  function composeChar(part, fixed, side) {
+    if (!compose || !part || !fixed) return null;
+    var key = SIDE_KEY[side];
+    var hit = compose[key + part + fixed];
+    if (hit) return { ch: hit[0], part: part };
+    var alias = PART_ALIASES[part];
+    hit = alias && compose[key + alias + fixed];
+    return hit ? { ch: hit[0], part: alias } : null;
+  }
+
+  // One row per line: radical | character | word | translation. Character and word are optional.
+  function parseRows() {
+    var opts = readSettings();
+    var seen = Object.create(null);
+    var rows = [];
+    $('swParts').value.split(/\r?\n/).forEach(function (raw) {
+      var line = raw.replace(/\u3000/g, ' ').trim();
+      if (!line) return;
+      var groups = /[|｜]/.test(line) ? [line.split(/\s*[|｜]\s*/)]
+        : /[、，,；;]/.test(line) ? line.split(/\s*[、，,；;]\s*/).map(function (p) { return [p]; })
+        : [line.split(/\s+/)];
+      groups.forEach(function (parts) {
+        var part = (parts[0] || '').trim();
+        if (!part || seen[part]) return;
+        seen[part] = true;
+        var ch = (parts[1] || '').trim();
+        var word = (parts[2] || '').trim();
+        var tr = parts.slice(3).join(' ').trim();
+        if (!ch) {
+          var hit = composeChar(part, opts.fixed, opts.side);
+          if (hit) { ch = hit.ch; part = hit.part; }
+        }
+        var zhText = word || ch;
+        rows.push({
+          part: part, ch: ch, word: word, zh: zhText, py: '', override: '',
+          en: tr || (zhText && core ? core.toEnglish(zhText) : ''), manualTr: tr
+        });
+      });
+    });
+    return rows;
+  }
+
   function parseSentences() {
     return $('swSentences').value.split(/\r?\n/).map(function (line) {
       var parts = line.replace(/　/g, ' ').trim().split(/\s*[|｜]\s*/);
@@ -158,13 +240,15 @@
   // Fill in English (needed to match a picture) and match each word to an OpenMoji picture.
   function prepare(list) {
     if (!emojiCore) return Promise.resolve(list);
+    var full = list;
+    list = list.filter(function (item) { return item && item.zh; });
     var ready = core && core.loadCedict ? core.loadCedict().catch(function () {}) : Promise.resolve();
     return ready.then(function () {
       list.forEach(function (item) {
         if (!item.en && core) item.en = core.toEnglish(item.zh) || '';
       });
       return emojiCore.matchAll(list, { translate: true });
-    }).then(function () { return list; }, function () { return list; });
+    }).then(function () { return full; }, function () { return full; });
   }
 
   function hasPic(item) {
@@ -202,7 +286,7 @@
     if (!opts.english || lang === 'en') { setTrStatus(''); return; }
     var need = [];
     items.slice(0, sectors).forEach(function (item) {
-      if (!item.manualTr) need.push(item.zh);
+      if (item.zh && !item.manualTr) need.push(item.zh);
     });
     sentences.forEach(function (sentence) {
       if (!sentence.en) need.push(sentence.zh);
@@ -414,7 +498,7 @@
     return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + box + '"' + size + ' role="img" aria-label="' + esc(label) + '">';
   }
 
-  function baseSvg(R, sizeMm, list, opts, used) {
+  function wordBaseSvg(R, sizeMm, list, opts, used) {
     var n = list.length;
     var half = 180 / n;
     var contentHalf = windowAngle(n) / 2 * 0.92;
@@ -454,7 +538,7 @@
     return lines;
   }
 
-  function topSvg(R, sizeMm, n, opts) {
+  function wordTopSvg(R, sizeMm, n, opts) {
     var w = windowAngle(n);
     var hub = R * 0.3;
     var out = svgOpen(R, sizeMm, L('Top circle with the window and sentence pattern', '上面的圆：窗口和句型'));
@@ -496,13 +580,186 @@
     return out + '</svg>';
   }
 
+  // ---------- the character wheel ----------
+  // Sizes shared by both circles so the radical in the window and the fixed part line up.
+  function hanziGeom(R, n) {
+    var half = windowAngle(n) / 2 * 0.9;
+    var hub = R * 0.5;
+    var inner = hub + R * 0.02;
+    var F = Math.min(R * 0.4, (R * 0.95 - inner) * 0.98, 2 * inner * Math.tan(rad(half)) * 0.95);
+    return { hub: hub, F: F, rc: inner + F / 2 };
+  }
+
+  // Ink edges of a glyph drawn centred (text-anchor middle, central baseline), as fractions of
+  // the font size from its centre. Radicals like 氵 or 艹 only fill part of their square.
+  var inkCache = {};
+  function ink(text) {
+    if (!inkCache[text]) {
+      measureCtx.font = '400 100px ' + FONT_ZH;
+      measureCtx.textAlign = 'center';
+      measureCtx.textBaseline = 'middle';
+      var m = measureCtx.measureText(text);
+      var ok = m.actualBoundingBoxRight != null;
+      inkCache[text] = ok
+        ? { left: m.actualBoundingBoxLeft / 100, right: m.actualBoundingBoxRight / 100, up: m.actualBoundingBoxAscent / 100, down: m.actualBoundingBoxDescent / 100 }
+        : { left: 0.5, right: 0.5, up: 0.5, down: 0.5 };
+      measureCtx.textAlign = 'start';
+      measureCtx.textBaseline = 'alphabetic';
+    }
+    return inkCache[text];
+  }
+
+  // How far a glyph can move in one direction before its ink would leave its square.
+  // `toward` is the side of the upright glyph that should come closer: left/right/up/down.
+  function inkRoom(text, toward, size) {
+    var extent = Math.min(0.5, ink(text)[toward]);
+    return Math.max(0, Math.min(0.3, 0.5 - extent - 0.04)) * size;
+  }
+
+  var TOWARD_CENTRE = { left: 'right', right: 'left', top: 'down', bottom: 'up' };
+  var TOWARD_WINDOW = { left: 'left', right: 'right', top: 'up', bottom: 'down' };
+
+  function glyph(text, x, y, size, rotate, cls) {
+    var t = rotate ? ' transform="rotate(' + num(rotate) + ' ' + num(x) + ' ' + num(y) + ')"' : '';
+    return '<text class="' + cls + '" x="' + num(x) + '" y="' + num(y) + '" font-size="' + num(size) + '" text-anchor="middle" dominant-baseline="central"' + t + '>' + esc(text) + '</text>';
+  }
+
+  function hanziBaseSvg(R, sizeMm, list, opts, used) {
+    var n = list.length;
+    var half = 180 / n;
+    var phi = SIDE_ANGLE[opts.side];
+    var g = hanziGeom(R, n);
+    var stroke = num(R * 0.005);
+    var out = svgOpen(R, sizeMm, L('Bottom circle with the radicals', '下面的圆：偏旁'));
+    out += '<circle cx="0" cy="0" r="' + num(R) + '" fill="#fff"/>';
+    list.forEach(function (row, i) {
+      var cls = 'sw-sector' + (used && used[i] ? ' is-used' : '');
+      out += '<g class="' + cls + '" transform="rotate(' + num(i * 360 / n + phi) + ')">';
+      out += '<path d="M0 0 L' + pt(R, -half) + ' A' + num(R) + ' ' + num(R) + ' 0 0 1 ' + pt(R, half) + ' Z" fill="' + sectorColor(i, n, opts) + '" stroke="#8a8a8a" stroke-width="' + stroke + '"/>';
+      if (row) {
+        // Counter-rotate so the radical stands upright when this section is in the window.
+        // Its ink is pulled in toward the centre, so it meets the fixed part across the window edge.
+        var r = g.rc - inkRoom(row.part, TOWARD_CENTRE[opts.side], g.F);
+        out += glyph(row.part, 0, -r, g.F, -phi, 'sw-t-part');
+      } else {
+        var box = g.F * 0.8;
+        out += '<rect x="' + num(-box / 2) + '" y="' + num(-g.rc - box / 2) + '" width="' + num(box) + '" height="' + num(box) + '" fill="none" stroke="#999" stroke-width="' + stroke + '" stroke-dasharray="' + num(R * 0.02) + ' ' + num(R * 0.015) + '"/>';
+      }
+      out += '</g>';
+    });
+    out += '<circle cx="0" cy="0" r="' + num(R) + '" fill="none" stroke="#111" stroke-width="' + num(R * 0.008) + '"/>';
+    out += pinMark(R);
+    return out + '</svg>';
+  }
+
+  // The 字—组词 list on the top circle, for the size step s.
+  function tableLines(R, opts, rows, s) {
+    var lines = [];
+    var zhSize = R * 0.1 * s;
+    var gap = zhSize * 0.25;
+    if (opts.title) {
+      var titleSize = R * 0.085 * s;
+      lines.push({ kind: 'title', h: titleSize * 1.25, w: textWidth(opts.title, FONT_ZH, titleSize, 700), size: titleSize });
+    }
+    rows.forEach(function (row) {
+      if (!row) return;
+      var text = row.ch ? row.ch + (row.word ? ' — ' + row.word : '') : row.part + ' — ？';
+      var tokens = rubyTokens(text, '');
+      var m = measureRuby(tokens, zhSize, opts.pinyin);
+      var pic = opts.emoji && row.zh && hasPic(row);
+      var picSize = zhSize * 1.15;
+      lines.push({
+        kind: 'row', tokens: tokens, size: zhSize, rubyW: m.w, rubyH: m.h, pic: pic ? row : null, picSize: picSize, gap: gap,
+        w: m.w + (pic ? gap + picSize : 0), h: Math.max(m.h, pic ? picSize : 0)
+      });
+      var tr = wordTranslation(row, opts);
+      if (tr) {
+        var enSize = zhSize * 0.48;
+        lines.push({ kind: 'en', h: enSize * 1.3, w: textWidth(tr, FONT_PY, enSize), size: enSize, text: tr });
+      }
+    });
+    return lines;
+  }
+
+  function hanziTopSvg(R, sizeMm, list, opts) {
+    var n = list.length;
+    var w = windowAngle(n);
+    var phi = SIDE_ANGLE[opts.side];
+    var g = hanziGeom(R, n);
+    var hub = g.hub;
+    var out = svgOpen(R, sizeMm, L('Top circle with the window and the fixed part', '上面的圆：窗口和固定部件'));
+    out += '<path transform="rotate(' + phi + ')" d="M' + pt(R, w / 2) + ' A' + num(R) + ' ' + num(R) + ' 0 1 1 ' + pt(R, -w / 2) +
+      ' L' + pt(hub, -w / 2) + ' A' + num(hub) + ' ' + num(hub) + ' 0 0 1 ' + pt(hub, w / 2) + ' Z"' +
+      ' fill="' + (opts.color === 'color' ? '#fffaf0' : '#fff') + '" stroke="#111" stroke-width="' + num(R * 0.008) + '" stroke-linejoin="round"/>';
+
+    // The fixed part sits right next to the window, so it reads as one character with the radical.
+    if (opts.fixed) {
+      var dc = hub - R * 0.02 - g.F / 2 + inkRoom(opts.fixed, TOWARD_WINDOW[opts.side], g.F);
+      out += glyph(opts.fixed, dc * Math.sin(rad(phi)), -dc * Math.cos(rad(phi)), g.F, 0, 'sw-t-part');
+    }
+
+    // The list goes on the half of the circle away from the window.
+    var vertical = opts.side === 'left' || opts.side === 'right';
+    var edge = R * 0.95;
+    var inset = R * 0.1;
+    var placed = null;
+    for (var s = 1; s > 0.2; s *= 0.92) {
+      var lines = tableLines(R, opts, list, s);
+      if (!lines.length) break;
+      var lineGap = R * 0.018 * s;
+      var H = lines.reduce(function (sum, line) { return sum + line.h; }, 0) + lineGap * (lines.length - 1);
+      var maxW = Math.max.apply(null, lines.map(function (line) { return line.w; }));
+      var top, left, fits;
+      if (vertical) {
+        top = -H / 2;
+        var far = Math.max(Math.abs(top), Math.abs(top + H));
+        var avail = Math.sqrt(Math.max(0, edge * edge - far * far)) - inset;
+        fits = far < edge * 0.9 && maxW <= avail * 0.95;
+        var start = inset + Math.max(0, avail - maxW) / 2;
+        left = opts.side === 'left' ? start : -start - maxW;
+      } else {
+        top = opts.side === 'top' ? inset : -inset - H;
+        var farY = opts.side === 'top' ? top + H : -top;
+        var chord = 2 * Math.sqrt(Math.max(0, edge * edge - farY * farY));
+        fits = farY < R * 0.93 && maxW <= chord * 0.92;
+        left = -maxW / 2;
+      }
+      var y = top;
+      lines.forEach(function (line) { line.y = y; y += line.h + lineGap; });
+      placed = { lines: lines, left: left, maxW: maxW };
+      if (fits) break;
+    }
+    (placed ? placed.lines : []).forEach(function (line) {
+      if (line.kind === 'title') {
+        out += '<text class="sw-t-title" x="' + num(placed.left + placed.maxW / 2) + '" y="' + num(line.y + line.size * 0.95) + '" font-size="' + num(line.size) + '" text-anchor="middle">' + esc(opts.title) + '</text>';
+      } else if (line.kind === 'row') {
+        out += rubySvg(line.tokens, placed.left + line.rubyW / 2, line.y + (line.h - line.rubyH) / 2, line.size, opts.pinyin);
+        if (line.pic) {
+          out += '<image href="' + esc(emojiCore.svgUrl(line.pic.openmoji.hexcode)) + '" x="' + num(placed.left + line.rubyW + line.gap) + '" y="' + num(line.y + (line.h - line.picSize) / 2) + '" width="' + num(line.picSize) + '" height="' + num(line.picSize) + '"/>';
+        }
+      } else {
+        out += '<text class="sw-t-en" x="' + num(placed.left) + '" y="' + num(line.y + line.size) + '" font-size="' + num(line.size) + '">' + esc(line.text) + '</text>';
+      }
+    });
+    out += pinMark(R);
+    return out + '</svg>';
+  }
+
+  function baseSvg(R, sizeMm, list, opts, used) {
+    return opts.mode === 'hanzi' ? hanziBaseSvg(R, sizeMm, list, opts, used) : wordBaseSvg(R, sizeMm, list, opts, used);
+  }
+
+  function topSvg(R, sizeMm, list, opts) {
+    return opts.mode === 'hanzi' ? hanziTopSvg(R, sizeMm, list, opts) : wordTopSvg(R, sizeMm, list.length, opts);
+  }
+
   // ---------- printable sheets ----------
   function circleBlock(svg, label) {
     return '<div class="sw-circle">' + svg + '<span class="sw-circle-label">' + esc(label) + '</span></div>';
   }
 
   function sheetHtml(W, H, circles, opts) {
-    var title = opts.title || '转盘手工';
+    var title = opts.title || (opts.mode === 'hanzi' ? '汉字转盘' : '转盘手工');
     return '<div class="sw-sheet" style="width:' + W + 'mm;height:' + num(H - 0.6) + 'mm">' +
       '<div class="sw-sheet-head"><strong>' + esc(title) + '</strong><span>Chen Laoshi\'s Teaching Tools</span></div>' +
       '<div class="sw-sheet-body">' + circles.join('') + '</div>' +
@@ -523,13 +780,13 @@
       var W = paper.h, H = paper.w;  // landscape
       var D = Math.min((W - 30) / 2, H - 41) * 0.98;
       html = sheetHtml(W, H, [
-        circleBlock(topSvg(D / 2, D, list.length, opts), labelTop),
+        circleBlock(topSvg(D / 2, D, list, opts), labelTop),
         circleBlock(baseSvg(D / 2, D, list, opts), labelBase)
       ], opts);
     } else {
       var PW = paper.w, PH = paper.h;  // portrait
       var PD = Math.min(PW - 20, PH - 41) * 0.97;
-      html = sheetHtml(PW, PH, [circleBlock(topSvg(PD / 2, PD, list.length, opts), labelTop)], opts) +
+      html = sheetHtml(PW, PH, [circleBlock(topSvg(PD / 2, PD, list, opts), labelTop)], opts) +
         sheetHtml(PW, PH, [circleBlock(baseSvg(PD / 2, PD, list, opts), labelBase)], opts);
     }
     $('swSheets').innerHTML = html;
@@ -553,7 +810,14 @@
   // ---------- counts and section hint ----------
   function updateCount() {
     var n = items.length;
-    $('swCount').textContent = n + L(n === 1 ? ' word' : ' words', ' 个词');
+    if (readSettings().mode === 'hanzi') {
+      var unknown = items.filter(function (row) { return !row.ch; }).length;
+      var count = n + L(n === 1 ? ' radical' : ' radicals', ' 个偏旁');
+      if (unknown) count += L(' · ' + unknown + ' could not be put together; type the character after a |', ' · ' + unknown + ' 个拼不出字，请在 | 后面自己写');
+      $('swCount').textContent = count;
+    } else {
+      $('swCount').textContent = n + L(n === 1 ? ' word' : ' words', ' 个词');
+    }
     $('swSectors').textContent = String(sectors);
     $('swMinus').disabled = sectors <= MIN_SECTORS;
     $('swPlus').disabled = sectors >= MAX_SECTORS;
@@ -714,9 +978,17 @@
   }
 
   // ---------- refresh ----------
+  function showModeInputs() {
+    var hanzi = readSettings().mode === 'hanzi';
+    $('swWordInputs').hidden = hanzi;
+    $('swHanziInputs').hidden = !hanzi;
+  }
+
   function refreshAll() {
-    items = parseWords();
-    sentences = parseSentences();
+    var hanzi = readSettings().mode === 'hanzi';
+    if (hanzi && !compose) loadCompose().then(refreshAll);
+    items = hanzi ? parseRows() : parseWords();
+    sentences = hanzi ? [] : parseSentences();
     if (!sectorsTouched && items.length >= MIN_SECTORS) sectors = clampSectors(items.length);
     updateCount();
     saveDraft();
@@ -779,6 +1051,16 @@
   function showResult(item) {
     var opts = readSettings();
     var html = '';
+    if (opts.mode === 'hanzi') {
+      html += '<div class="sw-result-parts" lang="zh">' + esc(item.part) + ' + ' + esc(opts.fixed || '？') + ' =</div>';
+      html += '<div class="sw-result-char" lang="zh">' + (item.ch ? rubyHtml(item.ch, '', opts.pinyin) : '？') + '</div>';
+      if (opts.emoji && item.zh && hasPic(item)) html += '<img src="' + esc(emojiCore.svgUrl(item.openmoji.hexcode)) + '" alt="">';
+      if (item.word) html += '<div class="sw-result-sentence" lang="zh">' + rubyHtml(item.word, '', opts.pinyin) + '</div>';
+      var trH = wordTranslation(item, opts);
+      if (trH) html += '<div class="sw-result-en">' + esc(trH) + '</div>';
+      popResult(html);
+      return;
+    }
     if (opts.emoji && hasPic(item)) html += '<img src="' + esc(emojiCore.svgUrl(item.openmoji.hexcode)) + '" alt="">';
     html += '<div class="sw-result-word" lang="zh">' + rubyHtml(item.zh, item.override, opts.pinyin) + '</div>';
     var tr = wordTranslation(item, opts);
@@ -789,6 +1071,10 @@
       var filled = esc(parts[0]) + '<mark>' + esc(item.zh) + '</mark>' + esc(parts.slice(1).join('____'));
       html += '<div class="sw-result-sentence" lang="zh">' + filled + '</div>';
     });
+    popResult(html);
+  }
+
+  function popResult(html) {
     var result = $('swResult');
     result.classList.remove('is-pop');
     result.innerHTML = html;
@@ -810,7 +1096,8 @@
     }
     var pick = choices[Math.floor(Math.random() * choices.length)];
     var sectorAngle = 360 / n;
-    var jitter = (Math.random() - 0.5) * Math.min(sectorAngle, windowAngle(n)) * 0.4;
+    // A little off-centre looks natural, but never so much that the next section shows in the window.
+    var jitter = (Math.random() - 0.5) * Math.min(4, (sectorAngle - windowAngle(n)) + 2);
     var target = -pick * sectorAngle + jitter;
     var delta = ((target - spin.rotation) % 360 + 360) % 360;
     spin.rotation += 360 * 5 + delta;
@@ -844,7 +1131,7 @@
     var list = wheelItems();
     if (!list.some(Boolean)) {
       $('swWords').focus();
-      $('swCount').textContent = L('Type some words first.', '请先输入词语。');
+      $('swCount').textContent = readSettings().mode === 'hanzi' ? L('Type some radicals first.', '请先输入偏旁。') : L('Type some words first.', '请先输入词语。');
       return;
     }
     var button = $('swSpin');
@@ -854,9 +1141,9 @@
       spin.list = wheelItems();
       spin.used = {};
       spin.busy = false;
-      $('swSpinTitle').textContent = readSettings().title || '转一转';
+      $('swSpinTitle').textContent = readSettings().title || (readSettings().mode === 'hanzi' ? '汉字转盘' : '转一转');
       renderSpinBase();
-      $('swWheelTop').innerHTML = topSvg(100, 0, spin.list.length, spinOpts());
+      $('swWheelTop').innerHTML = topSvg(100, 0, spin.list, spinOpts());
       $('swWheelBase').style.transform = 'rotate(' + spin.rotation + 'deg)';
       showIdle(L('Click Spin!', '点“转一转”！'));
       $('swSpinStage').hidden = false;
@@ -881,7 +1168,10 @@
     // Opened from the Vocab Game Switcher: use that list instead of the saved draft.
     var handoff = window.ChenWordlistHandoff;
     var handed = handoff && handoff.active();
+    var params = new URLSearchParams(location.search);
+    if (params.get('mode') === 'hanzi' || params.get('mode') === 'word') setRadio('swMode', params.get('mode'));
     if (handed) {
+      setRadio('swMode', 'word');
       $('swWords').value = handed.items.map(function (item) {
         return item.py || item.en ? [item.zh, item.py, item.en].join(' | ') : item.zh;
       }).join('\n');
@@ -889,7 +1179,7 @@
       handoff.mountBar(handed);
     }
 
-    ['swWords', 'swSentences', 'swTitle'].forEach(function (id) {
+    ['swWords', 'swSentences', 'swTitle', 'swParts', 'swFixed'].forEach(function (id) {
       $(id).addEventListener('input', function () {
         clearTimeout(inputTimer);
         inputTimer = setTimeout(refreshAll, 350);
@@ -903,6 +1193,19 @@
     });
     Array.prototype.forEach.call(document.querySelectorAll('input[name="swColor"], input[name="swLayout"]'), function (input) {
       input.addEventListener('change', function () { saveDraft(); renderSheets(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="swMode"], input[name="swSide"]'), function (input) {
+      input.addEventListener('change', function () {
+        if (input.name === 'swMode') {
+          showModeInputs();
+          try {
+            var url = new URL(location.href);
+            url.searchParams.set('mode', input.value);
+            history.replaceState(null, '', url);
+          } catch (error) { /* the address just keeps its old mode */ }
+        }
+        refreshAll();
+      });
     });
     $('swMinus').addEventListener('click', function () { setSectors(sectors - 1, true); });
     $('swPlus').addEventListener('click', function () { setSectors(sectors + 1, true); });
@@ -943,6 +1246,7 @@
       ]).then(function () { measureCache = {}; renderSheets(); }, function () {});
     }
 
+    showModeInputs();
     refreshAll();
   }
 

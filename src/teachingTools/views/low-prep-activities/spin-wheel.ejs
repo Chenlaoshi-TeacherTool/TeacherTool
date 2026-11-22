@@ -8,16 +8,16 @@
   <%- include('../partials/seo', { pageDescription: 'Printable spin wheel craft for Chinese class. Type a sentence pattern and words, add emoji pictures and pinyin, print two circles to cut out and pin together, or spin the wheel on the projector.' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/spin-wheel/spin-wheel.css?v=2">
+  <link rel="stylesheet" href="/low-prep/spin-wheel/spin-wheel.css?v=3">
   <style id="swPageSize"></style>
 </head>
 <body class="sw-page">
   <main class="sw-wrap">
     <header class="sw-header">
       <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
-      <p class="sw-eyebrow"><%= L('Printable craft · Sentence practice', '手工打印 · 句型练习') %></p>
+      <p class="sw-eyebrow"><%= L('Printable craft · Sentences and characters', '手工打印 · 句型和汉字练习') %></p>
       <h1>🎡 <%= L('Spin Wheel Craft', '转盘手工') %></h1>
-      <p><%= L('Print two circles. The top circle has a window and your sentence pattern; the bottom circle has your words with emoji pictures. Students pin them together, turn the wheel, and say a sentence with the word in the window.', '打印两个圆：上面的圆有一个窗口和句型，下面的圆写着词语并配 emoji。学生用双脚钉把两个圆钉在一起，转动转盘，用窗口里的词说句子。') %></p>
+      <p><%= L('Print two circles and pin them together with a paper fastener. Word wheel: turn it and say a sentence with the word in the window. Character wheel: each radical in the window joins the fixed part to make a new character.', '打印两个圆，用双脚钉钉在一起。词语转盘：转一转，用窗口里的词说句子。汉字转盘：窗口里的偏旁和固定部件拼成新的字。') %></p>
     </header>
 
     <div class="sw-layout">
@@ -25,9 +25,15 @@
         <p class="sw-kicker"><%= L('Step 1', '第一步') %></p>
         <h2 id="swContentHeading"><%= L('Content', '输入内容') %></h2>
 
+        <div class="sw-options sw-mode" role="radiogroup" aria-label="<%= L('Wheel type', '转盘类型') %>">
+          <label><input type="radio" name="swMode" value="word" checked> <span>🎡 <%= L('Word wheel', '词语转盘') %></span></label>
+          <label><input type="radio" name="swMode" value="hanzi"> <span>🀄 <%= L('Character wheel', '汉字转盘') %></span></label>
+        </div>
+
         <label for="swTitle" class="sw-label"><%= L('Title (optional)', '标题（可不填）') %></label>
         <input id="swTitle" class="sw-input" type="text" maxlength="40" autocomplete="off" placeholder="<%= L('e.g. 我喜欢吃……', '比如：我喜欢吃……') %>">
 
+        <div id="swWordInputs">
         <label for="swSentences" class="sw-label"><%= L('Sentence pattern (top circle)', '句型（上面的圆）') %></label>
         <p class="sw-hint"><%= L('One sentence per line. Use ____ for the blank. Thai, Vietnamese, Russian, Spanish and French translations are filled in for you. For English, or to write your own, put it after a |:', '每行一句，用 ____ 表示空格。泰语、越南语、俄语、西班牙语、法语会自动翻译；英文或自己的翻译写在 | 后面，比如：') %> <code>我喜欢吃____。 | I like to eat ____.</code></p>
         <textarea id="swSentences" class="sw-input" rows="3" spellcheck="false" placeholder="你喜欢吃什么？&#10;我喜欢吃____。"></textarea>
@@ -35,6 +41,25 @@
         <label for="swWords" class="sw-label"><%= L('Words (bottom circle)', '词语（下面的圆）') %></label>
         <p class="sw-hint"><%= L('One word per line. The first word is at the top, the rest go clockwise. Pinyin and pictures are filled in for you. To set them yourself:', '每行一个词，第一个在最上面，其余按顺时针排。拼音和图片会自动配好。也可以自己写：') %> <code>猫 | māo | cat</code></p>
         <textarea id="swWords" class="sw-input" rows="7" spellcheck="false" placeholder="苹果&#10;香蕉&#10;西瓜&#10;草莓&#10;葡萄&#10;面条"></textarea>
+        </div>
+
+        <div id="swHanziInputs" hidden>
+          <label for="swFixed" class="sw-label"><%= L('Fixed part (top circle)', '固定部件（上面的圆）') %></label>
+          <p class="sw-hint"><%= L('The part every character shares, for example 十 in 叶 汁 针 什.', '每个字都有的部分，比如“叶、汁、针、什”里的“十”。') %></p>
+          <input id="swFixed" class="sw-input sw-fixed-input" type="text" maxlength="3" autocomplete="off" placeholder="十">
+
+          <span class="sw-label" id="swSideLabel"><%= L('Where the changing radical goes', '变化的偏旁在哪边') %></span>
+          <div class="sw-options" role="radiogroup" aria-labelledby="swSideLabel">
+            <label><input type="radio" name="swSide" value="left" checked> <span><%= L('Left (针)', '左边（针）') %></span></label>
+            <label><input type="radio" name="swSide" value="right"> <span><%= L('Right (村)', '右边（村）') %></span></label>
+            <label><input type="radio" name="swSide" value="top"> <span><%= L('Top (草)', '上面（草）') %></span></label>
+            <label><input type="radio" name="swSide" value="bottom"> <span><%= L('Bottom (想)', '下面（想）') %></span></label>
+          </div>
+
+          <label for="swParts" class="sw-label"><%= L('Radicals (bottom circle)', '偏旁（下面的圆）') %></label>
+          <p class="sw-hint"><%= L('One per line: radical | character | word. The character and word can be left out: the character is put together for you when it can be.', '每行一个：偏旁 | 字 | 组词。字和组词可以不写，能拼出来的字会自动补上。') %> <code>氵 | 汁 | 果汁</code></p>
+          <textarea id="swParts" class="sw-input" rows="6" spellcheck="false" placeholder="口 | 叶 | 树叶&#10;氵 | 汁 | 果汁&#10;钅 | 针 | 针线&#10;亻 | 什 | 什么"></textarea>
+        </div>
         <p id="swCount" class="sw-count" role="status" aria-live="polite"></p>
 
         <div id="swPreviewBox" hidden>
@@ -155,7 +180,7 @@
   <script src="/shared/wordlist-core.js?v=cedict-1"></script>
   <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
-  <script src="/low-prep/spin-wheel/spin-wheel.js?v=2" defer></script>
+  <script src="/low-prep/spin-wheel/spin-wheel.js?v=3" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
