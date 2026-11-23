@@ -30,4 +30,34 @@
 <meta name="twitter:title" content="<%= seoTitle %>">
 <meta name="twitter:description" content="<%= seoDescription %>">
 <meta name="twitter:image" content="<%= seoImage %>">
+<% if (seoPath === '/') { %>
+<script type="application/ld+json"><%- JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': seoBaseUrl + '/#website',
+      name: seoBrand,
+      alternateName: ['clsteachingtools', 'CLS Teaching Tools', 'clsteachingtools.com', '陈老师教学工具', 'Chen Laoshi Teaching Tools'],
+      url: seoBaseUrl + '/',
+      inLanguage: ['en', 'zh'],
+      publisher: { '@id': seoBaseUrl + '/#org' }
+    },
+    {
+      '@type': 'Organization',
+      '@id': seoBaseUrl + '/#org',
+      name: seoBrand,
+      alternateName: ['clsteachingtools', 'CLS Teaching Tools', '陈老师教学工具'],
+      url: seoBaseUrl + '/',
+      logo: seoBaseUrl + '/images/chen-laoshi-avatar.png',
+      sameAs: [
+        'https://www.facebook.com/clsteachingtools',
+        'https://www.instagram.com/clsteachingtools/',
+        'https://www.tiktok.com/@clsteachingtools',
+        'https://www.youtube.com/@clsteachingtools'
+      ]
+    }
+  ]
+}).replace(/</g, '\\u003c') %></script>
+<% } %>
 <script src="/javascripts/clarity.js"></script>

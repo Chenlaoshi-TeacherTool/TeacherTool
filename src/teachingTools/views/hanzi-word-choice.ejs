@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><%= title %> · CLS Teaching Tools</title>
+<title>形近字选词 · Look-Alike Character Choice - Chen Laoshi's Teaching Toolkit</title>
 <% const studentView = typeof gameDataJson === 'string'; %>
 <meta name="theme-color" content="#194f45">
-<%- include('partials/seo', { pageDescription: 'Create Chinese fill-in-the-blank games with look-alike characters for classroom play, independent practice, and homework.', noindex: studentView }) %>
+<%- include('partials/seo', { pageDescription: 'Create Chinese fill-in-the-blank games with look-alike characters for classroom play, independent practice, and homework. 输入词汇，自动生成形近字填空题。', noindex: studentView }) %>
 <link rel="stylesheet" href="/stylesheets/site-theme.css">
 <link rel="stylesheet" href="/low-prep/sentence-reorder/sentence-reorder.css?v=6">
 <% if (!studentView) { %>

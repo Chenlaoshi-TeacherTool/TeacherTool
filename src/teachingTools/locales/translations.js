@@ -747,8 +747,8 @@ module.exports = {
       celebrationSubtitle: 'Excellent work — the sentence is in the correct order.'
     },
     poisonGame: {
-      metaTitle: "Witch's Poison - Chen Laoshi's Teaching Toolkit",
-      metaDescription: 'A quick team review game for any subject: put words, math problems, or definitions on the cards, hide the poison, and take turns.',
+      metaTitle: "女巫的毒药 · Witch's Poison - Chen Laoshi's Teaching Toolkit",
+      metaDescription: 'A quick team review game for any subject: put words, math problems, or definitions on the cards, hide the poison, and take turns. 女巫的毒药课堂复习游戏：卡片上写词语或题目，藏好毒药，各组轮流作答。',
       backBtn: '← Back to Teaching Tools',
       eyebrow: 'Quick team game · any subject',
       title: "Witch's Poison",

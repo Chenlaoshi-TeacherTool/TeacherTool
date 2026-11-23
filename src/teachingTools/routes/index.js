@@ -122,7 +122,7 @@ router.get('/teaching-tools/random-group-generator', function(req, res, next) {
 });
 
 router.get('/teaching-tools/missing-radicals', function(req, res) {
-  res.redirect(302, '/teaching-tools/missing-radicals/index.html');
+  res.redirect(301, '/teaching-tools/missing-radicals/');
 });
 
 router.get('/teaching-tools/classroom-noise-monitor', function(req, res, next) {
@@ -375,7 +375,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
     '/teaching-tools/word-list-library/word-list-library.html',
     '/teaching-tools/word-match',
     '/teaching-tools/question-bank-library/question-bank-library.html', '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html',
-    '/teaching-tools/missing-radicals',
+    '/teaching-tools/missing-radicals/',
     '/teaching-tools/fakebook-profile/fakebook-profile.html', '/teaching-tools/fake-wechat-moments/', '/teaching-tools/fake-wechat-single-post/', '/teaching-tools/social-media-classroom-tools/',
     '/low-prep/word-sudoku/word-sudoku-widget.html', '/low-prep/word-cloud/word-cloud-widget.html',
     '/teaching-tools/independent-reading', '/teaching-tools/tear-paper-bingo',

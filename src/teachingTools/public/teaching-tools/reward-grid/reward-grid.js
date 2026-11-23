@@ -2,7 +2,7 @@
 const language = /(?:^|; )lang=zh(?:;|$)/.test(document.cookie) ? 'zh' : 'en';
 const t = (zh, en) => language === 'zh' ? zh : en;
 document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
-document.title = `${t('课堂抽奖格子', 'Classroom Reward Grid')} · Teacher Toolkit`;
+document.title = `${t('课堂抽奖格子', 'Classroom Reward Grid')} · Chen Laoshi's Teaching Toolkit`;
 if (language === 'en') {
   document.querySelectorAll('[data-en]').forEach(element => { element.textContent = element.dataset.en; });
   document.querySelectorAll('[data-en-placeholder]').forEach(element => { element.placeholder = element.dataset.enPlaceholder; });
@@ -149,7 +149,7 @@ function applyTheme() {
   $('theme-icon').textContent = theme.icon;
   $('tool-title').textContent = themeText(theme.title);
   $('board-title').textContent = themeText(theme.board);
-  document.title = `${themeText(theme.title)} · Teacher Toolkit`;
+  document.title = `${themeText(theme.title)} · Chen Laoshi's Teaching Toolkit`;
   $('shower').checked = state.shower;
 }
 
