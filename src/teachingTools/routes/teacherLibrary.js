@@ -74,19 +74,29 @@ function create(options) {
   // ===== Favorites (我的收藏): every signed-in account, member or not, no limit =====
   var favorites = options.favorites || require('../services/teacherFavoritesRepository');
   var toolHrefs = new Set((options.toolHrefs || require('../config/tools').LIVE.map(function (tool) { return tool.href; })));
-  var FAVORITE_KINDS = { tool: function (ref) { return toolHrefs.has(ref); } };
+  // Themes come from the content catalog (admin-created themes too); ref = the theme key.
+  var themeKeys = options.themeKeys || async function () {
+    var catalog = await require('../services/contentCatalog').load().catch(function () { return null; });
+    return (catalog ? catalog.themes : require('../config/siteMap').children('activities')).map(function (theme) { return theme.key; });
+  };
+  // Resolves to a check (kind, ref) => boolean for this request.
+  async function favoriteCheck() {
+    var themes = new Set(await themeKeys());
+    var kinds = { tool: function (ref) { return toolHrefs.has(ref); }, theme: function (ref) { return themes.has(ref); } };
+    return function (kind, ref) { return Object.prototype.hasOwnProperty.call(kinds, kind) && typeof ref === 'string' && kinds[kind](ref); };
+  }
   function favoriteOwner(req, res) {
     var user = accountsEnabled() ? getUser(req) : null;
     if (!user) { res.status(401).json({ error: 'Sign in to keep favorites.', signedIn: false }); return null; }
     return ownerKey(user);
   }
-  function validFavorite(kind, ref) { return Object.prototype.hasOwnProperty.call(FAVORITE_KINDS, kind) && typeof ref === 'string' && FAVORITE_KINDS[kind](ref); }
   router.get('/favorites', async function (req, res) {
     // Signed out is a normal answer here (every page asks), not an error.
     var user = accountsEnabled() ? getUser(req) : null;
     if (!user) return res.json({ signedIn: false, favorites: [] });
     var owner = ownerKey(user);
     try {
+      var validFavorite = await favoriteCheck();
       var rows = (await favorites.list(owner)).filter(function (row) { return validFavorite(row.kind, row.ref); });
       res.json({ signedIn: true, favorites: rows });
     } catch (error) { res.status(503).json({ error: 'Your favorites could not be loaded right now.' }); }
@@ -96,6 +106,7 @@ function create(options) {
     var owner = favoriteOwner(req, res);
     if (!owner) return;
     var body = req.body || {};
+    var validFavorite = await favoriteCheck();
     if (!validFavorite(body.kind, body.ref) || typeof body.on !== 'boolean') return res.status(400).json({ error: 'Unknown item.' });
     try {
       if (body.on) await favorites.add(owner, body.kind, body.ref);
@@ -109,6 +120,7 @@ function create(options) {
     if (!owner) return;
     var body = req.body || {};
     var refs = Array.isArray(body.refs) ? body.refs.slice(0, favorites.MAX_PER_KIND || 500) : null;
+    var validFavorite = await favoriteCheck();
     if (!refs || !refs.every(function (ref) { return validFavorite(body.kind, ref); })) return res.status(400).json({ error: 'Unknown item.' });
     try { await favorites.reorder(owner, body.kind, refs); res.json({ ok: true }); }
     catch (error) { res.status(503).json({ error: 'The new order could not be saved right now.' }); }

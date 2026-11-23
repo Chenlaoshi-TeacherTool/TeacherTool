@@ -52,6 +52,7 @@ router.get('/theme-activities/:theme', function(req, res, next) {
   var heading = text(req, theme.en, theme.zh);
   renderPage(req, res, {
     heading: heading,
+    themeKey: theme.key,
     intro: text(req, 'Chinese language activities organized around ' + theme.en + '.', '围绕“' + theme.zh + '”整理中文课堂活动。'),
     parent: parentLink(req, 'activities'),
     cards: theme.custom ? [] : [

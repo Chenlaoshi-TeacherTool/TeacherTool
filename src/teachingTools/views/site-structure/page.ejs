@@ -12,6 +12,7 @@
     <div class="content-shell">
       <% if (page.parent) { %><a class="text-link" href="<%= page.parent.href %>">← <%= page.parent.label %></a><% } %>
       <h1><%= page.heading %></h1>
+      <% if (page.themeKey) { %><%- include('../partials/theme-favorite', { themeKey: page.themeKey }) %><% } %>
       <p><%= page.intro %></p>
     </div>
   </header>

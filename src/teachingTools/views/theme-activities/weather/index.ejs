@@ -159,6 +159,7 @@
   <div class="header">
     <a href="/theme-activities" class="back-btn">⬅ <%= t('themeActivitiesWeather.back') %></a>
     <h1>🌦️ <%= t('themeActivitiesWeather.title') %></h1>
+    <%- include('../../partials/theme-favorite', { themeKey: 'weather' }) %>
     <p><%= t('themeActivitiesWeather.subtitle') %></p>
 </div>
 

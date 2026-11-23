@@ -12,6 +12,7 @@
     <div class="content-shell">
       <a class="text-link" href="<%= parent.href %>">← <%= parent.label %></a>
       <h1><%= title %></h1>
+      <%- include('../partials/theme-favorite', { themeKey: 'self-introduction' }) %>
       <p><%= lang === 'zh' ? '通过阅读、人物配对和猜人游戏练习个人介绍。可直接打印 PDF，或下载可编辑版本。' : 'Practice self-introductions through reading, character matching, and Guess Who. Print the PDF or download an editable version.' %></p>
     </div>
   </header>

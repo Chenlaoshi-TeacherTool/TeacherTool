@@ -20,3 +20,12 @@
 .fresh-badge { display: inline-block; padding: 3px 9px; border-radius: 999px; background: #e0f2e4; color: #1d6b45; font-size: .72rem; font-weight: 800; letter-spacing: .03em; vertical-align: middle; }
 .fresh-badge--updated { background: #e6eefc; color: #2d4f99; }
 @media (prefers-reduced-motion: reduce) { .fav-star, .fav-toast { transition: none; } }
+.fav-button {
+  display: inline-flex; align-items: center; gap: 4px; padding: 8px 16px;
+  border: 1px solid #dce3ce; border-radius: 999px; background: #fffdf7; color: #31594d;
+  font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.fav-button:hover { border-color: #d9a21b; color: #8a5b15; }
+.fav-button[aria-pressed="true"] { color: #8a5b15; border-color: #f2d58a; background: #fff8e1; }
+.fav-button:focus-visible { outline: 3px solid #f8c63f; outline-offset: 2px; }
+.theme-fav { margin: 4px 0 14px; }

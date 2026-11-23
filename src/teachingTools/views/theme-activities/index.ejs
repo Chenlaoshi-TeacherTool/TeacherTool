@@ -143,6 +143,7 @@
         }
     </style>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
+    <link rel="stylesheet" href="/shared/tool-favorites.css?v=2">
 </head>
 
 <body>
@@ -172,7 +173,7 @@
             <h2 id="<%= category.key %>-heading"><%= category[lang] %></h2>
             <div class="tools-grid">
                 <% category.themes.forEach(function(theme) { %>
-                <div class="tool-card" data-tags="<%= category.en %> <%= category.zh %> <%= theme.key %> <%= theme.en %> <%= theme.zh %> <%= theme.tags || '' %>">
+                <div class="tool-card" data-fav-ref="<%= theme.key %>" data-fav-kind="theme" data-tags="<%= category.en %> <%= category.zh %> <%= theme.key %> <%= theme.en %> <%= theme.zh %> <%= theme.tags || '' %>">
                     <h3><%= theme.icon ? theme.icon + ' ' : '' %><%= theme[lang] %></h3>
                     <p><%= lang === 'zh' ? (theme.descZh || '主题课堂活动与可打印材料。') : (theme.descEn || 'Themed classroom activities and printable materials.') %></p>
                     <a href="<%= theme.href %>" class="btn"><%= t('themeActivities.openTheme') %></a>
@@ -226,6 +227,8 @@
             });
         })();
     </script>
+    <script src="/shared/tool-favorites.js?v=2"></script>
+    <script>window.ChenFavorites.attachStars(document); window.ChenFavorites.load();</script>
     <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

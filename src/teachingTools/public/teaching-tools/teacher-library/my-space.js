@@ -47,63 +47,80 @@
   }).catch(function () { account.textContent = text('Sign-in status is temporarily unavailable. Please try again later.', '暂时无法读取登录状态，请稍后重试。'); });
 })();
 
-// ===== 我的收藏: favorite tools, saved to the teacher account =====
+// ===== 我的收藏: favorite tools and themes, saved to the teacher account =====
 (function () {
   'use strict';
   var zh = window.LibraryI18n.chinese;
   function text(en, cn) { return zh ? cn : en; }
-  var list = document.getElementById('favList');
-  var status = document.getElementById('favStatus');
   var favorites = window.ChenFavorites;
-  if (!list || !favorites) return;
+  if (!favorites || !document.getElementById('favList')) return;
   var cards = null;
-  var refs = null;
+  var lists = favorites.cached('tool') ? { tool: favorites.cached('tool'), theme: favorites.cached('theme') } : null;
+  var sections = {
+    tool: { list: document.getElementById('favList'), status: document.getElementById('favStatus'),
+      count: function (n) { return text(n + ' favorite tools. The first ones show on the home page.', '共 ' + n + ' 个收藏，排在前面的会显示在首页。'); },
+      empty: function () { return text('No favorite tools yet. Open the tool directory and tap ☆ on the tools you use most.', '还没有收藏工具。打开工具目录，在常用工具上点 ☆。'); } },
+    theme: { list: document.getElementById('favThemesList'), status: document.getElementById('favThemesStatus'),
+      count: function (n) { return text(n + ' favorite themes.', '共 ' + n + ' 个收藏主题。'); },
+      empty: function () { return text('No favorite themes yet. Tap ☆ on a theme in Theme Activities.', '还没有收藏主题。在「主题活动」里点主题卡片上的 ☆。'); } }
+  };
 
   function el(tag, className, content) { var node = document.createElement(tag); if (className) node.className = className; if (content) node.textContent = content; return node; }
   function button(label, title, onClick) { var node = el('button', 'fav-action', label); node.type = 'button'; node.title = title; node.setAttribute('aria-label', title); node.addEventListener('click', onClick); return node; }
 
-  function move(index, step) {
-    var next = refs.slice();
+  function move(kind, index, step) {
+    var next = lists[kind].slice();
     var item = next.splice(index, 1)[0];
     next.splice(index + step, 0, item);
-    favorites.reorder(next).catch(function () {});
-    var focusIndex = index + step;
+    favorites.reorder(next, kind).catch(function () {});
     render();
-    var row = list.children[focusIndex];
+    var row = sections[kind].list.children[index + step];
     var again = row && row.querySelector(step < 0 ? '[data-move="up"]' : '[data-move="down"]');
     if (again && !again.disabled) again.focus(); else if (row) row.querySelector('a').focus();
   }
 
-  function render() {
-    list.replaceChildren();
-    if (favorites.signedIn() === false) { status.textContent = text('Sign in with the account button above to keep favorite tools on every device.', '请先通过顶部账号按钮登录，收藏的工具在每台设备上都能找到。'); return; }
-    if (!cards || refs === null) { status.textContent = text('Loading your favorites…', '正在读取收藏……'); return; }
-    var shown = refs.filter(function (ref) { return cards[ref]; });
-    status.textContent = shown.length ? text(shown.length + ' favorite tools. The first ones show on the home page.', '共 ' + shown.length + ' 个收藏，排在前面的会显示在首页。')
-      : text('No favorites yet. Open the tool directory and tap ☆ on the tools you use most.', '还没有收藏。打开工具目录，在常用工具上点 ☆。');
+  function renderKind(kind) {
+    var section = sections[kind];
+    section.list.replaceChildren();
+    if (favorites.signedIn() === false) {
+      section.status.textContent = kind === 'tool' ? text('Sign in with the account button above to keep favorite tools and themes on every device.', '请先通过顶部账号按钮登录，收藏的工具和主题在每台设备上都能找到。') : '';
+      return;
+    }
+    if (!cards || !lists) { section.status.textContent = text('Loading your favorites…', '正在读取收藏……'); return; }
+    var shown = (lists[kind] || []).filter(function (ref) { return cards[kind][ref]; });
+    section.status.textContent = shown.length ? section.count(shown.length) : section.empty();
     shown.forEach(function (ref, index) {
-      var card = cards[ref];
+      var card = cards[kind][ref];
       var row = el('li', 'fav-row');
-      var icon = el('span', 'fav-icon', card.icon || '✨'); icon.setAttribute('aria-hidden', 'true');
+      var icon = el('span', 'fav-icon', card.icon || (kind === 'theme' ? '🗂️' : '✨')); icon.setAttribute('aria-hidden', 'true');
       var info = el('div', 'fav-info');
       var link = el('a', '', card.title); link.href = card.href;
-      info.append(link, el('small', '', card.desc));
+      info.appendChild(link);
+      if (card.desc) info.appendChild(el('small', '', card.desc));
       var actions = el('div', 'fav-actions');
-      var up = button('↑', text('Move up', '上移'), function () { move(index, -1); }); up.dataset.move = 'up'; up.disabled = index === 0;
-      var down = button('↓', text('Move down', '下移'), function () { move(index, 1); }); down.dataset.move = 'down'; down.disabled = index === shown.length - 1;
-      var remove = button('★', text('Remove from favorites', '取消收藏'), function () { favorites.set(ref, false).catch(function () {}); });
+      var up = button('↑', text('Move up', '上移'), function () { move(kind, index, -1); }); up.dataset.move = 'up'; up.disabled = index === 0;
+      var down = button('↓', text('Move down', '下移'), function () { move(kind, index, 1); }); down.dataset.move = 'down'; down.disabled = index === shown.length - 1;
+      var remove = button('★', text('Remove from favorites', '取消收藏'), function () { favorites.set(ref, false, kind).catch(function () {}); });
       remove.classList.add('fav-remove');
       actions.append(up, down, remove);
       row.append(icon, info, actions);
-      list.appendChild(row);
+      section.list.appendChild(row);
     });
   }
+  function render() { renderKind('tool'); renderKind('theme'); }
 
-  favorites.onChange(function (next) { refs = next ? next.slice() : (favorites.signedIn() ? [] : null); render(); });
-  refs = favorites.cached();
+  favorites.onChange(function (tools, signedIn, all) {
+    lists = all ? { tool: all.tool.slice(), theme: all.theme.slice() } : (signedIn ? { tool: [], theme: [] } : null);
+    render();
+  });
   render();
   fetch('/api/tool-cards', { credentials: 'same-origin' }).then(function (response) { if (!response.ok) throw new Error(); return response.json(); })
-    .then(function (body) { cards = {}; body.cards.forEach(function (card) { cards[card.href] = card; }); render(); })
-    .catch(function () { status.textContent = text('Your favorites could not be loaded right now.', '暂时无法读取收藏，请稍后再试。'); });
-  favorites.load().then(function (result) { if (result.signedIn && !result.refs) refs = []; render(); });
+    .then(function (body) {
+      cards = { tool: {}, theme: {} };
+      body.cards.forEach(function (card) { cards.tool[card.href] = card; });
+      (body.themes || []).forEach(function (theme) { cards.theme[theme.key] = theme; });
+      render();
+    })
+    .catch(function () { sections.tool.status.textContent = text('Your favorites could not be loaded right now.', '暂时无法读取收藏，请稍后再试。'); });
+  favorites.load();
 })();

@@ -35,6 +35,7 @@ test.before(async function () {
     // Cloud library off: favorites must still work for every signed-in account.
     enabled: function () { return false; }, accountsEnabled: function () { return accounts; },
     favorites: favorites, accounts: { touch: async function () {} }, origin: SITE, providers: ['aad'],
+    themeKeys: async function () { return ['halloween', 'school']; },
     toolHrefs: ['/teaching-tools/dice-story', '/teaching-tools/pixel-art', '/teaching-tools/spin-wheel?mode=hanzi'],
     getUser: function (req) { return req.get('test-user') ? { id: req.get('test-user'), name: 'T', provider: 'aad' } : null; }
   }));
@@ -88,4 +89,13 @@ test('database trouble is a 503 without details', async function () {
   var res = await list('ana');
   assert.equal(res.status, 503);
   assert.doesNotMatch(await res.text(), /sql/);
+});
+
+test('themes can be starred by key; unknown themes are refused', async function () {
+  var post = function (ref) { return fetch(origin + '/api/teacher-library/favorites', { method: 'POST', headers: headers('ana'), body: JSON.stringify({ kind: 'theme', ref: ref, on: true }) }); };
+  assert.equal((await post('halloween')).status, 200);
+  assert.equal((await post('no-such-theme')).status, 400);
+  await star('ana', '/teaching-tools/dice-story', true);
+  var body = await (await list('ana')).json();
+  assert.deepEqual(body.favorites, [{ kind: 'theme', ref: 'halloween' }, { kind: 'tool', ref: '/teaching-tools/dice-story' }]);
 });

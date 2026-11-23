@@ -20,11 +20,16 @@ router.get('/tool-videos', async function (req, res) {
   }
 });
 
-// Card data for every live tool in the page language (My Space favorites).
-router.get('/tool-cards', function (req, res) {
+// Card data for every live tool and theme in the page language (My Space favorites).
+router.get('/tool-cards', async function (req, res) {
+  var lang = res.locals.lang;
+  var catalog = await require('../services/contentCatalog').load().catch(function () { return null; });
+  var themes = (catalog ? catalog.themes : require('../config/siteMap').children('activities')).map(function (theme) {
+    return { key: theme.key, href: theme.href, icon: theme.icon || '', title: lang === 'zh' ? theme.zh : theme.en };
+  });
   res.set('Cache-Control', 'public, max-age=300');
   res.set('Vary', 'Cookie');
-  res.json({ cards: require('../services/toolCards').cards(res.locals.lang) });
+  res.json({ cards: require('../services/toolCards').cards(lang), themes: themes });
 });
 
 var azureAuthEnabled = authUser.azureAuthEnabled;
