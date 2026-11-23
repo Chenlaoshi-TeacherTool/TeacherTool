@@ -1,6 +1,7 @@
 /*
  * 扩句阶梯 · rendering shared by the teacher page and the student link.
- * Needs ladder-core.js (SentenceLadder) and, for pinyin, wordlist-core.js (ChenWordlist).
+ * Needs ladder-core.js (SentenceLadder), /shared/zh-script.js (ChenZhScript) and,
+ * for pinyin, wordlist-core.js (ChenWordlist).
  */
 (function (global) {
   'use strict';
@@ -8,7 +9,7 @@
   var Core = global.SentenceLadder;
   var HAN = /[㐀-鿿豈-﫿]/;
   var EMOJI_BASE = 'https://cdn.jsdelivr.net/npm/openmoji@17.0.0/color/svg/';
-  var tablePromise = null;
+  var Zh = global.ChenZhScript;
 
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
@@ -16,19 +17,13 @@
     });
   }
 
+  // 简 ⇄ 繁 comes from the site-wide /shared/zh-script.js (ChenZhScript).
   function loadTable() {
-    if (Core.hasTable()) return Promise.resolve();
-    if (!tablePromise) {
-      tablePromise = fetch('/low-prep/sentence-ladder/zh-convert.json?v=1')
-        .then(function (response) { if (!response.ok) throw new Error('HTTP ' + response.status); return response.json(); })
-        .then(function (table) { Core.useTable(table); })
-        .catch(function (error) { tablePromise = null; throw error; });
-    }
-    return tablePromise;
+    return Zh.load().then(function () {});
   }
 
   function display(model, value) {
-    return model.script === 't' ? Core.toTraditional(value) : String(value || '');
+    return model.script === 't' ? Zh.toTraditional(value) : String(value || '');
   }
 
   function hanCount(value) {
@@ -37,7 +32,7 @@
 
   // Pinyin syllables for a piece of text, one per Chinese character.
   function syllables(value) {
-    var source = Core.toSimplified(value);
+    var source = Zh.toSimplified(value);
     var CW = global.ChenWordlist;
     var out = [];
     (source.match(/[㐀-鿿豈-﫿]+/g) || []).forEach(function (run) {

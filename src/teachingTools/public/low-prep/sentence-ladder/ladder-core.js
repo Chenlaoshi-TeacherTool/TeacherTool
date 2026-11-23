@@ -258,58 +258,6 @@
     });
   }
 
-  // ---------- simplified ⇄ traditional ----------
-  // `table` is zh-convert.json: { s2t: "简繁简繁…", t2s: "繁简…" } (pairs of characters).
-  // Character mapping first, then phrases where one simplified character has two
-  // traditional forms (发 → 發 / 髮, 面 → 面 / 麵, 只 → 只 / 隻, 干 → 乾 / 幹 …).
-  var S2T_CHAR_FIX = { '后': '後', '里': '裡', '么': '麼', '着': '著', '台': '臺', '于': '於', '干': '幹', '只': '只', '准': '准' };
-  var S2T_PHRASES = [
-    ['头发', '頭髮'], ['理发', '理髮'], ['白发', '白髮'], ['面条', '麵條'], ['面包', '麵包'], ['面粉', '麵粉'], ['吃面', '吃麵'],
-    ['皇后', '皇后'], ['公里', '公里'], ['干净', '乾淨'], ['干燥', '乾燥'], ['饼干', '餅乾'], ['干杯', '乾杯'], ['准备', '準備'],
-    ['标准', '標準'], ['准时', '準時'], ['台湾', '臺灣'], ['舞台', '舞臺'], ['窗台', '窗臺'], ['看着', '看著'], ['着急', '著急'],
-    ['睡着', '睡著'], ['钟表', '鐘錶'], ['手表', '手錶'], ['松树', '松樹'], ['一只', '一隻'], ['两只', '兩隻'], ['三只', '三隻'],
-    ['四只', '四隻'], ['几只', '幾隻'], ['每只', '每隻'], ['这只', '這隻'], ['那只', '那隻'], ['船只', '船隻'], ['只有', '只有'],
-    ['只是', '只是'], ['只好', '只好'], ['只要', '只要'], ['里面', '裡面'], ['冲过', '衝過'], ['向前冲', '向前衝']
-  ];
-
-  function pairsToMap(pairs) {
-    var map = Object.create(null);
-    var chars = Array.from(pairs || '');
-    for (var i = 0; i + 1 < chars.length; i += 2) map[chars[i]] = chars[i + 1];
-    return map;
-  }
-
-  var maps = null;
-  function useTable(table) {
-    maps = { s2t: pairsToMap(table && table.s2t), t2s: pairsToMap(table && table.t2s) };
-    Object.keys(S2T_CHAR_FIX).forEach(function (ch) { maps.s2t[ch] = S2T_CHAR_FIX[ch]; });
-  }
-  function hasTable() { return Boolean(maps); }
-
-  // Converts character by character so pinyin and highlights stay aligned (same length).
-  function toTraditional(value) {
-    var source = String(value || '');
-    if (!maps) return source;
-    var chars = Array.from(source);
-    var out = chars.map(function (ch) { return maps.s2t[ch] || ch; });
-    S2T_PHRASES.forEach(function (pair) {
-      var from = Array.from(pair[0]);
-      var to = Array.from(pair[1]);
-      for (var i = 0; i + from.length <= chars.length; i += 1) {
-        var hit = true;
-        for (var j = 0; j < from.length; j += 1) if (chars[i + j] !== from[j]) { hit = false; break; }
-        if (hit) for (var m = 0; m < to.length; m += 1) out[i + m] = to[m];
-      }
-    });
-    return out.join('');
-  }
-
-  function toSimplified(value) {
-    var source = String(value || '');
-    if (!maps) return source;
-    return Array.from(source).map(function (ch) { return maps.t2s[ch] || ch; }).join('');
-  }
-
   return {
     ALWAYS: ALWAYS,
     MAX_ROWS: MAX_ROWS,
@@ -335,10 +283,6 @@
     fullText: fullText,
     normalizeAnswer: normalizeAnswer,
     cleanWork: cleanWork,
-    blank: blank,
-    useTable: useTable,
-    hasTable: hasTable,
-    toTraditional: toTraditional,
-    toSimplified: toSimplified
+    blank: blank
   };
 });

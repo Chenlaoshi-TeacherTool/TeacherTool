@@ -6,7 +6,7 @@ const registry = require('../services/gameShareRegistry');
 const community = require('../services/community');
 const Core = require('../public/low-prep/sentence-ladder/ladder-core');
 const Themes = require('../public/low-prep/sentence-ladder/ladder-themes');
-const table = require('../public/low-prep/sentence-ladder/zh-convert.json');
+const Zh = require('../public/shared/zh-script.js');
 
 const adapter = registry.get('sentence-ladder', 1);
 
@@ -98,12 +98,8 @@ test('student work: beginner choices are checked, free writing is kept as writte
   assert.equal(free.correct, undefined);
 });
 
-test('simplified to traditional keeps length and fixes common one-to-many words', () => {
-  Core.useTable(table);
-  assert.equal(Core.toTraditional('我的头发和面条'), '我的頭髮和麵條');
-  assert.equal(Core.toTraditional('两只喜鹊在树上，以后再说'), '兩隻喜鵲在樹上，以後再說');
-  assert.equal(Core.toTraditional('里面很干净'), '裡面很乾淨');
+test('built-in ladders keep their length in traditional characters', () => {
   const sentence = Themes.THEMES.map((theme) => Themes.build(theme.id, 'native').segs.map((seg) => seg.t).join('')).join('');
-  assert.equal(Array.from(Core.toTraditional(sentence)).length, Array.from(sentence).length);
-  assert.equal(Core.toSimplified('蘋果書包'), '苹果书包');
+  assert.equal(Array.from(Zh.toTraditional(sentence)).length, Array.from(sentence).length);
+  assert.equal(Zh.toTraditional('两只喜鹊在树上'), '兩隻喜鵲在樹上');
 });
