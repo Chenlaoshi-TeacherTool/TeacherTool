@@ -39,6 +39,10 @@ async function publish(options) {
   if (Buffer.byteLength(JSON.stringify(options.data || null), 'utf8') > MAX_GAME_DATA_BYTES) fail('Game data is too large to share.', 413);
 
   var payload = adapter.sanitize(options.data);
+  // 简 / 繁 the teacher chose: kept with the payload (so a saved activity
+  // re-shared later keeps it) and used to show the whole student page.
+  var zhScript = normalizeZhScript(options.zhScript || (options.data && options.data.zhScript));
+  if (zhScript && payload && typeof payload === 'object') payload.zhScript = zhScript;
   var now = new Date();
   var manifest = {
     shareId: crypto.randomUUID(),
@@ -56,4 +60,8 @@ async function publish(options) {
   return manifest;
 }
 
-module.exports = { publish: publish, checkPassword: checkPassword, MAX_GAME_DATA_BYTES: MAX_GAME_DATA_BYTES };
+function normalizeZhScript(value) {
+  return value === 't' || value === 's' ? value : null;
+}
+
+module.exports = { publish: publish, normalizeZhScript: normalizeZhScript, checkPassword: checkPassword, MAX_GAME_DATA_BYTES: MAX_GAME_DATA_BYTES };

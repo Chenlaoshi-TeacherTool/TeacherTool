@@ -27,6 +27,14 @@
   var previewTimer = 0;
   var prepareToken = 0;
 
+  // 简 / 繁 for the cards: the board and the headline are converted as they are
+  // drawn (zh-content.js); the words stay as typed.
+  if (window.ChenZhContent) {
+    window.ChenZhContent.create({ mount: '#wmZhSlot', label: L('Card characters', '卡片用字') })
+      .region($('wmBoard'), { convert: true })
+      .region($('wmHeadline'), { convert: true });
+  }
+
   // ---------- settings ----------
   function radioValue(name) {
     var input = document.querySelector('input[name="' + name + '"]:checked');

@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var zh = document.documentElement.lang === 'zh';
+  var zh = /^zh/i.test(document.documentElement.lang);
   var t = function (c,e) { return zh ? c : e; };
   var game, names, teams, busy = false, lists = [], selected = [];
   var clock, deadline = 0, animationVersion = 0;

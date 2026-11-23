@@ -79,6 +79,9 @@
     });
 
     el.generate.addEventListener('click', function () { generate(); });
+    if (window.ChenZhContent) {
+      zh = window.ChenZhContent.create({ mount: '#vp-zh-slot', label: '标题用字 Title characters', onChange: function () { if (output.length) generateNow(); } });
+    }
     el.reshape.addEventListener('click', function () { seed = newSeed(); generate(); });
     el.png.addEventListener('click', downloadPngs);
     el.pdf.addEventListener('click', downloadPdf);
@@ -328,7 +331,17 @@
     return Promise.all(chosen.map(function (p) { return pageCanvas(p, opts.trim); }));
   }
 
+  // 简 / 繁 for what this tool prints on the sheets (title, instructions);
+  // the uploaded page itself is a picture and stays as it is.
+  var zh = null;
+  function T(value) { return zh ? zh.text(value) : value; }
+
   function generate() {
+    if (!zh) return generateNow();
+    return zh.ready().then(function () { zh.suggest(el.title.value); return generateNow(); }, function () { zh = null; return generateNow(); });
+  }
+
+  function generateNow() {
     var opts = readOptions();
     if (!opts.scrambled && !opts.board && !opts.cut) {
       el.status.textContent = 'Tick at least one page type to print · 请至少勾选一种打印页面。';
@@ -420,13 +433,13 @@
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, p.pageW, p.pageH);
 
-    var title = opts.title || '拼图 · Puzzle';
+    var title = T(opts.title || '拼图 · Puzzle');
     if (p.total > 1) title += '  (' + (p.index + 1) + '/' + p.total + ')';
     if (extra) title += '  ' + extra;
     var sub = {
-      pieces: '剪下拼图块，把被切开的字拼回来 · Cut out the pieces and rebuild the page.',
-      board: '拼图底板：把拼图块放在对应的位置 · Put each piece on its outline.',
-      cut: opts.scrambled ? '答案 · Answer key' : '沿线剪开，打乱后再拼起来 · Cut along the lines, mix, then rebuild.'
+      pieces: T('剪下拼图块，把被切开的字拼回来') + ' · Cut out the pieces and rebuild the page.',
+      board: T('拼图底板：把拼图块放在对应的位置') + ' · Put each piece on its outline.',
+      cut: opts.scrambled ? T('答案') + ' · Answer key' : T('沿线剪开，打乱后再拼起来') + ' · Cut along the lines, mix, then rebuild.'
     }[kind];
     var nameW = 560;
     fitText(ctx, title, MARGIN, MARGIN + 48, p.pageW - MARGIN * 2 - nameW, 54, '800', LATIN + ', ' + SANS, '#194f45');
@@ -434,7 +447,7 @@
     ctx.textAlign = 'right';
     ctx.fillStyle = '#193d38';
     ctx.font = '700 30px ' + LATIN + ', ' + SANS;
-    ctx.fillText(kind === 'cut' && opts.scrambled ? 'Teacher copy · 教师用' : '姓名 Name: _______________', p.pageW - MARGIN, MARGIN + 48);
+    ctx.fillText(kind === 'cut' && opts.scrambled ? 'Teacher copy · ' + T('教师用') : T('姓名') + ' Name: _______________', p.pageW - MARGIN, MARGIN + 48);
     ctx.textAlign = 'left';
     return { canvas: canvas, ctx: ctx };
   }

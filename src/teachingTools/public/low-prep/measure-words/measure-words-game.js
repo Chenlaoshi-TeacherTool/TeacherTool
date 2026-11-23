@@ -117,6 +117,12 @@
 
   function mount(container, config, hooks) {
     hooks = hooks || {};
+    // 简 / 繁: config.display(text) gives the text to show (called at every draw,
+    // so a switch applies from the next question). Answers stay as stored.
+    var show = typeof config.display === 'function' ? config.display : function (t) { return t; };
+    function txt(value) { return esc(show(value == null ? '' : String(value))); }
+    // A measure word on its own has no context (只 → 只); after 一 it does (一只 → 一隻).
+    function mwTxt(mw) { return esc(Array.from(show('一' + mw)).slice(1).join('')); }
     var opts = Object.assign({
       pinyin: true, challenge: false, duration: 60, rounds: 10,
       battleTarget: 4, battleType: 'mix', randomNumbers: true, speak: true
@@ -181,17 +187,17 @@
     function mwButton(mw, extraClass) {
       var m = metaFor(mw);
       return '<button type="button" class="mw-choice ' + (extraClass || '') + '" data-mw="' + esc(mw) + '" style="--mw-color:' + m.color + '">' +
-        '<span class="mw-choice-char">' + esc(mw) + '</span><span class="mw-py">' + esc(m.py) + '</span></button>';
+        '<span class="mw-choice-char">' + mwTxt(mw) + '</span><span class="mw-py">' + esc(m.py) + '</span></button>';
     }
 
     function chip(mw) {
       var m = metaFor(mw);
-      return '<span class="mw-chip" style="--mw-color:' + m.color + '">' + esc(mw) + '</span>';
+      return '<span class="mw-chip" style="--mw-color:' + m.color + '">' + mwTxt(mw) + '</span>';
     }
 
     function blankHtml(q, filled) {
       if (!filled) return '<span class="mw-blank">（　）</span>';
-      return '<span class="mw-blank mw-filled" style="--mw-color:' + metaFor(filled).color + '">' + esc(filled) + '</span>';
+      return '<span class="mw-blank mw-filled" style="--mw-color:' + metaFor(filled).color + '">' + mwTxt(filled) + '</span>';
     }
 
     function questionHtml(q, filled) {
@@ -199,23 +205,23 @@
       if (q.type === 'noun') {
         var icon = q.item.emoji ? '<div class="mw-emoji" aria-hidden="true">' + esc(q.item.emoji) + '</div>' : '';
         return badge + icon +
-          '<div class="mw-noun-line"><span class="mw-num">一</span>' + blankHtml(q, filled) + '<span class="mw-noun">' + esc(q.item.noun) + '</span></div>' +
+          '<div class="mw-noun-line"><span class="mw-num">一</span>' + blankHtml(q, filled) + '<span class="mw-noun">' + txt(q.item.noun) + '</span></div>' +
           '<div class="mw-py mw-noun-py">yī ___ ' + esc(pinyin(q.item.noun)) + '</div>';
       }
       var icon2 = q.item && q.item.emoji ? '<div class="mw-emoji mw-emoji-small" aria-hidden="true">' + esc(q.item.emoji) + '</div>' : '';
       return badge + icon2 +
-        '<div class="mw-sentence">' + esc(q.before) + blankHtml(q, filled) + esc(q.after) + '</div>' +
+        '<div class="mw-sentence">' + txt(q.before) + blankHtml(q, filled) + txt(q.after) + '</div>' +
         '<div class="mw-py mw-sentence-py">' + esc(pinyin(q.before)) + ' ___ ' + esc(pinyin(q.after)) + '</div>';
     }
 
     function hintHtml(q, picked) {
       var m = metaFor(q.answer);
       var html = '<div class="mw-hint" style="--mw-color:' + m.color + '">';
-      html += '<strong>' + esc(q.answer) + '</strong>';
-      if (m.rule) html += ' → ' + esc(m.rule) + ' <small>(' + esc(m.ruleEn) + ')</small>';
+      html += '<strong>' + mwTxt(q.answer) + '</strong>';
+      if (m.rule) html += ' → ' + txt(m.rule) + ' <small>(' + esc(m.ruleEn) + ')</small>';
       if (picked && picked !== q.answer) {
         var pm = metaFor(picked);
-        if (pm.rule) html += '<div class="mw-hint-wrong">' + esc(picked) + ' → ' + esc(pm.rule) + '</div>';
+        if (pm.rule) html += '<div class="mw-hint-wrong">' + mwTxt(picked) + ' → ' + txt(pm.rule) + '</div>';
       }
       return html + '</div>';
     }
@@ -291,7 +297,7 @@
         state.score += 10 * mult;
         el('score').textContent = state.score;
         el('combo').innerHTML = mult > 1 ? '🔥 Combo ×' + mult : '';
-        el('feedback').innerHTML = '<div class="mw-good">✓ ' + esc(q.speakText) + (mult > 1 ? ' <span>+' + 10 * mult + '</span>' : '') + '</div>';
+        el('feedback').innerHTML = '<div class="mw-good">✓ ' + txt(q.speakText) + (mult > 1 ? ' <span>+' + 10 * mult + '</span>' : '') + '</div>';
         if (opts.speak) speak(q.speakText);
         later(askCatch, 650);
       } else {
@@ -397,7 +403,7 @@
       el('feedback').innerHTML = '';
       el('legend').innerHTML = choicesFor(state.q).map(function (m) {
         var meta = metaFor(m);
-        return '<span class="mw-legend-item" data-mw="' + esc(m) + '" style="--mw-color:' + meta.color + '"><b>' + esc(m) + '</b><span class="mw-py">' + esc(meta.py) + '</span></span>';
+        return '<span class="mw-legend-item" data-mw="' + esc(m) + '" style="--mw-color:' + meta.color + '"><b>' + mwTxt(m) + '</b><span class="mw-py">' + esc(meta.py) + '</span></span>';
       }).join('');
     }
 
@@ -465,7 +471,7 @@
       }).join('');
 
       var missed = s.missed.slice(0, 12).map(function (t) {
-        return '<button type="button" class="mw-missed" data-say="' + esc(t) + '">🔊 ' + esc(t) + '</button>';
+        return '<button type="button" class="mw-missed" data-say="' + esc(t) + '">🔊 ' + txt(t) + '</button>';
       }).join('');
 
       var showStats = state.mode !== 'battle' || s.answered > 0;

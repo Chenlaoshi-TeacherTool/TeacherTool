@@ -70,6 +70,7 @@
 
           <label for="cu-title">Title on the sheet · 标题 <small>(optional)</small></label>
           <input type="text" id="cu-title" placeholder="e.g. 第三课 · 我的家" maxlength="60">
+          <div id="cu-zh-slot" class="zh-script-slot"></div>
 
           <label>Squares · 切几块</label>
           <div class="cu-levels" id="cu-levels" role="radiogroup" aria-label="Difficulty">
@@ -182,7 +183,9 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
-  <script src="/low-prep/character-unscrambler/character-unscrambler.js?v=4" defer></script>
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=4"></script>
+  <script src="/low-prep/character-unscrambler/character-unscrambler.js?v=5" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

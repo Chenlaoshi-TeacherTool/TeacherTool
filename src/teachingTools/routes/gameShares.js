@@ -74,7 +74,7 @@ router.post('/api/game-shares', async function (req, res) {
     var owner = teacherActivities.ownerKeyFor(req);
     var manifest = await publisher.publish({
       gameType: body.gameType, version: body.version, title: body.title, data: body.data, password: body.password,
-      owner: owner, lifetimeMs: await membershipLimits.shareLifetimeMs(req),
+      zhScript: body.zhScript, owner: owner, lifetimeMs: await membershipLimits.shareLifetimeMs(req),
       allowMembersOnly: await membershipLimits.canCollectStudentWork(req)
     });
     await teacherActivities.record(owner, { kind: 'game', id: manifest.shareId, gameType: manifest.gameType, version: manifest.version, title: manifest.title,
@@ -163,7 +163,12 @@ router.get('/play/:id', loadManifest, function (req, res, next) {
   var adapter = registry.get(manifest.gameType, manifest.version);
   if (!adapter) return next();
   if (takesSubmissions(manifest)) res.set('Cache-Control', 'private, no-store');
+  // The teacher's 简 / 繁 choice decides the whole student page, whatever the
+  // student's own site setting is (services/zhHant.js converts it).
+  var zhScript = publisher.normalizeZhScript(manifest.payload && manifest.payload.zhScript);
+  if (zhScript) res.locals.zhScript = zhScript === 't' ? 'hant' : 'hans';
   var safeJson = JSON.stringify({
+    zhScript: zhScript,
     shareId: manifest.shareId,
     gameType: manifest.gameType,
     version: manifest.version,

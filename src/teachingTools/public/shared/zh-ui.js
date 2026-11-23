@@ -18,7 +18,10 @@
   var Zh = window.ChenZhScript;
   var lang = (document.cookie.match(/(?:^|; )lang=([^;]+)/) || [])[1];
   var script = (document.cookie.match(/(?:^|; )zhScript=([^;]+)/) || [])[1];
-  if (!Zh || lang !== 'zh' || script !== 'hant') return;
+  // The server marks pages it sent in 繁 with <html lang="zh-Hant"> (also when a
+  // student game link follows the teacher's choice rather than the cookies).
+  var serverHant = document.documentElement.getAttribute('lang') === 'zh-Hant';
+  if (!Zh || !(serverHant || (lang === 'zh' && script === 'hant'))) return;
 
   var HAN = /[㐀-鿿豈-﫿]/;
   var ATTRS = ['title', 'alt', 'placeholder', 'aria-label'];

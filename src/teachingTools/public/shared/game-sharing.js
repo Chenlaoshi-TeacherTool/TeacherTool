@@ -67,6 +67,14 @@
     saveShares(listShares().filter((item) => item.shareId !== shareId));
   }
 
+  // 简 / 繁 for the student page: the tool's own switch if it has one, else
+  // 繁 when the teacher uses the site in 繁 (that is what the projector shows).
+  function currentZhScript() {
+    const content = window.ChenZhContent && window.ChenZhContent.current;
+    if (content) return content.value;
+    return /(?:^|; )lang=zh(?:;|$)/.test(document.cookie) && /(?:^|; )zhScript=hant(?:;|$)/.test(document.cookie) ? 't' : undefined;
+  }
+
   async function publish(options) {
     const response = await fetch('/api/game-shares', {
       method: 'POST',
@@ -76,7 +84,8 @@
         version: options.version || 1,
         title: options.title,
         password: options.password,
-        data: options.data
+        data: options.data,
+        zhScript: options.zhScript || currentZhScript()
       })
     });
     const result = await response.json().catch(() => ({}));

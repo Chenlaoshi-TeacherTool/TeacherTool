@@ -92,7 +92,7 @@
       deleteFailed: t('community.jsDeleteFailed'), failed: t('community.jsFailed')
     }).replace(/</g, '\\u003c') %>;
   </script>
-  <% if (game && !game.templateOnly) { %><script src="/shared/game-sharing.js"></script><% } else if (!game) { %><script src="/shared/wordlist-core.js?v=zh-1"></script><script src="/shared/wordlist-handoff.js?v=1"></script><% } %>
+  <% if (game && !game.templateOnly) { %><script src="/shared/game-sharing.js?v=zh1"></script><% } else if (!game) { %><script src="/shared/wordlist-core.js?v=zh-1"></script><script src="/shared/wordlist-handoff.js?v=1"></script><% } %>
   <script src="/community/detail.js?v=games1"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

@@ -18,8 +18,23 @@
   var state = {
     title: '',
     text: '',
-    rows: []              // [{ word, pinyin, meaning }]
+    rows: []              // [{ word, pinyin, meaning, at, len, edited }]
   };
+
+  // 简 / 繁: the article is segmented and looked up in simplified (the
+  // dictionary is keyed that way); the list and the Word file show the chosen
+  // script. A word is cut from the converted article at the same place, so it
+  // keeps its context (头发 → 頭髮 even though 发 alone is 發).
+  var zh = null;
+  function T(value) { return zh ? zh.text(value) : value; }
+  function simplified(text) {
+    var Zh = window.ChenZhScript;
+    return Zh && Zh.hasTable() ? Zh.toSimplified(text) : text;
+  }
+  function shownWord(row) {
+    if (row.at == null || row.edited) return T(row.word);
+    return Array.from(T(state.text)).slice(row.at, row.at + row.len).join('');
+  }
 
   var el = {};
 
@@ -43,6 +58,18 @@
     el.addRow.addEventListener('click', addEmptyRow);
     el.downloadButton.addEventListener('click', downloadDocx);
     el.pinyinToggle.addEventListener('change', updatePinyinColumn);
+
+    if (window.ChenZhContent) {
+      zh = window.ChenZhContent.create({
+        mount: '#vg-zh-slot',
+        label: '生词表用字 Characters',
+        onChange: function () {
+          state.rows.forEach(function (row) { row.word = shownWord(row); });
+          if (state.rows.length) renderTable();
+        }
+      });
+      zh.region(el.result);
+    }
 
     // Start loading the dictionary right away so the first build is instant.
     loadDictionary().then(function () {
@@ -81,7 +108,7 @@
   // ---- Segmentation (forward maximum matching against the dictionary) --------
 
   function segment(text) {
-    var tokens = [];       // recognized Chinese words, with duplicates
+    var tokens = [];       // recognized Chinese words, with duplicates: { word, at }
     var chars = Array.from(text);
     var i = 0;
     while (i < chars.length) {
@@ -95,11 +122,11 @@
         if (dict[candidate]) { matched = candidate; break; }
       }
       if (matched) {
-        tokens.push(matched);
+        tokens.push({ word: matched, at: i });
         i += Array.from(matched).length;
       } else {
         // No multi-character word here: emit the single character and move on.
-        tokens.push(ch);
+        tokens.push({ word: ch, at: i });
         i += 1;
       }
     }
@@ -118,6 +145,11 @@
       loadDictionary().then(build).catch(function () {});
       return;
     }
+    if (zh && !window.ChenZhScript.hasTable()) {
+      zh.ready().then(build, function () { zh = null; build(); });
+      return;
+    }
+    if (zh) zh.suggest(text);
 
     state.title = el.title.value.trim();
     state.text = text.replace(/\r\n/g, '\n');
@@ -125,22 +157,26 @@
     var minLen = parseInt(el.minLength.value, 10) === 1 ? 1 : 2;
     var skipStop = el.stopwordsToggle.checked;
 
-    var tokens = segment(state.text);
+    var tokens = segment(simplified(state.text));
     var seen = {};
     var rows = [];
-
-    tokens.forEach(function (token) {
+    tokens.forEach(function (found) {
+      var token = found.word;
       if (Array.from(token).length < minLen) return;
       if (seen[token]) return;
       if (skipStop && STOPWORDS[token]) return;
       var entry = dict[token];
       if (!entry) return; // single characters not in the dictionary
       seen[token] = true;
-      rows.push({
+      var row = {
         word: token,
         pinyin: entry[0].py || '',
-        meaning: formatMeaning(entry)
-      });
+        meaning: formatMeaning(entry),
+        at: found.at,
+        len: Array.from(token).length
+      };
+      row.word = shownWord(row);
+      rows.push(row);
     });
 
     state.rows = rows;
@@ -210,7 +246,8 @@
     td.addEventListener('input', function () {
       row[field] = td.textContent.trim();
       if (field === 'word') {
-        var lookup = dict && dict[row[field]];
+        row.edited = true;
+        var lookup = dict && (dict[row[field]] || dict[simplified(row[field])]);
         // Live-fill pinyin/meaning when a freshly typed word is in the dictionary
         // and those cells are still empty.
         if (lookup) autofillSiblings(td.parentNode, row, lookup);
@@ -270,28 +307,33 @@
 
     var d = window.docx;
     var showPinyin = el.pinyinToggle.checked;
-    var title = state.title || '生词表 · Vocabulary';
-
+    var title = T(state.title || '生词表 · Vocabulary');
     var children = [];
+    // Chinese runs in 繁体 files get a traditional face (正黑體); 简体 files keep Word's default.
+    var hant = zh && zh.value === 't';
+    function run(options) {
+      if (hant) options.font = { eastAsia: 'Microsoft JhengHei' };
+      return new d.TextRun(options);
+    }
 
     // Title
     children.push(new d.Paragraph({
       heading: d.HeadingLevel.HEADING_1,
       spacing: { after: 200 },
-      children: [new d.TextRun({ text: title, size: 32, bold: true })]
+      children: [run({ text: title, size: 32, bold: true })]
     }));
 
     // Article section
     children.push(new d.Paragraph({
       heading: d.HeadingLevel.HEADING_2,
       spacing: { before: 200, after: 120 },
-      children: [new d.TextRun({ text: '课文 · Text', size: 26, bold: true })]
+      children: [run({ text: T('课文') + ' · Text', size: 26, bold: true })]
     }));
 
-    state.text.split('\n').forEach(function (line) {
+    T(state.text).split('\n').forEach(function (line) {
       children.push(new d.Paragraph({
         spacing: { after: 120, line: 360 },
-        children: [new d.TextRun({ text: line, size: 24 })]
+        children: [run({ text: line, size: 24 })]
       }));
     });
 
@@ -299,10 +341,10 @@
     children.push(new d.Paragraph({
       heading: d.HeadingLevel.HEADING_2,
       spacing: { before: 320, after: 120 },
-      children: [new d.TextRun({ text: '生词表 · Vocabulary', size: 26, bold: true })]
+      children: [run({ text: T('生词表') + ' · Vocabulary', size: 26, bold: true })]
     }));
 
-    children.push(buildTable(d, rows, showPinyin));
+    children.push(buildTable(d, rows, showPinyin, run));
 
     var doc = new d.Document({
       creator: "Chen Laoshi's Teaching Toolkit",
@@ -325,7 +367,7 @@
     });
   }
 
-  function buildTable(d, rows, showPinyin) {
+  function buildTable(d, rows, showPinyin, run) {
     var BORDER = { style: d.BorderStyle.SINGLE, size: 4, color: 'CCCCCC' };
     var borders = { top: BORDER, bottom: BORDER, left: BORDER, right: BORDER };
 
@@ -339,13 +381,13 @@
     }
     function textRuns(text, o) {
       o = o || {};
-      return [new d.TextRun({ text: text || '', bold: !!o.bold, size: o.size || 22 })];
+      return [run({ text: text || '', bold: !!o.bold, size: o.size || 22 })];
     }
 
     var headerCells = [
-      cell(textRuns('词语 Word', { bold: true }), { header: true })
+      cell(textRuns(T('词语') + ' Word', { bold: true }), { header: true })
     ];
-    if (showPinyin) headerCells.push(cell(textRuns('拼音 Pinyin', { bold: true }), { header: true }));
+    if (showPinyin) headerCells.push(cell(textRuns(T('拼音') + ' Pinyin', { bold: true }), { header: true }));
     headerCells.push(cell(textRuns('英文 English', { bold: true }), { header: true }));
 
     var tableRows = [new d.TableRow({ tableHeader: true, children: headerCells })];

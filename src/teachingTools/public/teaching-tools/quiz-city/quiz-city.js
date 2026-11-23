@@ -5,7 +5,7 @@
   var storageKey = 'cls-quiz-city-match-v1';
   var bankKey = 'cls-quiz-city-bank-v1';
   var state = null;
-  var zh = document.documentElement.lang === 'zh';
+  var zh = /^zh/i.test(document.documentElement.lang);
   var sound = false;
   var motion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var audio = null;
@@ -142,7 +142,7 @@
     byId('clock').textContent = Math.floor(seconds / 60).toString().padStart(2, '0') + ':' + (seconds % 60).toString().padStart(2, '0');
   }
   function render() {
-    document.documentElement.lang = zh ? 'zh' : 'en'; document.body.classList.toggle('no-motion', !motion);
+    document.documentElement.lang = zh ? (/^zh/i.test(document.documentElement.lang) ? document.documentElement.lang : 'zh') : 'en'; document.body.classList.toggle('no-motion', !motion);
     document.querySelectorAll('[data-en]').forEach(function(element) { element.textContent = element.dataset[zh ? 'zh' : 'en']; });
     byId('sound').textContent = sound ? text('Sound on', '音效开') : text('Sound off', '音效关'); byId('sound').setAttribute('aria-pressed', sound);
     byId('motion').textContent = motion ? text('Animation on', '动画开') : text('Animation off', '动画关'); byId('motion').setAttribute('aria-pressed', motion);

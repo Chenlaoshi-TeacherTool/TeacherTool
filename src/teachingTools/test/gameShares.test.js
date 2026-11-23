@@ -479,3 +479,36 @@ test('quiz results allow same-origin referrers for Azure session-authenticated P
   assert.match(html, /<meta name="referrer" content="same-origin">/);
   assert.doesNotMatch(html, /<meta name="referrer" content="no-referrer">/);
 });
+
+test('a student link follows the teacher’s 简 / 繁 choice, not the student’s cookies', async function () {
+  async function open(zhScript, studentCookie) {
+    var published = await (await fetch(baseUrl + '/api/game-shares', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameType: 'sentence-reorder', version: 1, title: '句子练习', password: 'abc123', data: validSentenceReorderData(), zhScript: zhScript })
+    })).json();
+    var unlock = await fetch(baseUrl + published.url + '/unlock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ password: 'abc123' }),
+      redirect: 'manual'
+    });
+    var cookie = unlock.headers.get('set-cookie').split(';')[0] + (studentCookie ? '; ' + studentCookie : '');
+    return (await fetch(baseUrl + published.url, { headers: { Cookie: cookie } })).text();
+  }
+
+  var hant = await open('t', 'lang=en');
+  assert.match(hant, /<html lang="zh-Hant">/);
+  assert.match(hant, /\/shared\/zh-ui\.js/);
+  assert.match(hant, /"zhScript":"t"/);
+  assert.match(hant, /一只/); // the game data itself stays as typed; the page converts what it shows
+
+  var hans = await open('s', 'lang=zh; zhScript=hant');
+  assert.doesNotMatch(hans, /zh-ui\.js/);
+  assert.doesNotMatch(hans, /lang="zh-Hant"/);
+  assert.match(hans, /"zhScript":"s"/);
+
+  var none = await open(undefined, 'lang=zh; zhScript=hant');
+  assert.match(none, /zh-ui\.js/);
+  assert.match(none, /"zhScript":null/);
+});

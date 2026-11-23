@@ -1,6 +1,7 @@
 (() => {
   const element = id => document.getElementById(id);
-  const copy = (zh, en) => document.documentElement.lang === 'zh' ? zh : en;
+  // zh-Hant too: the 繁 site sends <html lang="zh-Hant">.
+  const copy = (zh, en) => /^zh/i.test(document.documentElement.lang) ? zh : en;
   const mode = element('mode');
   const words = element('words');
   const custom = element('custom');
@@ -17,15 +18,29 @@
   let remaining = [];
   let selected;
   let feedbackTimer;
+  // 简 / 繁 for the cards. Whole words are converted before they are split, so
+  // 头发 gives 頭 + 髮 (发 alone would be 發).
+  const zhContent = window.ChenZhContent ? window.ChenZhContent.create({
+    mount: '#zh-script-slot',
+    label: copy('卡片用字', 'Card characters'),
+    onChange: () => {
+      if (element('play').hidden) { updatePreview(); return; }
+      roundPairs = updatePreview();
+      startRound();
+    }
+  }) : null;
+  if (zhContent) zhContent.region(board).ready().then(() => updatePreview(), () => {});
+  const T = value => zhContent ? zhContent.text(value) : value;
 
   function preparePairs() {
     const pairs = [];
     const skipped = [];
     words.value.split(/\r?\n/).forEach((line, index) => {
       if (!line.trim()) return;
-      const [zh, py, en] = line.split(/[|\t]/).map(value => value.trim().normalize('NFC'));
+      const [typed, py, en] = line.split(/[|\t]/).map(value => value.trim().normalize('NFC'));
+      const zh = typed && T(typed);
       if (editingCustom && zh && py) {
-        pairs.push([zh, py, zh + ' ' + py]);
+        pairs.push([zh, T(py), zh + ' ' + T(py)]);
       } else if (!editingCustom && mode.value === 'word' && /^\p{Script=Han}{2}$/u.test(zh)) {
         pairs.push([...zh, zh]);
       } else if (mode.value !== 'word' && zh && (mode.value === 'py' ? py : en)) {

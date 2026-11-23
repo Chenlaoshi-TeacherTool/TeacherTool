@@ -72,6 +72,7 @@
             </label>
           </div>
 
+          <div id="vg-zh-slot" class="zh-script-slot"></div>
           <button id="vg-build-button" class="vg-primary" type="button">🔍 Find words</button>
           <p id="vg-dict-status" class="vg-dict-status" aria-live="polite">Loading the dictionary…</p>
         </section>
@@ -118,7 +119,9 @@
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script src="/low-prep/vocab-glossary/docx.umd.js"></script>
-  <script src="/low-prep/vocab-glossary/vocab-glossary.js?v=1" defer></script>
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=4"></script>
+  <script src="/low-prep/vocab-glossary/vocab-glossary.js?v=2" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

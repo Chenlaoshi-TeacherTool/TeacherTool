@@ -72,6 +72,7 @@
 
           <label for="vp-title">Title on the sheet · 标题 <small>(optional)</small></label>
           <input type="text" id="vp-title" placeholder="e.g. 第三课 · 我的学校" maxlength="60">
+          <div id="vp-zh-slot" class="zh-script-slot"></div>
 
           <label>Number of pieces · 拼图块数</label>
           <div class="vp-pieces" id="vp-pieces" role="radiogroup" aria-label="Number of pieces">
@@ -140,7 +141,9 @@
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script src="/low-prep/vocab-puzzle/pdfjs/pdf.min.js"></script>
-  <script src="/low-prep/vocab-puzzle/vocab-puzzle.js?v=11" defer></script>
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=4"></script>
+  <script src="/low-prep/vocab-puzzle/vocab-puzzle.js?v=12" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

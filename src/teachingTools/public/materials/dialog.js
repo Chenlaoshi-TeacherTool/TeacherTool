@@ -5,7 +5,7 @@
   var dialog = document.createElement('dialog');
   dialog.className = 'material-dialog'; dialog.setAttribute('aria-labelledby', 'materialDialogTitle');
   var close = document.createElement('button'); close.type = 'button'; close.className = 'material-close';
-  close.textContent = '×'; close.setAttribute('aria-label', document.documentElement.lang === 'zh' ? '关闭' : 'Close');
+  close.textContent = '×'; close.setAttribute('aria-label', /^zh/i.test(document.documentElement.lang) ? '关闭' : 'Close');
   var content = document.createElement('div'); dialog.append(close, content); document.body.append(dialog);
   var trigger;
   close.addEventListener('click', function () { dialog.close(); });

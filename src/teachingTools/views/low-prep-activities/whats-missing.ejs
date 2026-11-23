@@ -85,6 +85,7 @@
           </select>
         </div>
 
+        <div id="wmZhSlot" class="zh-script-slot"></div>
         <p id="wmError" class="wm-error" role="alert"></p>
         <button id="wmStart" class="wm-btn wm-btn-big" type="button">▶ <%= L('Start the game', '开始游戏') %></button>
       </section>
@@ -118,10 +119,12 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=4"></script>
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
-  <script src="/low-prep/whats-missing/whats-missing.js?v=2" defer></script>
+  <script src="/low-prep/whats-missing/whats-missing.js?v=3" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

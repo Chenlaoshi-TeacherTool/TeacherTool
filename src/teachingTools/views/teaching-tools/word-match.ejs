@@ -8,7 +8,9 @@
   <%- include('../partials/seo', { pageDescription: 'Build Chinese words or match them with pinyin and English.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/teaching-tools/word-match/match.css">
-  <script defer src="/teaching-tools/word-match/match.js?v=2"></script>
+  <script defer src="/shared/zh-script.js?v=4"></script>
+  <script defer src="/shared/zh-content.js?v=4"></script>
+  <script defer src="/teaching-tools/word-match/match.js?v=3"></script>
 </head>
 <body class="word-match-page">
   <main id="word-match">
@@ -47,6 +49,7 @@
         <label id="custom-label" class="checkbox">
           <input id="custom" type="checkbox"> <%= copy('手动指定组词或搭配', 'Enter word parts or phrases manually') %>
         </label>
+        <div id="zh-script-slot" class="zh-script-slot"></div>
         <p id="preview" role="status"></p>
         <button class="primary" type="submit"><%= copy('开始配对 →', 'Start matching →') %></button>
       </form>

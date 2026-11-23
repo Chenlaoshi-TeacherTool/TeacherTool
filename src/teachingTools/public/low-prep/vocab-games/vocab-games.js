@@ -8,6 +8,15 @@
 (function () {
   'use strict';
 
+  // 简 / 繁: one choice for every game opened from here (the games read the same
+  // saved choice); the word list on this page shows it too.
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.ChenZhContent) return;
+    var isZh = /^zh/i.test(document.documentElement.lang || '');
+    window.ChenZhContent.create({ mount: '#vgsZhSlot', label: isZh ? '游戏用字' : 'Game characters' })
+      .region(document.getElementById('vgsWords'), { convert: true });
+  });
+
   var zh = /^zh/i.test(document.documentElement.lang || '');
   function L(en, cn) { return zh ? cn : en; }
   function $(id) { return document.getElementById(id); }

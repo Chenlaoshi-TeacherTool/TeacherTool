@@ -58,6 +58,7 @@
         <p class="vgs-kicker"><%= L('Step 2', '第二步') %></p>
         <h2 id="vgsGamesHeading"><%= L('Switch game', '换个游戏') %></h2>
         <p id="vgsGamesHint" class="vgs-hint"><%= L('Choose a word list first.', '请先选择一套词。') %></p>
+        <div id="vgsZhSlot" class="zh-script-slot"></div>
         <h3 class="vgs-group"><%= L('🖥️ Play in class', '🖥️ 课堂上玩') %></h3>
         <div id="vgsPlay" class="vgs-game-grid"></div>
         <h3 class="vgs-group"><%= L('🖨️ Print', '🖨️ 打印') %></h3>
@@ -70,7 +71,9 @@
 
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
-  <script src="/low-prep/vocab-games/vocab-games.js?v=3" defer></script>
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=4"></script>
+  <script src="/low-prep/vocab-games/vocab-games.js?v=4" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

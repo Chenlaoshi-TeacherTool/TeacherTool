@@ -159,8 +159,13 @@
 
   // ---------- 开始 / 结束游戏 ----------
   var game = null;
+  // 简 / 繁 for the game screen (and, through game-sharing.js, the student link).
+  var zh = window.ChenZhContent ? window.ChenZhContent.create({ mount: '#mw-zh-slot', label: '游戏用字 Characters' }) : null;
+  // The whole game screen follows the switch, its own labels (对了！) included.
+  if (zh) { zh.region(els.host, { convert: true }); zh.ready().catch(function () {}); }
   function startGame(mode) {
     var config = refresh();
+    config.display = function (text) { return zh ? zh.text(text) : text; };
     els.setup.hidden = true;
     els.header.hidden = true;
     els.host.hidden = false;

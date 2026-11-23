@@ -255,8 +255,9 @@
       mount.appendChild(wrap);
     }
     paint();
+    root.ChenZhContent.current = controller;
     return controller;
   }
 
-  root.ChenZhContent = { create: create, siteScript: siteScript };
+  root.ChenZhContent = { create: create, siteScript: siteScript, current: null };
 })(typeof self !== 'undefined' ? self : this);

@@ -19,7 +19,7 @@
   var currentState = 'green';
 
   function text(key) {
-    var isZh = document.documentElement.lang === 'zh';
+    var isZh = /^zh/i.test(document.documentElement.lang);
     var labels = {
       start: isZh ? '开始监听' : 'Start Listening',
       stop: isZh ? '停止' : 'Stop',

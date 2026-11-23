@@ -25,6 +25,18 @@
     var mode = button.getAttribute('data-mode');
     if (mode === 'catch' && !hasNouns) button.disabled = true;
     button.addEventListener('click', function () {
+      // The teacher's 简 / 繁 choice (the page itself is already converted by the server).
+      var shared = window.__SHARED_GAME__ || {};
+      var Zh = window.ChenZhScript;
+      if (shared.zhScript === 't' && Zh && !Zh.hasTable()) {
+        Zh.load().then(play, play);
+      } else {
+        play();
+      }
+      function play() {
+      data.display = function (text) {
+        return shared.zhScript && Zh && Zh.hasTable() ? Zh.toScript(text, shared.zhScript) : text;
+      };
       menu.hidden = true;
       host.hidden = false;
       var current = window.MWGame.mount(host, data, {
@@ -46,6 +58,7 @@
       });
       current.start(mode);
       host.scrollIntoView({ block: 'start' });
+      }
     });
   });
   showBest();

@@ -19,6 +19,16 @@
     kai: "'KaiTi', 'STKaiti', 'Kaiti SC', 'BiauKai', 'Noto Serif SC', serif",
     sans: "'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Heiti SC', sans-serif"
   };
+  // 繁体 puzzles: traditional-standard faces first (標楷體 / 正黑體).
+  var FONTS_HANT = {
+    kai: "'DFKai-SB', 'BiauKai', 'Kaiti TC', 'KaiTi', 'STKaiti', serif",
+    sans: "'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', 'Microsoft YaHei', sans-serif"
+  };
+  // 简 / 繁 for the puzzles: the typed words are converted as a whole (so
+  // 头发 → 頭髮), then cut into characters.
+  var zh = null;
+  function T(value) { return zh ? zh.text(value) : value; }
+  function fonts() { return zh && zh.value === 't' ? FONTS_HANT : FONTS; }
   var LATIN = "'Nunito', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif";
   var COLORS = { red: '#e0201b', orange: '#bf7f35', black: '#1c1c1c', green: '#194f45', blue: '#1f4fa8' };
   var BACKGROUNDS = {
@@ -61,6 +71,9 @@
     });
 
     el.generate.addEventListener('click', function () { generate(); });
+    if (window.ChenZhContent) {
+      zh = window.ChenZhContent.create({ mount: '#cu-zh-slot', label: '拼图用字 Characters', onChange: function () { if (output.length) generateNow(); } });
+    }
     el.reshuffle.addEventListener('click', function () { seed = newSeed(); generate(); });
     el.png.addEventListener('click', downloadPngs);
     el.pdf.addEventListener('click', downloadPdf);
@@ -96,7 +109,7 @@
   // Words are split on new lines, commas, 、 and spaces; in "character" mode
   // every Chinese character becomes its own item.
   function parseItems(text, unit) {
-    var words = text.split(/[\s,，、;；。.!！?？]+/).map(function (s) {
+    var words = T(text).split(/[\s,，、;；。.!！?？]+/).map(function (s) {
       return Array.from(s).filter(function (ch) { return CJK.test(ch); }).join('');
     }).filter(Boolean);
     if (unit !== 'char') return words;
@@ -115,7 +128,7 @@
     return {
       unit: el.unit.value,
       per: parseInt(el.per.value, 10) || 1,
-      font: FONTS[el.font.value] || FONTS.kai,
+      font: fonts()[el.font.value] || fonts().kai,
       color: COLORS[el.color.value] || COLORS.red,
       background: el.background.value === 'upload'
         ? (bgImage ? { image: bgImage, fade: parseFloat(el.bgFade.value) } : null)
@@ -134,7 +147,16 @@
 
   // ---- Generation -------------------------------------------------------------------
 
+  // Waits for the 简/繁 table once, then draws.
   function generate() {
+    if (!zh) return generateNow();
+    zh.ready().then(function () {
+      zh.suggest(el.words.value);
+      generateNow();
+    }, function () { zh = null; generateNow(); });
+  }
+
+  function generateNow() {
     var opts = readOptions();
     var items = parseItems(el.words.value, opts.unit);
     if (!items.length) {
@@ -495,19 +517,19 @@
   }
 
   function drawHeader(ctx, p, kind, opts) {
-    var title = opts.title || '汉字拼图 · Character Unscrambler';
+    var title = T(opts.title || '汉字拼图 · Character Unscrambler');
     var sub = {
-      sheet: '剪下方格，拼出汉字' + (hasPractice(kind, opts) ? '，再写一写' : '') + ' · Cut out the squares, rebuild the character' + (hasPractice(kind, opts) ? ', then practise writing it.' : '.'),
-      board: '把剪下的方格贴在对应的位置' + (hasPractice(kind, opts) ? '，再写一写' : '') + ' · Glue each square in the right place' + (hasPractice(kind, opts) ? ', then practise writing it.' : '.'),
-      answer: '答案：字母表示练习纸上的方格 · Answer key: letters match the squares on the worksheet.'
+      sheet: T('剪下方格，拼出汉字' + (hasPractice(kind, opts) ? '，再写一写' : '')) + ' · Cut out the squares, rebuild the character' + (hasPractice(kind, opts) ? ', then practise writing it.' : '.'),
+      board: T('把剪下的方格贴在对应的位置' + (hasPractice(kind, opts) ? '，再写一写' : '')) + ' · Glue each square in the right place' + (hasPractice(kind, opts) ? ', then practise writing it.' : '.'),
+      answer: T('答案：字母表示练习纸上的方格') + ' · Answer key: letters match the squares on the worksheet.'
     }[kind];
     var nameW = 560;
-    fitText(ctx, title, MARGIN, MARGIN + 52, PAGE_W - MARGIN * 2 - nameW, 56, '800', LATIN + ', ' + FONTS.sans, '#194f45');
-    fitText(ctx, sub, MARGIN, MARGIN + 104, PAGE_W - MARGIN * 2, 28, '500', LATIN + ', ' + FONTS.sans, '#5d7168');
+    fitText(ctx, title, MARGIN, MARGIN + 52, PAGE_W - MARGIN * 2 - nameW, 56, '800', LATIN + ', ' + fonts().sans, '#194f45');
+    fitText(ctx, sub, MARGIN, MARGIN + 104, PAGE_W - MARGIN * 2, 28, '500', LATIN + ', ' + fonts().sans, '#5d7168');
     ctx.textAlign = 'right';
     ctx.fillStyle = '#193d38';
-    ctx.font = '700 30px ' + LATIN + ', ' + FONTS.sans;
-    ctx.fillText(kind === 'answer' ? 'Teacher copy · 教师用' : '姓名 Name: _______________', PAGE_W - MARGIN, MARGIN + 52);
+    ctx.font = '700 30px ' + LATIN + ', ' + fonts().sans;
+    ctx.fillText(kind === 'answer' ? 'Teacher copy · ' + T('教师用') : T('姓名') + ' Name: _______________', PAGE_W - MARGIN, MARGIN + 52);
     ctx.textAlign = 'left';
   }
 

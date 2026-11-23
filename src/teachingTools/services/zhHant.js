@@ -11,7 +11,7 @@ var Zh = require('../public/shared/zh-script');
 var BLOCKS = /<script\b[\s\S]*?<\/script\s*>|<style\b[\s\S]*?<\/style\s*>|<textarea\b[\s\S]*?<\/textarea\s*>|<!--[\s\S]*?-->|<[^>]*>/gi;
 var TEXT_ATTRS = /(\s(?:title|alt|placeholder|aria-label|label|content)\s*=\s*)("[^"]*"|'[^']*')/gi;
 var HAN = /[㐀-鿿豈-﫿]/;
-var UI_SCRIPTS = '<script src="/shared/zh-script.js?v=4" defer></script><script src="/shared/zh-ui.js?v=1" defer></script>';
+var UI_SCRIPTS = '<script src="/shared/zh-script.js?v=4" defer></script><script src="/shared/zh-ui.js?v=2" defer></script>';
 
 function convertText(text) {
   return HAN.test(text) ? Zh.toTraditional(text) : text;
@@ -44,12 +44,13 @@ function convertHtml(html) {
 
 // Wraps res.render for this request. Renders that pass their own callback
 // (partials, emails) are left as they are.
+// The script is read when the page renders, so a route may still set
+// res.locals.zhScript (student game links follow the teacher's choice).
 function middleware(req, res, next) {
-  if (res.locals.zhScript !== 'hant') return next();
   var render = res.render;
   res.render = function (view, options, callback) {
     if (typeof options === 'function') { callback = options; options = undefined; }
-    if (callback) return render.call(this, view, options, callback);
+    if (callback || res.locals.zhScript !== 'hant') return render.call(this, view, options, callback);
     var self = this;
     return render.call(this, view, options, function (err, html) {
       if (err) return req.next(err);

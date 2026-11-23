@@ -401,7 +401,7 @@
         setShapeText(shape, data.title);
         setShapeFontSize(shape, 28);
       } else if (original === '四季词语迷宫：参考答案') {
-        setShapeText(shape, data.title + (document.documentElement.lang === 'zh' ? '：答案' : ' — Key'));
+        setShapeText(shape, data.title + (/^zh/i.test(document.documentElement.lang) ? '：答案' : ' — Key'));
         setShapeFontSize(shape, 30);
       } else if (original.indexOf('从开始出发') === 0) {
         setShapeText(shape, 'Start at the beginning, choose each correct answer, and follow the path to the finish.');
