@@ -59,6 +59,19 @@
         .tool-search input { box-sizing: border-box; }
         .tool-empty-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .tool-empty-actions[hidden] { display: none; }
+        .quick-start { box-sizing: border-box; display: flex; align-items: center; gap: 24px; max-width: 1200px; margin: 40px auto 0; padding: 22px 28px; border: 2px solid #cbdac2; border-radius: 16px; background: #fffdf7; }
+        .quick-start[hidden] { display: none; }
+        .quick-start-text { flex: 1; }
+        .quick-start-kicker { margin: 0; color: #bf7f35; font-size: .8rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+        .quick-start h2 { margin: 2px 0 10px; color: #194f45; }
+        .quick-start-steps { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 0; list-style: none; color: #34463f; }
+        .quick-start-steps span { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-right: 7px; border-radius: 50%; background: #356e57; color: #fff; font-size: .8rem; font-weight: 800; }
+        .quick-start-btn { flex-shrink: 0; padding: 12px 22px; font-weight: 700; }
+        @media (max-width: 768px) {
+            .quick-start { flex-direction: column; align-items: stretch; margin: 32px 16px 0; padding: 18px; }
+            .quick-start-steps { flex-direction: column; }
+            .quick-start-btn { text-align: center; }
+        }
         .tool-card[hidden] {
             display: none;
         }
@@ -209,6 +222,19 @@
         </div>
     </section>
 
+    <section class="quick-start" id="quickStart" aria-labelledby="quick-start-heading">
+        <div class="quick-start-text">
+            <p class="quick-start-kicker"><%= t('teachingToolsIndex.quickStart.kicker') %></p>
+            <h2 id="quick-start-heading"><%= t('teachingToolsIndex.quickStart.heading') %></h2>
+            <ol class="quick-start-steps">
+                <li><span>1</span><%= t('teachingToolsIndex.quickStart.step1') %></li>
+                <li><span>2</span><%= t('teachingToolsIndex.quickStart.step2') %></li>
+                <li><span>3</span><%= t('teachingToolsIndex.quickStart.step3') %></li>
+            </ol>
+        </div>
+        <a class="btn quick-start-btn" href="/teaching-tools/vocab-games"><%= t('teachingToolsIndex.quickStart.action') %> →</a>
+    </section>
+
     <% var categoryNames = new Map();
        toolSections.forEach(function(section) {
            if (section.key === 'coming-soon') return;
@@ -306,6 +332,7 @@
                 });
                 var matches = query ? document.querySelectorAll('.tool-card:not([hidden])').length : seen.size;
                 document.querySelector('.tool-sections').classList.toggle('is-filtering', Boolean(query));
+                document.getElementById('quickStart').hidden = Boolean(query);
 
                 emptyActions.hidden = matches !== 0;
                 clearSearch.hidden = !query;

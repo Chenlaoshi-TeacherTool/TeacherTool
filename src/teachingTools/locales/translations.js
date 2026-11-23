@@ -492,6 +492,7 @@ module.exports = {
       jumpLabel: 'Jump to a group',
       showAll: 'Show all {count}',
       showFewer: 'Show fewer',
+      quickStart: { kicker: 'Quick start', heading: 'One word list, a whole lesson of games', step1: "Choose this lesson's words", step2: 'Play a game in class', step3: 'Print a practice sheet', action: 'Start with my words' },
       groups: {
         manage: { heading: 'Classroom Management', desc: 'Make groups, pick names, watch the noise level, track points, and set up the room.' },
         'classroom-games': { heading: 'Classroom Games', desc: 'Review, warm up, or play together in class.' },
@@ -2024,6 +2025,7 @@ module.exports = {
       jumpLabel: '跳到分组',
       showAll: '显示全部 {count} 个',
       showFewer: '收起',
+      quickStart: { kicker: '快捷开始', heading: '一套词，整节课的游戏和练习', step1: '选择本课字词', step2: '开始课堂游戏', step3: '打印练习纸', action: '用我的词开始' },
       groups: {
         manage: { heading: '课堂管理', desc: '分组、抽人、控制音量、积分和教室布置。' },
         'classroom-games': { heading: '课堂游戏', desc: '适合全班的复习竞赛、投影热身和纸上游戏。' },
