@@ -45,5 +45,8 @@
   "/teaching-tools/pixel-art": "/images/tool-previews/pixel-art.webp",
   "/teaching-tools/witchs-poison": "/images/tool-previews/witchs-poison.webp",
   "/teaching-tools/book-generator": "/images/tool-previews/book-generator.webp",
-  "/teaching-tools/measure-words": "/images/tool-previews/measure-words.webp"
+  "/teaching-tools/measure-words": "/images/tool-previews/measure-words.webp",
+  "/teaching-tools/spin-wheel": "/images/tool-previews/spin-wheel.webp",
+  "/teaching-tools/dice-story": "/images/tool-previews/dice-story.webp",
+  "/teaching-tools/spin-wheel?mode=hanzi": "/images/tool-previews/hanzi-wheel.webp"
 }
