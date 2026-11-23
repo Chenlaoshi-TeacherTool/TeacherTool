@@ -20,6 +20,7 @@ register(require('./games/measureWordsGame'));
 register(require('./games/hanziWordChoiceGame'));
 register(require('./games/vocabularyGachaGame'));
 register(require('./games/diceStoryGame'));
+register(require('./games/spinWheelGame'));
 register(require('./games/pixelArtGame'));
 
 module.exports = { register: register, get: get };

@@ -217,3 +217,9 @@ textarea.sw-input { resize: vertical; }
 .sw-t-part { font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", serif; fill: #1b1b1b; }
 .sw-result-parts { color: var(--sw-muted); font-size: clamp(20px, 3.4vh, 38px); font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", serif; }
 .sw-result-char { font-size: clamp(64px, 14vh, 160px); font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", serif; font-weight: 700; line-height: 1.15; }
+
+/* Template save button next to the Step 1 heading */
+.sw-builder-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.sw-builder-top .sw-btn-ghost { padding: 7px 14px; }
+/* 田字格 / tracing */
+.sw-t-trace { font-family: "KaiTi", "STKaiti", "Kaiti SC", "楷体", serif; fill: #c9c9c9; }

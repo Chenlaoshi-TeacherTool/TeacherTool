@@ -8,7 +8,8 @@
   <%- include('../partials/seo', { pageDescription: 'Printable spin wheel craft for Chinese class. Type a sentence pattern and words, add emoji pictures and pinyin, print two circles to cut out and pin together, or spin the wheel on the projector.' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/spin-wheel/spin-wheel.css?v=3">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
+  <link rel="stylesheet" href="/low-prep/spin-wheel/spin-wheel.css?v=4">
   <style id="swPageSize"></style>
 </head>
 <body class="sw-page">
@@ -22,8 +23,13 @@
 
     <div class="sw-layout">
       <section class="sw-panel sw-builder" aria-labelledby="swContentHeading">
-        <p class="sw-kicker"><%= L('Step 1', '第一步') %></p>
-        <h2 id="swContentHeading"><%= L('Content', '输入内容') %></h2>
+        <div class="sw-builder-top">
+          <div>
+            <p class="sw-kicker"><%= L('Step 1', '第一步') %></p>
+            <h2 id="swContentHeading"><%= L('Content', '输入内容') %></h2>
+          </div>
+          <button id="swSaveTemplate" class="sw-btn sw-btn-ghost" type="button" disabled>💾 <%= L('Save template', '保存模板') %></button>
+        </div>
 
         <div class="sw-options sw-mode" role="radiogroup" aria-label="<%= L('Wheel type', '转盘类型') %>">
           <label><input type="radio" name="swMode" value="word" checked> <span>🎡 <%= L('Word wheel', '词语转盘') %></span></label>
@@ -98,6 +104,17 @@
             </select>
           </div>
           <p id="swTrStatus" class="sw-hint" role="status" aria-live="polite"></p>
+        </fieldset>
+
+        <fieldset class="sw-field">
+          <legend><%= L('Characters', '汉字') %></legend>
+          <div class="sw-options">
+            <label><input type="radio" name="swWrite" value="zh" checked> <span><%= L('Show characters', '显示汉字') %></span></label>
+            <label><input type="radio" name="swWrite" value="grid"> <span><%= L('田字格 (students write)', '田字格（学生自己写）') %></span></label>
+            <label><input type="radio" name="swWrite" value="trace"> <span><%= L('Trace (grey characters)', '描红（浅灰色描字）') %></span></label>
+          </div>
+          <p class="sw-hint"><%= L('Word wheel: the words become writing boxes. Character wheel: the character in the word list becomes a box.', '词语转盘：转盘上的词变成格子。汉字转盘：组词表里的字变成格子。') %></p>
+          <p id="swWriteHint" class="sw-hint sw-tr-error" role="status" aria-live="polite"></p>
         </fieldset>
 
         <fieldset class="sw-field">
@@ -180,7 +197,8 @@
   <script src="/shared/wordlist-core.js?v=cedict-1"></script>
   <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
-  <script src="/low-prep/spin-wheel/spin-wheel.js?v=3" defer></script>
+  <script src="/shared/game-template.js?v=4" defer></script>
+  <script src="/low-prep/spin-wheel/spin-wheel.js?v=4" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

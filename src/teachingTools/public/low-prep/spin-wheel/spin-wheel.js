@@ -32,6 +32,9 @@
   // Translation languages. English comes from CC-CEDICT in the browser; the others are
   // translated on the server (Azure Translator, POST /api/translate-words) and cached here.
   var LANGS = ['en', 'th', 'vi', 'ru', 'es', 'fr'];
+  // How characters are printed: as text, as empty 田字格 to write in, or grey in 田字格 to trace.
+  var WRITE_STYLES = ['zh', 'grid', 'trace'];
+  var SMALL_BOX_MM = 9;  // smaller writing boxes are hard for children to write in
   var TRANSLATE_MAX_LENGTH = 40;  // the server skips longer text
 
   // Character wheel: where the changing radical sits, as an angle (clockwise from 12 o'clock).
@@ -52,6 +55,8 @@
   var sectors = DEFAULT_SECTORS;
   var sectorsTouched = false;  // once the teacher sets the count, stop following the word count
   var picOff = {};             // zh -> true when the teacher turned that word's picture off
+  var picPick = {};            // zh -> OpenMoji hexcode the teacher chose, kept with saved templates
+  var minBoxMm = Infinity;     // smallest writing box on the printed sheets, for the "too small" hint
   var items = [];
   var sentences = [];
   var prepareToken = 0;
@@ -106,7 +111,8 @@
       lang: LANGS.indexOf($('swLang').value) !== -1 ? $('swLang').value : 'en',
       color: radioValue('swColor') || 'color',
       layout: radioValue('swLayout') || 'same',
-      paper: PAPER[$('swPaper').value] ? $('swPaper').value : 'a4'
+      paper: PAPER[$('swPaper').value] ? $('swPaper').value : 'a4',
+      write: WRITE_STYLES.indexOf(radioValue('swWrite')) !== -1 ? radioValue('swWrite') : 'zh'
     };
   }
 
@@ -119,6 +125,7 @@
       data.sectors = sectors;
       data.sectorsTouched = sectorsTouched;
       data.picOff = picOff;
+      data.picPick = picPick;
       data.remove = $('swRemove').checked;
       data.trCache = trCache;
       localStorage.setItem(STORE_KEY, JSON.stringify(data));
@@ -129,7 +136,29 @@
     var data = null;
     try { data = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (error) { data = null; }
     if (!data || typeof data !== 'object') return;
+    applyData(data);
     if (typeof data.title === 'string') $('swTitle').value = data.title;
+    if (typeof data.remove === 'boolean') $('swRemove').checked = data.remove;
+    if (data.trCache && typeof data.trCache === 'object') trCache = data.trCache;
+  }
+
+  // What a saved template holds (see services/games/spinWheelGame.js). `title` is the
+  // template's name in the teacher's library; the wheel's own title is `heading`.
+  function templateData() {
+    var s = readSettings();
+    return {
+      title: s.title || (s.mode === 'hanzi' ? L('Character wheel', '汉字转盘') : L('Spin wheel', '转盘手工')),
+      heading: s.title, mode: s.mode, fixed: s.fixed, side: s.side,
+      sentences: $('swSentences').value, words: $('swWords').value, parts: $('swParts').value,
+      sectors: sectors, sectorsTouched: sectorsTouched, picOff: picOff, picPick: picPick,
+      options: { emoji: s.emoji, pinyin: s.pinyin, english: s.english, lang: s.lang, color: s.color, layout: s.layout, paper: s.paper, write: s.write }
+    };
+  }
+
+  // Puts a draft (flat settings) or a template (settings under `options`) into the form.
+  function applyData(data) {
+    var o = data.options && typeof data.options === 'object' ? data.options : data;
+    if (typeof data.heading === 'string') $('swTitle').value = data.heading;
     if (typeof data.sentences === 'string') $('swSentences').value = data.sentences;
     if (typeof data.words === 'string') $('swWords').value = data.words;
     if (typeof data.parts === 'string') $('swParts').value = data.parts;
@@ -138,17 +167,17 @@
     if (data.mode) setRadio('swMode', data.mode);
     ['emoji', 'pinyin', 'english'].forEach(function (key) {
       var id = 'sw' + key.charAt(0).toUpperCase() + key.slice(1);
-      if (typeof data[key] === 'boolean') $(id).checked = data[key];
+      if (typeof o[key] === 'boolean') $(id).checked = o[key];
     });
-    if (typeof data.remove === 'boolean') $('swRemove').checked = data.remove;
-    if (data.color) setRadio('swColor', data.color);
-    if (data.layout) setRadio('swLayout', data.layout);
-    if (data.paper && PAPER[data.paper]) $('swPaper').value = data.paper;
-    if (data.lang && LANGS.indexOf(data.lang) !== -1) $('swLang').value = data.lang;
-    if (data.trCache && typeof data.trCache === 'object') trCache = data.trCache;
+    if (o.color) setRadio('swColor', o.color);
+    if (o.layout) setRadio('swLayout', o.layout);
+    if (o.write && WRITE_STYLES.indexOf(o.write) !== -1) setRadio('swWrite', o.write);
+    if (o.paper && PAPER[o.paper]) $('swPaper').value = o.paper;
+    if (o.lang && LANGS.indexOf(o.lang) !== -1) $('swLang').value = o.lang;
     if (data.sectors) sectors = clampSectors(Number(data.sectors) || DEFAULT_SECTORS);
     sectorsTouched = !!data.sectorsTouched;
-    if (data.picOff && typeof data.picOff === 'object') picOff = data.picOff;
+    picOff = data.picOff && typeof data.picOff === 'object' ? data.picOff : {};
+    picPick = data.picPick && typeof data.picPick === 'object' ? data.picPick : {};
   }
 
   // ---------- content ----------
@@ -248,7 +277,15 @@
         if (!item.en && core) item.en = core.toEnglish(item.zh) || '';
       });
       return emojiCore.matchAll(list, { translate: true });
-    }).then(function () { return full; }, function () { return full; });
+    }).then(applyPicks, applyPicks).then(function () { return full; });
+
+    // Pictures chosen by hand (also from a saved template opened on another computer) win.
+    function applyPicks() {
+      list.forEach(function (item) {
+        var hex = picPick[item.zh];
+        if (hex && !(item.openmoji && item.openmoji.hexcode === hex)) item.openmoji = { hexcode: hex };
+      });
+    }
   }
 
   function hasPic(item) {
@@ -376,34 +413,66 @@
 
   function pySizeFor(zhSize) { return zhSize * 0.42; }
 
-  function measureRuby(tokens, zhSize, showPy) {
+  // Tokens marked `box` are drawn as a 田字格 instead of the character when `write` is
+  // 'grid' (empty, students write it) or 'trace' (the character in light grey to trace).
+  function boxSizeFor(zhSize) { return zhSize * 1.12; }
+  function boxed(t, write) { return t.box && (write === 'grid' || write === 'trace'); }
+
+  function measureRuby(tokens, zhSize, showPy, write) {
     var pySize = pySizeFor(zhSize);
+    var box = boxSizeFor(zhSize);
     var hasPy = showPy && tokens.some(function (t) { return t.py; });
+    var hasBox = tokens.some(function (t) { return boxed(t, write); });
     var widths = tokens.map(function (t) {
-      var w = textWidth(t.zh, FONT_ZH, zhSize);
+      var w = boxed(t, write) ? box : textWidth(t.zh, FONT_ZH, zhSize);
       if (hasPy && t.py) w = Math.max(w, textWidth(t.py, FONT_PY, pySize));
       return w + zhSize * 0.06;
     });
     var total = widths.reduce(function (a, b) { return a + b; }, 0);
-    return { w: total, h: zhSize * 1.02 + (hasPy ? pySize * 1.25 : 0), widths: widths, hasPy: hasPy };
+    var zhH = hasBox ? box : zhSize * 1.02;
+    return { w: total, h: zhH + (hasPy ? pySize * 1.25 : 0), zhH: zhH, widths: widths, hasPy: hasPy, hasBox: hasBox };
+  }
+
+  function writeBoxSvg(t, mid, top, zhSize, write) {
+    var box = boxSizeFor(zhSize);
+    var x = mid - box / 2;
+    var cy = top + box / 2;
+    var dash = ' stroke-dasharray="' + num(box * 0.06) + ' ' + num(box * 0.045) + '"';
+    var thin = ' stroke="#9a9a9a" stroke-width="' + num(box * 0.014) + '"' + dash;
+    minBoxMm = Math.min(minBoxMm, box);
+    var out = '<rect class="sw-box" x="' + num(x) + '" y="' + num(top) + '" width="' + num(box) + '" height="' + num(box) + '" fill="#fff" stroke="#3d3d3d" stroke-width="' + num(box * 0.028) + '"/>' +
+      '<line x1="' + num(x) + '" y1="' + num(cy) + '" x2="' + num(x + box) + '" y2="' + num(cy) + '"' + thin + '/>' +
+      '<line x1="' + num(mid) + '" y1="' + num(top) + '" x2="' + num(mid) + '" y2="' + num(top + box) + '"' + thin + '/>';
+    if (write === 'trace') {
+      out += '<text class="sw-t-trace" x="' + num(mid) + '" y="' + num(cy) + '" font-size="' + num(zhSize * 0.98) + '" text-anchor="middle" dominant-baseline="central">' + esc(t.zh) + '</text>';
+    }
+    return out;
   }
 
   // SVG for a pinyin-over-characters line whose top edge is at y = top, centred on x = cx.
-  function rubySvg(tokens, cx, top, zhSize, showPy) {
-    var m = measureRuby(tokens, zhSize, showPy);
+  function rubySvg(tokens, cx, top, zhSize, showPy, write) {
+    var m = measureRuby(tokens, zhSize, showPy, write);
     var pySize = pySizeFor(zhSize);
     var x = cx - m.w / 2;
-    var zhY = top + (m.hasPy ? pySize * 1.25 : 0) + zhSize * 0.86;
+    var zhTop = top + (m.hasPy ? pySize * 1.25 : 0);
+    var zhY = zhTop + (m.zhH - zhSize * 1.02) / 2 + zhSize * 0.86;
     var out = '';
     tokens.forEach(function (t, i) {
       var mid = x + m.widths[i] / 2;
       if (m.hasPy && t.py) {
         out += '<text class="sw-t-py" x="' + num(mid) + '" y="' + num(top + pySize * 0.95) + '" font-size="' + num(pySize) + '" text-anchor="middle">' + esc(t.py) + '</text>';
       }
-      out += '<text class="sw-t-zh" x="' + num(mid) + '" y="' + num(zhY) + '" font-size="' + num(zhSize) + '" text-anchor="middle">' + esc(t.zh) + '</text>';
+      if (boxed(t, write)) out += writeBoxSvg(t, mid, zhTop, zhSize, write);
+      else out += '<text class="sw-t-zh" x="' + num(mid) + '" y="' + num(zhY) + '" font-size="' + num(zhSize) + '" text-anchor="middle">' + esc(t.zh) + '</text>';
       x += m.widths[i];
     });
     return out;
+  }
+
+  // Marks every Chinese character, or only `ch`, to be written in a 田字格.
+  function markBoxes(tokens, ch) {
+    tokens.forEach(function (t) { if (HAN.test(t.zh) && (!ch || t.zh === ch)) t.box = true; });
+    return tokens;
   }
 
   // ---------- the bottom circle (words) ----------
@@ -423,14 +492,14 @@
     var rOut = R * 0.94;
     var rIn = R * 0.36;
     var edge = R * 0.97;
-    var tokens = rubyTokens(item.zh, item.override);
+    var tokens = markBoxes(rubyTokens(item.zh, item.override));
     var pic = opts.emoji && hasPic(item);
     var en = wordTranslation(item, opts);
     var last = null;
     for (var s = 1; s > 0.12; s *= 0.92) {
       var zhSize = R * 0.17 * s;
       var gap = R * 0.025 * s;
-      var ruby = measureRuby(tokens, zhSize, opts.pinyin);
+      var ruby = measureRuby(tokens, zhSize, opts.pinyin, opts.write);
       var lines = [];
       if (pic) lines.push({ kind: 'pic', h: R * 0.25 * s, w: R * 0.25 * s });
       lines.push({ kind: 'word', h: ruby.h, w: ruby.w });
@@ -478,7 +547,7 @@
       if (line.kind === 'pic') {
         out += '<image href="' + esc(emojiCore.svgUrl(item.openmoji.hexcode)) + '" x="' + num(-line.w / 2) + '" y="' + num(top) + '" width="' + num(line.w) + '" height="' + num(line.h) + '"/>';
       } else if (line.kind === 'word') {
-        out += rubySvg(layout.tokens, 0, top, layout.zhSize, opts.pinyin);
+        out += rubySvg(layout.tokens, 0, top, layout.zhSize, opts.pinyin, opts.write);
       } else {
         out += '<text class="sw-t-en" x="0" y="' + num(top + line.size * 0.95) + '" font-size="' + num(line.size) + '" text-anchor="middle">' + esc(line.text) + '</text>';
       }
@@ -664,8 +733,10 @@
     rows.forEach(function (row) {
       if (!row) return;
       var text = row.ch ? row.ch + (row.word ? ' — ' + row.word : '') : row.part + ' — ？';
+      // In 田字格 mode the character is written by the student, also where it appears in the word.
       var tokens = rubyTokens(text, '');
-      var m = measureRuby(tokens, zhSize, opts.pinyin);
+      if (row.ch) markBoxes(tokens, row.ch);
+      var m = measureRuby(tokens, zhSize, opts.pinyin, opts.write);
       var pic = opts.emoji && row.zh && hasPic(row);
       var picSize = zhSize * 1.15;
       lines.push({
@@ -733,7 +804,7 @@
       if (line.kind === 'title') {
         out += '<text class="sw-t-title" x="' + num(placed.left + placed.maxW / 2) + '" y="' + num(line.y + line.size * 0.95) + '" font-size="' + num(line.size) + '" text-anchor="middle">' + esc(opts.title) + '</text>';
       } else if (line.kind === 'row') {
-        out += rubySvg(line.tokens, placed.left + line.rubyW / 2, line.y + (line.h - line.rubyH) / 2, line.size, opts.pinyin);
+        out += rubySvg(line.tokens, placed.left + line.rubyW / 2, line.y + (line.h - line.rubyH) / 2, line.size, opts.pinyin, opts.write);
         if (line.pic) {
           out += '<image href="' + esc(emojiCore.svgUrl(line.pic.openmoji.hexcode)) + '" x="' + num(placed.left + line.rubyW + line.gap) + '" y="' + num(line.y + (line.h - line.picSize) / 2) + '" width="' + num(line.picSize) + '" height="' + num(line.picSize) + '"/>';
         }
@@ -771,6 +842,7 @@
 
   function renderSheets() {
     var opts = readSettings();
+    minBoxMm = Infinity;
     var paper = PAPER[opts.paper];
     var list = wheelItems();
     var labelTop = L('Top circle (cut out the window)', '上面的圆（剪掉窗口）');
@@ -791,7 +863,22 @@
     }
     $('swSheets').innerHTML = html;
     $('swPageSize').textContent = '@media print { @page { size: ' + paper.css + ' ' + (opts.layout === 'same' ? 'landscape' : 'portrait') + '; margin: 0; } }';
+    updateWriteHint(opts);
     fitPreview();
+  }
+
+  function updateWriteHint(opts) {
+    var text = '';
+    if (opts.write !== 'zh') {
+      if (minBoxMm < SMALL_BOX_MM) {
+        text = L('The writing boxes are small (' + Math.round(minBoxMm) + ' mm). Use fewer sections, shorter words, or print each circle on its own page.',
+          '格子比较小（约 ' + Math.round(minBoxMm) + ' 毫米），不太好写。可以减少格数、用短一点的词，或者选“每个圆单独一页”。');
+      } else if (opts.mode === 'word' && opts.write === 'grid' && !opts.pinyin && !opts.emoji && !opts.english) {
+        text = L('With pinyin, pictures and translation all off, students will not know what to write.',
+          '拼音、图片和翻译都关掉了，学生会不知道要写什么字。');
+      }
+    }
+    $('swWriteHint').textContent = text;
   }
 
   function fitPreview() {
@@ -962,6 +1049,7 @@
     var zhWord = pickerItem.zh;
     var item = items.filter(function (it) { return it.zh === zhWord; })[0] || pickerItem;
     item.openmoji = entry;
+    picPick[item.zh] = entry.hexcode;
     delete picOff[item.zh];
     emojiCore.remember(item, entry.emoji);
     saveDraft();
@@ -1028,6 +1116,7 @@
   function spinOpts() {
     var opts = readSettings();
     opts.color = 'color';
+    opts.write = 'zh';  // the projector shows the characters; boxes are for paper
     return opts;
   }
 
@@ -1191,7 +1280,7 @@
         saveDraft(); renderPreviewChips(); renderSheets(); ensureTranslations();
       });
     });
-    Array.prototype.forEach.call(document.querySelectorAll('input[name="swColor"], input[name="swLayout"]'), function (input) {
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="swColor"], input[name="swLayout"], input[name="swWrite"]'), function (input) {
       input.addEventListener('change', function () { saveDraft(); renderSheets(); });
     });
     Array.prototype.forEach.call(document.querySelectorAll('input[name="swMode"], input[name="swSide"]'), function (input) {
@@ -1248,6 +1337,36 @@
 
     showModeInputs();
     refreshAll();
+    bindTemplate();
+  }
+
+  // ---------- template saving (members: account, others: this browser) ----------
+  function bindTemplate() {
+    if (!window.TeacherGameTemplate) return;
+    $('swSaveTemplate').disabled = false;
+    window.TeacherGameTemplate.bind({
+      button: $('swSaveTemplate'),
+      gameType: 'spin-wheel',
+      version: 1,
+      getData: function () {
+        var data = templateData();
+        if (!(data.mode === 'hanzi' ? data.parts : data.words).trim()) {
+          throw new Error(data.mode === 'hanzi' ? L('Type some radicals before saving.', '请先输入偏旁再保存。') : L('Type some words before saving.', '请先输入词语再保存。'));
+        }
+        return data;
+      },
+      restore: function (data) {
+        if (!data || typeof data !== 'object') return;
+        applyData(data);
+        showModeInputs();
+        try {
+          var url = new URL(location.href);
+          url.searchParams.set('mode', readSettings().mode);
+          history.replaceState(null, '', url);
+        } catch (error) { /* the address just keeps its old mode */ }
+        refreshAll();
+      }
+    });
   }
 
   init();
