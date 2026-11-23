@@ -93,6 +93,7 @@
             </fieldset>
           </div>
           <p id="display-status" class="display-status" aria-live="polite"></p>
+          <div id="zh-script-slot" class="zh-script-slot"></div>
         </section>
 
         <section class="panel style-panel">
@@ -170,13 +171,15 @@
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script>window.FLASH_CARD_LANG = '<%= isZh ? 'zh' : 'en' %>';</script>
-  <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=3"></script>
+  <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/emoji-core.js"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/library-picker.js?v=2"></script>
   <script src="/shared/deck-export.js"></script>
   <script src="/low-prep/flash-card-generator/flash-card-core.js"></script>
-  <script src="/low-prep/flash-card-generator/flash-card-generator.js" defer></script>
+  <script src="/low-prep/flash-card-generator/flash-card-generator.js?v=zh1" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

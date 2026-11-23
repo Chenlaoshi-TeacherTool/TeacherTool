@@ -96,6 +96,7 @@
               <label class="emoji-mode"><input type="checkbox" name="displayField" value="emoji"> <%= t('bingoGenerator.modeEmoji') %> <span class="openmoji-badge">OpenMoji</span></label>
             </div>
             <p class="field-help display-help"><%= t('bingoGenerator.displayHelp') %></p>
+            <div id="zh-script-slot" class="zh-script-slot"></div>
             <p class="openmoji-attribution"><%= t('bingoGenerator.openMojiCreditPrefix') %><a href="https://openmoji.org/" target="_blank" rel="noopener noreferrer">OpenMoji</a><%= t('bingoGenerator.openMojiCreditSuffix') %><a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>.</p>
           </section>
 
@@ -129,12 +130,14 @@
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
-  <script src="/shared/wordlist-core.js"></script>
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=3"></script>
+  <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/emoji-core.js"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/library-picker.js?v=2"></script>
   <script src="/vendor/docx.iife.js" defer></script>
-  <script src="/low-prep/bingo-generator/bingo-generator.js?v=emoji5" defer></script>
+  <script src="/low-prep/bingo-generator/bingo-generator.js?v=zh1" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

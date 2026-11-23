@@ -135,6 +135,8 @@
         <span class="clue-text" id="clueText">Currently keeping 36 hint cells</span>
       </div>
 
+      <div id="sudokuZhSlot" class="zh-content-slot"></div>
+
       <div class="actions">
         <button class="btn btn-secondary" id="answerButton" type="button"><span aria-hidden="true">✓</span> Show Answer</button>
         <button class="btn btn-secondary" id="generateButton" type="button"><span aria-hidden="true">↻</span> Regenerate</button>
@@ -186,12 +188,19 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- OpenMoji artwork (CC BY-SA 4.0), loaded from the OpenMoji package. -->
-  <script src="/shared/wordlist-core.js?v=cedict-1"></script>
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=3"></script>
+  <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
   <script src="/shared/library-picker.js"></script>
   <script src="/shared/game-sharing.js?v=2"></script>
   <script src="/shared/game-template.js?v=4"></script>
   <script src="./word-sudoku-widget.js?v=template1"></script>
+  <script>
+    // 简 / 繁 for the printed sheet: words stay as typed, the sheet is converted (zh-content.js).
+    window.ChenZhContent && ChenZhContent.create({ mount: '#sudokuZhSlot', label: 'Characters 用字' })
+      .region('#worksheet', { convert: true }).region('#screenLegend', { convert: true });
+  </script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

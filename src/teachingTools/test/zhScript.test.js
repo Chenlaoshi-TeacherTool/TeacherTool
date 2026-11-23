@@ -76,6 +76,23 @@ test('convert follows the script flag', () => {
   assert.equal(Zh.convert('头发'), '头发');
 });
 
+test('toScript gives content in the chosen script, keeping typed 繁 forms', () => {
+  assert.equal(Zh.toScript('我的头发', 't'), '我的頭髮');
+  assert.equal(Zh.toScript('我的頭髮', 's'), '我的头发');
+  assert.equal(Zh.toScript('我的頭髮', 't'), '我的頭髮');
+  assert.equal(Zh.toScript('裡面的头发', 't'), '裡面的頭髮');
+  assert.equal(Zh.toScript('裡面', 's'), '里面');
+  assert.equal(Zh.toScript('', 't'), '');
+});
+
+test('looksTraditional spots text typed in 繁体', () => {
+  assert.equal(Zh.looksTraditional('我們的學校'), true);
+  assert.equal(Zh.looksTraditional('我们的学校'), false);
+  assert.equal(Zh.looksTraditional('大小人'), false);
+  assert.equal(Zh.looksTraditional('Hello'), false);
+  assert.equal(Zh.looksTraditional(''), false);
+});
+
 // Every Chinese string on the site keeps its length, so pinyin stays aligned.
 test('site text keeps its length after conversion', () => {
   const root = path.join(__dirname, '..');

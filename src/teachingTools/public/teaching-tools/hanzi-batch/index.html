@@ -5,7 +5,7 @@
 <link rel="canonical" href="https://clsteachingtools.com/teaching-tools/hanzi-batch/index.html">
 <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/stylesheets/site-theme.css">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 <script src="/javascripts/clarity.js"></script></head>
 <body class="hanzi-page">
 <header class="header hanzi-hero">
@@ -16,7 +16,7 @@
   <div class="hanzi-hero-tags"><span>动态笔顺预览</span><span>批量打包下载</span><span>文件在本机生成</span></div>
 </header>
 <main id="hanziApp"><aside class="panel inputpanel"><div class="eyebrow">第一步 · 添加汉字</div><h2 class="inputtitle">准备本课汉字</h2><p class="muted">粘贴文字，或从 Word Bank 加入。</p>
-<label for="input">输入或粘贴汉字</label><textarea id="input" rows="3" placeholder="例如：你好，大家好！">你好大家</textarea><button id="add" class="primary wide">生成汉字列表</button><p class="hint">只保留汉字，自动去重，按首次出现排序。</p>
+<label for="input">输入或粘贴汉字</label><textarea id="input" rows="3" placeholder="例如：你好，大家好！">你好大家</textarea><div id="scriptSlot" class="scriptslot"></div><button id="add" class="primary wide">生成汉字列表</button><p class="hint">只保留汉字，自动去重，按首次出现排序。</p>
 <div class="sectionhead"><h2>待生成汉字 <small id="count">0</small></h2><button id="clear" class="text">清空</button></div><div id="chips" class="chips"></div><p class="hint">点汉字预览 · 勾选后批量导出</p>
 <hr><div class="sectionhead"><h2>Word Bank 词库</h2><button id="wordBankReload" class="text" type="button">刷新</button></div>
 <label for="wordBank">选择词表</label><select id="wordBank" disabled><option value="">正在加载词库…</option></select>
@@ -32,4 +32,4 @@
 <div class="hanzi-related"><span>还需要纸上练习？</span><a href="/teaching-tools/stroke-order-worksheet">汉字笔顺练习纸 →</a><a href="/teaching-tools/word-list-library">词表库 →</a></div>
 <p class="hanzi-attribution">Stroke data from Make Me a Hanzi (Arphic Public License) via Hanzi Writer.</p>
 <footer></footer>
-<script src="vendor/hanzi-writer.min.js"></script><script src="vendor/gif.js"></script><script src="vendor/jszip.min.js"></script><script src="vendor/jspdf.umd.min.js"></script><script type="module" src="app.js?v=3"></script><script src="/javascripts/milk-tea-footer.js"></script></body></html>
+<script src="vendor/hanzi-writer.min.js"></script><script src="vendor/gif.js"></script><script src="vendor/jszip.min.js"></script><script src="vendor/jspdf.umd.min.js"></script><script src="/shared/zh-script.js?v=4"></script><script src="/shared/zh-content.js?v=3"></script><script src="/shared/zh-ui.js?v=1"></script><script type="module" src="app.js?v=4"></script><script src="/javascripts/milk-tea-footer.js"></script></body></html>

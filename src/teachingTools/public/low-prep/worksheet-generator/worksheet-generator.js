@@ -104,6 +104,15 @@
     });
     el.print.addEventListener('click', function () { window.print(); });
 
+    // 简 / 繁 for the printed sheet. Words and sentences stay as typed and are
+    // matched as typed; the finished sheet is converted as a whole (zh-content.js).
+    if (window.ChenZhContent) {
+      var zh = window.ChenZhContent.create({ mount: '#wg-zh-slot', label: '练习单用字 Characters' });
+      zh.region(el.output, { convert: true });
+      // Pinyin for words typed in 繁 is looked up from the simplified form.
+      zh.ready().then(function () { if (typeof render === 'function') render(); }, function () {});
+    }
+
     document.querySelector('.wg-controls').addEventListener('input', scheduleRender);
     document.querySelector('.wg-controls').addEventListener('change', scheduleRender);
 
@@ -292,7 +301,14 @@
     return dictPromise;
   }
 
+  // 繁 → 简 for lookups (same length), when /shared/zh-script.js has its table.
+  function simplified(text) {
+    var Zh = window.ChenZhScript;
+    return Zh && Zh.hasTable() ? Zh.toSimplified(text) : text;
+  }
+
   function lookupPinyin(word) {
+    word = simplified(word);
     if (window.pinyinPro && typeof window.pinyinPro.pinyin === 'function') {
       try { return window.pinyinPro.pinyin(word, { toneType: 'symbol' }) || ''; } catch (e) { /* fall through */ }
     }
@@ -301,7 +317,7 @@
   }
 
   function lookupEnglish(word) {
-    var entry = dict && dict[word];
+    var entry = dict && (dict[word] || dict[simplified(word)]);
     if (!entry) return '';
     var defs = [];
     entry.forEach(function (reading) {
@@ -320,7 +336,7 @@
     var chars = Array.from(text);
     var arr = null;
     if (window.pinyinPro) {
-      try { arr = window.pinyinPro.pinyin(text, { type: 'array', toneType: 'symbol' }); } catch (e) { arr = null; }
+      try { arr = window.pinyinPro.pinyin(simplified(text), { type: 'array', toneType: 'symbol' }); } catch (e) { arr = null; }
     }
     return chars.map(function (ch, i) {
       if (!CJK.test(ch)) return '';

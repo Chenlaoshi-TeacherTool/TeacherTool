@@ -41,6 +41,16 @@
   };
   var updateTimer = null;
 
+  // 简 / 繁 for the cards. The word list keeps what was typed (pinyin, English,
+  // pictures and edits are keyed by it); only the printed Chinese is converted.
+  var zh = window.ChenZhContent ? window.ChenZhContent.create({
+    mount: '#zh-script-slot',
+    label: isZh ? '卡片用字' : 'Card characters',
+    onChange: function () { renderPreview(); }
+  }) : null;
+  if (zh) zh.region(previewGrid);
+  function T(value) { return zh ? zh.text(value) : value; }
+
   function pinyinFor(value) {
     if (Wordlist && typeof Wordlist.toPinyin === 'function') {
       return Wordlist.toPinyin(value, { spaced: true });
@@ -69,6 +79,7 @@
   }
 
   function refreshEntries() {
+    if (zh) zh.suggest(termsInput.value);
     var entries = Core.parseEntries(termsInput.value, pinyinFor, englishFor);
     entries.forEach(function (item) {
       if (Object.prototype.hasOwnProperty.call(state.overrides.py, item.zh)) item.py = state.overrides.py[item.zh];
@@ -282,7 +293,8 @@
 
   function displayValues(item, side) {
     return selectedDisplayTypes(side).map(function (type) {
-      return { type: type, text: String(item[type] || '').trim() || '—' };
+      var text = String(item[type] || '').trim();
+      return { type: type, text: (type === 'zh' ? T(text) : text) || '—' };
     });
   }
 
@@ -301,7 +313,7 @@
 
     if (kaiCoverage) {
       var missing = selectedDisplayTypes(state.side).includes('zh')
-        ? missingKaiCharacters((pages[state.page] || []).map(function (item) { return item.zh; }).join(' '))
+        ? missingKaiCharacters((pages[state.page] || []).map(function (item) { return T(item.zh); }).join(' '))
         : [];
       setKaiFontStatus(missing.length ? kaiMissingMessage(missing) : '');
     }
@@ -653,6 +665,8 @@
   });
 
   refreshEntries();
+  // Once the 简/繁 table is in, typed 繁 words get their pinyin from the simplified form.
+  if (zh) zh.ready().then(refreshEntries, function () {});
   setKaiFontStatus(isZh ? '正在加载楷体…' : 'Loading the Kai font…');
   loadKaiFont().then(renderPreview).catch(function () {
     setKaiFontStatus(isZh ? '楷体加载失败，请刷新页面。' : 'The Kai font failed to load. Refresh the page.');

@@ -6,7 +6,12 @@ import {svg} from './exporters/svg.js';
 import {png} from './exporters/png.js';
 import {breakdown} from './exporters/breakdown.js';
 const $=id=>document.getElementById(id);
-let items=[],current=-1,controller=null,viewToken=0;
+let items=[],current=-1,controller=null,viewToken=0,sources=[];
+// 简 / 繁 for the characters (and so the stroke data). Every text added is kept so a
+// switch can rebuild the list with phrase context (头发 → 頭髮, 发现 → 發現).
+const zh=window.ChenZhContent.create({mount:'#scriptSlot',label:'笔顺字形',onChange:()=>rebuild()});
+zh.region('#chips').region('#char');
+const toScript=text=>zh.text(text);
 const options=()=>({grid:$('grid').value,scheme:$('scheme').value,color:$('color').value,speed:Number($('speed').value),size:Number($('size').value),pdf:$('pdf').checked});
 const status=text=>$('status').textContent=text;
 const player=new Player($('stage'),n=>{const total=items[current]?.data?.strokes.length||0;$('step').textContent=`${n} / ${total} 画`;$('strokeProgress').max=total||1;$('strokeProgress').value=n;});
@@ -28,7 +33,16 @@ async function show(i){
   $('legend').replaceChildren();item.data.strokes.forEach((_,n)=>{const b=document.createElement('button');b.textContent=`第${n+1}笔`;b.style.background=color(n,options());b.onclick=()=>player.step(n+1);$('legend').append(b);});
 }
 async function add(text){
-  const chars=extract(text);for(const char of chars)if(!items.some(x=>x.char===char))items.push({char,data:undefined,selected:false});render();
+  try{await zh.ready();}catch(e){/* no table: characters stay as typed */}
+  sources.push(text);zh.suggest(sources.join('\n'));
+  await load(extract(toScript(text)));
+}
+async function rebuild(){
+  player.stop();viewToken++;current=-1;items=[];$('stage').replaceChildren();$('legend').replaceChildren();
+  await load(extract(toScript(sources.join('\n'))));
+}
+async function load(chars){
+  for(const char of chars)if(!items.some(x=>x.char===char))items.push({char,data:undefined,selected:false});render();
   const pending=items.filter(x=>x.data===undefined||x.error);let index=0;
   // Four requests at a time keeps large pasted lists from flooding the CDN.
   await Promise.all(Array.from({length:Math.min(4,pending.length)},async()=>{while(index<pending.length){const item=pending[index++];try{item.data=await loadChar(item.char);item.error=false;item.selected=!!item.data;}catch(e){item.error=true;status(e.message);}render();}}));
@@ -36,7 +50,7 @@ async function add(text){
   render();if(current>=0)$('position').textContent=`第 ${current+1} / ${items.length} 字`;
 }
 $('add').onclick=()=>add($('input').value);
-$('clear').onclick=()=>{player.stop();viewToken++;items=[];current=-1;$('stage').replaceChildren();$('legend').replaceChildren();$('char').textContent='—';$('strokes').textContent='0 画';$('position').textContent='第 0 / 0 字';$('step').textContent='0 / 0 画';$('strokeProgress').value=0;render();};
+$('clear').onclick=()=>{player.stop();viewToken++;items=[];sources=[];current=-1;$('stage').replaceChildren();$('legend').replaceChildren();$('char').textContent='—';$('strokes').textContent='0 画';$('position').textContent='第 0 / 0 字';$('step').textContent='0 / 0 画';$('strokeProgress').value=0;render();};
 $('all').onchange=()=>{items.forEach(x=>x.selected=!!x.data&&$('all').checked);render();};
 for(const id of ['grid','scheme','color','speed'])$(id).onchange=()=>{if(current>=0)show(current);};
 $('speed').oninput=()=>{$('speedLabel').textContent=`${$('speed').value} ms`;};

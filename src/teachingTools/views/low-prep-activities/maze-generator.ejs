@@ -69,6 +69,7 @@
             <textarea id="mazePairInput" class="maze-pair-input" rows="12" maxlength="1500" spellcheck="true" aria-describedby="mazePairHelp" placeholder="1. The puppy is sitting ___ the table. | under"></textarea>
             <p id="mazePairHelp" class="maze-pair-help"><%= t('mazeGenerator.pairHelp') %></p>
           </div>
+          <div id="mazeZhSlot" class="zh-script-slot"></div>
           <div class="maze-generate-row">
             <button id="generateMaze" class="maze-primary" type="button"><%= t('mazeGenerator.generateButton') %></button>
             <span><%= t('mazeGenerator.readyText') %></span>
@@ -97,7 +98,9 @@
   <script src="/shared/library-v2.js"></script>
   <script src="/shared/library-store.js"></script>
   <script src="/low-prep/maze-generator/maze-library.js"></script>
-  <script src="/low-prep/maze-generator/maze-generator.js?v=personal-library-1"></script>
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=3"></script>
+  <script src="/low-prep/maze-generator/maze-generator.js?v=zh1"></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

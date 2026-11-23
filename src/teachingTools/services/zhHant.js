@@ -11,7 +11,7 @@ var Zh = require('../public/shared/zh-script');
 var BLOCKS = /<script\b[\s\S]*?<\/script\s*>|<style\b[\s\S]*?<\/style\s*>|<textarea\b[\s\S]*?<\/textarea\s*>|<!--[\s\S]*?-->|<[^>]*>/gi;
 var TEXT_ATTRS = /(\s(?:title|alt|placeholder|aria-label|label|content)\s*=\s*)("[^"]*"|'[^']*')/gi;
 var HAN = /[㐀-鿿豈-﫿]/;
-var UI_SCRIPTS = '<script src="/shared/zh-script.js?v=3" defer></script><script src="/shared/zh-ui.js?v=1" defer></script>';
+var UI_SCRIPTS = '<script src="/shared/zh-script.js?v=4" defer></script><script src="/shared/zh-ui.js?v=1" defer></script>';
 
 function convertText(text) {
   return HAN.test(text) ? Zh.toTraditional(text) : text;

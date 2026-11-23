@@ -21,7 +21,8 @@
   if (typeof module === 'object' && module.exports) {
     api._nodeLoad = function () { return require('./zh-script-data.json'); };
     module.exports = api;
-  } else {
+  } else if (!root.ChenZhScript) {
+    // Loaded twice on one page (tool + 繁 UI): keep the first copy and its table.
     root.ChenZhScript = api;
   }
 })(typeof self !== 'undefined' ? self : this, function () {
@@ -151,6 +152,35 @@
     return script === 't' || script === 'hant' || script === 'zh-Hant';
   }
 
+  // Content in the chosen script, whichever script it was typed in.
+  // 's' → toSimplified. 't' → toTraditional, but characters the teacher already
+  // typed in traditional stay as typed (裡 stays 裡, not 裏).
+  function toScript(value, script) {
+    var simplified = toSimplified(value);
+    if (!isTraditional(script)) return simplified;
+    var source = Array.from(value == null ? '' : String(value));
+    var simp = Array.from(simplified);
+    var trad = Array.from(toTraditional(simplified));
+    for (var i = 0; i < source.length; i += 1) if (simp[i] !== source[i]) trad[i] = source[i];
+    return trad.join('');
+  }
+
+  // True when more characters change going to 简 than going to 繁, i.e. the
+  // text was most likely typed in traditional characters.
+  function looksTraditional(value) {
+    var source = Array.from(value == null ? '' : String(value));
+    if (!source.length) return false;
+    var simp = Array.from(toSimplified(source.join('')));
+    var trad = Array.from(toTraditional(source.join('')));
+    var toS = 0;
+    var toT = 0;
+    for (var i = 0; i < source.length; i += 1) {
+      if (simp[i] !== source[i]) toS += 1;
+      if (trad[i] !== source[i]) toT += 1;
+    }
+    return toS > toT;
+  }
+
   api.DATA_URL = DATA_URL;
   api.useTable = useTable;
   api.hasTable = hasTable;
@@ -159,5 +189,7 @@
   api.toSimplified = toSimplified;
   api.convert = convert;
   api.isTraditional = isTraditional;
+  api.toScript = toScript;
+  api.looksTraditional = looksTraditional;
   return api;
 });

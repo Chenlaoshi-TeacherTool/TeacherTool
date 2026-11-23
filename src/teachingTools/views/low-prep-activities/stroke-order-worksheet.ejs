@@ -14,6 +14,7 @@
   background:#fff;color:#1E2635;max-width:816px;margin:0 auto;padding:32px 36px;border-radius:6px;
   box-shadow:0 1px 3px rgba(31,58,95,.12);
   font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif}
+.cls-ws:lang(zh-Hant){font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
 .cls-ws svg{display:block;width:100%;height:auto}
 .cls-ws .ws-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;
   border-bottom:2px solid var(--ws-navy);padding-bottom:10px;margin-bottom:6px}
@@ -56,6 +57,7 @@
         <input id="chars" type="text" value="大小人" maxlength="40" autocomplete="off">
       </label>
       <button class="primary" id="go">生成练习纸</button>
+      <div id="scriptSlot"></div>
     </div>
     <div class="row">
       <label class="field">格子 Grid
@@ -111,7 +113,9 @@
 </div>
 
 <script src="/low-prep/stroke-order-worksheet/stroke-dict.js?v=1"></script>
-<script src="/low-prep/stroke-order-worksheet/stroke-order-worksheet.js?v=3"></script>
+<script src="/shared/zh-script.js?v=4"></script>
+<script src="/shared/zh-content.js?v=3"></script>
+<script src="/low-prep/stroke-order-worksheet/stroke-order-worksheet.js?v=4"></script>
 <script src="/javascripts/account-coming-soon.js"></script>
 <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

@@ -26,6 +26,21 @@
 
   var state = { cards: null, meta: null, page: 0 };
 
+  // 简 / 繁 for the cards: words stay as typed in the list (pinyin, English and
+  // emoji are looked up from them); only what is shown and printed is converted.
+  var zh = window.ChenZhContent ? window.ChenZhContent.create({
+    mount: "#zh-script-slot",
+    label: "卡片用字",
+    onChange: function () { if (state.cards) rerender(); }
+  }) : null;
+  if (zh) zh.region(previewArea);
+  function T(value) { return zh ? zh.text(value) : value; }
+  function zhFont() { return zh && zh.value === "t" ? "DFKai-SB" : "KaiTi"; }
+  function zhReady() { return zh ? zh.ready().catch(function () {}) : Promise.resolve(); }
+  function rerender() {
+    renderPreview(state.cards, state.meta.gridSize, state.meta.fields, T(state.meta.title), state.meta.callItems);
+  }
+
   function shuffle(items) {
     if (CW && CW.shuffle) {
       return CW.shuffle(items);
@@ -83,7 +98,7 @@
 
   function cellLines(item, fields) {
     var values = {
-      zh: item.zh,
+      zh: T(item.zh),
       py: item.py || item.zh,
       en: item.en || item.zh,
     };
@@ -420,7 +435,7 @@
           cellLines(item, CALL_SHEET_FIELDS).forEach(function (line, lineIndex) {
             runs.push(new D.TextRun({
               text: (lineIndex ? "  " : "") + (line.field === "py" ? pinyinForWord(line.text) : line.text),
-              font: line.field === "zh" ? "KaiTi" : (line.field === "py" ? "SimSun" : "Arial"),
+              font: line.field === "zh" ? zhFont() : (line.field === "py" ? "SimSun" : "Arial"),
               size: lineIndex === 0 ? 28 : 18,
             }));
           });
@@ -515,7 +530,7 @@
                 spacing: { after: 0 },
                 children: [new D.TextRun({
                   text: line.field === "py" ? pinyinForWord(line.text) : line.text,
-                  font: line.field === "zh" ? "KaiTi" : (line.field === "py" ? "SimSun" : "Arial"),
+                  font: line.field === "zh" ? zhFont() : (line.field === "py" ? "SimSun" : "Arial"),
                   size: halfPoints(itemFit, lineIndex === 0 ? 1 : 0.62),
                   bold: line.field !== "zh" && lineIndex === 0,
                 })],
@@ -674,6 +689,8 @@
 
   async function handleSubmit(event) {
     event.preventDefault();
+    await zhReady();
+    if (zh) zh.suggest(termsInput.value);
 
     var items = parseTerms(termsInput.value);
     var gridSize = parseInt(gridSizeSelect.value, 10);
@@ -727,7 +744,7 @@
     var callItems = callSheetCheckbox && callSheetCheckbox.checked ? items : null;
     state.meta = { gridSize: gridSize, fields: fields, title: title, includeFree: includeFree, callItems: callItems };
 
-    renderPreview(state.cards, gridSize, fields, title, callItems);
+    renderPreview(state.cards, gridSize, fields, T(title), callItems);
 
     downloadWordBtn.disabled = false;
     printBtn.disabled = false;
@@ -752,7 +769,7 @@
       status.textContent = hasField(state.meta.fields, "emoji")
         ? "Adding OpenMoji artwork to the Word document…"
         : "Building the Word document…";
-      var doc = await buildDocx(state.cards, state.meta.gridSize, state.meta.fields, state.meta.title, state.meta.callItems);
+      var doc = await buildDocx(state.cards, state.meta.gridSize, state.meta.fields, T(state.meta.title), state.meta.callItems);
       var blob = await window.docx.Packer.toBlob(doc);
       var url = URL.createObjectURL(blob);
       var link = document.createElement("a");
@@ -804,7 +821,7 @@
         }
       });
     });
-    renderPreview(state.cards, state.meta.gridSize, state.meta.fields, state.meta.title, state.meta.callItems);
+    rerender();
   }
 
   function closeEmojiChoices() {

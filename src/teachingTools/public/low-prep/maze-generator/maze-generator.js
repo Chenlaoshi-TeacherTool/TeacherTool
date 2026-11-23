@@ -440,9 +440,25 @@
     return String(title || 'maze-challenge').replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim() || 'maze-challenge';
   }
 
+  // 简 / 繁 for the PowerPoint: the questions stay as typed; the deck gets the
+  // chosen script.
+  var zh = window.ChenZhContent ? window.ChenZhContent.create({ mount: '#mazeZhSlot', label: 'PPT 用字 Characters' }) : null;
+
+  async function inChosenScript(data) {
+    if (!zh) return data;
+    try { await zh.ready(); } catch (error) { return data; }
+    zh.suggest(data.title + '\n' + data.pairs.map(function (pair) { return pair.question + '\n' + pair.answer; }).join('\n'));
+    return {
+      title: zh.text(data.title),
+      pairs: data.pairs.map(function (pair) { return { question: zh.text(pair.question), answer: zh.text(pair.answer) }; }),
+      sourceRefs: data.sourceRefs
+    };
+  }
+
   async function downloadEditablePptx() {
     var data = readData();
     if (!validate(data)) return;
+    data = await inChosenScript(data);
     data.title = data.title || 'Maze Challenge';
     if (!window.JSZip) {
       showToast('The PowerPoint exporter is not available yet. Please refresh and try again.', true);

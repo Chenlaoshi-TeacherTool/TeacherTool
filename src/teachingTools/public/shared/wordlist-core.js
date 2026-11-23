@@ -224,6 +224,7 @@
     var sandhi = opts.sandhi !== false;
     var remembered = opts.remembered === false ? '' : recallPinyin(text);
     if (remembered) return spaced ? remembered : remembered.replace(/ /g, '');
+    text = simplified(text); // 繁体 typed by a teacher: look up the simplified form (same length)
     var out = [];        // 输出片段
     var run = [];        // 当前中文连续段的音节
     var runChars = [];   // 与 run 一一对应的汉字
@@ -338,7 +339,14 @@
 
   /** 查英文释义：先查内置精选词典，再兜底查 CC-CEDICT，查不到返回 '' */
   function toEnglish(text) {
-    return EN_DICT[text] || cedictEnglish(text) || '';
+    var simp = simplified(text);
+    return EN_DICT[text] || EN_DICT[simp] || cedictEnglish(text) || cedictEnglish(simp) || '';
+  }
+
+  /** 繁 → 简 when /shared/zh-script.js is on the page and its table is loaded; otherwise unchanged. */
+  function simplified(text) {
+    var Zh = global.ChenZhScript;
+    return Zh && Zh.hasTable && Zh.hasTable() ? Zh.toSimplified(text) : text;
   }
 
   /** 是否已经加载好 CC-CEDICT 兜底词典 */

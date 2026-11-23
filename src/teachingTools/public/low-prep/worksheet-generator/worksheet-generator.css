@@ -88,6 +88,10 @@
 .wg-size-l { --hz: 27px; --lat: 16px; --box: 17mm; }
 .wg-font-song { --hz-font: "SimSun", "Songti SC", "STSong", "Noto Serif SC", serif; }
 .wg-font-hei { --hz-font: "Microsoft YaHei", "PingFang SC", "Heiti SC", "Noto Sans SC", sans-serif; }
+/* 繁体 sheets: traditional-standard faces first (標楷體 / 細明體 / 正黑體). */
+.wg-output:lang(zh-Hant) { --hz-font: "DFKai-SB", "BiauKai", "Kaiti TC", "KaiTi", "STKaiti", serif; }
+.wg-output.wg-font-song:lang(zh-Hant) { --hz-font: "PMingLiU", "MingLiU", "Songti TC", "LiSong Pro", "SimSun", "Noto Serif TC", serif; }
+.wg-output.wg-font-hei:lang(zh-Hant) { --hz-font: "Microsoft JhengHei", "PingFang TC", "Heiti TC", "Noto Sans TC", "Microsoft YaHei", sans-serif; }
 
 .wg-sheet {
   width: 210mm; min-height: 297mm; padding: 12mm; background: #fff; color: #111;

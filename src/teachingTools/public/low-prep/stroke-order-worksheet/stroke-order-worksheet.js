@@ -1,4 +1,5 @@
-/* 汉字笔顺练习纸生成器 · Stroke Order Worksheet. Needs stroke-dict.js (DICT) loaded first. */
+/* 汉字笔顺练习纸生成器 · Stroke Order Worksheet. Needs stroke-dict.js (DICT),
+   /shared/zh-script.js and /shared/zh-content.js loaded first. */
 /* Stroke data: hanzi-writer-data (derived from Make Me a Hanzi) */
 const SOURCES = [
   c => `https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/${encodeURIComponent(c)}.json`,
@@ -10,6 +11,12 @@ const GRAY = '#C3CAD3', INK = '#1E2635', TRACE = '#D6DBE2', GRID = '#E6A3A3';
 const $ = s => document.querySelector(s);
 const cache = {};
 const state = { chars: [], info: {} };
+// 简 / 繁 for the worksheet: the characters (and their stroke data) and its printed labels.
+const zh = ChenZhContent.create({ mount: '#scriptSlot', label: '练习纸用字', onChange: () => generate() }).region('#worksheet');
+const T = s => zh.text(s);
+// Pinyin and meaning: the character itself first (髮 → fà is more exact than 发), else its simplified form.
+const simplifiedOf = c => (window.ChenZhScript && ChenZhScript.hasTable()) ? ChenZhScript.toSimplified(c) : c;
+const fontFor = base => zh.value === 't' ? 'PingFang TC, Microsoft JhengHei, Noto Sans TC, ' + base : base;
 const esc = s => String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
 function opts(){
@@ -80,9 +87,9 @@ function worksheetCell(d, k, o, attrs = ''){
 /* ---------- HTML / CSS worksheet ---------- */
 function render(){
   const o = opts(), ws = $('#worksheet');
-  if (!state.chars.length){ ws.innerHTML = '<p style="color:#5F6B7A;margin:0">在上方输入汉字，然后点“生成练习纸”。</p>'; return; }
-  let h = `<div class="ws-top"><h2 class="ws-title">汉字笔顺练习<small>Stroke Order Practice</small></h2>`
-        + (o.nameLine ? `<div class="ws-name">姓名 Name<span></span>日期 Date<span></span></div>` : '') + `</div>`;
+  if (!state.chars.length){ ws.innerHTML = '<p style="color:#5F6B7A;margin:0">' + T('在上方输入汉字，然后点“生成练习纸”。') + '</p>'; return; }
+  let h = `<div class="ws-top"><h2 class="ws-title">${T('汉字笔顺练习')}<small>Stroke Order Practice</small></h2>`
+        + (o.nameLine ? `<div class="ws-name">${T('姓名')} Name<span></span>${T('日期')} Date<span></span></div>` : '') + `</div>`;
   for (const ch of state.chars){
     const d = cache[ch], info = state.info[ch];
     h += `<section class="ws-char"><div class="ws-head">`
@@ -92,7 +99,7 @@ function render(){
       + worksheetKinds(d, o).map(k => worksheetCell(d, k, o)).join('')
       + `</div></section>`;
   }
-  h += `<div class="ws-foot">clsteachingtools.com · 笔顺数据 Make Me a Hanzi</div>`;
+  h += `<div class="ws-foot">clsteachingtools.com · ${T('笔顺数据')} Make Me a Hanzi</div>`;
   ws.innerHTML = h;
 }
 $('#worksheet').addEventListener('input', e => {
@@ -100,15 +107,18 @@ $('#worksheet').addEventListener('input', e => {
 });
 
 async function generate(){
-  const chars = [...new Set([...$('#chars').value].filter(c => /\p{Script=Han}/u.test(c)))].slice(0, 12);
   const st = $('#status'); st.className = 'status no-print';
+  try { await zh.ready(); } catch(e){ /* no table: characters stay as typed */ }
+  const typed = $('#chars').value;
+  zh.suggest(typed);
+  const chars = [...new Set([...T(typed)].filter(c => /\p{Script=Han}/u.test(c)))].slice(0, 12);
   if (!chars.length){ st.textContent = '请输入至少一个汉字。'; st.classList.add('err'); return; }
   st.textContent = '正在获取笔顺数据…';
   const res = await Promise.allSettled(chars.map(loadChar));
   const bad = chars.filter((_, i) => res[i].status === 'rejected');
   state.chars = chars.filter((_, i) => res[i].status === 'fulfilled');
   for (const c of state.chars) if (!state.info[c]){
-    const e = DICT[c] || ['', '', ''];
+    const e = DICT[c] || DICT[simplifiedOf(c)] || ['', '', ''];
     state.info[c] = { pinyin: e[0].replace(/\//g,' / '), meaning: e[1], radical: e[2] };
   }
   render();
@@ -123,11 +133,11 @@ function wrap(text, max){
   if (cur) lines.push(cur); return lines.slice(0, 2);
 }
 function buildSVG(){
-  const o = opts(), W = 816, M = 40, CW = W - 2*M, F = 'PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif';
+  const o = opts(), W = 816, M = 40, CW = W - 2*M, F = fontFor('PingFang SC, Microsoft YaHei, Noto Sans SC, sans-serif');
   const t = (x,y,s,txt,ex='') => `<text x="${x}" y="${y}" font-size="${s}" font-family="${F}" ${ex}>${esc(txt)}</text>`;
   let y = M, p = [];
-  p.push(t(M, y+24, 22, '汉字笔顺练习', 'font-weight="700" fill="#1F3A5F"') + t(M+140, y+24, 14, 'Stroke Order Practice', 'fill="#5F6B7A"'));
-  if (o.nameLine) p.push(t(W-M-200, y+24, 13, '姓名 Name ______________', 'fill="#5F6B7A" text-anchor="end"') + t(W-M, y+24, 13, '日期 Date ______________', 'fill="#5F6B7A" text-anchor="end"'));
+  p.push(t(M, y+24, 22, T('汉字笔顺练习'), 'font-weight="700" fill="#1F3A5F"') + t(M+140, y+24, 14, 'Stroke Order Practice', 'fill="#5F6B7A"'));
+  if (o.nameLine) p.push(t(W-M-200, y+24, 13, T('姓名') + ' Name ______________', 'fill="#5F6B7A" text-anchor="end"') + t(W-M, y+24, 13, T('日期') + ' Date ______________', 'fill="#5F6B7A" text-anchor="end"'));
   y += 38; p.push(`<rect x="${M}" y="${y}" width="${CW}" height="2" fill="#1F3A5F"/>`); y += 6;
   for (const ch of state.chars){
     const d = cache[ch], info = state.info[ch];
@@ -141,7 +151,7 @@ function buildSVG(){
       `x="${M + (i % o.cols)*cs}" y="${y + Math.floor(i / o.cols)*cs}" width="${cs}" height="${cs}"`)));
     y += kinds.length / o.cols * cs + 10;
   }
-  y += 18; p.push(t(W-M, y, 11, 'clsteachingtools.com · 笔顺数据 Make Me a Hanzi', 'fill="#8A94A1" text-anchor="end"'));
+  y += 18; p.push(t(W-M, y, 11, 'clsteachingtools.com · ' + T('笔顺数据') + ' Make Me a Hanzi', 'fill="#8A94A1" text-anchor="end"'));
   const H = Math.ceil(y + M/2);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#fff"/>${p.join('')}</svg>`;
 }
@@ -166,21 +176,21 @@ $('#dlPng').onclick = () => {
 };
 function embedCode(){
   const body = $('#worksheet').innerHTML.replace(/ contenteditable="true"| data-ch="[^"]*"| data-k="[^"]*"/g, '');
-  return `<style>\n${$('#ws-css').textContent.trim()}\n</style>\n<div class="cls-ws">\n${body}\n</div>`;
+  return `<style>\n${$('#ws-css').textContent.trim()}\n</style>\n<div class="cls-ws" lang="${zh.value === 't' ? 'zh-Hant' : 'zh-Hans'}">\n${body}\n</div>`;
 }
 $('#embed').onclick = () => { if (!ready()) return; $('#code').value = embedCode(); $('#modal').classList.add('open'); $('#copyCode').focus(); };
 $('#copyCode').onclick = async () => {
   try { await navigator.clipboard.writeText($('#code').value); } catch(e){ $('#code').select(); document.execCommand('copy'); }
   $('#copyCode').textContent = '已复制'; setTimeout(() => $('#copyCode').textContent = '复制代码', 1500);
 };
-$('#dlHtml').onclick = () => download(new Blob([`<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>汉字笔顺练习 ${state.chars.join('')}</title></head><body style="margin:0;padding:16px;background:#F4F6F1">\n${embedCode()}\n</body></html>`], {type:'text/html'}), fname('html'));
+$('#dlHtml').onclick = () => download(new Blob([`<!DOCTYPE html><html lang="${zh.value === 't' ? 'zh-Hant' : 'zh-Hans'}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${T('汉字笔顺练习')} ${state.chars.join('')}</title></head><body style="margin:0;padding:16px;background:#F4F6F1">\n${embedCode()}\n</body></html>`], {type:'text/html'}), fname('html'));
 $('#closeModal').onclick = () => $('#modal').classList.remove('open');
 $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') e.target.classList.remove('open'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#modal').classList.remove('open'); });
 $('#print').onclick = () => window.print();
 $('#share').onclick = async () => {
   const o = opts(), u = new URL(location.href);
-  u.search = new URLSearchParams({ chars: state.chars.join('') || $('#chars').value, grid:o.grid, cols:o.cols, rows:o.rows, trace:o.trace }).toString();
+  u.search = new URLSearchParams({ chars: state.chars.join('') || $('#chars').value, grid:o.grid, cols:o.cols, rows:o.rows, trace:o.trace, script: zh.value }).toString();
   try { await navigator.clipboard.writeText(u.toString()); $('#status').textContent = '分享链接已复制。'; }
   catch(e){ prompt('复制这个链接：', u.toString()); }
 };
