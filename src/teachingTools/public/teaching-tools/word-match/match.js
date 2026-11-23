@@ -94,8 +94,8 @@
     const right = left === first ? card : first;
     const index = remaining.findIndex(([a, b]) =>
       (mixed || left.dataset.side !== right.dataset.side) &&
-      ((a === left.textContent && b === right.textContent) ||
-        (mixed && b === left.textContent && a === right.textContent)));
+      ((a === left.dataset.text && b === right.dataset.text) ||
+        (mixed && b === left.dataset.text && a === right.dataset.text)));
     const matched = index >= 0;
     const [pair] = matched ? remaining.splice(index, 1) : [];
     const state = matched ? 'correct' : 'incorrect';
@@ -170,6 +170,7 @@
         button.lang = mixed || side === 'left' ? 'zh' : mode.value === 'py' ? 'zh-Latn' : 'en';
         button.setAttribute('aria-pressed', 'false');
         button.textContent = label;
+        button.dataset.text = label; // compare this, not textContent (the 繁体 view may convert the display)
         button.addEventListener('click', () => choose(button));
         group.append(button);
       }

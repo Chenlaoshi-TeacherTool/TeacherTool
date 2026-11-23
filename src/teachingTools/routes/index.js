@@ -19,6 +19,11 @@ siteContentStore.refresh().catch(function (err) {
 router.get('/set-language', function(req, res) {
   var lang = req.query.lang === 'zh' ? 'zh' : 'en';
   res.cookie('lang', lang, { maxAge: 365 * 24 * 60 * 60 * 1000, sameSite: 'Lax' });
+  // 简 / 繁 only changes when Chinese is chosen; EN keeps the last choice for next time.
+  if (lang === 'zh') {
+    if (req.query.script === 'hant') res.cookie('zhScript', 'hant', { maxAge: 365 * 24 * 60 * 60 * 1000, sameSite: 'Lax' });
+    else res.clearCookie('zhScript');
+  }
   var redirectTo = req.query.redirect;
   var safeRedirect = (typeof redirectTo === 'string' && redirectTo.charAt(0) === '/' && redirectTo.charAt(1) !== '/') ? redirectTo : '/';
   res.redirect(safeRedirect);

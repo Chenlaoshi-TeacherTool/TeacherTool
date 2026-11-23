@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var fs = require('fs');
 var i18n = require('./services/i18n');
+var zhHant = require('./services/zhHant');
 var siteMap = require('./config/siteMap');
 
 var indexRouter = require('./routes/index');
@@ -57,11 +58,16 @@ app.use(function(req, res, next) {
 app.use(function(req, res, next) {
   var lang = i18n.normalizeLang(req.cookies && req.cookies.lang);
   res.locals.lang = lang;
+  // 'hant' = show this Chinese page in 繁体 (see services/zhHant.js).
+  res.locals.zhScript = lang === 'zh' ? i18n.normalizeScript(req.cookies && req.cookies.zhScript) : 'hans';
   res.locals.t = function(key) { return i18n.t(lang, key); };
   // The same key in the other language, so search can match either one.
   res.locals.tOther = function(key) { return i18n.t(lang === 'zh' ? 'en' : 'zh', key); };
   next();
 });
+
+// 中文 · 繁: convert rendered pages to 通用繁体 (services/zhHant.js).
+app.use(zhHant.middleware);
 
 // Let application routes own clean directory-style URLs instead of having
 // express.static add a trailing-slash redirect before the router can respond.

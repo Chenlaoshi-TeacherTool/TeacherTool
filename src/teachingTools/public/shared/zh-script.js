@@ -27,7 +27,8 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  var DATA_URL = '/shared/zh-script-data.json?v=1';
+  var DATA_URL = '/shared/zh-script-data.json?v=2';
+  var GZIP_URL = '/shared/zh-script-data.json.gz?v=2';
   var api = {};
   var s2t = null;
   var t2s = null;
@@ -77,15 +78,30 @@
   function load(url) {
     if (ensure()) return Promise.resolve(api);
     if (!loading) {
-      loading = fetch(url || DATA_URL)
-        .then(function (response) {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.json();
-        })
+      loading = fetchTable(url)
         .then(function (data) { useTable(data); return api; })
         .catch(function (error) { loading = null; throw error; });
     }
     return loading;
+  }
+
+  // The site has no gzip middleware, so the table is also stored as .json.gz
+  // (about half the size) and unpacked here; plain JSON if that is not possible.
+  function fetchJson(url) {
+    return fetch(url).then(function (response) {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      return response.json();
+    });
+  }
+
+  function fetchTable(url) {
+    if (url || typeof DecompressionStream === 'undefined' || typeof Response === 'undefined') return fetchJson(url || DATA_URL);
+    return fetch(GZIP_URL)
+      .then(function (response) {
+        if (!response.ok || !response.body) throw new Error('HTTP ' + response.status);
+        return new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).json();
+      })
+      .catch(function () { return fetchJson(DATA_URL); });
   }
 
   // Longest phrase first (as OpenCC does), otherwise character by character.
@@ -115,7 +131,15 @@
     return out.join('');
   }
 
-  function toTraditional(value) { ensure(); return run(s2t, value); }
+  // OpenCC only knows 一只 / 两只 …; "24 只" or "3只猫" is the measure word too,
+  // unless 只 starts 只有 / 只是 / 只要 ….
+  var DIGIT_ZHI = /([0-9０-９]\s?)只(?![有是要好能会可])/g;
+
+  function toTraditional(value) {
+    ensure();
+    var out = run(s2t, value);
+    return out.indexOf('只') === -1 ? out : out.replace(DIGIT_ZHI, '$1隻');
+  }
   function toSimplified(value) { ensure(); return run(t2s, value); }
 
   // script: 't' / 'hant' / 'zh-Hant' → traditional; anything else leaves the text as it is.

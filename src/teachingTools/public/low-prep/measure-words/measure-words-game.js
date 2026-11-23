@@ -397,7 +397,7 @@
       el('feedback').innerHTML = '';
       el('legend').innerHTML = choicesFor(state.q).map(function (m) {
         var meta = metaFor(m);
-        return '<span class="mw-legend-item" style="--mw-color:' + meta.color + '"><b>' + esc(m) + '</b><span class="mw-py">' + esc(meta.py) + '</span></span>';
+        return '<span class="mw-legend-item" data-mw="' + esc(m) + '" style="--mw-color:' + meta.color + '"><b>' + esc(m) + '</b><span class="mw-py">' + esc(meta.py) + '</span></span>';
       }).join('');
     }
 
@@ -407,7 +407,7 @@
       el('card').innerHTML = questionHtml(state.q, state.q.answer);
       el('feedback').innerHTML = hintHtml(state.q);
       el('legend').querySelectorAll('.mw-legend-item').forEach(function (node) {
-        node.classList.toggle('is-answer', node.querySelector('b').textContent === state.q.answer);
+        node.classList.toggle('is-answer', node.getAttribute('data-mw') === state.q.answer);
       });
       if (opts.speak) speak(state.q.speakText);
     }

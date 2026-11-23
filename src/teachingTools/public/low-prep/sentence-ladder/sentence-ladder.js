@@ -504,7 +504,8 @@
         (options.key ? '' : View.wordBoxHtml(m, k)) + '</div></div>';
     }
     var credit = m.image ? 'clsteachingtools.com' : 'Emoji: OpenMoji · CC BY-SA 4.0 · clsteachingtools.com';
-    return '<div class="sl-sheet' + (m.showPy ? '' : ' no-py') + '"><div class="sl-sheet-body">' + head + '<div class="sl-ladder">' + rows + '</div>' +
+    // data-no-convert: the ladder's own 简/繁 choice wins over the site's 繁 view.
+    return '<div class="sl-sheet' + (m.showPy ? '' : ' no-py') + '" data-no-convert><div class="sl-sheet-body">' + head + '<div class="sl-ladder">' + rows + '</div>' +
       '<div class="sl-foot">' + esc(credit) + '</div></div></div>';
   }
 
@@ -626,6 +627,7 @@
         (show.key ? '<div class="sl-row is-model"><div class="sl-label">' + esc(View.display(m, '示范')) + '</div><div class="sl-text"><div class="sl-line">' + View.rowHtml(m, last, { mode: 'key', py: py }) + '</div></div></div>' : '') +
         '</div>';
     }
+    stage.setAttribute('data-no-convert', '');
     stage.innerHTML = html;
     fitShow();
     $('slShowPrev').disabled = show.step === 0;
@@ -777,6 +779,7 @@
       if (typeof item.score === 'number') head.appendChild(el('span', 'sl-score', item.score + ' / ' + item.total));
       if (item.submittedAt) head.appendChild(el('span', 'sl-link-meta', new Date(item.submittedAt).toLocaleString()));
       var body = el('div', 'sl-line sl-work-line' + (m.showPy ? '' : ' no-py'));
+      body.setAttribute('data-no-convert', '');
       body.innerHTML = View.rowHtml(m, last, { mode: 'student', answers: item.answers, py: py });
       li.append(head, body);
       if (item.correct) {
@@ -822,6 +825,8 @@
   // ---------- start ----------
   var draft = readDraft();
   S = draft && Array.isArray(draft.rows) && draft.rows.length ? Core.normalize(draft) : Core.normalize(Themes.build('apple', 'native'));
+  // A new ladder starts in 繁体 when the site is shown as 中文 · 繁.
+  if (!(draft && draft.rows && draft.rows.length) &&/(?:^|; )lang=zh(?:;|$)/.test(document.cookie) && /(?:^|; )zhScript=hant(?:;|$)/.test(document.cookie)) S.script = 't';
   renderThemes();
   writeControls();
   renderAllEditors();

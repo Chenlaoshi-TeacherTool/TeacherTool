@@ -166,11 +166,13 @@ function main() {
 
   var outFile = path.join(__dirname, '..', 'public', 'shared', 'zh-script-data.json');
   fs.writeFileSync(outFile, JSON.stringify(data) + '\n');
+  // No gzip middleware on the site; zh-script.js fetches this and unpacks it.
+  fs.writeFileSync(outFile + '.gz', require('zlib').gzipSync(fs.readFileSync(outFile), { level: 9 }));
 
   console.log('s2t: ' + s2t.charMap.size + ' chars, ' + s2t.phrases.size + ' of ' + s2t.total + ' phrases, mismatches ' + s2t.mismatches.length);
   console.log('t2s: ' + t2s.charMap.size + ' chars, ' + t2s.phrases.size + ' of ' + t2s.total + ' phrases, mismatches ' + t2s.mismatches.length);
   if (s2t.mismatches.length) console.log('s2t mismatches: ' + s2t.mismatches.slice(0, 30).join(' '));
-  console.log('wrote ' + outFile + ' (' + Math.round(fs.statSync(outFile).size / 1024) + ' KB)');
+  console.log('wrote ' + outFile + ' (' + Math.round(fs.statSync(outFile).size / 1024) + ' KB, gzip ' + Math.round(fs.statSync(outFile + '.gz').size / 1024) + ' KB)');
 }
 
 if (require.main === module) main();

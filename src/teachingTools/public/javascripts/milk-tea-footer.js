@@ -152,11 +152,19 @@
     });
   }
 
+  // 简 / 繁 are both lang=zh; the zhScript cookie says which characters to show.
+  function getScript() {
+    var match = document.cookie.match(/(?:^|; )zhScript=([^;]+)/);
+    return match && match[1] === 'hant' ? 'hant' : 'hans';
+  }
+
   function buildLangSwitchHtml(lang) {
     var redirect = encodeURIComponent(window.location.pathname + window.location.search);
+    var script = getScript();
     return '<div class="site-lang-switch" role="group" aria-label="Language / 语言">' +
       '<a class="' + (lang === 'en' ? 'is-active' : '') + '" href="/set-language?lang=en&redirect=' + redirect + '" hreflang="en" lang="en">EN</a>' +
-      '<a class="' + (lang === 'zh' ? 'is-active' : '') + '" href="/set-language?lang=zh&redirect=' + redirect + '" hreflang="zh" lang="zh">中文</a>' +
+      '<a class="' + (lang === 'zh' && script === 'hans' ? 'is-active' : '') + '" href="/set-language?lang=zh&script=hans&redirect=' + redirect + '" hreflang="zh-Hans" lang="zh-Hans" title="简体中文" data-no-convert>简</a>' +
+      '<a class="' + (lang === 'zh' && script === 'hant' ? 'is-active' : '') + '" href="/set-language?lang=zh&script=hant&redirect=' + redirect + '" hreflang="zh-Hant" lang="zh-Hant" title="繁體中文">繁</a>' +
       '</div>';
   }
 
