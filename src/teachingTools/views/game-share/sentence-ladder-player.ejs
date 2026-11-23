@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title><%= title %> - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Expand a Chinese sentence row by row and hand it in.', noindex: true }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/sentence-ladder/sentence-ladder.css?v=3">
+</head>
+<body class="game-share-page sl-page sls-page">
+  <main class="sls-wrap">
+    <div id="slsApp"></div>
+    <noscript><p>请打开 JavaScript。 Please turn on JavaScript.</p></noscript>
+  </main>
+
+  <script>window.__SHARED_GAME__ = <%- gameDataJson %>;</script>
+  <script src="/shared/wordlist-core.js?v=cedict-1"></script>
+  <script src="/low-prep/sentence-ladder/ladder-core.js?v=1"></script>
+  <script src="/low-prep/sentence-ladder/ladder-view.js?v=3"></script>
+  <script src="/low-prep/sentence-ladder/sentence-ladder-player.js?v=2"></script>
+</body>
+</html>

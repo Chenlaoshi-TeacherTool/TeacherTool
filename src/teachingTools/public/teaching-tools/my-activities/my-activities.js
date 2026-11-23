@@ -15,6 +15,7 @@
     'word-sudoku': { icon: '🔢', label: 'Word Sudoku', tool: '/low-prep/word-sudoku/word-sudoku-widget.html' },
     'measure-words': { icon: '🍎', label: 'Measure Word Challenge', tool: '/teaching-tools/measure-words' },
     'pixel-art': { icon: '👾', label: chinese ? '像素画猜猜看' : 'Pixel Art Guessing', tool: '/teaching-tools/pixel-art' },
+    'sentence-ladder': { icon: '🪜', label: chinese ? '扩句阶梯' : 'Sentence Ladder', tool: '/teaching-tools/sentence-ladder' },
     'vocabulary-gacha': { icon: '🎲', label: chinese ? '词汇扭蛋机' : 'Vocabulary Gacha', tool: '/teaching-tools/vocabulary-gacha' },
     book: { icon: '📖', label: 'Book', tool: '/teaching-tools/book-generator' }
   };
@@ -221,8 +222,9 @@
         actions.appendChild(results);
       }
       if (status && status.gallery) {
-        var gallery = element('a', chinese ? '查看作品' : 'View drawings', 'small-button is-primary');
-        gallery.href = '/teaching-tools/pixel-art?gallery=' + encodeURIComponent(item.id);
+        var ladder = item.type === 'sentence-ladder';
+        var gallery = element('a', chinese ? (ladder ? '查看作业' : '查看作品') : (ladder ? 'View answers' : 'View drawings'), 'small-button is-primary');
+        gallery.href = (ladder ? '/teaching-tools/sentence-ladder' : '/teaching-tools/pixel-art') + '?gallery=' + encodeURIComponent(item.id);
         actions.appendChild(gallery);
       }
       if (item.kind === 'game' && item.inAccount && item.canRelink) actions.appendChild(shareLink(item));

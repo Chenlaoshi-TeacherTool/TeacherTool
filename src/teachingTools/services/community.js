@@ -35,7 +35,8 @@ var GAME_TYPES = {
   'hanzi-word-choice': { zh: '形近字选词', en: 'Hanzi Word Choice', icon: '🀄', tool: '/teaching-tools/hanzi-word-choice', templateEditor: true },
   'vocabulary-gacha': { zh: '词汇扭蛋机', en: 'Vocabulary Gacha', icon: '🎲', tool: '/teaching-tools/vocabulary-gacha', templateEditor: true, templateOnly: true },
   'dice-story': { zh: '骰子故事', en: 'Dice Story', icon: '🎲', tool: '/teaching-tools/dice-story', templateEditor: true, templateOnly: true },
-  'spin-wheel': { zh: '转盘手工', en: 'Spin Wheel Craft', icon: '🎡', tool: '/teaching-tools/spin-wheel', templateEditor: true, templateOnly: true }
+  'spin-wheel': { zh: '转盘手工', en: 'Spin Wheel Craft', icon: '🎡', tool: '/teaching-tools/spin-wheel', templateEditor: true, templateOnly: true },
+  'sentence-ladder': { zh: '扩句阶梯', en: 'Sentence Ladder', icon: '🪜', tool: '/teaching-tools/sentence-ladder', templateEditor: true }
 };
 
 var KINDS = ['wordlist', 'game', 'contest', 'website', 'grant'];

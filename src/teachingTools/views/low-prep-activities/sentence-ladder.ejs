@@ -1,0 +1,187 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>扩句阶梯 · Sentence Ladder - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Build a Chinese sentence-expansion ladder: one picture, one short sentence that grows row by row (measure word, place, colour, action, feelings). Print a worksheet at three levels, project it row by row, or send a student link that collects every answer.' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
+  <link rel="stylesheet" href="/low-prep/sentence-ladder/sentence-ladder.css?v=3">
+</head>
+<body class="sl-page" data-lang="<%= lang %>">
+  <main class="sl-wrap">
+    <header class="sl-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="sl-eyebrow"><%= L('Look · expand · write', '看图 · 扩句 · 写话') %></p>
+      <h1>🪜 <%= L('Sentence Ladder', '扩句阶梯') %></h1>
+      <p><%= L('One picture, one short sentence. Each row adds one thing — a measure word, a place, a colour, an action, a feeling — until students have written a full paragraph. The same ladder prints at three levels, so beginners and heritage speakers can work on the same picture.', '一张图，一句短短的话。每一行加一样东西：量词、地点、颜色、动作、感受……一步一步扩成一段话。同一个阶梯可以打印成三个级别，初学的孩子和母语孩子看同一张图一起练。') %></p>
+    </header>
+
+    <section class="sl-panel" aria-labelledby="slThemesHeading">
+      <p class="sl-kicker"><%= L('Step 1', '第一步') %></p>
+      <h2 id="slThemesHeading"><%= L('Start from an example or a blank ladder', '从示范主题开始，或者自己写') %></h2>
+      <div class="sl-version" role="radiogroup" aria-label="<%= L('Example version', '示范版本') %>">
+        <span><%= L('Example sentences:', '示范句子：') %></span>
+        <label><input type="radio" name="slVersion" value="basic"> <%= L('Beginner version (4 rows)', '初学版（4 行）') %></label>
+        <label><input type="radio" name="slVersion" value="native" checked> <%= L('Heritage / native version (6 rows)', '母语版（6 行）') %></label>
+      </div>
+      <div id="slThemes" class="sl-themes"></div>
+    </section>
+
+    <section class="sl-panel" aria-labelledby="slEditHeading">
+      <p class="sl-kicker"><%= L('Step 2', '第二步') %></p>
+      <h2 id="slEditHeading"><%= L('Edit the ladder', '编辑阶梯') %></h2>
+      <div class="sl-editor">
+        <div class="sl-editor-form">
+          <div class="sl-field-row">
+            <label class="sl-field"><span><%= L('Topic word', '主题词') %></span><input id="slTopic" class="sl-input" maxlength="12" placeholder="苹果"></label>
+            <label class="sl-field"><span><%= L('Title (for saving and links)', '标题（保存和链接用）') %></span><input id="slTitle" class="sl-input" maxlength="60"></label>
+            <label class="sl-field sl-field-small"><span><%= L('Type', '类型') %></span>
+              <select id="slKind" class="sl-input"><option value="thing"><%= L('写物 Things', '写物篇') %></option><option value="event"><%= L('写事 Events', '写事篇') %></option></select>
+            </label>
+          </div>
+
+          <fieldset class="sl-box">
+            <legend><%= L('Picture', '图片') %></legend>
+            <div class="sl-field-row">
+              <label class="sl-field sl-field-small"><span><%= L('Layout', '排法') %></span>
+                <select id="slLayout" class="sl-input">
+                  <option value="single"><%= L('One big picture', '一个大图') %></option>
+                  <option value="pile"><%= L('Main picture + small ones', '一大几小') %></option>
+                  <option value="row"><%= L('In a row', '排成一排') %></option>
+                  <option value="pair"><%= L('Two facing each other', '左右对面') %></option>
+                </select>
+              </label>
+              <label class="sl-field sl-field-small"><span><%= L('Background', '背景') %></span>
+                <select id="slBg" class="sl-input">
+                  <option value="room"><%= L('Indoors', '室内') %></option>
+                  <option value="outdoor"><%= L('Outdoors', '户外') %></option>
+                  <option value="snow"><%= L('Snow', '雪地') %></option>
+                  <option value="sky"><%= L('Sky', '天空') %></option>
+                  <option value="plain"><%= L('Plain', '纯色') %></option>
+                </select>
+              </label>
+            </div>
+            <div id="slItems" class="sl-items"></div>
+            <div class="sl-picker" id="slPicker" hidden>
+              <input id="slPickerSearch" class="sl-input" placeholder="<%= L('Search: apple, cat, 苹果…', '搜索：苹果、cat……') %>">
+              <div id="slPickerResults" class="sl-picker-results" role="listbox"></div>
+            </div>
+            <div class="sl-actions">
+              <label class="sl-btn sl-btn-small"><input id="slUpload" type="file" accept="image/*" hidden>📷 <%= L('Use my own picture', '上传自己的图片') %></label>
+              <button id="slRemoveUpload" class="sl-btn sl-btn-small sl-btn-ghost" type="button" hidden><%= L('Back to emoji picture', '换回 emoji 图') %></button>
+            </div>
+            <small class="sl-hint"><%= L('Emoji pictures: OpenMoji (CC BY-SA 4.0). Uploaded pictures are made small so they fit in a student link.', 'Emoji 图片来自 OpenMoji（CC BY-SA 4.0）。上传的图片会自动压缩，方便放进学生链接。') %></small>
+          </fieldset>
+
+          <fieldset class="sl-box">
+            <legend><%= L('Rows (what each row adds)', '每一行加什么') %></legend>
+            <div id="slRows" class="sl-rows"></div>
+            <datalist id="slLabelList"></datalist>
+            <button id="slAddRow" class="sl-btn sl-btn-small" type="button">+ <%= L('Add a row', '加一行') %></button>
+          </fieldset>
+
+          <fieldset class="sl-box">
+            <legend><%= L('The finished sentence, in pieces', '完整的句子，分成小块') %></legend>
+            <details class="sl-quick">
+              <summary><%= L('Quick start: paste the whole sentence', '快速开始：粘贴整段话') %></summary>
+              <p class="sl-hint"><%= L('Type the finished paragraph and cut it into pieces with /. Then set each piece’s row and blank below.', '写好完整的一段话，用 / 分成小块。然后在下面给每一块选行和留空。') %></p>
+              <textarea id="slQuickText" class="sl-input" rows="3" placeholder="桌子上放着/一堆/红彤彤的/苹果"></textarea>
+              <button id="slQuickApply" class="sl-btn sl-btn-small" type="button"><%= L('Cut into pieces', '分块') %></button>
+            </details>
+            <p class="sl-hint"><%= L('Each piece: which row it first appears in, and for how many rows it is a blank before it is printed. “Given” pieces are just printed.', '每一块：从第几行开始出现，出现后留空几行再写出来。“直接给出”的块不留空。') %></p>
+            <div id="slSegs" class="sl-segs"></div>
+            <button id="slAddSeg" class="sl-btn sl-btn-small" type="button">+ <%= L('Add a piece', '加一块') %></button>
+            <p id="slProblem" class="sl-problem" role="status"></p>
+          </fieldset>
+        </div>
+
+        <div class="sl-preview-col">
+          <div class="sl-preview-bar">
+            <div class="sl-seg-control" role="radiogroup" aria-label="<%= L('Level', '级别') %>">
+              <label><input type="radio" name="slLevel" value="basic"> 🌱 <%= L('Beginner', '入门') %></label>
+              <label><input type="radio" name="slLevel" value="mid"> 🌿 <%= L('Middle', '进阶') %></label>
+              <label><input type="radio" name="slLevel" value="native" checked> 🌳 <%= L('Native', '母语') %></label>
+            </div>
+            <p id="slLevelNote" class="sl-hint"></p>
+            <div class="sl-field-row sl-preview-options">
+              <label class="sl-field sl-field-small"><span><%= L('Rows shown', '显示行数') %></span><select id="slShown" class="sl-input"></select></label>
+              <label class="sl-field sl-field-small"><span><%= L('Characters', '字体') %></span>
+                <select id="slScript" class="sl-input"><option value="s"><%= L('Simplified 简体', '简体') %></option><option value="t"><%= L('Traditional 繁體', '繁體') %></option></select>
+              </label>
+              <label class="sl-check"><input id="slShowPy" type="checkbox" checked> <%= L('Pinyin', '拼音') %></label>
+              <label class="sl-check"><input id="slShowKey" type="checkbox"> <%= L('Show answers', '显示答案') %></label>
+            </div>
+          </div>
+          <div id="slPreview" class="sl-preview" aria-label="<%= L('Worksheet preview', '练习纸预览') %>"></div>
+          <div class="sl-actions">
+            <button id="slPrint" class="sl-btn sl-btn-primary" type="button">🖨️ <%= L('Print worksheet', '打印练习纸') %></button>
+            <button id="slPrintKey" class="sl-btn" type="button">🖨️ <%= L('Print answer key', '打印答案') %></button>
+            <button id="slPresent" class="sl-btn" type="button">📽️ <%= L('Present row by row', '投影：一行一行出') %></button>
+            <button id="slSaveTemplate" class="sl-btn" type="button" disabled>💾 <%= L('Save template', '保存模板') %></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sl-panel" aria-labelledby="slStudentsHeading">
+      <p class="sl-kicker"><%= L('Step 3', '第三步') %></p>
+      <h2 id="slStudentsHeading"><%= L('Student link · collect answers', '学生链接 · 收作业') %> <span class="sl-badge"><%= L('Members', '会员') %></span></h2>
+      <p><%= L('Students open the link on their own device. Beginners tap words from the word box, others type. Each answer carries into the next row, so students watch their own sentence grow. Press Submit and the work appears below.', '学生用自己的设备打开链接。入门级点选词语框里的词，其他级别自己打字。每填一个空，下一行就会接着用学生自己的答案，看着自己的句子越变越长。点“交给老师”后，作业会出现在下面。') %></p>
+      <div class="sl-actions">
+        <button id="slShare" class="sl-btn sl-btn-primary" type="button">🔗 <%= L('Create student link (uses the level above)', '生成学生链接（用上面选的级别）') %></button>
+      </div>
+      <p class="sl-hint"><%= L('Collecting student work is part of the', '收集学生作业是') %> <a href="/membership"><%= L('teacher membership', '会员功能') %></a>.</p>
+      <div id="slLinks" class="sl-links"></div>
+
+      <div id="slGalleryBox" class="sl-gallery-box" hidden>
+        <div class="sl-gallery-head">
+          <h3 id="slGalleryTitle"></h3>
+          <div class="sl-actions">
+            <button id="slGalleryReload" class="sl-btn sl-btn-small" type="button">↻ <%= L('Refresh', '刷新') %></button>
+            <button id="slGalleryShow" class="sl-btn sl-btn-small sl-btn-primary" type="button">📽️ <%= L('Present', '投影展示') %></button>
+            <label class="sl-check"><input id="slGalleryPickedOnly" type="checkbox"> <%= L('Only starred', '只投影加星的') %></label>
+            <label class="sl-check"><input id="slGalleryNames" type="checkbox" checked> <%= L('Show names', '显示名字') %></label>
+          </div>
+        </div>
+        <p id="slGalleryStatus" class="sl-hint" role="status"></p>
+        <ol id="slGallery" class="sl-gallery"></ol>
+      </div>
+    </section>
+  </main>
+
+  <div id="slShow" class="sl-show" hidden>
+    <div class="sl-show-top">
+      <span id="slShowCount"></span>
+      <span class="sl-show-buttons">
+        <button id="slShowKey" class="sl-btn" type="button"><%= L('Model answer (A)', '示范（A）') %></button>
+        <button id="slShowFull" class="sl-btn" type="button" title="<%= L('Full screen', '全屏') %>">⛶</button>
+        <button id="slShowClose" class="sl-btn" type="button" title="<%= L('Close (Esc)', '关闭 (Esc)') %>">✕</button>
+      </span>
+    </div>
+    <div id="slShowStage" class="sl-show-stage"></div>
+    <div class="sl-show-nav">
+      <button id="slShowPrev" class="sl-btn" type="button">← <%= L('Back', '上一步') %></button>
+      <button id="slShowNext" class="sl-btn sl-btn-primary" type="button"><%= L('Next (space)', '下一步（空格）') %> →</button>
+    </div>
+  </div>
+
+  <div id="slPrintArea" class="sl-print-area" aria-hidden="true"></div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/wordlist-core.js?v=cedict-1"></script>
+  <script src="/shared/emoji-core.js?v=learned-emoji-1"></script>
+  <script src="/shared/game-sharing.js?v=6" defer></script>
+  <script src="/shared/game-template.js?v=4" defer></script>
+  <script src="/low-prep/sentence-ladder/ladder-core.js?v=1"></script>
+  <script src="/low-prep/sentence-ladder/ladder-themes.js?v=1"></script>
+  <script src="/low-prep/sentence-ladder/ladder-view.js?v=3"></script>
+  <script src="/low-prep/sentence-ladder/sentence-ladder.js?v=2" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

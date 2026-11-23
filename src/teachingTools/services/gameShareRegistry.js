@@ -22,5 +22,6 @@ register(require('./games/vocabularyGachaGame'));
 register(require('./games/diceStoryGame'));
 register(require('./games/spinWheelGame'));
 register(require('./games/pixelArtGame'));
+register(require('./games/sentenceLadderGame'));
 
 module.exports = { register: register, get: get };
