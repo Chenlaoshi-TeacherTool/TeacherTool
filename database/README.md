@@ -86,6 +86,9 @@ warning and the app logs one at start-up.
 - `0017_move-printables-to-materials.sql` — the self-introduction and Halloween printables that
   were hard-coded in `routes/siteStructure.js` become `activity_materials` rows. Their files stay in
   `public/printables` and the printables blob container; the rows link to them.
+- `0027_add-teacher-favorites.sql` — `teacher_favorites`: what each teacher account starred (我的收藏),
+  in the teacher's own order. Generic `kind` + `ref`; the app accepts `tool` (the tool's href in
+  `config/tools.js`) for now. Read and written by `/api/teacher-library/favorites`. Not exposed through DAB.
 
 ## Other files
 

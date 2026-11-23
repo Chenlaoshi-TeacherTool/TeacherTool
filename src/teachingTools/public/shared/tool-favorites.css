@@ -1,0 +1,22 @@
+.has-fav-star { position: relative; }
+.fav-star {
+  position: absolute; top: 10px; right: 10px; z-index: 6;
+  display: grid; place-items: center; width: 38px; height: 38px; padding: 0;
+  border: 1px solid #dce3ce; border-radius: 50%; background: #fffdf7;
+  box-shadow: 0 2px 6px #194f4520; color: #8a9a82;
+  font-size: 21px; line-height: 1; cursor: pointer;
+  transition: transform .15s ease, color .15s ease;
+}
+.fav-star:hover { transform: scale(1.1); color: #d9a21b; }
+.fav-star[aria-pressed="true"] { color: #e0a800; border-color: #f2d58a; background: #fff8e1; }
+.fav-star:focus-visible { outline: 3px solid #f8c63f; outline-offset: 2px; }
+.fav-toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 1000; max-width: calc(100vw - 32px);
+  padding: 12px 18px; border-radius: 12px; background: #194f45; color: #fff; font-size: 15px;
+  box-shadow: 0 8px 24px #0003; transform: translate(-50%, 140%); opacity: 0;
+  transition: transform .25s ease, opacity .25s ease; pointer-events: none;
+}
+.fav-toast.is-shown { transform: translate(-50%, 0); opacity: 1; }
+.fresh-badge { display: inline-block; padding: 3px 9px; border-radius: 999px; background: #e0f2e4; color: #1d6b45; font-size: .72rem; font-weight: 800; letter-spacing: .03em; vertical-align: middle; }
+.fresh-badge--updated { background: #e6eefc; color: #2d4f99; }
+@media (prefers-reduced-motion: reduce) { .fav-star, .fav-toast { transition: none; } }

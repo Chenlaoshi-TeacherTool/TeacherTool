@@ -73,3 +73,24 @@ test('every /teaching-tools/<slug> page is in the catalog or deliberately unlist
     assert.ok(listed.indexOf(slug) === -1, slug + ' is both listed and unlisted');
   });
 });
+
+test('every live tool has a launch date, and updates carry both languages', function () {
+  var catalog = require('../config/tools');
+  catalog.LIVE.forEach(function (tool) {
+    assert.match(tool.added || '', /^20\d\d-[01]\d-[0-3]\d$/, tool.href + ' needs added: YYYY-MM-DD');
+    if (tool.updated) {
+      assert.match(tool.updated.date || '', /^20\d\d-[01]\d-[0-3]\d$/, tool.href + ' updated.date');
+      assert.ok(tool.updated.en && tool.updated.zh, tool.href + ' updated needs en and zh notes');
+    }
+  });
+});
+
+test('newest tools: latest launch or big update first; NEW/UPDATED badges last 14 days', function () {
+  var catalog = require('../config/tools');
+  var list = catalog.newest(4, '2026-11-23');
+  assert.equal(list.length, 4);
+  for (var i = 1; i < list.length; i += 1) assert.ok(list[i - 1].freshDate >= list[i].freshDate);
+  assert.equal(catalog.freshness({ added: '2026-11-12' }, '2026-11-23'), 'new');
+  assert.equal(catalog.freshness({ added: '2026-11-01' }, '2026-11-23'), null);
+  assert.equal(catalog.freshness({ added: '2026-09-01', updated: { date: '2026-11-20', en: 'x', zh: 'x' } }, '2026-11-23'), 'updated');
+});

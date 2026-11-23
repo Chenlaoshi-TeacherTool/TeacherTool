@@ -89,5 +89,7 @@
     refresh();
     window.addEventListener('focus', refresh);
   }
+  // Lets other scripts (the favorites ☆) open the sign-in dialog.
+  window.ChenTeacherAccount = { openLogin: function () { if (!dialog) setup(); openDialog('login'); } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setup); else setup();
 })();

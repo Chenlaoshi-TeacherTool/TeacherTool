@@ -46,3 +46,64 @@
     account.textContent = session.signedIn ? text('Signed in as ', '当前账号：') + session.user.name : text('Sign in using the account button above to access your account. Materials saved on this device are still available.', '请通过顶部账号按钮登录。此设备保存的材料仍然可以使用。');
   }).catch(function () { account.textContent = text('Sign-in status is temporarily unavailable. Please try again later.', '暂时无法读取登录状态，请稍后重试。'); });
 })();
+
+// ===== 我的收藏: favorite tools, saved to the teacher account =====
+(function () {
+  'use strict';
+  var zh = window.LibraryI18n.chinese;
+  function text(en, cn) { return zh ? cn : en; }
+  var list = document.getElementById('favList');
+  var status = document.getElementById('favStatus');
+  var favorites = window.ChenFavorites;
+  if (!list || !favorites) return;
+  var cards = null;
+  var refs = null;
+
+  function el(tag, className, content) { var node = document.createElement(tag); if (className) node.className = className; if (content) node.textContent = content; return node; }
+  function button(label, title, onClick) { var node = el('button', 'fav-action', label); node.type = 'button'; node.title = title; node.setAttribute('aria-label', title); node.addEventListener('click', onClick); return node; }
+
+  function move(index, step) {
+    var next = refs.slice();
+    var item = next.splice(index, 1)[0];
+    next.splice(index + step, 0, item);
+    favorites.reorder(next).catch(function () {});
+    var focusIndex = index + step;
+    render();
+    var row = list.children[focusIndex];
+    var again = row && row.querySelector(step < 0 ? '[data-move="up"]' : '[data-move="down"]');
+    if (again && !again.disabled) again.focus(); else if (row) row.querySelector('a').focus();
+  }
+
+  function render() {
+    list.replaceChildren();
+    if (favorites.signedIn() === false) { status.textContent = text('Sign in with the account button above to keep favorite tools on every device.', '请先通过顶部账号按钮登录，收藏的工具在每台设备上都能找到。'); return; }
+    if (!cards || refs === null) { status.textContent = text('Loading your favorites…', '正在读取收藏……'); return; }
+    var shown = refs.filter(function (ref) { return cards[ref]; });
+    status.textContent = shown.length ? text(shown.length + ' favorite tools. The first ones show on the home page.', '共 ' + shown.length + ' 个收藏，排在前面的会显示在首页。')
+      : text('No favorites yet. Open the tool directory and tap ☆ on the tools you use most.', '还没有收藏。打开工具目录，在常用工具上点 ☆。');
+    shown.forEach(function (ref, index) {
+      var card = cards[ref];
+      var row = el('li', 'fav-row');
+      var icon = el('span', 'fav-icon', card.icon || '✨'); icon.setAttribute('aria-hidden', 'true');
+      var info = el('div', 'fav-info');
+      var link = el('a', '', card.title); link.href = card.href;
+      info.append(link, el('small', '', card.desc));
+      var actions = el('div', 'fav-actions');
+      var up = button('↑', text('Move up', '上移'), function () { move(index, -1); }); up.dataset.move = 'up'; up.disabled = index === 0;
+      var down = button('↓', text('Move down', '下移'), function () { move(index, 1); }); down.dataset.move = 'down'; down.disabled = index === shown.length - 1;
+      var remove = button('★', text('Remove from favorites', '取消收藏'), function () { favorites.set(ref, false).catch(function () {}); });
+      remove.classList.add('fav-remove');
+      actions.append(up, down, remove);
+      row.append(icon, info, actions);
+      list.appendChild(row);
+    });
+  }
+
+  favorites.onChange(function (next) { refs = next ? next.slice() : (favorites.signedIn() ? [] : null); render(); });
+  refs = favorites.cached();
+  render();
+  fetch('/api/tool-cards', { credentials: 'same-origin' }).then(function (response) { if (!response.ok) throw new Error(); return response.json(); })
+    .then(function (body) { cards = {}; body.cards.forEach(function (card) { cards[card.href] = card; }); render(); })
+    .catch(function () { status.textContent = text('Your favorites could not be loaded right now.', '暂时无法读取收藏，请稍后再试。'); });
+  favorites.load().then(function (result) { if (result.signedIn && !result.refs) refs = []; render(); });
+})();

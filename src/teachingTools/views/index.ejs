@@ -11,6 +11,7 @@
     <%- include('partials/seo', { pageDescription: 'Practical classroom tools, adaptable teaching activities, and thoughtful resources for educators across subjects. 陈老师教学工具：中文教学、汉字练习、词汇活动与可打印课堂资源。' }) %>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
     <link rel="stylesheet" href="/stylesheets/tool-snapshots.css?v=1">
+    <link rel="stylesheet" href="/shared/tool-favorites.css?v=1">
     <style>
         .home-hero {
             position: relative;
@@ -118,7 +119,28 @@
         .home-tool-card__icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; background: #edf5df; font-size: 1.4rem; }
         .home-tool-card h3 { margin: 0; color: #194f45; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.1rem; font-weight: 400; line-height: 1.25; }
         .home-tool-card p { margin: 0; color: #5d7168; font-size: .9rem; line-height: 1.55; }
-        .home-tools-more { display: flex; justify-content: center; margin-top: 26px; }
+        .home-tools-more { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 26px; }
+        .home-tools-more .btn-secondary { background: #fffdf7; color: #194f45; border: 1px solid #cbdac2; box-shadow: none; }
+        .home-tool-card__link { display: flex; flex: 1; flex-direction: column; color: inherit; text-decoration: none; }
+        .home-tool-card__link:focus-visible { outline: 3px solid #bb952e; outline-offset: 5px; border-radius: 12px; }
+        .home-tool-card .fresh-badge { align-self: flex-start; margin: -6px 0 10px; }
+        .home-fav-hint { margin: 18px 0 0; color: #5d7168; font-size: .95rem; }
+        .home-newest { margin-top: 56px; }
+        .home-newest .eyebrow { margin-bottom: 12px; border-color: #d7e3c7; background: #edf5df; color: #356e57; }
+        .home-newest h2 { margin: 0; color: #194f45; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 400; }
+        .home-newest-intro { margin: 8px 0 0; color: #5d7168; }
+        .home-newest-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 22px; }
+        .home-newest-card { border: 1px solid #e5ddc9; border-radius: 18px; background: #fffdf7; box-shadow: 0 6px 16px rgba(24, 66, 55, .07); transition: transform .15s ease, box-shadow .15s ease; }
+        .home-newest-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(24, 66, 55, .12); }
+        .home-newest-card > a { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 18px 20px 20px; color: inherit; text-decoration: none; border-radius: 18px; }
+        .home-newest-card > a:focus-visible { outline: 3px solid #bb952e; outline-offset: 3px; }
+        .home-newest-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; background: #edf5df; font-size: 1.4rem; }
+        .home-newest-meta { color: #7a8a80; font-size: .8rem; }
+        .home-newest-card h3 { margin: 0; padding-right: 30px; color: #194f45; font-family: 'DM Serif Display', 'Noto Sans SC', serif; font-size: 1.1rem; font-weight: 400; line-height: 1.3; }
+        .home-newest-card p { display: -webkit-box; margin: 0; overflow: hidden; color: #5d7168; font-size: .88rem; line-height: 1.55; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+        @media (max-width: 1000px) { .home-newest-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 520px) { .home-newest-grid { grid-template-columns: 1fr; } }
+        @media (prefers-reduced-motion: reduce) { .home-newest-card { transition: none; } .home-newest-card:hover { transform: none; } }
         .home-paths-about { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 30px; padding: 17px 22px; border: 1px dashed #cbdac2; border-radius: 16px; color: #5d7168; }
         .home-paths-about strong { color: #194f45; }
         .home-paths-about a { flex: 0 0 auto; color: #a63f34; font-weight: 900; text-decoration: none; }
@@ -197,28 +219,52 @@
 
     <main class="home-paths-section" aria-labelledby="home-paths-heading">
         <div class="home-paths-shell">
-            <header class="home-paths-header">
+            <%# Signed-in teachers with favorites see "My favorite tools" here instead (script at the end of the page). %>
+            <header class="home-paths-header" id="homeToolsHeader"
+                data-fav-eyebrow="<%= t('home.myToolsEyebrow') %>" data-fav-heading="<%= t('home.myToolsHeading') %>" data-fav-intro="<%= t('home.myToolsIntro') %>">
                 <div>
-                    <div class="eyebrow"><%= t('home.pathsEyebrow') %></div>
+                    <div class="eyebrow" id="homeToolsEyebrow"><%= t('home.pathsEyebrow') %></div>
                     <h2 id="home-paths-heading"><%= t('home.pathsHeading') %></h2>
                 </div>
-                <p><%= t('home.pathsIntro') %></p>
+                <p id="homeToolsIntro"><%= t('home.pathsIntro') %></p>
             </header>
+            <p class="home-fav-hint" id="homeFavHint" hidden>☆ <%= t('home.favHint') %></p>
 
-            <div class="home-tools-grid" id="tools">
+            <div class="home-tools-grid" id="tools" data-popular-badge="<%= t('home.popularBadge') %>" data-open-label="<%= t('teachingToolsIndex.openTool') %>">
                 <% popularTools.forEach(function(tool) { %>
-                <a class="home-tool-card snapshot-card" href="<%= tool.href %>">
-                    <%- include('partials/tool-snapshot', { previewHref: tool.href }) %>
-                    <h3><%= t(tool.titleKey) %></h3>
-                    <p><%= t(tool.descKey) %></p>
-                    <span class="btn" aria-hidden="true"><%= t('teachingToolsIndex.openTool') %> →</span>
-                </a>
+                <div class="home-tool-card snapshot-card" data-fav-ref="<%= tool.href %>" data-popular>
+                    <a class="home-tool-card__link" href="<%= tool.href %>">
+                        <%- include('partials/tool-snapshot', { previewHref: tool.href }) %>
+                        <h3><%= t(tool.titleKey) %></h3>
+                        <p><%= t(tool.descKey) %></p>
+                        <span class="btn" aria-hidden="true"><%= t('teachingToolsIndex.openTool') %> →</span>
+                    </a>
+                </div>
                 <% }); %>
             </div>
 
             <div class="home-tools-more">
                 <a href="/teaching-tools" class="btn"><%= t('home.browseAll') %></a>
+                <a href="/teaching-tools/teacher-library/teacher-library.html#favorites" class="btn btn-secondary" id="homeManageFavorites" hidden><%= t('home.manageFavorites') %></a>
             </div>
+
+            <section class="home-newest" aria-labelledby="home-newest-heading">
+                <div class="eyebrow"><%= t('home.newestEyebrow') %></div>
+                <h2 id="home-newest-heading"><%= t('home.newestHeading') %></h2>
+                <p class="home-newest-intro"><%= t('home.newestIntro') %></p>
+                <div class="home-newest-grid">
+                    <% newestTools.forEach(function(tool) { %>
+                    <div class="home-newest-card" data-fav-ref="<%= tool.href %>">
+                        <a href="<%= tool.href %>">
+                            <span class="home-newest-icon" aria-hidden="true"><%= tool.icon || '✨' %></span>
+                            <span class="home-newest-meta"><span class="fresh-badge fresh-badge--<%= tool.fresh %>"><%= t(tool.fresh === 'updated' ? 'home.freshUpdated' : 'home.freshNew') %></span> <time datetime="<%= tool.freshDate %>"><%= tool.freshDate.slice(5).replace('-', '/') %></time></span>
+                            <h3><%= t(tool.titleKey) %></h3>
+                            <p><%= tool.fresh === 'updated' && tool.updated ? (lang === 'zh' ? tool.updated.zh : tool.updated.en) : t(tool.descKey) %></p>
+                        </a>
+                    </div>
+                    <% }); %>
+                </div>
+            </section>
 
             <div class="home-paths-about">
                 <span><strong><%= t('home.newHereStrong') %></strong> <%= t('home.newHereText') %></span>
@@ -293,7 +339,10 @@
     <footer>
         <p><%- t('footer.home') %></p>
     </footer>
+    <script type="application/json" id="homeToolCards"><%- toolCardsJson %></script>
     <script src="/javascripts/account-coming-soon.js"></script>
+    <script src="/shared/tool-favorites.js?v=1"></script>
+    <script src="/javascripts/home-favorites.js?v=1"></script>
     <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>

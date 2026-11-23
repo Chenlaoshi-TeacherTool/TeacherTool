@@ -20,6 +20,13 @@ router.get('/tool-videos', async function (req, res) {
   }
 });
 
+// Card data for every live tool in the page language (My Space favorites).
+router.get('/tool-cards', function (req, res) {
+  res.set('Cache-Control', 'public, max-age=300');
+  res.set('Vary', 'Cookie');
+  res.json({ cards: require('../services/toolCards').cards(res.locals.lang) });
+});
+
 var azureAuthEnabled = authUser.azureAuthEnabled;
 var currentUser = authUser.currentUser;
 

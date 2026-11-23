@@ -35,7 +35,8 @@ var ebayStoreUrl = siteMap.children('shop').find(function(item) { return item.ke
 router.get('/', async function(req, res, next) {
   try {
     res.locals.t = await require('../services/editablePages').publicText('home', res.locals.lang, res.locals.t);
-    res.render('index', { title: 'Home', ebayStoreUrl: ebayStoreUrl, popularTools: await popularTools.getCards() });
+    res.render('index', { title: 'Home', ebayStoreUrl: ebayStoreUrl, popularTools: await popularTools.getCards(),
+      newestTools: tools.newest(4), toolCardsJson: require('../services/toolCards').json(res.locals.lang) });
   } catch (err) { next(err); }
 });
 
@@ -109,7 +110,7 @@ router.get('/chinese-teaching', function(req, res) {
 });
 
 router.get('/teaching-tools', function(req, res, next) {
-  res.render('teaching-tools/index', { title: 'Teaching Tools', toolSections: tools.sections(), socialTools: tools.socialTools });
+  res.render('teaching-tools/index', { title: 'Teaching Tools', toolSections: tools.sections(), socialTools: tools.socialTools, freshness: tools.freshness });
 });
 
 router.get('/teaching-tools/qr-code-generator', function(req, res, next) {

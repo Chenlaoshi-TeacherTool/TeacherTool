@@ -188,6 +188,7 @@
     </style>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
     <link rel="stylesheet" href="/stylesheets/tool-snapshots.css?v=1">
+    <link rel="stylesheet" href="/shared/tool-favorites.css?v=1">
 </head>
 <body>
     <a href="/" class="back-btn">← <%= t('teachingToolsIndex.backToHomepage') %></a>
@@ -242,9 +243,9 @@
                     var searchText = searchKeys.map(function(key) { return t(key) + ' ' + tOther(key); }).join(' ');
                     var categories = categoryNames.get(tool);
                 %>
-                <div data-tool="<%= tool.titleKey %>" data-search="<%= searchText %>" class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %>">
+                <div data-tool="<%= tool.titleKey %>" data-search="<%= searchText %>"<% if (tool.href) { %> data-fav-ref="<%= tool.href %>"<% } %> class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %>">
                     <% if (tool.href) { %><%- include('../partials/tool-snapshot', { previewHref: tool.href }) %><% } %>
-                    <h3><% if (tool.icon) { %><%= tool.icon %> <% } %><%= t(tool.titleKey) %><% if (tool.subject === 'chinese') { %> <span class="tool-subject"><%= t('teachingToolsIndex.chineseOnly') %></span><% } %><% if (tool.limitedFree) { %> <span class="tool-limited-free"><%= t('teachingToolsIndex.limitedFree') %></span><% } %></h3>
+                    <h3><% if (tool.icon) { %><%= tool.icon %> <% } %><%= t(tool.titleKey) %><% if (tool.subject === 'chinese') { %> <span class="tool-subject"><%= t('teachingToolsIndex.chineseOnly') %></span><% } %><% if (tool.limitedFree) { %> <span class="tool-limited-free"><%= t('teachingToolsIndex.limitedFree') %></span><% } %><% var fresh = tool.href && freshness(tool); if (fresh) { %> <span class="fresh-badge fresh-badge--<%= fresh %>"><%= t(fresh === 'new' ? 'teachingToolsIndex.freshNew' : 'teachingToolsIndex.freshUpdated') %></span><% } %></h3>
                     <p class="tool-scope"><%= t(tool.scopeKey) %></p>
                     <p><%= t(tool.descKey) %></p>
                     <% if (categories) { %><p class="tool-categories"><%= categories.join(lang === 'zh' ? '、' : ' · ') %></p><% } %>
@@ -268,6 +269,8 @@
     </main>
 
     <script src="/javascripts/account-coming-soon.js"></script>
+    <script src="/shared/tool-favorites.js?v=1"></script>
+    <script>window.ChenFavorites.attachStars(document); window.ChenFavorites.load();</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
     <script>
         // Removed QR generator functionality as it's now on a separate page
