@@ -1,0 +1,133 @@
+/* 部件卡片 · Component Cards — prefix cc- */
+.cc-page { background: #f6f3ea; }
+.cc-wrap { max-width: 1320px; margin: 0 auto; padding: 24px 20px 48px; color: #1f2d27; }
+.cc-header { margin-bottom: 22px; }
+.cc-header h1 { margin: 6px 0 8px; color: #194f45; }
+.cc-header p { max-width: 760px; margin: 0; color: #4b5f56; }
+.cc-header .back-btn { display: inline-block; margin-bottom: 12px; color: #356e57; font-weight: 700; text-decoration: none; }
+.cc-eyebrow { margin: 0; color: #bf7f35 !important; font-size: .8rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+
+.cc-layout { display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 22px; align-items: start; }
+.cc-builder { display: flex; flex-direction: column; gap: 14px; }
+.cc-panel { padding: 16px 18px; border: 1px solid #d9e3d2; border-radius: 14px; background: #fffdf7; }
+.cc-kicker { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; color: #194f45; font-weight: 800; }
+.cc-step { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #356e57; color: #fff; font-size: .8rem; }
+.cc-panel label { display: block; margin: 10px 0 5px; font-weight: 700; font-size: .92rem; }
+.cc-panel label small { color: #6b7d74; font-weight: 400; }
+.cc-panel textarea, .cc-panel input[type=text], .cc-panel select { box-sizing: border-box; width: 100%; padding: 9px 11px; border: 1px solid #c9d6c2; border-radius: 9px; background: #fff; font: inherit; }
+.cc-panel textarea { font-size: 1.3rem; letter-spacing: .1em; }
+.cc-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cc-check { display: flex !important; align-items: center; gap: 8px; font-weight: 500 !important; }
+.cc-check[hidden] { display: none !important; }
+.cc-note { margin: 8px 0 0; color: #5d7168; font-size: .86rem; }
+
+.cc-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.cc-chip { display: flex; flex-direction: column; align-items: center; min-width: 54px; padding: 5px 8px; border: 1px solid #c9d6c2; border-radius: 10px; background: #fff; cursor: pointer; font: inherit; }
+.cc-chip b { font-size: 1.3rem; font-weight: 600; }
+.cc-chip small { color: #5d7168; font-size: .72rem; white-space: nowrap; }
+.cc-chip.is-active { border-color: #356e57; box-shadow: 0 0 0 2px #356e57; }
+.cc-chip.is-missing { opacity: .5; cursor: not-allowed; }
+
+.cc-modes { display: grid; gap: 8px; }
+.cc-modes button { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; padding: 10px 12px; border: 1px solid #c9d6c2; border-radius: 11px; background: #fff; text-align: left; cursor: pointer; font: inherit; font-size: 1.05rem; }
+.cc-modes button b { font-size: .98rem; }
+.cc-modes button small { grid-column: 2; color: #5d7168; font-size: .8rem; }
+.cc-modes button[aria-checked=true] { border-color: #356e57; background: #edf5df; box-shadow: inset 0 0 0 1px #356e57; }
+
+.cc-editor { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: start; margin-top: 10px; }
+.cc-editor[hidden] { display: none; }
+.cc-editor-char .cc-glyph { width: 150px; height: 150px; background: #fff; }
+.cc-editor-char path { cursor: pointer; }
+.cc-editor-char path:hover { opacity: .7; }
+.cc-part-row { display: flex !important; align-items: center; gap: 8px; margin: 0 0 6px !important; }
+.cc-part-row input { width: 64px !important; text-align: center; font-size: 1.2rem !important; }
+
+.cc-btn { padding: 10px 18px; border: 0; border-radius: 10px; background: #c8553d; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.cc-btn:hover { filter: brightness(1.05); }
+.cc-btn-ghost { background: #fff; color: #194f45; border: 1px solid #c9d6c2; }
+.cc-btn[hidden] { display: none; }
+
+.cc-preview { position: sticky; top: 12px; }
+.cc-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.cc-stage { max-height: calc(100vh - 90px); overflow: auto; padding: 12px; border-radius: 14px; background: #e4e0d4; }
+.cc-sheets { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.cc-empty { padding: 40px; color: #5d7168; text-align: center; }
+
+/* ---------- sheet (real paper size) ---------- */
+.cc-sheet { box-sizing: border-box; flex-shrink: 0; padding: 12mm 13mm; background: #fff; box-shadow: 0 3px 14px rgba(0,0,0,.14); color: #1f2d27; font-family: "KaiTi", "STKaiti", "Kaiti SC", "Microsoft YaHei", serif; }
+.cc-sheet-inner { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.cc-sheet-inner > * { flex-shrink: 0; }
+.cc-sheet-head { display: flex; justify-content: space-between; align-items: baseline; min-height: 8mm; margin-bottom: 3mm; font-family: "Microsoft YaHei", sans-serif; }
+.cc-sheet-title { color: #194f45; font-size: 16pt; font-weight: 700; }
+.cc-name { font-size: 11pt; color: #444; }
+.cc-sheet-foot { display: flex; justify-content: space-between; margin-top: auto; padding-top: 2mm; border-top: .3mm solid #dfe6db; color: #8a968f; font: 7.5pt "Microsoft YaHei", sans-serif; }
+.cc-instruct { margin: 0 0 4mm; font: 11pt "Microsoft YaHei", sans-serif; color: #34463f; }
+.cc-answer { color: #c8553d; font-weight: 700; }
+
+.cc-glyph { display: block; }
+.cc-grid rect { fill: #fff; stroke: #e39a9a; stroke-width: 6; }
+.cc-grid line { stroke: #efc3c3; stroke-width: 5; stroke-dasharray: 22 16; }
+.cc-ol-edge path { fill: none; stroke: #1f2d27; stroke-width: 22; stroke-linejoin: round; }
+.cc-ol-fill path { fill: #fff; }
+
+.cc-cards { flex: 1; display: grid; gap: 5mm; align-content: space-evenly; justify-items: center; }
+.cc-cards.per-1 { --g: 150mm; }
+.cc-cards.per-2 { --g: 92mm; }
+.cc-cards.per-4 { --g: 68mm; grid-template-columns: 1fr 1fr; }
+.cc-cards.per-6 { --g: 54mm; grid-template-columns: 1fr 1fr; }
+.cc-card { display: flex; flex-direction: column; align-items: center; gap: 2.5mm; }
+.cc-card .cc-glyph { width: var(--g); height: var(--g); }
+.cc-card-text { display: flex; flex-direction: column; align-items: center; gap: 1.5mm; }
+.cc-formula { display: flex; align-items: center; gap: 2mm; font-size: calc(var(--g) * .17); line-height: 1.1; }
+.cc-formula i { font-style: normal; color: #7b8a83; font-size: .8em; }
+.cc-single { font: calc(var(--g) * .07) "Microsoft YaHei", sans-serif; color: #7b8a83; }
+.cc-part-shape svg { width: 1em; height: 1em; }
+.cc-py { font-family: Andika, sans-serif; font-size: calc(var(--g, 60mm) * .1); color: #4b5f56; }
+
+.cc-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5mm 5mm; margin: 0; padding: 0; list-style: none; font-size: calc(var(--g) * .13); }
+.cc-legend li { display: flex; align-items: center; gap: 1.5mm; }
+.cc-legend b { font: 700 calc(var(--g) * .085) "Microsoft YaHei", sans-serif; }
+.cc-swatch { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 50%; border: .3mm solid rgba(0,0,0,.25); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.cc-legend .cc-swatch { width: .7em; height: .7em; }
+.cc-arrow { color: #8a968f; font-size: .6em; }
+
+.cc-boards { display: flex; flex-wrap: wrap; justify-content: center; gap: 6mm 8mm; }
+.cc-board { display: flex; flex-direction: column; align-items: center; gap: 1.5mm; }
+.cc-board-box .cc-glyph { width: 100%; height: 100%; }
+.cc-board-text { display: flex; gap: 3mm; align-items: baseline; font: 10pt "Microsoft YaHei", sans-serif; }
+.cc-board-text .cc-py { font-size: 13pt; }
+.cc-count { color: #7b8a83; }
+.cc-cut-label { margin: 6mm 0 2mm; padding-top: 3mm; border-top: .4mm dashed #9aa79f; font: 10pt "Microsoft YaHei", sans-serif; color: #5d7168; }
+.cc-pieces { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 3mm; }
+.cc-piece { border: .35mm dashed #6b7d74; }
+.cc-piece .cc-glyph { width: 100%; height: 100%; }
+
+/* ---------- projector ---------- */
+.cc-show { position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; background: #fffdf7; }
+.cc-show[hidden] { display: none; }
+.cc-show-close { position: absolute; top: 16px; right: 20px; border: 0; background: none; font-size: 28px; cursor: pointer; color: #4b5f56; }
+.cc-show-card { display: flex; flex-direction: column; align-items: center; gap: 2vh; --g: 62vh; }
+.cc-show-card .cc-glyph { width: 62vh; height: 62vh; overflow: visible; }
+.cc-show-text { display: flex; align-items: baseline; gap: 4vh; }
+.cc-show-text .cc-formula { gap: 2vh; font-size: 9vh; font-family: "KaiTi", "STKaiti", "Kaiti SC", serif; }
+.cc-show-text .cc-py { font-size: 6vh; }
+.cc-part { transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+.is-split .cc-part { transform: translate(var(--dx), var(--dy)); }
+.cc-show-bar { display: flex; align-items: center; gap: 14px; font-size: 1.1rem; color: #4b5f56; }
+@media (prefers-reduced-motion: reduce) { .cc-part { transition: none; } }
+
+@media (max-width: 900px) {
+  .cc-layout { grid-template-columns: 1fr; }
+  .cc-preview { position: static; }
+}
+
+@media print {
+  html, body.cc-page { margin: 0; padding: 0 !important; background: #fff !important; }
+  body > *:not(.cc-wrap), .cc-header, .cc-builder, .cc-toolbar { display: none !important; }
+  .cc-wrap, .cc-layout, .cc-preview { display: block; max-width: none; margin: 0; padding: 0; }
+  .cc-stage { max-height: none; overflow: visible; padding: 0; background: none; border-radius: 0; }
+  .cc-sheets { display: block; zoom: 1 !important; }
+  .cc-sheet { box-shadow: none; break-after: page; page-break-after: always; }
+  .cc-sheet:last-child { break-after: auto; page-break-after: auto; }
+  .cc-sheet, .cc-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

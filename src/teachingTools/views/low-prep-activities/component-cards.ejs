@@ -1,0 +1,108 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>部件卡片 · Component Cards - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Type Chinese characters and colour each component: show colour cards like 好 = 女 + 子 on the projector, print a colour-by-component worksheet, or print the components as cut-out pieces students glue back together. 输入汉字，按部件上色：彩色字卡、部件涂色练习纸、部件拼图。' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=1">
+  <style id="cc-page-size">@page { size: A4; margin: 0; }</style>
+</head>
+<body class="cc-page">
+  <main class="cc-wrap">
+    <header class="cc-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="cc-eyebrow"><%= L('Characters · components', '汉字 · 部件') %></p>
+      <h1>🎨 <%= L('Component Cards', '部件卡片') %></h1>
+      <p><%= L('Type characters and every component gets its own colour. Show colour cards on the projector, print a colour-by-component sheet, or print the components as pieces to cut out and glue back together.', '输入汉字，每个部件自动换一种颜色。可以投影彩色字卡，打印照图例涂色的练习纸，或把部件印成小块，让学生剪下来拼回原字。') %></p>
+    </header>
+
+    <div class="cc-layout">
+      <section class="cc-builder" aria-label="<%= L('Settings', '设置') %>">
+        <section class="cc-panel">
+          <p class="cc-kicker"><span class="cc-step">1</span><%= L('Characters', '汉字') %></p>
+          <label for="ccChars"><%= L('Characters or words', '汉字或词语') %> <small><%= L('(up to 24 characters)', '（最多 24 个字）') %></small></label>
+          <textarea id="ccChars" rows="3" spellcheck="false">好 明 休 林 河 想</textarea>
+          <div id="ccChips" class="cc-chips" aria-live="polite"></div>
+          <p id="ccStatus" class="cc-note" role="status"></p>
+        </section>
+
+        <section class="cc-panel">
+          <p class="cc-kicker"><span class="cc-step">2</span><%= L('What to make', '做什么') %></p>
+          <div class="cc-modes" role="radiogroup" aria-label="<%= L('Output', '输出') %>">
+            <button type="button" role="radio" data-mode="color" aria-checked="true">🌈 <b><%= L('Colour cards', '彩色字卡') %></b><small><%= L('Projector or print', '投影或打印') %></small></button>
+            <button type="button" role="radio" data-mode="coloring" aria-checked="false">🖍️ <b><%= L('Colouring sheet', '部件涂色') %></b><small><%= L('Students colour by legend', '学生照图例涂色') %></small></button>
+            <button type="button" role="radio" data-mode="puzzle" aria-checked="false">✂️ <b><%= L('Cut-out puzzle', '部件拼图') %></b><small><%= L('Cut, then glue back', '剪下来拼回原字') %></small></button>
+          </div>
+        </section>
+
+        <section class="cc-panel">
+          <p class="cc-kicker"><span class="cc-step">3</span><%= L('Settings', '设置') %></p>
+          <label for="ccTitle"><%= L('Title on the sheet', '纸上的标题') %> <small><%= L('(optional)', '（可不填）') %></small></label>
+          <input id="ccTitle" type="text" maxlength="60" placeholder="<%= L('e.g. Lesson 3 characters', '比如：第三课 生字') %>">
+          <div class="cc-two">
+            <div>
+              <label for="ccPer"><%= L('Characters per page', '每页几个字') %></label>
+              <select id="ccPer"></select>
+            </div>
+            <div>
+              <label for="ccPaper"><%= L('Paper', '纸张') %></label>
+              <select id="ccPaper">
+                <option value="A4">A4</option>
+                <option value="Letter">Letter</option>
+              </select>
+            </div>
+          </div>
+          <label class="cc-check"><input type="checkbox" id="ccPinyin" checked> <%= L('Show pinyin', '显示拼音') %></label>
+          <label class="cc-check" data-for="coloring"><input type="checkbox" id="ccKey" checked> <%= L('Add a coloured answer page', '加一页彩色答案') %></label>
+          <label class="cc-check" data-for="puzzle"><input type="checkbox" id="ccHint" checked> <%= L('Faint outline on the gluing board', '拼贴格里印淡淡的轮廓') %></label>
+          <label class="cc-check" data-for="puzzle"><input type="checkbox" id="ccPieceColor"> <%= L('Pieces in colour (otherwise black)', '部件印成彩色（不勾就是黑色）') %></label>
+        </section>
+
+        <section class="cc-panel">
+          <p class="cc-kicker"><span class="cc-step">4</span><%= L('Adjust a split (optional)', '调整拆法（可不做）') %></p>
+          <p class="cc-note"><%= L('Click a character above, then click its strokes to move them to another component. Type the component names below.', '先点上面的某个字，再点它的笔画，就能把这一笔换到别的部件。部件名称可以在下面改。') %></p>
+          <div id="ccEditor" class="cc-editor" hidden>
+            <div id="ccEditorChar" class="cc-editor-char"></div>
+            <div>
+              <div id="ccEditorParts" class="cc-editor-parts"></div>
+              <button id="ccEditorReset" type="button" class="cc-btn cc-btn-ghost"><%= L('Back to the original split', '恢复原来的拆法') %></button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="cc-preview" aria-label="<%= L('Preview', '预览') %>">
+        <div class="cc-toolbar">
+          <button id="ccPrint" type="button" class="cc-btn">🖨️ <%= L('Print / Save PDF', '打印 / 存成 PDF') %></button>
+          <button id="ccShow" type="button" class="cc-btn cc-btn-ghost">📽️ <%= L('Show on projector', '投影展示') %></button>
+        </div>
+        <div id="ccStage" class="cc-stage"><div id="ccSheets" class="cc-sheets"></div></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="ccShowBox" class="cc-show" hidden>
+    <button type="button" class="cc-show-close" id="ccShowClose" aria-label="<%= L('Close', '关闭') %>">✕</button>
+    <div id="ccShowCard" class="cc-show-card"></div>
+    <div class="cc-show-bar">
+      <button type="button" id="ccShowPrev" class="cc-btn cc-btn-ghost">←</button>
+      <button type="button" id="ccShowSplit" class="cc-btn"><%= L('Split apart', '拆开') %></button>
+      <span id="ccShowCount"></span>
+      <button type="button" id="ccShowNext" class="cc-btn cc-btn-ghost">→</button>
+    </div>
+  </div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script>window.CC_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
+  <script src="/shared/wordlist-core.js?v=zh-1"></script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/low-prep/component-cards/component-cards.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

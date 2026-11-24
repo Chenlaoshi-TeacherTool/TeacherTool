@@ -82,6 +82,7 @@ var TOOLS = [
   { href: '/teaching-tools/hanzi-batch/index.html', added: '2026-10-17', icon: '🎨', titleKey: 'teachingToolsIndex.hanziBatchTitle', scopeKey: 'teachingToolsIndex.hanziBatchScope', descKey: 'teachingToolsIndex.hanziBatchDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'hanzi', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/missing-radicals', added: '2026-10-17', icon: '✍️', titleKey: 'teachingToolsIndex.missingPartsTitle', scopeKey: 'teachingToolsIndex.missingPartsScope', descKey: 'teachingToolsIndex.missingPartsDesc', actionKey: 'teachingToolsIndex.openActivity', section: 'hanzi', uses: ['print', 'project'], subject: 'chinese' },
   { href: '/teaching-tools/spin-wheel?mode=hanzi', added: '2026-11-22', icon: '🀄', titleKey: 'teachingToolsIndex.hanziWheelTitle', scopeKey: 'teachingToolsIndex.hanziWheelScope', descKey: 'teachingToolsIndex.hanziWheelDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'hanzi', uses: ['print', 'project'], subject: 'chinese' },
+  { href: '/teaching-tools/component-cards', added: '2026-11-23', icon: '🎨', titleKey: 'teachingToolsIndex.componentCardsTitle', scopeKey: 'teachingToolsIndex.componentCardsScope', descKey: 'teachingToolsIndex.componentCardsDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'hanzi', uses: ['print', 'project'], subject: 'chinese' },
   { href: '/teaching-tools/character-unscrambler', added: '2026-11-02', icon: '✂️', titleKey: 'teachingToolsIndex.charUnscramblerTitle', scopeKey: 'teachingToolsIndex.charUnscramblerScope', descKey: 'teachingToolsIndex.charUnscramblerDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'hanzi', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/yu-duoyinzi-font', added: '2026-08-21', icon: '🈶', titleKey: 'teachingToolsIndex.fontTitle', scopeKey: 'teachingToolsIndex.fontScope', descKey: 'teachingToolsIndex.fontDesc', actionKey: 'teachingToolsIndex.viewAndDownload', section: 'hanzi', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/independent-reading', added: '2026-08-11', icon: '📖', titleKey: 'teachingToolsIndex.independentReadingTitle', scopeKey: 'teachingToolsIndex.independentReadingScope', descKey: 'teachingToolsIndex.independentReadingDesc', actionKey: 'teachingToolsIndex.openActivity', section: 'reading', uses: ['print'] },
@@ -134,7 +135,7 @@ var DIRECTORY = {
   printables: {
     'classroom-supplies': 'nameTentTitle qrTitle',
     'printable-games': 'sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle spinWheelTitle diceStoryTitle vocabPuzzleTitle pixelArtTitle',
-    'chinese-materials': 'decodeTitle worksheetTitle sentenceLadderTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle charUnscramblerTitle hanziWheelTitle independentReadingTitle glossaryTitle'
+    'chinese-materials': 'decodeTitle worksheetTitle sentenceLadderTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle componentCardsTitle charUnscramblerTitle hanziWheelTitle independentReadingTitle glossaryTitle'
   },
   prep: { main: 'libraryTitle questionBankTitle emojiSearchTitle glossaryTitle fontTitle' }
 };
