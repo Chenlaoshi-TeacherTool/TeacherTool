@@ -1,0 +1,130 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>口语任务卡 · Speaking Task Cards - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Printable Chinese speaking task cards: role-play cards for pairs (ordering food, shopping, asking the way, seeing a doctor and more) with roles A and B, sentence patterns with pinyin and words to use, plus a find-someone-who interview sheet from your word list. 口语任务卡：情景角色卡和“找一个……的同学”采访表。' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/speaking-cards/speaking-cards.css?v=2">
+  <style id="scPageSize">@page { size: A4; margin: 0; }</style>
+</head>
+<body class="sc-page">
+  <main class="sc-wrap">
+    <header class="sc-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="sc-eyebrow"><%= L('Speaking · pairs and whole class', '口语 · 两人一组或全班') %></p>
+      <h1>💬 <%= L('Speaking Task Cards', '口语任务卡') %></h1>
+      <p><%= L('Role-play cards give each partner a role, a task, sentence patterns and words they must use. The interview sheet sends students around the room to find classmates who match.', '情景角色卡给每个人一个角色、一个任务、几个句型和必须用到的词。采访表让学生满教室去找符合条件的同学。') %></p>
+    </header>
+
+    <div class="sc-layout">
+      <section class="sc-builder" aria-label="<%= L('Settings', '设置') %>">
+        <section class="sc-panel">
+          <p class="sc-kicker"><span class="sc-step">1</span><%= L('Words to use', '要用到的词') %></p>
+          <label for="scWords"><%= L('One word per line', '每行一个词') %> <small><%= L('(pinyin and English are filled in)', '（拼音和英文会自动补上）') %></small></label>
+          <textarea id="scWords" rows="6" spellcheck="false">饺子
+面条
+米饭
+可乐
+苹果
+书包
+铅笔
+熊猫
+游泳
+打篮球</textarea>
+          <p id="scCount" class="sc-note"></p>
+        </section>
+
+        <section class="sc-panel">
+          <p class="sc-kicker"><span class="sc-step">2</span><%= L('What to make', '做什么') %></p>
+          <div class="sc-modes" role="radiogroup" aria-label="<%= L('Output', '输出') %>">
+            <button type="button" role="radio" data-mode="roles" aria-checked="true">🎭 <b><%= L('Role-play cards', '情景角色卡') %></b><small><%= L('Pairs: card A and card B', '两人一组：A 卡和 B 卡') %></small></button>
+            <button type="button" role="radio" data-mode="interview" aria-checked="false">🔍 <b><%= L('Find someone who…', '找一个……的同学') %></b><small><%= L('Interview sheet for the whole class', '全班走动采访表') %></small></button>
+          </div>
+        </section>
+
+        <section class="sc-panel" data-for="roles">
+          <p class="sc-kicker"><span class="sc-step">3</span><%= L('Situations', '情景') %></p>
+          <div id="scScenarios" class="sc-picks"></div>
+          <details class="sc-own">
+            <summary><%= L('Add your own situation', '加一个自己的情景') %></summary>
+            <label for="scOwnTitle"><%= L('Situation', '情景') %></label>
+            <input id="scOwnTitle" type="text" maxlength="30" placeholder="<%= L('e.g. At the zoo', '比如：在动物园') %>">
+            <div class="sc-two">
+              <div><label for="scOwnARole"><%= L('Role A', '角色 A') %></label><input id="scOwnARole" type="text" maxlength="12" placeholder="<%= L('e.g. Guide', '比如：导游') %>"></div>
+              <div><label for="scOwnBRole"><%= L('Role B', '角色 B') %></label><input id="scOwnBRole" type="text" maxlength="12" placeholder="<%= L('e.g. Visitor', '比如：游客') %>"></div>
+            </div>
+            <label for="scOwnATask"><%= L('Task for A', 'A 的任务') %></label>
+            <input id="scOwnATask" type="text" maxlength="60">
+            <label for="scOwnBTask"><%= L('Task for B', 'B 的任务') %></label>
+            <input id="scOwnBTask" type="text" maxlength="60">
+            <label for="scOwnPatterns"><%= L('Sentence patterns (one per line)', '句型（每行一个）') %></label>
+            <textarea id="scOwnPatterns" rows="2"></textarea>
+          </details>
+          <div class="sc-two">
+            <div>
+              <label for="scPerRole"><%= L('Words per role', '每个角色几个词') %></label>
+              <select id="scPerRole"><option value="0"><%= L('None', '不用') %></option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select>
+            </div>
+            <div>
+              <label for="scSets"><%= L('Sets to print', '印几套') %></label>
+              <select id="scSets"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="6">6</option></select>
+            </div>
+          </div>
+          <p class="sc-note"><%= L('Each set prints every chosen situation once (two pairs of cards per page). More sets give other pairs different words.', '每套把选中的情景各印一次（每页两组卡）。多印几套，每组拿到的词不一样。') %></p>
+        </section>
+
+        <section class="sc-panel" data-for="interview" hidden>
+          <p class="sc-kicker"><span class="sc-step">3</span><%= L('Interview sheet', '采访表') %></p>
+          <label for="scFrame"><%= L('Question', '问题') %></label>
+          <select id="scFrame"></select>
+          <input id="scOwnFrame" type="text" maxlength="30" placeholder="<%= L('Your own question with ____, e.g. 你想去____吗？', '自己的问题，用 ____ 表示词，比如：你想去____吗？') %>">
+          <div class="sc-two">
+            <div>
+              <label for="scGrid"><%= L('Grid', '格子') %></label>
+              <select id="scGrid"><option value="3">3 × 3</option><option value="4" selected>4 × 4</option></select>
+            </div>
+            <div>
+              <label for="scCopies"><%= L('Copies (each shuffled)', '印几份（每份顺序不同）') %></label>
+              <select id="scCopies"><option value="1">1</option><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="30">30</option></select>
+            </div>
+          </div>
+        </section>
+
+        <section class="sc-panel">
+          <p class="sc-kicker"><span class="sc-step">4</span><%= L('Print', '打印') %></p>
+          <label class="sc-check"><input type="checkbox" id="scPinyin" checked> <%= L('Show pinyin', '显示拼音') %></label>
+          <label class="sc-check"><input type="checkbox" id="scEnglish" checked> <%= L('Show English', '显示英文') %></label>
+          <label for="scPaper"><%= L('Paper', '纸张') %></label>
+          <select id="scPaper"><option value="A4">A4</option><option value="Letter">Letter</option></select>
+          <div class="sc-actions">
+            <button id="scPrint" type="button" class="sc-btn">🖨️ <%= L('Print / Save PDF', '打印 / 存成 PDF') %></button>
+            <button id="scShuffle" type="button" class="sc-btn sc-btn-ghost">🔀 <%= L('Shuffle words', '换一批词') %></button>
+            <button id="scShow" type="button" class="sc-btn sc-btn-ghost" data-for="roles">📽️ <%= L('Draw a card on the projector', '投影抽一张') %></button>
+          </div>
+        </section>
+      </section>
+
+      <section class="sc-preview" aria-label="<%= L('Preview', '预览') %>">
+        <p id="scStatus" class="sc-status" role="status"></p>
+        <div id="scStage" class="sc-stage"><div id="scSheets" class="sc-sheets"></div></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="scShowBox" class="sc-show" hidden></div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script>window.SC_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
+  <script src="/shared/wordlist-core.js?v=zh-1"></script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/low-prep/speaking-cards/speaking-scenarios.js?v=2"></script>
+  <script src="/low-prep/speaking-cards/speaking-cards.js?v=2" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

@@ -31,7 +31,7 @@
 .et-empty { padding: 40px; color: #5d7168; text-align: center; }
 
 /* ---------- sheets ---------- */
-.et-sheet { box-sizing: border-box; flex-shrink: 0; padding: 10mm; background: #fff; box-shadow: 0 3px 14px rgba(0,0,0,.14); color: #1f2d27; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; --fs: 11pt; }
+.et-sheet { box-sizing: border-box; flex-shrink: 0; padding: 10mm; background: #fff; box-shadow: 0 3px 14px rgba(0,0,0,.14); color: #1f2d27; font-family: "Segoe UI", "Helvetica Neue", Arial, "Microsoft YaHei", "PingFang SC", sans-serif; --fs: 11pt; }
 .et-sheet-inner { display: flex; flex-direction: column; height: 100%; }
 .et-sheet-foot { display: flex; justify-content: space-between; margin-top: 2mm; color: #8a968f; font-size: 7pt; }
 .et-strips { flex: 1; display: grid; min-height: 0; border: .35mm dashed #8a968f; }
