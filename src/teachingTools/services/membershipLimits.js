@@ -39,6 +39,10 @@ function create(options) {
     // Members-only textbook companion material (words, patterns, activities, files).
     canUseTextbookMaterials: async function (req) {
       return !enabled() || isMember(req);
+    },
+    // Online board game rooms (students join on their own devices).
+    canHostOnlineRooms: async function (req) {
+      return !enabled() || isMember(req);
     }
   };
 }

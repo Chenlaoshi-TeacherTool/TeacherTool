@@ -158,3 +158,57 @@
 .pl-win b { font-size: 9vh; color: var(--team); }
 .pl-win span { font-size: 6vh; }
 @media (max-width: 820px) { .pl-game { grid-template-columns: 1fr; height: auto; } }
+
+/* ---------- online rooms (rm-) ---------- */
+.rm-note { color: #5d7168; font-size: .92rem; }
+.rm-error { color: #b42318; font-weight: 700; }
+.rm-error a { color: #b42318; }
+.rm-code { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px; border-radius: 14px; background: #194f45; color: #fff; text-align: center; }
+.rm-code span { font-size: .85rem; opacity: .85; }
+.rm-code b { font-size: 2.6rem; letter-spacing: .12em; line-height: 1.1; }
+.rm-code small { font-size: .8rem; opacity: .9; word-break: break-all; }
+.rm-qr { margin-top: 8px; padding: 6px; border-radius: 8px; background: #fff; }
+.rm-qr:empty { display: none; }
+.rm-members { grid-column: 2; display: flex; flex-wrap: wrap; gap: 4px; }
+.rm-members i { padding: 1px 7px; border-radius: 999px; background: #fff; font-style: normal; font-size: .78rem; border: 1px solid #e0e6dc; }
+.rm-members i.is-active { border-color: var(--team); background: var(--team); color: #fff; font-weight: 700; }
+.pl-teams li.is-mine { outline: 2px dashed var(--team); outline-offset: 2px; }
+.rm-who { margin: 0 0 1vh; color: #5d7168; font-weight: 700; font-size: 2.4vh; }
+.rm-ask { margin: 1vh 0 0; color: #194f45; font-weight: 700; font-size: 2.8vh; }
+.rm-choices { display: grid; gap: 1.4vh; margin-top: 2.4vh; }
+.rm-choices button { padding: 1.8vh 2vw; border: 2px solid #c9d6c2; border-radius: 16px; background: #fff; font-size: 3.4vh; font-weight: 700; cursor: pointer; }
+.rm-choices button:hover:not(:disabled) { border-color: #356e57; background: #edf5df; }
+.rm-choices button:disabled { cursor: default; color: #1f2d27; }
+.rm-choices button.is-answer { border-color: #2f9e44; background: #d3f9d8; }
+
+.rm-page { margin: 0; min-height: 100vh; background: #fbf8ef; color: #1f2d27; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+.rm-join { max-width: 440px; margin: 0 auto; padding: 32px 18px; display: flex; flex-direction: column; gap: 12px; }
+.rm-join h1 { margin: 0 0 6px; color: #194f45; font-size: 1.6rem; }
+.rm-join label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; }
+.rm-join input { padding: 12px; border: 1px solid #c9d6c2; border-radius: 10px; font: inherit; font-size: 1.2rem; }
+.rm-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rm-teams p { grid-column: 1 / -1; margin: 4px 0 0; font-weight: 700; }
+.rm-teams button { display: flex; align-items: center; gap: 6px; padding: 10px; border: 2px solid var(--team); border-radius: 12px; background: #fff; font: inherit; cursor: pointer; }
+.rm-teams button span { color: var(--team); font-size: 1.2rem; }
+.rm-teams button small { margin-left: auto; color: #5d7168; }
+.rm-teams button[aria-pressed=true] { background: var(--team); color: #fff; }
+.rm-teams button[aria-pressed=true] span { color: #fff; }
+.rm-join .pl-start { text-align: center; text-decoration: none; }
+.rm-student { display: flex; flex-direction: column; gap: 10px; max-width: 900px; margin: 0 auto; padding: 10px; }
+.rm-top { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
+.rm-top .pl-chip { width: 30px; height: 30px; }
+.rm-board svg { width: 100%; height: auto; max-height: 60vh; }
+.rm-panel { display: flex; flex-direction: column; gap: 10px; }
+.rm-big { margin: 0; font-size: 1.3rem; font-weight: 700; text-align: center; }
+.rm-you { color: #c8553d; }
+.rm-roll { font-size: 1.6rem; padding: 18px; }
+.rm-die { font-size: 64px; }
+.rm-page .pl-card { min-width: 0; width: min(560px, 92vw); padding: 24px 18px; }
+.rm-page .pl-word b { font-size: 4.2rem; }
+.rm-page .pl-word img { width: 96px; height: 96px; }
+.rm-page .pl-py { font-size: 1.6rem; }
+.rm-page .rm-choices button { font-size: 1.4rem; padding: 14px; }
+.rm-page .rm-ask, .rm-page .rm-who { font-size: 1.1rem; }
+.rm-page .pl-action b { font-size: 2.4rem; }
+.rm-page .pl-icon { font-size: 4.5rem; }
+.rm-page .pl-task { font-size: 1.3rem; }
