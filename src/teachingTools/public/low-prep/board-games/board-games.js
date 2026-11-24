@@ -233,7 +233,7 @@
 
   // ---------- boards ----------
 
-  function drawPath(layout, W, H) {
+  function drawPath(layout, W, H, geom) {
     var data = layout.data, color = data.options.color;
     var cols = layout.cols, rows = layout.rows, gx = 1.6, gy = 6;
     var cw = (W - (cols - 1) * gx) / cols;
@@ -254,18 +254,20 @@
     });
     layout.squares.forEach(function (sq, i) {
       var p = pos(sq);
+      if (geom) geom[i] = { x: p.x, y: p.y, w: cw, h: ch };
       body += squareRect(p.x, p.y, cw, ch, fill(sq.kind, i, color), null, 2.2) + content(sq, p.x, p.y, cw, ch, data);
     });
     return svg(W, H, body);
   }
 
-  function drawLadder(layout, W, H) {
+  function drawLadder(layout, W, H, geom) {
     var data = layout.data, color = data.options.color, size = layout.size;
     var S = Math.min(W, H), c = S / size, ox = (W - S) / 2;
     var pos = function (i) { var sq = layout.squares[i]; return { x: ox + sq.col * c, y: sq.row * c }; };
     var body = '';
     layout.squares.forEach(function (sq, i) {
       var p = pos(i);
+      if (geom) geom[i] = { x: p.x, y: p.y, w: c, h: c };
       body += squareRect(p.x, p.y, c, c, fill(sq.kind, sq.row + sq.col, color), null, 0) +
         '<text x="' + n(p.x + 1) + '" y="' + n(p.y + c * 0.13) + '" font-size="' + n(c * 0.14) + '" font-family=\'' + FONT_UI + '\' fill="#6b7d74">' + (i + 1) + '</text>' +
         content(sq, p.x, p.y + c * 0.08, c, c * 0.92, data, { small: c < 16 });
@@ -297,18 +299,19 @@
     return svg(W, S, body);
   }
 
-  function drawLine(layout, W, H) {
+  function drawLine(layout, W, H, geom) {
     var data = layout.data, color = data.options.color, size = layout.size;
     var S = Math.min(W, H), c = S / size, ox = (W - S) / 2;
     var body = '';
     layout.squares.forEach(function (sq) {
       var x = ox + sq.col * c, y = sq.row * c;
+      if (geom) geom[sq.i] = { x: x, y: y, w: c, h: c };
       body += squareRect(x + 0.6, y + 0.6, c - 1.2, c - 1.2, fill(sq.kind, sq.row + sq.col, color), null, 1.6) + content(sq, x + 0.6, y + 0.6, c - 1.2, c - 1.2, data);
     });
     return svg(W, S, body);
   }
 
-  function drawFlight(layout, W, H) {
+  function drawFlight(layout, W, H, geom) {
     var data = layout.data, color = data.options.color;
     var S = Math.min(W, H), c = S / 15, ox = (W - S) / 2;
     var teams = core.TEAMS;
@@ -317,6 +320,7 @@
     // bases
     layout.teams.forEach(function (ft, t) {
       var team = teams[t], p = at(ft.base[0], ft.base[1]);
+      if (geom) geom['base' + t] = { x: p.x + 1.5 * c, y: p.y + 2.6 * c, w: 3 * c, h: 1.6 * c };
       body += '<rect x="' + n(p.x + 0.5) + '" y="' + n(p.y + 0.5) + '" width="' + n(6 * c - 1) + '" height="' + n(6 * c - 1) + '" rx="3" fill="' + (color ? team.soft : '#fff') + '" stroke="' + (color ? team.color : INK) + '" stroke-width="0.8"/>';
       body += txt(p.x + 3 * c, p.y + c * 1.1, team.shape + ' ' + team.zh + (ZH ? '队' : ' · ' + team.en), c * 0.62, FONT_UI, color ? team.color : INK, 700);
       [[2, 3.4], [4, 3.4]].forEach(function (spot) {
@@ -324,13 +328,15 @@
       });
       body += txt(p.x + 3 * c, p.y + 5.1 * c, T('Base', '基地'), c * 0.45, FONT_UI, '#4a5a52');
       // home column
-      ft.home.forEach(function (xy) {
+      ft.home.forEach(function (xy, k) {
         var q = at(xy[0], xy[1]);
+        if (geom) geom['home' + t + '_' + k] = { x: q.x, y: q.y, w: c, h: c };
         body += squareRect(q.x, q.y, c, c, color ? team.color : '#fff', null, 0) + (color ? '' : txt(q.x + c / 2, q.y + c / 2, team.shape, c * 0.5, FONT_UI));
       });
     });
     // centre
     var m = at(6, 6), mid = { x: m.x + 1.5 * c, y: m.y + 1.5 * c };
+    if (geom) geom.centre = { x: m.x + c, y: m.y + c, w: c, h: c };
     var corners = [[m.x, m.y + 3 * c, m.x, m.y], [m.x, m.y, m.x + 3 * c, m.y], [m.x + 3 * c, m.y, m.x + 3 * c, m.y + 3 * c], [m.x + 3 * c, m.y + 3 * c, m.x, m.y + 3 * c]];
     corners.forEach(function (k, t) {
       body += '<path d="M' + n(k[0]) + ' ' + n(k[1]) + ' L' + n(k[2]) + ' ' + n(k[3]) + ' L' + n(mid.x) + ' ' + n(mid.y) + ' Z" fill="' + (color ? teams[t].color : '#fff') + '" stroke="' + INK + '" stroke-width="0.35"/>';
@@ -339,6 +345,7 @@
     // track
     layout.squares.forEach(function (sq) {
       var p = at(sq.col, sq.row), team = teams[sq.team];
+      if (geom) geom[sq.i] = { x: p.x, y: p.y, w: c, h: c };
       var bg = sq.kind === 'start' ? (color ? team.color : '#fff') : (color ? team.soft : '#fff');
       body += squareRect(p.x, p.y, c, c, bg, null, 0);
       if (!color) body += '<text x="' + n(p.x + c - 0.4) + '" y="' + n(p.y + c * 0.22) + '" font-size="' + n(c * 0.2) + '" text-anchor="end" font-family=\'' + FONT_UI + '\'>' + team.shape + '</text>';
@@ -531,6 +538,17 @@
       }
     });
   }
+
+  // For the projector view (board-games-play.js).
+  window.BoardGamesRender = {
+    draw: function (layout, W, H, geom) {
+      return { path: drawPath, ladder: drawLadder, line: drawLine, flight: drawFlight }[layout.data.board](layout, W, H, geom);
+    },
+    current: function () { state.words = parseWords(); return state.words.length < 4 ? null : core.generate(currentData()); },
+    picture: function (zh) { return state.pictures[zh] || null; },
+    actionPool: actionPool,
+    boardName: function (board) { return BOARD_NAMES[board]; }
+  };
 
   // ---------- start ----------
 

@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
-  <link rel="stylesheet" href="/low-prep/board-games/board-games.css?v=1">
+  <link rel="stylesheet" href="/low-prep/board-games/board-games.css?v=2">
   <style id="bgPageSize">@page port { size: A4 portrait; margin: 0; } @page land { size: A4 landscape; margin: 0; }</style>
 </head>
 <body class="bg-page">
@@ -124,11 +124,16 @@
       </section>
 
       <section class="bg-preview" aria-label="<%= L('Preview', '预览') %>">
-        <p id="bgStatus" class="bg-status" role="status"></p>
+        <div class="bg-toolbar">
+          <button id="bgPlayBtn" type="button" class="bg-btn">📽️ <%= L('Play on the projector', '投影一起玩') %></button>
+          <p id="bgStatus" class="bg-status" role="status"></p>
+        </div>
         <div id="bgStage" class="bg-stage"><div id="bgSheets" class="bg-sheets"></div></div>
       </section>
     </div>
   </main>
+
+  <div id="bgPlay" class="pl-overlay" hidden></div>
 
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
@@ -138,7 +143,8 @@
   <script src="/shared/emoji-core.js"></script>
   <script src="/shared/game-template.js?v=4" defer></script>
   <script src="/low-prep/board-games/board-games-core.js?v=1"></script>
-  <script src="/low-prep/board-games/board-games.js?v=1" defer></script>
+  <script src="/low-prep/board-games/board-games.js?v=2" defer></script>
+  <script src="/low-prep/board-games/board-games-play.js?v=1" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
