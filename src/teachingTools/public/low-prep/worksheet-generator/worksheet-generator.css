@@ -254,3 +254,8 @@
 .wg-lang-grid .wg-check input:disabled + span { opacity: .45; }
 .wg-vocab-3 td:not(.wg-cell-hz), .wg-vocab-4 td:not(.wg-cell-hz) { font-size: .92em; }
 .wg-vocab-4 .wg-cell-hz { white-space: nowrap; }
+
+/* 同课分层 A/B/C: the question types are chosen per level, so the checkboxes step back. */
+.wg-tier-names { margin-top: 6px; font-size: .85em; }
+.wg-controls.is-tiered #wg-types { opacity: .45; pointer-events: none; }
+.wg-controls.is-tiered #wg-types::before { content: "分层模式会自动选题型（数量仍按这里的设置）。Tiered mode picks the question types; the counts here still apply."; display: block; margin-bottom: 6px; color: #9a4b16; font-size: .85em; opacity: 1; }

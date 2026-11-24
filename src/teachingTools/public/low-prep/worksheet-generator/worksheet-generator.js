@@ -58,6 +58,14 @@
       instr: '先描红，再自己写。Trace the grey characters, then write on your own.' }
   ];
 
+  // 同课分层: one word list, three sheets from easy to hard. 'a|b' means use a
+  // when there are example sentences, otherwise b. pinyin: null keeps the setting.
+  var TIERS = [
+    { key: 'A', shape: '○', zh: 'A 基础', en: 'Foundation', pinyin: true, types: ['vocab', 'match', 'mc', 'trace'] },
+    { key: 'B', shape: '△', zh: 'B 进阶', en: 'Core', pinyin: null, types: ['mc', 'pinyin', 'fill|translate', 'tf'] },
+    { key: 'C', shape: '□', zh: 'C 挑战', en: 'Stretch', pinyin: false, types: ['translate', 'fill|pinyin', 'reorder|dictation', 'makeSentence'] }
+  ];
+
   var SAMPLE_WORDS = [
     '爸爸 | bà ba | dad',
     '妈妈 | mā ma | mum',
@@ -87,7 +95,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     ['words', 'sentences', 'autofill', 'dict-status', 'types', 'all', 'none', 'title', 'subtitle',
       'paper', 'font', 'versions', 'size', 'pinyin', 'info', 'answers', 'shuffle', 'print',
-      'status', 'output', 'page-size', 'langs', 'qlang'].forEach(function (id) {
+      'status', 'output', 'page-size', 'langs', 'qlang', 'tiers', 'tier-names'].forEach(function (id) {
       el[id.replace(/-(\w)/g, function (m, c) { return c.toUpperCase(); })] = document.getElementById('wg-' + id);
     });
 
@@ -186,6 +194,8 @@
       paper: el.paper.value,
       font: el.font.value,
       versions: parseInt(el.versions.value, 10) || 1,
+      tiers: el.tiers.value === 'abc',
+      tierNames: el.tierNames.checked,
       size: el.size.value,
       pinyin: el.pinyin.checked,
       info: el.info.checked,
@@ -219,6 +229,8 @@
     if (saved.paper) el.paper.value = saved.paper;
     if (saved.font) el.font.value = saved.font;
     if (saved.versions) el.versions.value = String(saved.versions);
+    el.tiers.value = saved.tiers ? 'abc' : 'off';
+    el.tierNames.checked = Boolean(saved.tierNames);
     if (saved.size) el.size.value = saved.size;
     el.pinyin.checked = saved.pinyin !== false;
     el.info.checked = saved.info !== false;
@@ -861,6 +873,10 @@
     }
     el.print.disabled = false;
 
+    document.querySelector('.wg-controls').classList.toggle('is-tiered', s.tiers);
+    el.versions.disabled = s.tiers;
+    if (s.tiers) { renderTiers(s, items, sentences); return; }
+
     var active = TYPES.filter(function (t) { return s.types[t.key].on; });
     var sheets = [];
     var keys = [];
@@ -877,6 +893,40 @@
       (s.versions > 1 ? ' · ' + s.versions + ' 个版本 versions' : '') + (s.answers ? ' · 含答案 with key' : '');
   }
 
+  // Three sheets with the same words: A easier, C harder. The question-type
+  // checkboxes are not used here; their item counts still are.
+  function renderTiers(s, items, sentences) {
+    var byKey = {};
+    TYPES.forEach(function (t) { byKey[t.key] = t; });
+    var sheets = [], keys = [];
+    TIERS.forEach(function (tier, v) {
+      var seen = {};
+      var active = tier.types.map(function (choice) {
+        var opts = choice.split('|');
+        var key = opts[0];
+        if (byKey[key].needs === 'sentences' && !sentences.length && opts[1]) key = opts[1];
+        if (byKey[key].needs === 'sentences' && !sentences.length) return null;
+        return key;
+      }).filter(function (key) {
+        if (!key || seen[key]) return false;
+        seen[key] = true;
+        return true;
+      }).map(function (key) { return byKey[key]; });
+      var tierSettings = Object.assign({}, s, {
+        pinyin: tier.pinyin === null ? s.pinyin : tier.pinyin,
+        tierLabel: s.tierNames ? tier.zh + ' ' + tier.en : tier.shape,
+        tierFull: tier.zh + ' ' + tier.en
+      });
+      var caches = {};
+      sheets.push(renderSheet(tierSettings, items, sentences, active, v, tier.key, false, caches));
+      if (s.answers) keys.push(renderSheet(tierSettings, items, sentences, active, v, tier.key, true, caches));
+    });
+    el.output.innerHTML = sheets.concat(keys).join('');
+    fitPreview();
+    el.status.textContent = items.length + ' 个词 words · 分层 A/B/C tiered (○ 基础 △ 进阶 □ 挑战)' + (s.answers ? ' · 含答案 with key' : '') +
+      (sentences.length ? '' : ' · 加几句例句，B、C 会多出填空和排序题 Add example sentences for fill-in and sentence order');
+  }
+
   // Shrink the paper preview to fit narrow screens (print resets zoom to 1).
   function fitPreview() {
     el.output.style.zoom = '';
@@ -890,7 +940,7 @@
     html += '<header class="wg-sheet-head"><div class="wg-sheet-titles"><h2>' + esc(s.title || '练习单') +
       (answers ? ' <span class="wg-key-tag">答案 Answer Key</span>' : '') + '</h2>' +
       (s.subtitle ? '<p>' + esc(s.subtitle) + '</p>' : '') + '</div>' +
-      (label ? '<span class="wg-version">' + (answers ? '' : 'Version ') + label + '</span>' : '') + '</header>';
+      (label ? '<span class="wg-version">' + (s.tierLabel ? (answers ? s.tierFull : s.tierLabel) : (answers ? '' : 'Version ') + label) + '</span>' : '') + '</header>';
     if (s.info && !answers) {
       html += '<div class="wg-info"><span>姓名 Name <i></i></span><span>班级 Class <i></i></span><span>日期 Date <i></i></span></div>';
     }

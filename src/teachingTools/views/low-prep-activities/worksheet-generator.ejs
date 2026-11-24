@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/worksheet-generator/worksheet-generator.css?v=5">
+  <link rel="stylesheet" href="/low-prep/worksheet-generator/worksheet-generator.css?v=6">
   <style id="wg-page-size">@page { size: A4; margin: 12mm; }</style>
 </head>
 <body class="wg-page">
@@ -107,6 +107,14 @@
               </select>
             </div>
             <div>
+              <label for="wg-tiers" class="wg-label">分层练习 Tiered levels</label>
+              <select id="wg-tiers">
+                <option value="off">不分层 Off</option>
+                <option value="abc">A 基础 · B 进阶 · C 挑战</option>
+              </select>
+              <label class="wg-check wg-tier-names"><input type="checkbox" id="wg-tier-names"> <span>页眉写级别名称 <small>Show level names (otherwise ○ △ □)</small></span></label>
+            </div>
+            <div>
               <label for="wg-size" class="wg-label">字号 Text size</label>
               <select id="wg-size">
                 <option value="s">小 Small</option>
@@ -145,7 +153,7 @@
   <script src="/vendor/pinyin-pro.js"></script>
   <script src="/shared/zh-script.js?v=4"></script>
   <script src="/shared/zh-content.js?v=4"></script>
-  <script src="/low-prep/worksheet-generator/worksheet-generator.js?v=5" defer></script>
+  <script src="/low-prep/worksheet-generator/worksheet-generator.js?v=6" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
