@@ -30,8 +30,8 @@
     { hex: '#9c36b5', zh: '紫', en: 'purple' },
     { hex: '#0c8599', zh: '青', en: 'teal' }
   ];
-  var PER = { color: [1, 2, 4, 6], coloring: [2, 4, 6], puzzle: [1, 2, 3, 4], family: [1] };
-  var PER_DEFAULT = { color: 4, coloring: 4, puzzle: 2, family: 1 };
+  var PER = { color: [1, 2, 4, 6], coloring: [2, 4, 6], puzzle: [1, 2, 3, 4], family: [1], tracing: [3, 4, 5, 6, 8] };
+  var PER_DEFAULT = { color: 4, coloring: 4, puzzle: 2, family: 1, tracing: 4 };
   var ORDER_URL = '/low-prep/component-cards/data/common-order.txt';
   var HIGHLIGHT = '#1c7ed6';
   // A component typed in its full form also finds its side form (水 → 氵).
@@ -162,6 +162,12 @@
     } else {
       body = '<g transform="' + FLIP + '">' + item.strokes.map(function (d, i) {
         if (!keep(i)) return '';
+        if (style === 'trace') {
+          var part = split.parts[i];
+          if (opts.done && opts.done.indexOf(part) !== -1) return '<path fill="' + color(part) + '" d="' + d + '"/>';
+          if (opts.trace && opts.trace.indexOf(part) === -1) return '';
+          return '<path fill="' + color(part) + '" fill-opacity=".26" d="' + d + '"/>';
+        }
         var fillColor = style === 'solid' ? '#1f2d27' : style === 'faint' ? '#e3e7e5' : style === 'highlight' ? (split.parts[i] === opts.hl ? HIGHLIGHT : '#1f2d27') : color(split.parts[i]);
         return '<path data-i="' + i + '" fill="' + fillColor + '" d="' + d + '"/>';
       }).join('') + '</g>';
@@ -286,6 +292,53 @@
       group.forEach(function (item) { splitOf(item).labels.forEach(function (l, part) { order.push({ item: item, part: part }); }); });
       return { group: group, order: shuffle(order), side: start };
     });
+  }
+
+  // ---------- component tracing ----------
+  //
+  // One block per character:
+  //   row 1  colour model | build-up: trace part 1, then part 1 done + trace part 2 … | whole character to trace | empty
+  //   row 2  (optional) whole character to trace ×2, then empty boxes to write alone
+
+  function tracingBlock(item, side, perRow, rows) {
+    var split = splitOf(item);
+    var all = split.labels.map(function (l, p) { return p; });
+    var box = function (inner, cls) {
+      return '<div class="cc-tr-box' + (cls ? ' ' + cls : '') + '" style="width:' + side + 'mm;height:' + side + 'mm">' + inner + '</div>';
+    };
+    var empty = function () { return box(glyph({ strokes: [] }, split, { grid: true })); };
+    var whole = function () { return box(glyph(item, split, { grid: true, style: 'trace', trace: all })); };
+
+    var first = [box(glyph(item, split, { grid: true }), 'is-model')];
+    if (split.labels.length > 1) {
+      all.forEach(function (p) {
+        first.push(box(glyph(item, split, { grid: true, style: 'trace', done: all.slice(0, p), trace: [p] })));
+      });
+    }
+    var room = perRow - first.length;
+    var wholeCount = rows === 1 ? Math.min(2, Math.max(1, room - 2)) : room;
+    for (var i = 0; i < wholeCount && first.length < perRow; i++) first.push(whole());
+    while (first.length < perRow) first.push(empty());
+
+    var html = '<div class="cc-tr-row">' + first.join('') + '</div>';
+    if (rows === 2) {
+      var second = [whole(), whole()];
+      while (second.length < perRow) second.push(empty());
+      html += '<div class="cc-tr-row">' + second.join('') + '</div>';
+    }
+    var label = '<div class="cc-tr-label">' + ($('ccPinyin').checked ? '<span class="cc-py">' + esc(item.py) + '</span>' : '') +
+      formula(item, split, true) + '</div>';
+    return '<div class="cc-tr-block" style="--g:' + (side * 1.5) + 'mm">' + label + html + '</div>';
+  }
+
+  function tracingSheet(group, side) {
+    var size = PAPER[$('ccPaper').value];
+    var width = size[0] - 26;
+    var gap = 1.2;
+    var perRow = Math.max(5, Math.floor((width + gap) / (side + gap)));
+    var rows = Number($('ccRows').value);
+    return sheet('<p class="cc-instruct">' + T('Trace one component at a time in its colour, then trace the whole character, then write it on your own.', '先按颜色一个部件一个部件地描，再描整个字，最后自己写。') + '</p>' +
+      '<div class="cc-tr">' + group.map(function (item) { return tracingBlock(item, side, perRow, rows); }).join('') + '</div>', 'is-student');
   }
 
   // ---------- component family ----------
@@ -479,8 +532,25 @@
     var per = Number($('ccPer').value);
     var box = $('ccSheets');
     if (!items.length) { box.innerHTML = '<p class="cc-empty">' + T('None of these characters has stroke data yet.', '这些字暂时没有笔画数据。') + '</p>'; return; }
+    box.innerHTML = '';
     if (state.mode === 'color') box.innerHTML = colorSheets(items, per);
     else if (state.mode === 'coloring') box.innerHTML = coloringSheets(items, per);
+    else if (state.mode === 'tracing') {
+      // Shrink the boxes until each sheet fits on one page.
+      chunks(items, per).forEach(function (group) {
+        var holder = document.createElement('div');
+        var side = 21;
+        holder.innerHTML = tracingSheet(group, side);
+        box.appendChild(holder.firstChild);
+        var page = box.lastChild;
+        for (var guard = 0; guard < 12 && overflows(page) && side > 12; guard++) {
+          side -= 1;
+          holder.innerHTML = tracingSheet(group, side);
+          box.replaceChild(holder.firstChild, page);
+          page = box.lastChild;
+        }
+      });
+    }
     else {
       // A single-component character would be one piece: nothing to rebuild.
       items = items.filter(function (item) { return splitOf(item).labels.length > 1; });
@@ -688,7 +758,7 @@
     $('cc-page-size').textContent = '@page { size: ' + $('ccPaper').value + '; margin: 0; }';
     paintSheets();
   });
-  ['ccPinyin', 'ccKey', 'ccHint', 'ccPieceColor', 'ccFamCount', 'ccFamBlank'].forEach(function (id) { $(id).addEventListener('change', paintSheets); });
+  ['ccPinyin', 'ccKey', 'ccHint', 'ccPieceColor', 'ccFamCount', 'ccFamBlank', 'ccRows'].forEach(function (id) { $(id).addEventListener('change', paintSheets); });
   $('ccFamCaption').addEventListener('input', paintSheets);
   var famTyping = null;
   $('ccFamComp').addEventListener('input', function () { clearTimeout(famTyping); famTyping = setTimeout(paintSheets, 350); });

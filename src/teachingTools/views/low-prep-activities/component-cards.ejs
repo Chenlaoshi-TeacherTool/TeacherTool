@@ -8,7 +8,7 @@
   <%- include('../partials/seo', { pageDescription: 'Type Chinese characters and colour each component: show colour cards like 好 = 女 + 子 on the projector, print a colour-by-component worksheet, or print the components as cut-out pieces students glue back together. 输入汉字，按部件上色：彩色字卡、部件涂色练习纸、部件拼图。' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=2">
+  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=3">
   <style id="cc-page-size">@page { size: A4; margin: 0; }</style>
 </head>
 <body class="cc-page">
@@ -36,6 +36,7 @@
             <button type="button" role="radio" data-mode="color" aria-checked="true">🌈 <b><%= L('Colour cards', '彩色字卡') %></b><small><%= L('Projector or print', '投影或打印') %></small></button>
             <button type="button" role="radio" data-mode="coloring" aria-checked="false">🖍️ <b><%= L('Colouring sheet', '部件涂色') %></b><small><%= L('Students colour by legend', '学生照图例涂色') %></small></button>
             <button type="button" role="radio" data-mode="puzzle" aria-checked="false">✂️ <b><%= L('Cut-out puzzle', '部件拼图') %></b><small><%= L('Cut, then glue back', '剪下来拼回原字') %></small></button>
+            <button type="button" role="radio" data-mode="tracing" aria-checked="false">✏️ <b><%= L('Component tracing', '部件描红') %></b><small><%= L('Trace part by part, then write', '一个部件一个部件地描') %></small></button>
             <button type="button" role="radio" data-mode="family" aria-checked="false">🌳 <b><%= L('Component family', '部件家族图') %></b><small><%= L('One component, many characters', '一个部件，一串字') %></small></button>
           </div>
         </section>
@@ -88,6 +89,13 @@
               </select>
             </div>
           </div>
+          <div data-for="tracing">
+            <label for="ccRows"><%= L('Practice rows per character', '每个字练几行') %></label>
+            <select id="ccRows">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+            </select>
+          </div>
           <label class="cc-check"><input type="checkbox" id="ccPinyin" checked> <%= L('Show pinyin', '显示拼音') %></label>
           <label class="cc-check" data-for="coloring family"><input type="checkbox" id="ccKey" checked> <%= L('Add a coloured answer page', '加一页彩色答案') %></label>
           <label class="cc-check" data-for="puzzle"><input type="checkbox" id="ccHint" checked> <%= L('Faint outline on the gluing board', '拼贴格里印淡淡的轮廓') %></label>
@@ -133,7 +141,7 @@
   <script>window.CC_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
-  <script src="/low-prep/component-cards/component-cards.js?v=2" defer></script>
+  <script src="/low-prep/component-cards/component-cards.js?v=3" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
