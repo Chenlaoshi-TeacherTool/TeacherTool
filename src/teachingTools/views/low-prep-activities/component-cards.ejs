@@ -8,7 +8,7 @@
   <%- include('../partials/seo', { pageDescription: 'Type Chinese characters and colour each component: show colour cards like 好 = 女 + 子 on the projector, print a colour-by-component worksheet, or print the components as cut-out pieces students glue back together. 输入汉字，按部件上色：彩色字卡、部件涂色练习纸、部件拼图。' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=4">
+  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=5">
   <style id="cc-page-size">@page { size: A4; margin: 0; }</style>
 </head>
 <body class="cc-page">
@@ -133,6 +133,17 @@
         <div class="cc-toolbar">
           <button id="ccPrint" type="button" class="cc-btn">🖨️ <%= L('Print / Save PDF', '打印 / 存成 PDF') %></button>
           <button id="ccShow" type="button" class="cc-btn cc-btn-ghost">📽️ <%= L('Show on projector', '投影展示') %></button>
+          <button id="ccBundle" type="button" class="cc-btn cc-btn-ghost">📦 <%= L('Print several together', '一起打印') %></button>
+        </div>
+        <div id="ccBundlePanel" class="cc-bundle" hidden>
+          <p><b><%= L('Which outputs go into one PDF?', '哪几种放进同一个 PDF？') %></b> <small><%= L('Each uses the settings you chose in its own mode.', '每种都用你在它那里选的设置。') %></small></p>
+          <div id="ccBundleModes" class="cc-bundle-modes"></div>
+          <label class="cc-check"><input type="checkbox" id="ccBundleCovers" checked> <%= L('A divider page before each one', '每种前面加一张分隔页') %></label>
+          <button id="ccBundleGo" type="button" class="cc-btn"><%= L('Put them together', '合在一起预览') %></button>
+        </div>
+        <div id="ccBundleBar" class="cc-bundle-bar" hidden>
+          <span id="ccBundleBarText"></span>
+          <button id="ccBundleBack" type="button" class="cc-btn cc-btn-ghost"><%= L('Back to one output', '返回单项') %></button>
         </div>
         <div id="ccStage" class="cc-stage"><div id="ccSheets" class="cc-sheets"></div></div>
       </section>
@@ -157,7 +168,7 @@
   <script>window.CC_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
-  <script src="/low-prep/component-cards/component-cards.js?v=4" defer></script>
+  <script src="/low-prep/component-cards/component-cards.js?v=5" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

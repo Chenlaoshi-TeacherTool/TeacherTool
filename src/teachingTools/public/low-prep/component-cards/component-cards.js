@@ -404,6 +404,7 @@
   var famView = null;
   var famToken = 0;
   function renderFamily() {
+    endBundleView();
     var token = ++famToken;
     var comp = Array.from($('ccFamComp').value.trim())[0] || '';
     var count = Number($('ccFamCount').value);
@@ -415,7 +416,7 @@
       return;
     }
     $('ccStatus').textContent = T('Loading…', '正在加载…');
-    Promise.all([loadData(), loadOrder()]).then(function (res) {
+    return Promise.all([loadData(), loadOrder()]).then(function (res) {
       if (token !== famToken) return null;
       var data = res[0], rank = res[1];
       var family = familyOf(comp, data, rank);
@@ -563,9 +564,10 @@
   }
 
   function renderGuide() {
+    endBundleView();
     var token = ++famToken;
     var box = $('ccSheets');
-    Promise.all([loadGuide(), loadData(), loadOrder()]).then(function (res) {
+    return Promise.all([loadGuide(), loadData(), loadOrder()]).then(function (res) {
       if (token !== famToken) return null;
       var guide = res[0], data = res[1], rank = res[2];
       paintGuidePicker(guide);
@@ -731,6 +733,83 @@
     if (!pop.hidden && !ev.target.closest('#ccGuidePop') && !ev.target.closest('.cc-gd-ex')) pop.hidden = true;
   });
 
+
+  // ---------- print several outputs together (一起打印) ----------
+  //
+  // Draws each ticked output in turn with its own settings, keeps the pages,
+  // then shows them all in one preview so one print makes one PDF.
+
+  var MODE_NAMES = {
+    color: ['Colour cards', '彩色字卡'], coloring: ['Colouring sheet', '部件涂色'], puzzle: ['Cut-out puzzle', '部件拼图'],
+    tracing: ['Component tracing', '部件描红'], explain: ['Component guide cards', '部件图解卡'], family: ['Component family', '部件家族图']
+  };
+  var MODE_ORDER = ['color', 'coloring', 'puzzle', 'tracing', 'explain', 'family'];
+  var bundleView = false;
+
+  function paintBundlePicker() {
+    var picks = readJson('cc-bundle-v1', null) || [state.mode];
+    $('ccBundleModes').innerHTML = MODE_ORDER.map(function (m) {
+      return '<label class="cc-check"><input type="checkbox" value="' + m + '"' + (picks.indexOf(m) !== -1 ? ' checked' : '') + '> ' + T(MODE_NAMES[m][0], MODE_NAMES[m][1]) + '</label>';
+    }).join('');
+  }
+
+  function endBundleView() {
+    if (!bundleView) return;
+    bundleView = false;
+    $('ccBundleBar').hidden = true;
+  }
+
+  function coverSheet(mode, pages) {
+    var chars = usable().map(function (c) { return c.ch; }).join(' ');
+    return sheet('<div class="cc-cover"><p class="cc-cover-kicker">' + T('Next', '下面是') + '</p><h2>' + T(MODE_NAMES[mode][0], MODE_NAMES[mode][1]) + '</h2>' +
+      '<p>' + T(pages + (pages === 1 ? ' page' : ' pages'), '共 ' + pages + ' 页') + '</p>' +
+      (chars && mode !== 'family' && mode !== 'explain' ? '<p class="cc-cover-chars">' + esc(chars) + '</p>' : '') + '</div>', 'cc-cover-sheet');
+  }
+
+  async function buildBundle() {
+    var modes = Array.prototype.filter.call($('ccBundleModes').querySelectorAll('input'), function (b) { return b.checked; }).map(function (b) { return b.value; });
+    writeJson('cc-bundle-v1', modes);
+    if (!modes.length) { $('ccStatus').textContent = T('Tick at least one output.', '至少勾选一种。'); return; }
+    var covers = $('ccBundleCovers').checked;
+    var home = state.mode;
+    var parts = [], skipped = [], pages = 0;
+    $('ccBundleGo').disabled = true;
+    $('ccStatus').textContent = T('Putting the pages together…', '正在合并页面…');
+    try {
+      for (var i = 0; i < modes.length; i++) {
+        var mode = modes[i];
+        setMode(mode);
+        await Promise.resolve(paintSheets());
+        var box = $('ccSheets');
+        var count = box.querySelectorAll('.cc-sheet').length;
+        if (!count) { skipped.push(T(MODE_NAMES[mode][0], MODE_NAMES[mode][1])); continue; }
+        pages += count;
+        parts.push((covers ? coverSheet(mode, count) : '') + box.innerHTML);
+      }
+    } finally {
+      setMode(home);
+      $('ccBundleGo').disabled = false;
+    }
+    if (!parts.length) { paintSheets(); $('ccStatus').textContent = T('Nothing to print yet: type some characters first.', '还没有可以打印的内容：请先输入汉字。'); return; }
+    $('ccSheets').innerHTML = parts.join('');
+    bundleView = true;
+    $('ccBundlePanel').hidden = true;
+    $('ccBundleBar').hidden = false;
+    $('ccBundleBarText').textContent = T('Preview of everything together: ' + pages + ' pages', '一起打印预览：共 ' + pages + ' 页') +
+      (covers ? T(' (plus covers)', '（另加分隔页）') : '') + ' · ' + modes.filter(function (m) { return skipped.indexOf(T(MODE_NAMES[m][0], MODE_NAMES[m][1])) === -1; })
+        .map(function (m) { return T(MODE_NAMES[m][0], MODE_NAMES[m][1]); }).join(' + ');
+    $('ccStatus').textContent = skipped.length ? T('Left out (nothing to show): ', '没有内容，已跳过：') + skipped.join('、') : '';
+    fitPreview();
+  }
+
+  $('ccBundle').addEventListener('click', function () {
+    var panel = $('ccBundlePanel');
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) paintBundlePicker();
+  });
+  $('ccBundleGo').addEventListener('click', function () { buildBundle(); });
+  $('ccBundleBack').addEventListener('click', function () { endBundleView(); paintSheets(); });
+
   // ---------- render ----------
 
   var renderToken = 0;
@@ -766,8 +845,9 @@
   function usable() { return state.chars.filter(function (c) { return !c.missing; }); }
 
   function paintSheets() {
-    if (state.mode === 'family') { renderFamily(); return; }
-    if (state.mode === 'explain') { renderGuide(); return; }
+    endBundleView();
+    if (state.mode === 'family') return renderFamily();
+    if (state.mode === 'explain') return renderGuide();
     var items = usable();
     var per = Number($('ccPer').value);
     var box = $('ccSheets');

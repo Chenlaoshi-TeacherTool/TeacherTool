@@ -234,3 +234,21 @@
   [contenteditable="true"] { outline: none !important; background: none !important; }
   .cc-gd-ex { cursor: default; }
 }
+
+/* ---------- print several together ---------- */
+.cc-bundle { margin: -4px 0 12px; padding: 12px 14px; border: 1px solid #d9e3d2; border-radius: 12px; background: #fffdf7; }
+.cc-bundle[hidden], .cc-bundle-bar[hidden] { display: none; }
+.cc-bundle p { margin: 0 0 6px; }
+.cc-bundle small { color: #5d7168; }
+.cc-bundle-modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px 12px; margin-bottom: 6px; }
+.cc-bundle .cc-btn { margin-top: 8px; }
+.cc-bundle-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: -4px 0 12px; padding: 10px 14px; border-radius: 12px; background: #194f45; color: #fff; font-weight: 700; }
+.cc-bundle-bar span { flex: 1; }
+.cc-cover { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 4mm; text-align: center; font-family: "Microsoft YaHei", sans-serif; }
+.cc-cover h2 { margin: 0; color: #194f45; font-size: 34pt; }
+.cc-cover p { margin: 0; color: #5d7168; font-size: 14pt; }
+.cc-cover-kicker { color: #bf7f35 !important; font-weight: 800; letter-spacing: .1em; }
+.cc-cover-chars { max-width: 150mm; font: 22pt "KaiTi", "STKaiti", serif !important; color: #1f2d27 !important; letter-spacing: .2em; }
+@media (max-width: 700px) { .cc-bundle-modes { grid-template-columns: 1fr 1fr; } }
+
+@media print { .cc-bundle, .cc-bundle-bar { display: none !important; } .cc-cover-sheet { break-after: page; } }
