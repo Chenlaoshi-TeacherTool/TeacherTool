@@ -81,6 +81,7 @@
     if (!list.items.length) { setStatus(L('This list has no words yet.', '这个词表还没有词语。')); return; }
     if (!list.name) list.name = L('My word list', '我的词表');
     currentList = list;
+    $('vgsTopics').open = false;
     render();
     enrichWithCedict(list).then(function (enriched) {
       if (currentList !== list) return;
@@ -133,8 +134,8 @@
 
   function renderGames(list) {
     $('vgsGamesHint').textContent = list
-      ? L('Click a game to open it with these words.', '点一个游戏，用这套词打开。')
-      : L('Choose a word list first.', '请先选择一套词。');
+      ? L('Using: ', '正在使用：') + list.name + ' · ' + wordCountText(list.items.length)
+      : L('Choose a word list to open an activity.', '选好词表后即可打开玩法。');
     ['play', 'print'].forEach(function (group) {
       var grid = $(group === 'play' ? 'vgsPlay' : 'vgsPrint');
       grid.replaceChildren();
@@ -143,6 +144,7 @@
         var card = document.createElement('button');
         card.type = 'button';
         card.className = 'vgs-game';
+        card.classList.toggle('vgs-game-awaiting-list', !list);
         card.disabled = !list || Boolean(reason);
         card.dataset.game = game.id;
         var icon = document.createElement('span');
@@ -211,17 +213,7 @@
     box.replaceChildren();
     var core = window.ChenWordlist;
     var saved = core && core.hasStorage ? core.listAll() : [];
-    if (!saved.length) {
-      var empty = document.createElement('p');
-      empty.className = 'vgs-empty';
-      empty.append(L('No saved lists yet. Make one in the ', '还没有保存的词表。可以先在'));
-      var link = document.createElement('a');
-      link.href = '/teaching-tools/word-list-library/word-list-library.html';
-      link.textContent = L('word list library', '词表库');
-      empty.append(link, L('.', '里建一个。'));
-      box.appendChild(empty);
-      return;
-    }
+    $('vgsSavedSource').hidden = !saved.length;
     saved.forEach(function (entry) {
       box.appendChild(choiceButton(entry.name, wordCountText(entry.count || 0), function () {
         var list = core.load(entry.id);
@@ -293,6 +285,9 @@
       $('vgsChooser').scrollIntoView({ block: 'start' });
     });
     $('vgsUsePaste').addEventListener('click', usePasted);
+    $('vgsTryPreset').addEventListener('click', function () {
+      loadPreset('preset-food-and-fruit');
+    });
 
     renderSaved();
     renderPresets();

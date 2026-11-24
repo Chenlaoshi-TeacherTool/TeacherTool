@@ -8,13 +8,12 @@
   <%- include('../partials/seo', { pageDescription: 'Pick one Chinese vocabulary list and switch between classroom games and printables: Term Race, Quiz City, Would You Rather, flash cards, bingo, Tarsia puzzles and sentence reorder. 选好一套词，就能在不同游戏之间切换：词汇竞速、问答城市、二选一讨论、生词卡、宾果等，打开时词语已经自动填好。' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/vocab-games/vocab-games.css?v=1">
+  <link rel="stylesheet" href="/low-prep/vocab-games/vocab-games.css?v=2">
 </head>
 <body class="vgs-page">
   <main class="vgs-wrap">
     <header class="vgs-header">
       <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
-      <p class="vgs-eyebrow"><%= L('One word list · many games', '一套词 · 多种玩法') %></p>
       <h1>🎮 <%= L('Vocab Game Switcher', '一套词换着玩') %></h1>
       <p><%= L('Choose a word list once, then switch between games. Every game opens with your words already filled in.', '选好一套词，就能在不同游戏之间切换。点开任何游戏，词语都已经自动填好。') %></p>
     </header>
@@ -25,6 +24,7 @@
           <p class="vgs-kicker"><%= L('Your word list', '当前词表') %></p>
           <h2 id="vgsListHeading" class="vgs-list-name"></h2>
           <p id="vgsListMeta" class="vgs-meta"></p>
+          <a class="vgs-btn vgs-view-games" href="#vgsGamesHeading"><%= L('See activities', '查看玩法') %></a>
           <ul id="vgsWords" class="vgs-words" aria-label="<%= L('Words in this list', '词表里的词') %>"></ul>
           <button id="vgsChange" class="vgs-btn vgs-btn-ghost" type="button"><%= L('Choose another list', '换一套词') %></button>
         </div>
@@ -34,30 +34,33 @@
           <h2><%= L('Choose a word list', '选择一套词') %></h2>
 
           <div class="vgs-source">
+            <h3><label for="vgsPaste"><%= L('Paste words', '粘贴词语') %></label></h3>
+            <p class="vgs-hint"><%= L('One word per line. Pinyin and English are filled in when missing, or type them yourself:', '每行一个词。拼音和英文没写会自动补上，也可以自己写：') %> <code>猫 | māo | cat</code></p>
+            <textarea id="vgsPaste" class="vgs-input" rows="4" spellcheck="false" placeholder="猫&#10;狗&#10;兔子&#10;熊猫"></textarea>
+            <input id="vgsPasteName" class="vgs-input" type="text" maxlength="120" placeholder="<%= L('List name (optional)', '词表名称（选填）') %>">
+            <button id="vgsUsePaste" class="vgs-btn" type="button"><%= L('Use these words', '用这些词') %></button>
+          </div>
+          <div class="vgs-source">
+            <button id="vgsTryPreset" class="vgs-btn vgs-btn-ghost" type="button"><%= L('Try Food & Fruit · 14 words', '试用食物与水果 · 14 词') %></button>
+            <details id="vgsTopics">
+              <summary><%= L('Chen Laoshi’s topic lists', '陈老师主题词表') %></summary>
+              <div id="vgsPresets" class="vgs-choices"><p class="vgs-empty"><%= L('Loading…', '加载中…') %></p></div>
+            </details>
+          </div>
+
+          <div id="vgsSavedSource" class="vgs-source" hidden>
             <h3><%= L('Saved in this browser', '保存在这个浏览器里的词表') %></h3>
             <div id="vgsSaved" class="vgs-choices"></div>
           </div>
-
-          <div class="vgs-source">
-            <h3><%= L('Chen Laoshi topic lists', '陈老师主题词表') %></h3>
-            <div id="vgsPresets" class="vgs-choices"><p class="vgs-empty"><%= L('Loading…', '加载中…') %></p></div>
-          </div>
-
-          <div class="vgs-source">
-            <h3><label for="vgsPaste"><%= L('Or paste words', '或者直接粘贴词语') %></label></h3>
-            <p class="vgs-hint"><%= L('One word per line. Pinyin and English are filled in when missing, or type them yourself:', '每行一个词。拼音和英文没写会自动补上，也可以自己写：') %> <code>猫 | māo | cat</code></p>
-            <input id="vgsPasteName" class="vgs-input" type="text" maxlength="120" placeholder="<%= L('List name, e.g. Lesson 3 animals', '词表名称，比如：第三课 动物') %>">
-            <textarea id="vgsPaste" class="vgs-input" rows="6" spellcheck="false" placeholder="猫&#10;狗&#10;兔子&#10;熊猫"></textarea>
-            <button id="vgsUsePaste" class="vgs-btn" type="button"><%= L('Use these words', '用这些词') %></button>
-          </div>
+          <a class="vgs-library-link" href="/teaching-tools/word-list-library/word-list-library.html"><%= L('Open word list library', '打开词表库') %></a>
           <p id="vgsStatus" class="vgs-status" role="status" aria-live="polite"></p>
         </div>
       </section>
 
       <section class="vgs-panel vgs-games" aria-labelledby="vgsGamesHeading">
         <p class="vgs-kicker"><%= L('Step 2', '第二步') %></p>
-        <h2 id="vgsGamesHeading"><%= L('Switch game', '换个游戏') %></h2>
-        <p id="vgsGamesHint" class="vgs-hint"><%= L('Choose a word list first.', '请先选择一套词。') %></p>
+        <h2 id="vgsGamesHeading" tabindex="-1"><%= L('Choose an activity', '选一种玩法') %></h2>
+        <p id="vgsGamesHint" class="vgs-hint"><%= L('Choose a word list to open an activity.', '选好词表后即可打开玩法。') %></p>
         <div id="vgsZhSlot" class="zh-script-slot"></div>
         <h3 class="vgs-group"><%= L('🖥️ Play in class', '🖥️ 课堂上玩') %></h3>
         <div id="vgsPlay" class="vgs-game-grid"></div>
@@ -73,7 +76,7 @@
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/zh-script.js?v=4"></script>
   <script src="/shared/zh-content.js?v=4"></script>
-  <script src="/low-prep/vocab-games/vocab-games.js?v=4" defer></script>
+  <script src="/low-prep/vocab-games/vocab-games.js?v=5" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

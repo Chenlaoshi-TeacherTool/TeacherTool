@@ -3,7 +3,6 @@
   --vgs-muted: #5a6b62;
   --vgs-green: #20473a;
   --vgs-green-soft: #e7f1ec;
-  --vgs-gold: #ffd978;
   --vgs-line: #d6e2dc;
   --vgs-card: #ffffff;
   margin: 0;
@@ -18,7 +17,7 @@
 }
 
 .vgs-header {
-  padding: 22px 26px;
+  padding: 16px 26px;
   border-radius: 18px;
   background: linear-gradient(135deg, #20473a, #356e57);
   color: #fff;
@@ -34,14 +33,7 @@
 .vgs-header .back-btn:hover,
 .vgs-header .back-btn:focus-visible { opacity: 1; text-decoration: underline; }
 
-.vgs-eyebrow {
-  margin: 14px 0 4px;
-  color: var(--vgs-gold);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.vgs-header h1 { margin: 0 0 8px; font-size: clamp(26px, 4vw, 36px); }
+.vgs-header h1 { margin: 8px 0 6px; font-size: clamp(26px, 4vw, 36px); }
 .vgs-header p:last-child { margin: 0; max-width: 680px; line-height: 1.6; opacity: 0.92; }
 
 .vgs-layout {
@@ -94,6 +86,13 @@
 
 .vgs-source { padding-top: 14px; border-top: 1px solid var(--vgs-line); margin-top: 14px; }
 .vgs-source h3 { margin: 0 0 8px; font-size: 16px; }
+
+.vgs-source details { margin-top: 12px; }
+.vgs-source summary { cursor: pointer; font-weight: 700; }
+.vgs-source details[open] summary { margin-bottom: 8px; }
+.vgs-library-link { display: inline-block; margin-top: 12px; }
+.vgs-view-games { display: none; }
+#vgsGamesHeading { scroll-margin-top: 1rem; }
 
 .vgs-choices { display: flex; flex-wrap: wrap; gap: 8px; }
 
@@ -168,6 +167,8 @@ textarea.vgs-input { resize: vertical; }
 .vgs-game:not(:disabled):focus-visible { border-color: #356e57; background: var(--vgs-green-soft); transform: translateY(-1px); }
 .vgs-game:disabled { cursor: not-allowed; opacity: 0.6; }
 
+.vgs-game-awaiting-list:disabled { opacity: 1; }
+
 .vgs-game-icon { flex: none; font-size: 30px; line-height: 1; }
 .vgs-game-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .vgs-game-body strong { font-size: 17px; }
@@ -183,4 +184,5 @@ textarea.vgs-input { resize: vertical; }
   .vgs-layout { grid-template-columns: 1fr; }
   .vgs-header { padding: 18px; }
   .vgs-panel { padding: 16px; }
+  .vgs-view-games { display: inline-block; margin-bottom: 12px; text-decoration: none; }
 }
