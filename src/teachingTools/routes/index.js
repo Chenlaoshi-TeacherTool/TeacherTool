@@ -306,6 +306,10 @@ router.get('/teaching-tools/spin-wheel', function(req, res, next) {
   res.render('low-prep-activities/spin-wheel', { title: '转盘手工 · Spin Wheel Craft', toolGuide: siteContentStore.get().toolGuides['spin-wheel'] });
 });
 
+router.get('/teaching-tools/print-pack', function(req, res, next) {
+  res.render('low-prep-activities/print-pack', { title: '打印包 · Print Pack' });
+});
+
 router.get('/teaching-tools/speaking-cards', function(req, res, next) {
   res.render('low-prep-activities/speaking-cards', { title: '口语任务卡 · Speaking Task Cards', toolGuide: siteContentStore.get().toolGuides['speaking-cards'] });
 });

@@ -313,6 +313,16 @@
       $('vgsChooser').scrollIntoView({ block: 'start' });
     });
     $('vgsUsePaste').addEventListener('click', usePasted);
+    $('vgsPack').addEventListener('click', function () {
+      if (!currentList) {
+        setStatus(L('Choose a word list first, then make a print pack.', '先选一套词，再做打印包。'));
+        $('vgsChooser').scrollIntoView({ block: 'start', behavior: 'smooth' });
+        $('vgsPaste').focus({ preventScroll: true });
+        return;
+      }
+      try { window.ChenWordlistHandoff.openGame('/teaching-tools/print-pack', currentList); }
+      catch (error) { setStatus(L('This browser could not pass the list on. Check that site data is allowed.', '这个浏览器无法传递词表，请检查是否允许网站存储数据。')); }
+    });
     $('vgsTryPreset').addEventListener('click', function () {
       loadPreset(TRY_PRESET);
     });

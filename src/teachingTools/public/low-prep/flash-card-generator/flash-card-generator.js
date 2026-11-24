@@ -672,4 +672,26 @@
     setKaiFontStatus(isZh ? '楷体加载失败，请刷新页面。' : 'The Kai font failed to load. Refresh the page.');
   });
   initLibraryPicker();
+
+  var pack = window.ChenPrintPack;
+  if (pack) {
+    pack.provide({
+      duplex: true,
+      pages: function () {
+        return loadKaiFont().catch(function () {}).then(function () {
+          return new Promise(function (resolve) { setTimeout(resolve, 600); });
+        }).then(function () {
+          refreshEntries();
+          if (!state.entries.length) return [];
+          var count = Number(sheetSize.value);
+          var out = [];
+          Core.paginate(state.entries, count).forEach(function (chunk) {
+            out.push('<div class="pp-letter">' + buildPageSvg(chunk, 'front', count) + '</div>');
+            out.push('<div class="pp-letter">' + buildPageSvg(chunk, 'back', count) + '</div>');
+          });
+          return out;
+        });
+      }
+    });
+  }
 })();

@@ -106,7 +106,8 @@ var UNLISTED = {
   'fakebook-profile': 'opened from the social media hub',
   'fake-wechat-moments': 'opened from the social media hub',
   'fake-wechat-single-post': 'opened from the social media hub',
-  'uno-card-generator': 'page exists, but its card still says coming soon'
+  'uno-card-generator': 'page exists, but its card still says coming soon',
+  'print-pack': 'opened from the Vocab Game Switcher with a word list'
 };
 
 // Tools that have a page (everything except coming-soon cards).

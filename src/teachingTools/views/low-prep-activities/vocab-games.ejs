@@ -8,7 +8,7 @@
   <%- include('../partials/seo', { pageDescription: 'Pick one Chinese vocabulary list and switch between classroom games and printables: Term Race, Quiz City, Would You Rather, flash cards, bingo, Tarsia puzzles and sentence reorder. 选好一套词，就能在不同游戏之间切换：词汇竞速、问答城市、二选一讨论、生词卡、宾果等，打开时词语已经自动填好。' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/vocab-games/vocab-games.css?v=3">
+  <link rel="stylesheet" href="/low-prep/vocab-games/vocab-games.css?v=4">
 </head>
 <body class="vgs-page">
   <main class="vgs-wrap">
@@ -64,7 +64,10 @@
         <div id="vgsZhSlot" class="zh-script-slot"></div>
         <h3 class="vgs-group"><%= L('🖥️ Play in class', '🖥️ 课堂上玩') %></h3>
         <div id="vgsPlay" class="vgs-game-grid"></div>
-        <h3 class="vgs-group"><%= L('🖨️ Print', '🖨️ 打印') %></h3>
+        <div class="vgs-group-row">
+          <h3 class="vgs-group"><%= L('🖨️ Print', '🖨️ 打印') %></h3>
+          <button id="vgsPack" type="button" class="vgs-btn vgs-pack-btn">📦 <%= L('Print pack: several in one PDF', '打印包：几样合成一个 PDF') %></button>
+        </div>
         <div id="vgsPrint" class="vgs-game-grid"></div>
       </section>
     </div>
@@ -76,7 +79,7 @@
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/zh-script.js?v=4"></script>
   <script src="/shared/zh-content.js?v=4"></script>
-  <script src="/low-prep/vocab-games/vocab-games.js?v=8" defer></script>
+  <script src="/low-prep/vocab-games/vocab-games.js?v=9" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

@@ -238,6 +238,19 @@
     $('scWords').value = handed.items.map(function (item) { return [item.zh, item.py, item.en].filter(Boolean).join(' | '); }).join('\n');
     handoff.mountBar(handed);
   }
+  var pack = window.ChenPrintPack;
+  if (pack) {
+    pack.remember('speaking-cards', ['scPerRole', 'scSets', 'scFrame', 'scGrid', 'scCopies', 'scPinyin', 'scEnglish']);
+    pack.provide({
+      css: ['/low-prep/speaking-cards/'],
+      prepare: function (o) { pack.setControl('scPaper', o.paper); pack.setControl('scPinyin', o.pinyin); render(); },
+      pages: function () {
+        return pack.settled($('scSheets'), '.sc-sheet').then(function () {
+          return Array.prototype.map.call($('scSheets').querySelectorAll('.sc-sheet'), function (s) { return s.outerHTML; });
+        });
+      }
+    });
+  }
   setMode(new URLSearchParams(location.search).get('mode') === 'interview' ? 'interview' : 'roles');
   if (window.ChenWordlist && window.ChenWordlist.loadCedict) window.ChenWordlist.loadCedict().then(render, function () {});
 })();

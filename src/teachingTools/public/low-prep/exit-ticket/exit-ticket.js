@@ -247,6 +247,19 @@
     if (handed.name && ['我的词表', 'My word list'].indexOf(handed.name) === -1) $('etTitle').value = handed.name;
     handoff.mountBar(handed);
   }
+  var pack = window.ChenPrintPack;
+  if (pack) {
+    pack.remember('exit-ticket', ['etPer', 'etVersions', 'etStrips', 'etPages', 'etPinyin', 'etKey']);
+    pack.provide({
+      css: ['/low-prep/exit-ticket/'],
+      prepare: function (o) { pack.setControl('etPaper', o.paper); render(); },
+      pages: function () {
+        return pack.settled($('etSheets'), '.et-sheet').then(function () {
+          return Array.prototype.map.call($('etSheets').querySelectorAll('.et-sheet'), function (s) { return s.outerHTML; });
+        });
+      }
+    });
+  }
   render();
   // Fuller English meanings for the choice questions once the dictionary loads.
   if (window.ChenWordlist && window.ChenWordlist.loadCedict) window.ChenWordlist.loadCedict().then(render, function () {});

@@ -188,3 +188,6 @@ textarea.vgs-input { resize: vertical; }
   .vgs-panel { padding: 16px; }
   .vgs-view-games { display: inline-block; margin-bottom: 12px; text-decoration: none; }
 }
+
+.vgs-group-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.vgs-pack-btn { padding: 7px 14px; font-size: 14px; }

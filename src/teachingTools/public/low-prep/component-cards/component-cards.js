@@ -766,6 +766,23 @@
       (chars && mode !== 'family' && mode !== 'explain' ? '<p class="cc-cover-chars">' + esc(chars) + '</p>' : '') + '</div>', 'cc-cover-sheet');
   }
 
+  // Pages of several outputs, each drawn with its own settings. Leaves the page on `home`.
+  async function bundlePages(modes, covers) {
+    var home = state.mode, parts = [], skipped = [], pages = 0;
+    try {
+      for (var i = 0; i < modes.length; i++) {
+        var mode = modes[i];
+        setMode(mode);
+        await Promise.resolve(paintSheets());
+        var count = $('ccSheets').querySelectorAll('.cc-sheet').length;
+        if (!count) { skipped.push(mode); continue; }
+        pages += count;
+        parts.push((covers ? coverSheet(mode, count) : '') + $('ccSheets').innerHTML);
+      }
+    } finally { setMode(home); }
+    return { html: parts.join(''), pages: pages, skipped: skipped };
+  }
+
   async function buildBundle() {
     var modes = Array.prototype.filter.call($('ccBundleModes').querySelectorAll('input'), function (b) { return b.checked; }).map(function (b) { return b.value; });
     writeJson('cc-bundle-v1', modes);
@@ -800,6 +817,25 @@
         .map(function (m) { return T(MODE_NAMES[m][0], MODE_NAMES[m][1]); }).join(' + ');
     $('ccStatus').textContent = skipped.length ? T('Left out (nothing to show): ', '没有内容，已跳过：') + skipped.join('、') : '';
     fitPreview();
+  }
+
+  var pack = window.ChenPrintPack;
+  if (pack) {
+    pack.remember('component-cards', ['ccPaper', 'ccPinyin', 'ccKey', 'ccHint', 'ccPieceColor', 'ccRows']);
+    pack.provide({
+      css: ['/low-prep/component-cards/'],
+      prepare: function (o) { pack.setControl('ccPaper', o.paper); pack.setControl('ccPinyin', o.pinyin); },
+      pages: function () {
+        return pack.settled($('ccSheets'), '.cc-sheet').then(function () {
+          var modes = readJson('cc-bundle-v1', null) || ['color'];
+          return bundlePages(modes, false);
+        }).then(function (result) {
+          var holder = document.createElement('div');
+          holder.innerHTML = result.html;
+          return Array.prototype.map.call(holder.querySelectorAll('.cc-sheet'), function (s) { return s.outerHTML; });
+        });
+      }
+    });
   }
 
   $('ccBundle').addEventListener('click', function () {

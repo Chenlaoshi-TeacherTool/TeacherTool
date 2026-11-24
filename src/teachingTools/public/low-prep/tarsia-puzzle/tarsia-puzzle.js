@@ -1189,4 +1189,21 @@
   }
 
   initialize();
+
+  // 打印包: the cut page and the answer page, letter size like the tool's own print.
+  var pack = typeof window !== 'undefined' && window.ChenPrintPack;
+  if (pack) {
+    pack.provide({
+      css: ['/low-prep/tarsia-puzzle/'],
+      pages: function () {
+        return new Promise(function (resolve) { setTimeout(resolve, 1500); }).then(function () {
+          if (!ensureCurrentPuzzle()) return [];
+          renderPrintPages();
+          return Array.prototype.map.call(elements.printPages.querySelectorAll('.print-page'), function (page) {
+            return '<div class="pp-letter">' + page.innerHTML + '</div>';
+          });
+        });
+      }
+    });
+  }
 })();

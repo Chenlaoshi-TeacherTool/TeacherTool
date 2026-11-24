@@ -904,4 +904,23 @@
 
   updateTermCount();
   initLibraryPicker();
+
+  // 打印包: make the sheets from the handed-over list with the current settings.
+  var pack = window.ChenPrintPack;
+  if (pack) {
+    pack.provide({
+      css: ['/low-prep/bingo-generator/'],
+      pages: function () {
+        return pack.settled(termsInput.form || document.body, 'textarea', 600, 4000).then(function () {
+          if (!termsInput.value.trim()) return [];
+          form.requestSubmit();
+          return pack.settled(previewArea, '.bingo-sheet', 700, 12000).then(function () {
+            if (!previewArea.querySelector('.bingo-sheet')) return [];
+            syncPrintRoot();
+            return Array.prototype.map.call(printRoot.querySelectorAll('.bingo-sheet'), function (s) { return '<div class="pp-bingo">' + s.outerHTML + '</div>'; });
+          });
+        });
+      }
+    });
+  }
 })();

@@ -1,0 +1,61 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <meta name="robots" content="noindex">
+  <title>打印包 · Print Pack - Chen Laoshi's Teaching Toolkit</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/print-pack/print-pack.css?v=2">
+  <style id="ppPageSize">@page { size: A4; margin: 0; }</style>
+  <style id="ppToolCss"></style>
+</head>
+<body class="pp-page">
+  <main class="pp-wrap">
+    <header class="pp-header">
+      <a href="/teaching-tools/vocab-games?wordlist=handoff" class="back-btn"><%= L('← Back to the Vocab Game Switcher', '← 返回一套词换着玩') %></a>
+      <h1>📦 <%= L('Print pack', '打印包') %></h1>
+      <p id="ppList"></p>
+    </header>
+
+    <div class="pp-layout">
+      <section class="pp-builder" aria-label="<%= L('Settings', '设置') %>">
+        <section class="pp-panel">
+          <p class="pp-kicker"><span class="pp-step">1</span><%= L('What goes in the pack', '打印包里放什么') %></p>
+          <div id="ppTools" class="pp-tools"></div>
+          <p class="pp-note"><%= L('Each tool uses the settings you last chose in it. “Adjust” opens the tool with these words; change what you like, close the tab, then make the pack again.', '每个工具都用你上次在它那里选的设置。点“调整”会用这套词打开那个工具，改好后关掉分页，再生成一次打印包。') %></p>
+        </section>
+        <section class="pp-panel">
+          <p class="pp-kicker"><span class="pp-step">2</span><%= L('For every page', '所有页面') %></p>
+          <div class="pp-two">
+            <div>
+              <label for="ppPaper"><%= L('Paper', '纸张') %></label>
+              <select id="ppPaper"><option value="A4">A4</option><option value="Letter">Letter</option></select>
+            </div>
+          </div>
+          <label class="pp-check"><input type="checkbox" id="ppPinyin" checked> <%= L('Pinyin (tools that offer it)', '显示拼音（有这个选项的工具）') %></label>
+          <label class="pp-check"><input type="checkbox" id="ppCovers" checked> <%= L('A divider page before each tool', '每个工具前面加一张分隔页') %></label>
+          <div class="pp-actions">
+            <button id="ppBuild" type="button" class="pp-btn">📦 <%= L('Make the pack', '生成打印包') %></button>
+            <button id="ppPrint" type="button" class="pp-btn pp-btn-ghost" disabled>🖨️ <%= L('Print / Save PDF', '打印 / 存成 PDF') %></button>
+          </div>
+          <ol id="ppProgress" class="pp-progress"></ol>
+        </section>
+      </section>
+
+      <section class="pp-preview" aria-label="<%= L('Preview', '预览') %>">
+        <p id="ppStatus" class="pp-status" role="status"></p>
+        <div id="ppStage" class="pp-stage"><div id="ppPages" class="pp-pages"></div></div>
+      </section>
+    </div>
+  </main>
+
+  <script>window.PP_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/shared/print-pack.js?v=1"></script>
+  <script src="/low-prep/print-pack/print-pack.js?v=1" defer></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>
