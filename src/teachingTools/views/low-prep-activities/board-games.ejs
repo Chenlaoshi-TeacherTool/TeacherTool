@@ -1,0 +1,145 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>棋盘游戏 · Board Game Maker - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Turn a Chinese vocabulary list into a printable board game: a race track, ladders and slides, get-in-a-row, or a four-colour flight race. Add task and action squares or action cards, and print dice, pawns and a rule card in colour or black and white. 一套词做成棋盘游戏：前进游戏盘、梯子滑梯棋、连成一线、飞行棋。' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
+  <link rel="stylesheet" href="/low-prep/board-games/board-games.css?v=1">
+  <style id="bgPageSize">@page port { size: A4 portrait; margin: 0; } @page land { size: A4 landscape; margin: 0; }</style>
+</head>
+<body class="bg-page">
+  <main class="bg-wrap">
+    <header class="bg-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="bg-eyebrow"><%= L('Vocabulary · printable games', '词汇 · 打印游戏') %></p>
+      <h1>♟️ <%= L('Board Game Maker', '棋盘游戏') %></h1>
+      <p><%= L('Type a word list and pick a board. Every square gets a word; add task squares and action squares if you like. Print the board with dice, pawns and a rule card.', '输入一套词，选一种棋盘，每个格子都会放上词语，也可以加任务格和动作格。打印棋盘，再附上骰子、棋子和规则卡。') %></p>
+    </header>
+
+    <div class="bg-layout">
+      <section class="bg-builder" aria-label="<%= L('Settings', '设置') %>">
+        <section class="bg-panel">
+          <p class="bg-kicker"><span class="bg-step">1</span><%= L('Words', '词语') %></p>
+          <label for="bgWords"><%= L('One word per line', '每行一个词') %> <small><%= L('(pinyin and English are filled in; or type 猫 | māo | cat)', '（拼音和英文会自动补上，也可以写：猫 | māo | cat）') %></small></label>
+          <textarea id="bgWords" rows="7" spellcheck="false">猫
+狗
+兔子
+熊猫
+老虎
+大象
+猴子
+鸟
+鱼
+马
+牛
+羊</textarea>
+          <p id="bgCount" class="bg-note"></p>
+          <label for="bgTitle"><%= L('Title on the board', '棋盘标题') %> <small><%= L('(optional)', '（可不填）') %></small></label>
+          <input id="bgTitle" type="text" maxlength="60" placeholder="<%= L('e.g. Animals', '比如：动物') %>">
+        </section>
+
+        <section class="bg-panel">
+          <p class="bg-kicker"><span class="bg-step">2</span><%= L('Board', '棋盘') %></p>
+          <div class="bg-boards" role="radiogroup" aria-label="<%= L('Board', '棋盘') %>">
+            <button type="button" role="radio" data-board="path" aria-checked="true">🐍 <b><%= L('Race track', '前进游戏盘') %></b><small><%= L('Roll and move along a track', '掷骰子沿路线前进') %></small></button>
+            <button type="button" role="radio" data-board="ladder" aria-checked="false">🪜 <b><%= L('Ladders & slides', '梯子滑梯棋') %></b><small><%= L('Climb ladders, slide down', '爬梯子、滑滑梯') %></small></button>
+            <button type="button" role="radio" data-board="line" aria-checked="false">⭕ <b><%= L('Get in a row', '连成一线') %></b><small><%= L('Claim squares, no dice', '占格子，不用骰子') %></small></button>
+            <button type="button" role="radio" data-board="flight" aria-checked="false">✈️ <b><%= L('Flight race', '飞行棋') %></b><small><%= L('Four colours, 2–4 players', '四种颜色，2–4 人') %></small></button>
+          </div>
+          <div class="bg-two">
+            <div>
+              <label for="bgSize"><%= L('Size', '大小') %></label>
+              <select id="bgSize"></select>
+            </div>
+            <div>
+              <label for="bgShow"><%= L('On each square', '格子上显示') %></label>
+              <select id="bgShow">
+                <option value="zhpy"><%= L('Characters + pinyin', '汉字 + 拼音') %></option>
+                <option value="zh"><%= L('Characters only', '只有汉字') %></option>
+                <option value="py"><%= L('Pinyin only', '只有拼音') %></option>
+              </select>
+            </div>
+          </div>
+          <label class="bg-check"><input type="checkbox" id="bgPictures" checked> <%= L('Add a picture (emoji) to each word', '给词语配图（emoji）') %></label>
+          <label class="bg-check" data-board-only="path"><input type="checkbox" id="bgSpecials" checked> <%= L('Game squares: go forward, go back, roll again, miss a turn', '游戏格：前进、后退、再掷一次、停一次') %></label>
+          <button id="bgShuffle" type="button" class="bg-btn bg-btn-ghost">🔀 <%= L('Shuffle the squares', '重新排列格子') %></button>
+        </section>
+
+        <section class="bg-panel">
+          <p class="bg-kicker"><span class="bg-step">3</span><%= L('Task squares', '任务格') %></p>
+          <label class="bg-check"><input type="checkbox" id="bgTasks"> <%= L('Add task squares (do something with the word)', '加任务格（用这个词完成一个小任务）') %></label>
+          <div id="bgTaskBox" class="bg-sub" hidden>
+            <label for="bgTaskRate"><%= L('How many squares', '占多少格子') %> <output id="bgTaskRateOut"></output></label>
+            <input id="bgTaskRate" type="range" min="5" max="40" step="5" value="20">
+            <div id="bgTaskList" class="bg-picks"></div>
+            <label for="bgCustomTasks"><%= L('Your own tasks (one per line)', '自己的任务（每行一个）') %></label>
+            <textarea id="bgCustomTasks" rows="2" placeholder="<%= L('e.g. 说出它的颜色', '比如：说出它的颜色') %>"></textarea>
+          </div>
+        </section>
+
+        <section class="bg-panel">
+          <p class="bg-kicker"><span class="bg-step">4</span><%= L('Action squares', '动作格') %></p>
+          <div class="bg-seg" role="radiogroup" aria-label="<%= L('Actions', '动作') %>">
+            <button type="button" role="radio" data-action="off" aria-checked="true"><%= L('None', '不加') %></button>
+            <button type="button" role="radio" data-action="cell" aria-checked="false"><%= L('On the square', '写在格子上') %></button>
+            <button type="button" role="radio" data-action="card" aria-checked="false"><%= L('Draw an action card', '抽动作卡') %></button>
+          </div>
+          <div id="bgActionBox" class="bg-sub" hidden>
+            <label for="bgActionRate"><%= L('How many squares', '占多少格子') %> <output id="bgActionRateOut"></output></label>
+            <input id="bgActionRate" type="range" min="5" max="40" step="5" value="15">
+            <p class="bg-note"><%= L('Actions marked 🤝 involve touching a classmate and are off unless you tick them.', '带 🤝 的动作需要和同学接触，默认不选。') %></p>
+            <div id="bgActionList" class="bg-picks"></div>
+            <label for="bgCustomActions"><%= L('Your own actions (one per line)', '自己的动作（每行一个）') %></label>
+            <textarea id="bgCustomActions" rows="2" placeholder="<%= L('e.g. 学老虎叫', '比如：学老虎叫') %>"></textarea>
+          </div>
+        </section>
+
+        <section class="bg-panel">
+          <p class="bg-kicker"><span class="bg-step">5</span><%= L('Print', '打印') %></p>
+          <div class="bg-seg" role="radiogroup" aria-label="<%= L('Colour', '颜色') %>">
+            <button type="button" role="radio" data-color="1" aria-checked="true">🎨 <%= L('Colour', '彩色') %></button>
+            <button type="button" role="radio" data-color="0" aria-checked="false">⚫ <%= L('Black & white', '黑白') %></button>
+          </div>
+          <div class="bg-two">
+            <div>
+              <label for="bgPaper"><%= L('Paper', '纸张') %></label>
+              <select id="bgPaper">
+                <option value="a4">A4</option>
+                <option value="letter">Letter</option>
+              </select>
+            </div>
+          </div>
+          <label class="bg-check"><input type="checkbox" id="bgIncCards" checked> <%= L('Action cards (when “draw an action card” is on)', '动作卡（选了“抽动作卡”时）') %></label>
+          <label class="bg-check"><input type="checkbox" id="bgIncKit" checked> <%= L('Rule card, die and pawns', '规则卡、骰子和棋子') %></label>
+          <div class="bg-actions">
+            <button id="bgPrint" type="button" class="bg-btn">🖨️ <%= L('Print / Save PDF', '打印 / 存成 PDF') %></button>
+            <button id="bgSave" type="button" class="bg-btn bg-btn-ghost" disabled>💾 <%= L('Save template', '保存模板') %></button>
+          </div>
+        </section>
+      </section>
+
+      <section class="bg-preview" aria-label="<%= L('Preview', '预览') %>">
+        <p id="bgStatus" class="bg-status" role="status"></p>
+        <div id="bgStage" class="bg-stage"><div id="bgSheets" class="bg-sheets"></div></div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script>window.BG_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
+  <script src="/shared/wordlist-core.js?v=zh-1"></script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/shared/emoji-core.js"></script>
+  <script src="/shared/game-template.js?v=4" defer></script>
+  <script src="/low-prep/board-games/board-games-core.js?v=1"></script>
+  <script src="/low-prep/board-games/board-games.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

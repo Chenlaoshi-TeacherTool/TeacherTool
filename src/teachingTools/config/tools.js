@@ -70,6 +70,7 @@ var TOOLS = [
   { href: '/teaching-tools/maze-generator', added: '2026-08-14', icon: '🧭', titleKey: 'teachingToolsIndex.mazeTitle', scopeKey: 'teachingToolsIndex.tenToFifteenPrintable', descKey: 'teachingToolsIndex.mazeDesc', actionKey: 'teachingToolsIndex.openActivity', section: 'printables', uses: ['print'] },
   { href: '/teaching-tools/tarsia-puzzle', added: '2026-08-12', icon: '🧩', titleKey: 'teachingToolsIndex.tarsiaTitle', scopeKey: 'teachingToolsIndex.tenToFifteenPrintable', descKey: 'teachingToolsIndex.tarsiaDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'] },
   { href: '/teaching-tools/secret-message', added: '2026-10-27', icon: '🔐', titleKey: 'teachingToolsIndex.secretMessageTitle', scopeKey: 'teachingToolsIndex.secretMessageScope', descKey: 'teachingToolsIndex.secretMessageDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'] },
+  { href: '/teaching-tools/board-games', added: '2026-11-23', icon: '♟️', titleKey: 'teachingToolsIndex.boardGamesTitle', scopeKey: 'teachingToolsIndex.boardGamesScope', descKey: 'teachingToolsIndex.boardGamesDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'project'] },
   { href: '/teaching-tools/spin-wheel', added: '2026-11-21', icon: '🎡', titleKey: 'teachingToolsIndex.spinWheelTitle', scopeKey: 'teachingToolsIndex.spinWheelScope', descKey: 'teachingToolsIndex.spinWheelDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'project'] },
   { href: '/teaching-tools/dice-story', added: '2026-11-22', icon: '🎲', titleKey: 'teachingToolsIndex.diceStoryTitle', scopeKey: 'teachingToolsIndex.diceStoryScope', descKey: 'teachingToolsIndex.diceStoryDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'independent'] },
   { href: '/teaching-tools/sentence-ladder', added: '2026-11-22', icon: '🪜', titleKey: 'teachingToolsIndex.sentenceLadderTitle', scopeKey: 'teachingToolsIndex.sentenceLadderScope', descKey: 'teachingToolsIndex.sentenceLadderDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'project', 'independent'], subject: 'chinese' },
@@ -134,7 +135,7 @@ var DIRECTORY = {
   },
   printables: {
     'classroom-supplies': 'nameTentTitle qrTitle',
-    'printable-games': 'sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle spinWheelTitle diceStoryTitle vocabPuzzleTitle pixelArtTitle',
+    'printable-games': 'boardGamesTitle sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle spinWheelTitle diceStoryTitle vocabPuzzleTitle pixelArtTitle',
     'chinese-materials': 'decodeTitle worksheetTitle sentenceLadderTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle componentCardsTitle charUnscramblerTitle hanziWheelTitle independentReadingTitle glossaryTitle'
   },
   prep: { main: 'libraryTitle questionBankTitle emojiSearchTitle glossaryTitle fontTitle' }
