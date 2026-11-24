@@ -8,7 +8,7 @@
   <%- include('../partials/seo', { pageDescription: 'Type Chinese characters and colour each component: show colour cards like 好 = 女 + 子 on the projector, print a colour-by-component worksheet, or print the components as cut-out pieces students glue back together. 输入汉字，按部件上色：彩色字卡、部件涂色练习纸、部件拼图。' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=3">
+  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=4">
   <style id="cc-page-size">@page { size: A4; margin: 0; }</style>
 </head>
 <body class="cc-page">
@@ -37,8 +37,22 @@
             <button type="button" role="radio" data-mode="coloring" aria-checked="false">🖍️ <b><%= L('Colouring sheet', '部件涂色') %></b><small><%= L('Students colour by legend', '学生照图例涂色') %></small></button>
             <button type="button" role="radio" data-mode="puzzle" aria-checked="false">✂️ <b><%= L('Cut-out puzzle', '部件拼图') %></b><small><%= L('Cut, then glue back', '剪下来拼回原字') %></small></button>
             <button type="button" role="radio" data-mode="tracing" aria-checked="false">✏️ <b><%= L('Component tracing', '部件描红') %></b><small><%= L('Trace part by part, then write', '一个部件一个部件地描') %></small></button>
+            <button type="button" role="radio" data-mode="explain" aria-checked="false">🖼️ <b><%= L('Component guide cards', '部件图解卡') %></b><small><%= L('What a component means, with examples', '部件的意思和例字') %></small></button>
             <button type="button" role="radio" data-mode="family" aria-checked="false">🌳 <b><%= L('Component family', '部件家族图') %></b><small><%= L('One component, many characters', '一个部件，一串字') %></small></button>
           </div>
+        </section>
+
+        <section class="cc-panel" data-for="explain">
+          <p class="cc-kicker"><span class="cc-step">🖼️</span><%= L('Components', '部件') %> <small id="ccGuideCount" class="cc-note"></small></p>
+          <div class="cc-gd-tools">
+            <button type="button" id="ccGuideFromChars" class="cc-btn cc-btn-ghost">🔎 <%= L('Find them in the characters above', '从上面的字里找部件') %></button>
+            <button type="button" id="ccGuideClear" class="cc-btn cc-btn-ghost"><%= L('Clear', '清空') %></button>
+          </div>
+          <div id="ccGuideList" class="cc-gd-list"></div>
+          <label class="cc-check"><input type="checkbox" id="ccGuidePractice" checked> <%= L('Add a “write more characters” row (1–2 per page)', '加“写一写”练习格（每页 1–2 张时）') %></label>
+          <label class="cc-check"><input type="checkbox" id="ccGuideEn" checked> <%= L('Show English', '显示英文') %></label>
+          <p class="cc-note"><%= L('On the preview, click the meaning or the explanation to change the words, and click an example character to swap it. Your changes stay in this browser.', '在预览上点“意思”或“讲解”可以直接改字，点例字可以换成别的字。改过的内容存在这个浏览器里。') %></p>
+          <button type="button" id="ccGuideReset" class="cc-btn cc-btn-ghost" hidden><%= L('Undo my changes', '撤销我的修改') %></button>
         </section>
 
         <section class="cc-panel" data-for="family">
@@ -136,12 +150,14 @@
     </div>
   </div>
 
+  <div id="ccGuidePop" class="cc-gd-pop" hidden></div>
+
   <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
 
   <script>window.CC_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
-  <script src="/low-prep/component-cards/component-cards.js?v=3" defer></script>
+  <script src="/low-prep/component-cards/component-cards.js?v=4" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

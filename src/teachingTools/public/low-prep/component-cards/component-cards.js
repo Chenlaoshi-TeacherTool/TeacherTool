@@ -30,8 +30,8 @@
     { hex: '#9c36b5', zh: '紫', en: 'purple' },
     { hex: '#0c8599', zh: '青', en: 'teal' }
   ];
-  var PER = { color: [1, 2, 4, 6], coloring: [2, 4, 6], puzzle: [1, 2, 3, 4], family: [1], tracing: [3, 4, 5, 6, 8] };
-  var PER_DEFAULT = { color: 4, coloring: 4, puzzle: 2, family: 1, tracing: 4 };
+  var PER = { color: [1, 2, 4, 6], coloring: [2, 4, 6], puzzle: [1, 2, 3, 4], family: [1], tracing: [3, 4, 5, 6, 8], explain: [1, 2, 4] };
+  var PER_DEFAULT = { color: 4, coloring: 4, puzzle: 2, family: 1, tracing: 4, explain: 2 };
   var ORDER_URL = '/low-prep/component-cards/data/common-order.txt';
   var HIGHLIGHT = '#1c7ed6';
   // A component typed in its full form also finds its side form (水 → 氵).
@@ -493,6 +493,244 @@
       nodes + hubHtml + '</div>', student ? 'is-student' : '');
   }
 
+  // ---------- component guide cards (部件图解卡) ----------
+  //
+  // Data: data/component-guide.json, built from the teacher's component table by
+  // scripts/build-guide.js. Teachers can change a card's meaning, explanation and
+  // example characters on the page; those edits stay in this browser.
+
+  var GUIDE_URL = '/low-prep/component-cards/data/component-guide.json';
+  var GUIDE_EDITS = 'cc-guide-edits-v1';
+  var GUIDE_PICKS = 'cc-guide-picks-v1';
+  var SIDE_ZH = { left: '左边', right: '右边', top: '上面', bottom: '下面', frame: '外面' };
+  var SIDE_EN = { left: 'on the left', right: 'on the right', top: 'on top', bottom: 'at the bottom', frame: 'around the outside' };
+  var guidePromise = null;
+  var guideEdits = readJson(GUIDE_EDITS, {});
+  var guidePicks = readJson(GUIDE_PICKS, ['氵-left', '木-left', '口-left', '扌-left']);
+  var guideView = null;
+
+  function readJson(key, fallback) {
+    try { var v = JSON.parse(localStorage.getItem(key)); return v || fallback; } catch (e) { return fallback; }
+  }
+  function writeJson(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* private mode */ }
+  }
+  function loadGuide() {
+    if (!guidePromise) guidePromise = fetch(GUIDE_URL).then(function (res) { if (!res.ok) throw new Error('guide ' + res.status); return res.json(); });
+    return guidePromise;
+  }
+
+  function guideGroups(guide) {
+    var groups = [
+      { side: 'left', zh: '左边', en: 'Left' }, { side: 'right', zh: '右边', en: 'Right' }, { side: 'top', zh: '上边', en: 'Top' },
+      { side: 'bottom', zh: '下边', en: 'Bottom' }, { side: 'frame', zh: '外框', en: 'Frame' }, { side: 'any', zh: '常见独立部件', en: 'Common parts' }
+    ];
+    return groups.map(function (g) { return Object.assign({ items: guide.filter(function (e) { return e.side === g.side; }) }, g); });
+  }
+
+  function paintGuidePicker(guide) {
+    $('ccGuideList').innerHTML = guideGroups(guide).map(function (g, i) {
+      return '<details' + (i === 0 ? ' open' : '') + '><summary>' + T(g.en, g.zh) + ' <small>' + g.items.length + '</small></summary><div class="cc-chips">' +
+        g.items.map(function (e) {
+          return '<button type="button" class="cc-chip' + (guidePicks.indexOf(e.id) !== -1 ? ' is-active' : '') + '" data-guide="' + esc(e.id) + '" title="' + esc(e.name) + '"><b>' + esc(e.comp) + '</b><small>' + esc(e.name) + '</small></button>';
+        }).join('') + '</div></details>';
+    }).join('');
+    $('ccGuideCount').textContent = T(guidePicks.length + ' chosen', '已选 ' + guidePicks.length + ' 个');
+  }
+
+  function firstMeaning(text) { return String(text || '').split(/[；;、，,（(\/]/)[0].trim(); }
+
+  function explainText(e) {
+    var meaning = firstMeaning(e.meaning);
+    var origin = Array.from(e.origin || '').length === 1 && e.origin !== e.comp ? e.origin : '';
+    var where = SIDE_ZH[e.side];
+    return (origin && where ? '「' + origin + '」写在字的' + where + '时，常写成「' + e.comp + '」。' : '') +
+      '带「' + e.comp + '」的字，常常和' + meaning + '有关。';
+  }
+  function explainEn(e) {
+    var origin = Array.from(e.origin || '').length === 1 && e.origin !== e.comp ? e.origin : '';
+    return (origin && SIDE_EN[e.side] ? origin + ' is written as ' + e.comp + ' ' + SIDE_EN[e.side] + '. ' : '') +
+      'Characters with ' + e.comp + ' are often about ' + firstMeaning(e.en) + '.';
+  }
+
+  function guideEntry(e) {
+    var edit = guideEdits[e.id] || {};
+    return Object.assign({}, e, {
+      meaningShown: edit.meaning != null ? edit.meaning : e.meaning,
+      explain: edit.explain != null ? edit.explain : explainText(e),
+      exampleChars: edit.examples || e.examples.map(function (x) { return x.zh; })
+    });
+  }
+
+  function renderGuide() {
+    var token = ++famToken;
+    var box = $('ccSheets');
+    Promise.all([loadGuide(), loadData(), loadOrder()]).then(function (res) {
+      if (token !== famToken) return null;
+      var guide = res[0], data = res[1], rank = res[2];
+      paintGuidePicker(guide);
+      var entries = guidePicks.map(function (id) { return guide.find(function (e) { return e.id === id; }); }).filter(Boolean).map(guideEntry);
+      if (!entries.length) { box.innerHTML = '<p class="cc-empty">' + T('Pick a component on the left.', '在左边点一个部件。') + '</p>'; return null; }
+      var chars = {};
+      entries.forEach(function (e) { chars[e.comp] = true; e.exampleChars.forEach(function (c) { chars[c] = true; }); });
+      var list = Object.keys(chars);
+      return Promise.all(list.map(loadStrokes)).then(function (strokes) {
+        if (token !== famToken) return;
+        var byChar = {};
+        list.forEach(function (c, i) { if (strokes[i]) byChar[c] = { ch: c, strokes: strokes[i], base: baseSplit(c, data[c], strokes[i].length), py: pinyinOf(c) }; });
+        guideView = { entries: entries, byChar: byChar, data: data, rank: rank };
+        var per = Number($('ccPer').value);
+        box.innerHTML = chunks(entries, per).map(function (group) {
+          return sheet('<div class="cc-gd-cards per-' + per + '">' + group.map(function (e) { return guideCard(e, byChar, per); }).join('') + '</div>', 'cc-gd-sheet');
+        }).join('');
+        fitGuide();
+        fitPreview();
+        $('ccStatus').textContent = '';
+      });
+    }).catch(function (error) {
+      $('ccStatus').textContent = T('Could not load the component data. Check the internet connection and reload.', '部件数据没有加载成功，请检查网络后刷新页面。');
+      console.error(error);
+    });
+  }
+
+  function guideCard(e, byChar, per) {
+    var english = $('ccGuideEn').checked, withPy = $('ccPinyin').checked;
+    var compItem = byChar[e.comp];
+    var big = compItem
+      ? glyph(compItem, { labels: [e.comp], parts: compItem.strokes.map(function () { return 0; }) }, { grid: true, style: 'highlight', hl: 0, viewBox: centeredView(compItem) })
+      : '<span class="cc-gd-text">' + esc(e.comp) + '</span>';
+    var origin = e.origin && e.origin !== e.comp
+      ? '<p class="cc-gd-origin">' + T('From', '来自') + ' <b>' + esc(e.origin) + '</b> → <b class="cc-gd-hl">' + esc(e.comp) + '</b></p>' : '';
+    var forms = e.forms || [e.comp];
+    var examples = e.exampleChars.map(function (c, i) {
+      var item = byChar[c];
+      var drawn = item ? glyph(item, splitOf(item), { grid: true, style: 'highlight', hl: familyPart(splitOf(item), forms) }) : '<span class="cc-gd-text">' + esc(c) + '</span>';
+      var en = english && window.ChenWordlist ? firstMeaning(window.ChenWordlist.toEnglish(c) || '') : '';
+      return '<button type="button" class="cc-gd-ex" data-gid="' + esc(e.id) + '" data-ex="' + i + '" title="' + T('Click to change this example', '点一下换一个例字') + '">' + drawn +
+        (withPy && item ? '<span class="cc-py">' + esc(item.py) + '</span>' : '') + (en ? '<small>' + esc(en) + '</small>' : '') + '</button>';
+    }).join('');
+    var practice = $('ccGuidePractice').checked && per < 4
+      ? '<div class="cc-gd-try">✏️ ' + T('Which other characters with「' + esc(e.comp) + '」do you know? Write them.', '你还认识哪些带「' + esc(e.comp) + '」的字？写一写。') +
+        '<div class="cc-gd-boxes">' + '<span></span><span></span><span></span><span></span>' + '</div></div>' : '';
+    return '<div class="cc-gd-card">' +
+      '<div class="cc-gd-bar"><b>' + T('Component card', '部件图解卡') + '</b>' + (e.note ? '' : '') + '</div>' +
+      '<div class="cc-gd-hero"><div class="cc-gd-big">' + big + '</div><div class="cc-gd-info">' +
+        '<h3>' + esc(e.name) + '</h3>' + (withPy ? '<p class="cc-py cc-gd-namepy">' + esc(window.ChenWordlist ? window.ChenWordlist.toPinyin(e.name.replace(/（.*?）/g, ''), { spaced: true }) : '') + '</p>' : '') +
+        origin +
+        '<p class="cc-gd-meaning"><span class="cc-gd-emoji">' + esc(e.emoji) + '</span><span contenteditable="true" data-edit="meaning" data-gid="' + esc(e.id) + '">' + esc(e.meaningShown) + '</span>' +
+        (english && e.en ? '<small>' + esc(e.en) + '</small>' : '') + '</p></div></div>' +
+      '<p class="cc-gd-explain"><span contenteditable="true" data-edit="explain" data-gid="' + esc(e.id) + '">' + esc(e.explain) + '</span>' +
+        (english ? '<small>' + esc(explainEn(e)) + '</small>' : '') + '</p>' +
+      '<div class="cc-gd-examples">' + examples + '</div>' + practice +
+      '</div>';
+  }
+
+  // Shrink a card's text until it fits its box.
+  function fitGuide() {
+    Array.prototype.forEach.call($('ccSheets').querySelectorAll('.cc-gd-card'), function (card) {
+      var size = 100;
+      card.style.fontSize = '';
+      while (card.scrollHeight > card.clientHeight + 1 && size > 55) { size -= 5; card.style.fontSize = size + '%'; }
+    });
+  }
+
+  function saveGuideEdit(id, field, value) {
+    var edit = guideEdits[id] || (guideEdits[id] = {});
+    edit[field] = value;
+    writeJson(GUIDE_EDITS, guideEdits);
+    $('ccGuideReset').hidden = false;
+  }
+
+  // Example swap: a small list of other characters with this component.
+  function openSwap(button) {
+    if (!guideView) return;
+    var e = guideView.entries.find(function (x) { return x.id === button.dataset.gid; });
+    if (!e) return;
+    var index = Number(button.dataset.ex);
+    var current = e.exampleChars;
+    var pool = [];
+    e.forms.forEach(function (f) {
+      familyOf(f, guideView.data, guideView.rank).forEach(function (c) { if (pool.indexOf(c) === -1 && current.indexOf(c) === -1) pool.push(c); });
+    });
+    pool = pool.slice(0, 40);
+    var pop = $('ccGuidePop');
+    var r = button.getBoundingClientRect();
+    pop.innerHTML = '<p>' + T('Swap 「' + esc(current[index]) + '」for:', '把「' + esc(current[index]) + '」换成：') + '</p><div>' +
+      pool.map(function (c) { return '<button type="button" data-pick="' + esc(c) + '">' + esc(c) + '</button>'; }).join('') + '</div>' +
+      '<button type="button" class="cc-gd-pop-close" data-pick="">' + T('Cancel', '取消') + '</button>';
+    pop.hidden = false;
+    pop.style.left = Math.max(8, Math.min(window.innerWidth - pop.offsetWidth - 8, r.left)) + 'px';
+    pop.style.top = Math.max(8, Math.min(window.innerHeight - pop.offsetHeight - 8, r.bottom + 6)) + 'px';
+    pop.onclick = function (ev) {
+      var b = ev.target.closest('[data-pick]');
+      if (!b) return;
+      pop.hidden = true;
+      if (!b.dataset.pick) return;
+      var next = current.slice();
+      next[index] = b.dataset.pick;
+      saveGuideEdit(e.id, 'examples', next);
+      renderGuide();
+    };
+  }
+
+  $('ccGuideList').addEventListener('click', function (ev) {
+    var chip = ev.target.closest('[data-guide]');
+    if (!chip) return;
+    var id = chip.dataset.guide, at = guidePicks.indexOf(id);
+    if (at === -1) guidePicks.push(id); else guidePicks.splice(at, 1);
+    writeJson(GUIDE_PICKS, guidePicks);
+    renderGuide();
+  });
+  $('ccGuideFromChars').addEventListener('click', function () {
+    var chars = parseChars($('ccChars').value);
+    Promise.all([loadGuide(), loadData()]).then(function (res) {
+      var guide = res[0], data = res[1], found = [];
+      chars.forEach(function (c) {
+        var labels = Array.from((data[c] || [''])[0]);
+        guide.forEach(function (e) {
+          // The parts are stored in writing order, so left/top come first and right/bottom last.
+          var at = function (f) {
+            if (labels.length < 2) return false;
+            if (e.side === 'left' || e.side === 'top') return labels[0] === f;
+            if (e.side === 'right' || e.side === 'bottom') return labels[labels.length - 1] === f;
+            return labels.indexOf(f) !== -1;
+          };
+          var hit = e.forms.some(at);
+          if (hit && found.indexOf(e.id) === -1 && found.length < 24) found.push(e.id);
+        });
+      });
+      if (!found.length) { $('ccStatus').textContent = T('No components from the list were found in these characters.', '在这些字里没有找到表里的部件。'); return; }
+      guidePicks = found;
+      writeJson(GUIDE_PICKS, guidePicks);
+      renderGuide();
+    });
+  });
+  $('ccGuideClear').addEventListener('click', function () { guidePicks = []; writeJson(GUIDE_PICKS, guidePicks); renderGuide(); });
+  $('ccGuideReset').hidden = !Object.keys(guideEdits).length;
+  $('ccGuideReset').addEventListener('click', function () {
+    if (!confirm(T('Undo all your changes to the component cards?', '撤销你对部件图解卡的所有修改？'))) return;
+    guideEdits = {};
+    writeJson(GUIDE_EDITS, guideEdits);
+    $('ccGuideReset').hidden = true;
+    renderGuide();
+  });
+  ['ccGuidePractice', 'ccGuideEn'].forEach(function (id) { $(id).addEventListener('change', renderGuide); });
+  $('ccSheets').addEventListener('click', function (ev) {
+    var ex = ev.target.closest('.cc-gd-ex');
+    if (ex) openSwap(ex);
+  });
+  $('ccSheets').addEventListener('focusout', function (ev) {
+    var field = ev.target.closest('[data-edit]');
+    if (field) saveGuideEdit(field.dataset.gid, field.dataset.edit, field.textContent.trim());
+  });
+  $('ccSheets').addEventListener('keydown', function (ev) {
+    if (ev.key === 'Enter' && ev.target.closest('[data-edit]')) { ev.preventDefault(); ev.target.blur(); }
+  });
+  document.addEventListener('click', function (ev) {
+    var pop = $('ccGuidePop');
+    if (!pop.hidden && !ev.target.closest('#ccGuidePop') && !ev.target.closest('.cc-gd-ex')) pop.hidden = true;
+  });
+
   // ---------- render ----------
 
   var renderToken = 0;
@@ -503,6 +741,7 @@
       state.chars = [];
       paintChips();
       if (state.mode === 'family') { renderFamily(); return; }
+      if (state.mode === 'explain') { renderGuide(); return; }
       $('ccSheets').innerHTML = '<p class="cc-empty">' + T('Type a few characters to start.', '输入几个汉字就能开始。') + '</p>';
       return;
     }
@@ -528,6 +767,7 @@
 
   function paintSheets() {
     if (state.mode === 'family') { renderFamily(); return; }
+    if (state.mode === 'explain') { renderGuide(); return; }
     var items = usable();
     var per = Number($('ccPer').value);
     var box = $('ccSheets');
@@ -683,6 +923,16 @@
   // ---------- projector ----------
 
   function paintShow() {
+    if (state.mode === 'explain') {
+      var list = guideView ? guideView.entries : [];
+      if (!list.length) return;
+      state.show = (state.show + list.length) % list.length;
+      $('ccShowCard').classList.remove('is-reveal');
+      $('ccShowSplit').textContent = T('Show examples', '显示例字');
+      $('ccShowCard').innerHTML = '<div class="cc-gd-show per-1">' + guideCard(list[state.show], guideView.byChar, 1) + '</div>';
+      $('ccShowCount').textContent = (state.show + 1) + ' / ' + list.length;
+      return;
+    }
     var items = usable();
     if (!items.length) return;
     state.show = (state.show + items.length) % items.length;
@@ -696,7 +946,7 @@
   }
 
   function openShow() {
-    if (!usable().length) return;
+    if (state.mode === 'explain' ? !(guideView && guideView.entries.length) : !usable().length) return;
     state.show = 0;
     $('ccShowBox').hidden = false;
     paintShow();
@@ -713,6 +963,11 @@
   $('ccShowPrev').addEventListener('click', function () { state.show--; paintShow(); });
   $('ccShowNext').addEventListener('click', function () { state.show++; paintShow(); });
   function toggleSplit() {
+    if (state.mode === 'explain') {
+      var shown = $('ccShowCard').classList.toggle('is-reveal');
+      $('ccShowSplit').textContent = shown ? T('Hide examples', '隐藏例字') : T('Show examples', '显示例字');
+      return;
+    }
     var split = $('ccShowCard').classList.toggle('is-split');
     $('ccShowSplit').textContent = split ? T('Put together', '合上') : T('Split apart', '拆开');
   }
@@ -735,7 +990,7 @@
     state.mode = mode;
     document.querySelectorAll('.cc-modes [data-mode]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.mode === mode)); });
     document.querySelectorAll('[data-for]').forEach(function (el) { el.hidden = el.dataset.for.split(' ').indexOf(mode) === -1; });
-    $('ccShow').hidden = mode !== 'color';
+    $('ccShow').hidden = mode !== 'color' && mode !== 'explain';
     $('ccPer').closest('div').hidden = mode === 'family';
     var per = state.per[mode] || PER_DEFAULT[mode];
     $('ccPer').innerHTML = PER[mode].map(function (n) { return '<option value="' + n + '"' + (n === per ? ' selected' : '') + '>' + n + '</option>'; }).join('');
@@ -750,7 +1005,7 @@
     var button = event.target.closest('[data-mode]');
     if (!button) return;
     setMode(button.dataset.mode);
-    if (state.chars.length || state.mode === 'family') paintSheets();
+    if (state.chars.length || state.mode === 'family' || state.mode === 'explain') paintSheets();
   });
 
   $('ccPer').addEventListener('change', function () { state.per[state.mode] = Number($('ccPer').value); paintSheets(); });
@@ -778,7 +1033,7 @@
   $('ccTitle').addEventListener('input', paintSheets);
   var typing = null;
   $('ccChars').addEventListener('input', function () { clearTimeout(typing); typing = setTimeout(render, 350); });
-  $('ccPrint').addEventListener('click', function () { if (usable().length) window.print(); });
+  $('ccPrint').addEventListener('click', function () { if ($('ccSheets').querySelector('.cc-sheet')) window.print(); });
   window.addEventListener('resize', fitPreview);
 
   // ---------- start ----------

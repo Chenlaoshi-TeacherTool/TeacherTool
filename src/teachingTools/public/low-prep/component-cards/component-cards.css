@@ -160,3 +160,77 @@
 .cc-tr-box .cc-glyph { width: 100%; height: 100%; }
 .cc-tr-box.is-model { outline: .5mm solid #356e57; outline-offset: -.25mm; }
 [data-for][hidden] { display: none !important; }
+
+/* ---------- component guide cards (部件图解卡) ---------- */
+.cc-gd-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.cc-gd-tools .cc-btn { padding: 7px 12px; font-size: .88rem; }
+.cc-gd-list details { margin: 6px 0; }
+.cc-gd-list summary { cursor: pointer; font-weight: 700; color: #194f45; }
+.cc-gd-list summary small { color: #6b7d74; font-weight: 400; }
+.cc-gd-list .cc-chip small { max-width: 5.5em; overflow: hidden; text-overflow: ellipsis; }
+.cc-kicker small { margin-left: auto; font-weight: 500; }
+
+.cc-gd-cards { flex: 1; display: grid; gap: 5mm; min-height: 0; }
+.cc-gd-cards.per-2 { grid-template-rows: 1fr 1fr; }
+.cc-gd-cards.per-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 4mm; }
+.cc-gd-card { box-sizing: border-box; display: flex; flex-direction: column; gap: 3mm; min-height: 0; overflow: hidden; padding: 0 0 4mm; border: .5mm solid #cfdac9; border-radius: 4mm; background: #fffdf7; font-family: "Segoe UI", Arial, "Microsoft YaHei", sans-serif; font-size: 12pt; }
+.per-4 .cc-gd-card { font-size: 9.5pt; gap: 2mm; }
+.cc-gd-bar { padding: 2mm 5mm; background: #356e57; color: #fff; letter-spacing: .08em; }
+.cc-gd-hero { display: flex; align-items: center; gap: 5mm; padding: 0 5mm; }
+.cc-gd-big { flex: none; width: 13em; height: 13em; }
+.per-2 .cc-gd-big { width: 10em; height: 10em; }
+.per-4 .cc-gd-big { width: 8em; height: 8em; }
+.cc-gd-big .cc-glyph, .cc-gd-ex .cc-glyph { width: 100%; height: 100%; }
+.cc-gd-text { display: grid; place-items: center; width: 100%; height: 100%; color: #1c7ed6; font: 7em "KaiTi", "STKaiti", serif; }
+.cc-gd-info { flex: 1; min-width: 0; }
+.cc-gd-info h3 { margin: 0; color: #194f45; font: 700 2.2em "KaiTi", "STKaiti", "Kaiti SC", serif; letter-spacing: .06em; }
+.cc-gd-namepy { margin: 0 0 1.5mm; font-size: 1.1em !important; }
+.cc-gd-origin { margin: 0 0 1.5mm; color: #34463f; }
+.cc-gd-origin b { font: 1.5em "KaiTi", "STKaiti", serif; }
+.cc-gd-hl { color: #1c7ed6; }
+.cc-gd-meaning { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1.5mm 2.5mm; margin: 0; padding: 2mm 3mm; border-radius: 3mm; background: #e8f2fb; font-size: 1.15em; }
+.cc-gd-meaning small { flex-basis: 100%; color: #5d7168; font-size: .78em; }
+.cc-gd-emoji { font-size: 1.3em; }
+.cc-gd-explain { margin: 0 5mm; padding-left: 3mm; border-left: 1.2mm solid #1c7ed6; line-height: 1.5; }
+.cc-gd-explain small { display: block; color: #5d7168; font-size: .82em; }
+[contenteditable="true"] { border-radius: 1mm; outline: 1px dashed transparent; }
+.cc-sheets [contenteditable="true"]:hover, .cc-sheets [contenteditable="true"]:focus { outline-color: #bf7f35; background: #fff8e8; }
+.cc-gd-examples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5mm; padding: 0 5mm; }
+.cc-gd-ex { display: flex; flex-direction: column; align-items: center; gap: .6mm; padding: 1.5mm; border: .35mm solid #cfdac9; border-radius: 2.5mm; background: #fff; font: inherit; cursor: pointer; }
+.cc-gd-ex .cc-glyph { aspect-ratio: 1; height: auto; }
+.cc-gd-ex .cc-py { font-size: 1em; }
+.cc-gd-ex small { color: #5d7168; font-size: .8em; }
+.cc-sheets .cc-gd-ex:hover { border-color: #bf7f35; box-shadow: 0 0 0 1px #bf7f35; }
+.cc-gd-try { margin: auto 5mm 0; padding: 2.5mm 3mm; border: .35mm dashed #cfdac9; border-radius: 3mm; }
+.cc-gd-boxes { display: flex; gap: 3mm; margin-top: 2mm; }
+.cc-gd-boxes span { flex: 1; max-width: 24mm; aspect-ratio: 1; border: .3mm solid #e7a3a3;
+  background: linear-gradient(90deg, transparent calc(50% - .15mm), #f1c4c4 calc(50% - .15mm), #f1c4c4 calc(50% + .15mm), transparent calc(50% + .15mm)),
+              linear-gradient(transparent calc(50% - .15mm), #f1c4c4 calc(50% - .15mm), #f1c4c4 calc(50% + .15mm), transparent calc(50% + .15mm)); }
+
+/* Two per page: the hero on the left, everything else on the right. */
+.per-2 .cc-gd-card { display: grid; grid-template-columns: 40% 1fr; grid-template-rows: auto auto auto 1fr; grid-template-areas: "bar bar" "hero explain" "hero examples" "hero try"; column-gap: 4mm; }
+.per-2 .cc-gd-bar { grid-area: bar; }
+.per-2 .cc-gd-hero { grid-area: hero; flex-direction: column; align-items: flex-start; padding-right: 0; }
+.per-2 .cc-gd-explain { grid-area: explain; margin-left: 0; }
+.per-2 .cc-gd-examples { grid-area: examples; padding-left: 0; }
+.per-2 .cc-gd-try { grid-area: try; margin-left: 0; align-self: end; }
+.per-4 .cc-gd-examples { grid-template-columns: repeat(4, 1fr); gap: 1.5mm; }
+
+.cc-gd-pop { position: fixed; z-index: 3000; width: min(320px, 90vw); padding: 10px; border: 1px solid #c9d6c2; border-radius: 12px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+.cc-gd-pop[hidden] { display: none; }
+.cc-gd-pop p { margin: 0 0 6px; font-weight: 700; color: #194f45; }
+.cc-gd-pop div { display: flex; flex-wrap: wrap; gap: 5px; max-height: 210px; overflow: auto; }
+.cc-gd-pop div button { width: 40px; height: 40px; border: 1px solid #c9d6c2; border-radius: 8px; background: #fffdf7; font: 1.3rem "KaiTi", "STKaiti", serif; cursor: pointer; }
+.cc-gd-pop div button:hover { background: #edf5df; border-color: #356e57; }
+.cc-gd-pop-close { margin-top: 8px; padding: 5px 12px; border: 1px solid #c9d6c2; border-radius: 8px; background: #fff; cursor: pointer; }
+
+.cc-gd-show { width: min(1100px, 94vw); height: 80vh; display: flex; }
+.cc-gd-show .cc-gd-card { flex: 1; font-size: 2.3vh; }
+.cc-gd-show .cc-gd-big { width: 30vh; height: 30vh; }
+#ccShowCard:not(.is-reveal) .cc-gd-examples { visibility: hidden; }
+.cc-show-card .cc-gd-try { display: none; }
+
+@media print {
+  [contenteditable="true"] { outline: none !important; background: none !important; }
+  .cc-gd-ex { cursor: default; }
+}
