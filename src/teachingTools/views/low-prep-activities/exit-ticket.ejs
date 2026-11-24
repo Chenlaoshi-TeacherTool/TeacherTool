@@ -1,0 +1,133 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>出门条 · Exit Tickets - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Turn a Chinese word list into printable exit-ticket strips: 4–8 per page, quick questions (write the characters, pick the meaning, make a sentence), an optional reflection line, A/B versions and an answer key. 一套词变成下课前的出门条：看拼音写汉字、选意思、造句、反思，A/B 两版，附答案。' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/exit-ticket/exit-ticket.css?v=1">
+  <style id="etPageSize">@page { size: A4; margin: 0; }</style>
+</head>
+<body class="et-page">
+  <main class="et-wrap">
+    <header class="et-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="et-eyebrow"><%= L('End of class · 3–5 minutes', '下课前 · 3–5 分钟') %></p>
+      <h1>🎟️ <%= L('Exit Tickets', '出门条') %></h1>
+      <p><%= L('Paste today’s words and print a page of small strips. Each student answers 2–4 quick questions before leaving; neighbours get different versions.', '粘贴今天学的词，打印一页小纸条。学生下课前答 2–4 道小题再出门，同桌拿到的版本不一样。') %></p>
+    </header>
+
+    <div class="et-layout">
+      <section class="et-builder" aria-label="<%= L('Settings', '设置') %>">
+        <section class="et-panel">
+          <p class="et-kicker"><span class="et-step">1</span><%= L('Today’s words', '今天的词') %></p>
+          <label for="etWords"><%= L('One word per line', '每行一个词') %> <small><%= L('(pinyin and English are filled in; or type 熊猫 | xióngmāo | panda)', '（拼音和英文会自动补上，也可以写：熊猫 | xióngmāo | panda）') %></small></label>
+          <textarea id="etWords" rows="7" spellcheck="false">熊猫
+老虎
+大象
+猴子
+兔子
+小狗
+小猫
+小鸟</textarea>
+          <p id="etCount" class="et-note"></p>
+          <label for="etTitle"><%= L('Title on each strip', '纸条上的标题') %> <small><%= L('(optional)', '（可不填）') %></small></label>
+          <input id="etTitle" type="text" maxlength="40" placeholder="<%= L('e.g. Lesson 5 · Animals', '比如：第五课 · 动物') %>">
+        </section>
+
+        <section class="et-panel">
+          <p class="et-kicker"><span class="et-step">2</span><%= L('Questions', '题目') %></p>
+          <div class="et-two">
+            <div>
+              <label for="etPer"><%= L('Questions per strip', '每张几道题') %></label>
+              <select id="etPer">
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+            <div>
+              <label for="etVersions"><%= L('Versions', '版本') %></label>
+              <select id="etVersions">
+                <option value="1"><%= L('One version', '一个版本') %></option>
+                <option value="2" selected><%= L('A / B (neighbours differ)', 'A / B 两版（同桌不同）') %></option>
+                <option value="3">A / B / C</option>
+              </select>
+            </div>
+          </div>
+          <p class="et-sub"><%= L('Question types (mixed on each strip)', '题型（每张纸条混合出题）') %></p>
+          <div class="et-picks" id="etTypes">
+            <label><input type="checkbox" value="write" checked> ✍️ <%= L('See pinyin, write the characters', '看拼音，写汉字') %></label>
+            <label><input type="checkbox" value="meaning" checked> 🔤 <%= L('Pick the meaning', '选意思') %></label>
+            <label><input type="checkbox" value="pickzh" checked> 🀄 <%= L('Pick the characters', '选汉字') %></label>
+            <label><input type="checkbox" value="sentence" checked> 💬 <%= L('Make a sentence', '用词造句') %></label>
+          </div>
+          <label for="etOwn"><%= L('Your own questions (one per line, on every strip)', '自己的题（每行一题，每张纸条都有）') %></label>
+          <textarea id="etOwn" rows="2" placeholder="<%= L('e.g. Which animal do you like best? Why?', '比如：你最喜欢哪个动物？为什么？') %>"></textarea>
+        </section>
+
+        <section class="et-panel">
+          <p class="et-kicker"><span class="et-step">3</span><%= L('Reflection', '反思') %></p>
+          <div class="et-picks" id="etReflect">
+            <label><input type="checkbox" value="faces" checked> 😀😐😟 <%= L('How well I know today’s words', '今天的词我会了吗') %></label>
+            <label><input type="checkbox" value="learned"> 📝 <%= L('Today I learned…', '今天我学会了……') %></label>
+            <label><input type="checkbox" value="question"> ❓ <%= L('I still want to ask…', '我还想问……') %></label>
+          </div>
+        </section>
+
+        <section class="et-panel">
+          <p class="et-kicker"><span class="et-step">4</span><%= L('Print', '打印') %></p>
+          <div class="et-two">
+            <div>
+              <label for="etStrips"><%= L('Strips per page', '每页几张') %></label>
+              <select id="etStrips">
+                <option value="4">4</option>
+                <option value="6" selected>6</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+            <div>
+              <label for="etPaper"><%= L('Paper', '纸张') %></label>
+              <select id="etPaper">
+                <option value="A4">A4</option>
+                <option value="Letter">Letter</option>
+              </select>
+            </div>
+          </div>
+          <label for="etPages"><%= L('Pages of strips', '印几页纸条') %></label>
+          <select id="etPages">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          <label class="et-check"><input type="checkbox" id="etPinyin" checked> <%= L('Pinyin on the multiple-choice answers', '选择题的汉字选项加拼音') %></label>
+          <label class="et-check"><input type="checkbox" id="etKey" checked> <%= L('Add an answer key page', '加一页答案') %></label>
+          <div class="et-actions">
+            <button id="etPrint" type="button" class="et-btn">🖨️ <%= L('Print / Save PDF', '打印 / 存成 PDF') %></button>
+            <button id="etShuffle" type="button" class="et-btn et-btn-ghost">🔀 <%= L('New questions', '换一批题') %></button>
+          </div>
+        </section>
+      </section>
+
+      <section class="et-preview" aria-label="<%= L('Preview', '预览') %>">
+        <p id="etStatus" class="et-status" role="status"></p>
+        <div id="etStage" class="et-stage"><div id="etSheets" class="et-sheets"></div></div>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script>window.ET_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
+  <script src="/shared/wordlist-core.js?v=zh-1"></script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/low-prep/exit-ticket/exit-ticket.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

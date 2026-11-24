@@ -76,6 +76,7 @@ var TOOLS = [
   { href: '/teaching-tools/sentence-ladder', added: '2026-11-22', icon: '🪜', titleKey: 'teachingToolsIndex.sentenceLadderTitle', scopeKey: 'teachingToolsIndex.sentenceLadderScope', descKey: 'teachingToolsIndex.sentenceLadderDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'project', 'independent'], subject: 'chinese' },
   { href: '/teaching-tools/vocab-puzzle', added: '2026-10-14', icon: '🧩', titleKey: 'teachingToolsIndex.vocabPuzzleTitle', scopeKey: 'teachingToolsIndex.vocabPuzzleScope', descKey: 'teachingToolsIndex.vocabPuzzleDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'] },
   { href: '/teaching-tools/decode-practice', added: '2026-09-01', icon: '🔡', titleKey: 'teachingToolsIndex.decodeTitle', scopeKey: 'teachingToolsIndex.decodeScope', descKey: 'teachingToolsIndex.decodeDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'], subject: 'chinese' },
+  { href: '/teaching-tools/exit-ticket', added: '2026-11-23', icon: '🎟️', titleKey: 'teachingToolsIndex.exitTicketTitle', scopeKey: 'teachingToolsIndex.exitTicketScope', descKey: 'teachingToolsIndex.exitTicketDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/worksheet-generator', added: '2026-10-19', icon: '📝', titleKey: 'teachingToolsIndex.worksheetTitle', scopeKey: 'teachingToolsIndex.worksheetScope', descKey: 'teachingToolsIndex.worksheetDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/flash-card-generator', added: '2026-09-01', icon: '🗂️', titleKey: 'teachingToolsIndex.flashCardTitle', scopeKey: 'teachingToolsIndex.flashCardScope', descKey: 'teachingToolsIndex.flashCardDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/vocabulary-booklet/vocabulary-booklet.html', added: '2026-08-12', icon: '📖', titleKey: 'teachingToolsIndex.vocabBookletTitle', scopeKey: 'teachingToolsIndex.tenToFifteenPrintable', descKey: 'teachingToolsIndex.vocabBookletDesc', actionKey: 'teachingToolsIndex.openActivity', section: 'printables', uses: ['print'] },
@@ -97,7 +98,6 @@ var TOOLS = [
   { icon: '🌻', titleKey: 'teachingToolsIndex.unoTitle', scopeKey: 'teachingToolsIndex.unoScope', descKey: 'teachingToolsIndex.unoDesc', section: 'coming-soon', uses: [], comingSoon: true },
   { icon: '💬', titleKey: 'teachingToolsIndex.speakingPromptsTitle', scopeKey: 'teachingToolsIndex.speakingPromptsScope', descKey: 'teachingToolsIndex.speakingPromptsDesc', section: 'coming-soon', uses: [], comingSoon: true },
   { icon: '✍️', titleKey: 'teachingToolsIndex.quickWriteTitle', scopeKey: 'teachingToolsIndex.quickWriteScope', descKey: 'teachingToolsIndex.quickWriteDesc', section: 'coming-soon', uses: [], comingSoon: true },
-  { icon: '🎟️', titleKey: 'teachingToolsIndex.exitTicketTitle', scopeKey: 'teachingToolsIndex.exitTicketScope', descKey: 'teachingToolsIndex.exitTicketDesc', section: 'coming-soon', uses: [], comingSoon: true },
   { icon: '🔄', titleKey: 'teachingToolsIndex.thinkPairShareTitle', scopeKey: 'teachingToolsIndex.thinkPairShareScope', descKey: 'teachingToolsIndex.thinkPairShareDesc', section: 'coming-soon', uses: [], comingSoon: true }
 ];
 
@@ -136,7 +136,7 @@ var DIRECTORY = {
   printables: {
     'classroom-supplies': 'nameTentTitle qrTitle',
     'printable-games': 'boardGamesTitle sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle spinWheelTitle diceStoryTitle vocabPuzzleTitle pixelArtTitle',
-    'chinese-materials': 'decodeTitle worksheetTitle sentenceLadderTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle componentCardsTitle charUnscramblerTitle hanziWheelTitle independentReadingTitle glossaryTitle'
+    'chinese-materials': 'exitTicketTitle decodeTitle worksheetTitle sentenceLadderTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle componentCardsTitle charUnscramblerTitle hanziWheelTitle independentReadingTitle glossaryTitle'
   },
   prep: { main: 'libraryTitle questionBankTitle emojiSearchTitle glossaryTitle fontTitle' }
 };

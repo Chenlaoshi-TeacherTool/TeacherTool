@@ -1,0 +1,86 @@
+/* 出门条 · Exit Tickets — prefix et- */
+.et-page { background: #f6f3ea; }
+.et-wrap { max-width: 1320px; margin: 0 auto; padding: 24px 20px 48px; color: #1f2d27; }
+.et-header { margin-bottom: 22px; }
+.et-header h1 { margin: 6px 0 8px; color: #194f45; }
+.et-header p { max-width: 760px; margin: 0; color: #4b5f56; }
+.et-header .back-btn { display: inline-block; margin-bottom: 12px; color: #356e57; font-weight: 700; text-decoration: none; }
+.et-eyebrow { margin: 0; color: #bf7f35 !important; font-size: .8rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+
+.et-layout { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 22px; align-items: start; }
+.et-builder { display: flex; flex-direction: column; gap: 14px; }
+.et-panel { padding: 16px 18px; border: 1px solid #d9e3d2; border-radius: 14px; background: #fffdf7; }
+.et-kicker { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; color: #194f45; font-weight: 800; }
+.et-step { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #356e57; color: #fff; font-size: .8rem; }
+.et-panel label { display: block; margin: 10px 0 5px; font-weight: 700; font-size: .92rem; }
+.et-panel label small { color: #6b7d74; font-weight: 400; }
+.et-panel textarea, .et-panel input[type=text], .et-panel select { box-sizing: border-box; width: 100%; padding: 9px 11px; border: 1px solid #c9d6c2; border-radius: 9px; background: #fff; font: inherit; }
+.et-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.et-note { margin: 6px 0 0; color: #5d7168; font-size: .85rem; }
+.et-sub { margin: 12px 0 4px; font-weight: 700; font-size: .92rem; }
+.et-picks { display: flex; flex-direction: column; gap: 2px; }
+.et-picks label, .et-check { display: flex !important; align-items: center; gap: 8px; margin: 2px 0 !important; font-weight: 500 !important; }
+.et-btn { padding: 10px 18px; border: 0; border-radius: 10px; background: #c8553d; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.et-btn-ghost { background: #fff; color: #194f45; border: 1px solid #c9d6c2; }
+.et-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+.et-preview { position: sticky; top: 12px; min-width: 0; }
+.et-status { min-height: 1.3em; margin: 0 0 8px; color: #9a4b16; font-size: .88rem; }
+.et-stage { max-height: calc(100vh - 70px); overflow: auto; padding: 12px; border-radius: 14px; background: #e4e0d4; }
+.et-sheets { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.et-empty { padding: 40px; color: #5d7168; text-align: center; }
+
+/* ---------- sheets ---------- */
+.et-sheet { box-sizing: border-box; flex-shrink: 0; padding: 10mm; background: #fff; box-shadow: 0 3px 14px rgba(0,0,0,.14); color: #1f2d27; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; --fs: 11pt; }
+.et-sheet-inner { display: flex; flex-direction: column; height: 100%; }
+.et-sheet-foot { display: flex; justify-content: space-between; margin-top: 2mm; color: #8a968f; font-size: 7pt; }
+.et-strips { flex: 1; display: grid; min-height: 0; border: .35mm dashed #8a968f; }
+.et-strip { box-sizing: border-box; display: flex; flex-direction: column; gap: .5em; min-height: 0; padding: 3.5mm 4.5mm; overflow: hidden; border-right: .35mm dashed #8a968f; border-bottom: .35mm dashed #8a968f; font-size: var(--fs); }
+.et-strip-head { display: flex; align-items: baseline; gap: 3mm; padding-bottom: .35em; border-bottom: .3mm solid #cfdac9; }
+.et-brand { color: #194f45; font-weight: 800; }
+.et-name { margin-left: auto; color: #4b5f56; white-space: nowrap; }
+.et-blank { display: inline-block; width: 6em; border-bottom: .3mm solid #4b5f56; }
+.et-ver { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: #194f45; color: #fff; font-weight: 800; font-size: .85em; }
+.et-qs { display: flex; flex-direction: column; gap: .6em; margin: 0; padding: 0; list-style: none; }
+.et-q { display: flex; flex-wrap: wrap; align-items: center; gap: .35em .6em; }
+.et-num { color: #c8553d; }
+.et-prompt { flex: 1 1 auto; }
+.et-prompt small { color: #6b7d74; }
+.et-zh { font-family: "KaiTi", "STKaiti", "Kaiti SC", serif; font-size: 1.25em; font-weight: 600; }
+.et-py { font-family: Andika, sans-serif; color: #356e57; }
+.et-en { font-style: italic; }
+.et-tzgs { display: inline-flex; gap: .25em; }
+.et-tzg { width: 2.2em; height: 2.2em; border: .3mm solid #e39a9a;
+  background: linear-gradient(90deg, transparent calc(50% - .15mm), #f1c4c4 calc(50% - .15mm), #f1c4c4 calc(50% + .15mm), transparent calc(50% + .15mm)),
+              linear-gradient(transparent calc(50% - .15mm), #f1c4c4 calc(50% - .15mm), #f1c4c4 calc(50% + .15mm), transparent calc(50% + .15mm)); }
+.et-q-line { flex-wrap: wrap; }
+.et-line { flex: 1 1 100%; height: 1.7em; border-bottom: .3mm solid #9aa79f; }
+.et-choices { display: flex; flex-wrap: wrap; gap: .3em 1.2em; flex: 1 1 100%; padding-left: 1.2em; }
+.et-choice { display: inline-flex; align-items: center; gap: .35em; }
+.et-choice i, .et-faces i { display: inline-block; width: .95em; height: .95em; border: .3mm solid #4b5f56; border-radius: 50%; }
+.et-reflect { display: flex; flex-wrap: wrap; align-items: center; gap: .3em .9em; margin-top: auto; padding-top: .4em; border-top: .3mm dotted #cfdac9; color: #34463f; }
+.et-reflect + .et-reflect { margin-top: 0; border-top: 0; }
+.et-reflect .et-line { flex: 1 1 8em; height: 1.4em; }
+.et-faces span { display: inline-flex; align-items: center; gap: .3em; }
+
+.et-key-title { margin: 0 0 5mm; color: #194f45; font-size: 15pt; }
+.et-key { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; align-content: start; flex: 1; font-size: 11pt; }
+.et-key h3 { margin: 0 0 2mm; color: #c8553d; font-size: 12pt; }
+.et-key ol { margin: 0; padding-left: 6mm; }
+.et-key li { margin-bottom: 1.6mm; }
+
+@media (max-width: 960px) {
+  .et-layout { grid-template-columns: 1fr; }
+  .et-preview { position: static; }
+}
+
+@media print {
+  html, body.et-page { margin: 0; padding: 0 !important; background: #fff !important; }
+  body > *:not(.et-wrap), .et-header, .et-builder, .et-status { display: none !important; }
+  .et-wrap, .et-layout, .et-preview { display: block; max-width: none; margin: 0; padding: 0; }
+  .et-stage { max-height: none; overflow: visible; padding: 0; background: none; border-radius: 0; }
+  .et-sheets { display: block; zoom: 1 !important; }
+  .et-sheet { box-shadow: none; break-after: page; page-break-after: always; }
+  .et-sheet:last-child { break-after: auto; page-break-after: auto; }
+  .et-sheet, .et-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

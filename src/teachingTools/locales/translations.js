@@ -694,8 +694,8 @@ module.exports = {
       quickWriteScope: '5–10 min · Writing',
       quickWriteDesc: 'Short writing prompts that review key terms, concepts, or lesson themes.',
       exitTicketTitle: 'Exit Ticket',
-      exitTicketScope: '3–5 min · Assessment',
-      exitTicketDesc: 'A fast end-of-class check for understanding, reflection, or one final learning challenge.',
+      exitTicketScope: '3–5 min · Vocabulary check · Printable',
+      exitTicketDesc: 'Turn a word list into exit-ticket strips: 4–8 per page, 2–4 quick questions each (write the characters, pick the meaning, make a sentence), an optional reflection line, A/B versions so neighbours differ, and an answer key.',
       thinkPairShareTitle: 'Think–Pair–Share',
       thinkPairShareScope: '5–8 min · Discussion',
       thinkPairShareDesc: 'Move students from independent thinking to partner talk and class sharing.'
@@ -2233,8 +2233,8 @@ module.exports = {
       quickWriteScope: '5–10 分钟 · 写作',
       quickWriteDesc: '复习关键词汇、概念或课程主题的简短写作提示。',
       exitTicketTitle: '出门条',
-      exitTicketScope: '3–5 分钟 · 评估',
-      exitTicketDesc: '快速检验理解程度、反思或提出最后一个学习挑战，用于结束课堂。',
+      exitTicketScope: '3–5 分钟 · 词汇小测 · 打印',
+      exitTicketDesc: '一套词变成下课前的出门条：一页 4–8 张，每张 2–4 道小题（看拼音写汉字、选意思、造句），可加反思题；A/B 两版交替，同桌不一样，附答案页。',
       thinkPairShareTitle: '思考—配对—分享',
       thinkPairShareScope: '5–8 分钟 · 讨论',
       thinkPairShareDesc: '带领学生从独立思考走向搭档交流，再到全班分享。'
