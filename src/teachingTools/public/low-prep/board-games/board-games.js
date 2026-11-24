@@ -348,7 +348,8 @@
   var handed = handoff && handoff.active();
   if (handed) {
     $('bgWords').value = handed.items.map(function (item) { return [item.zh, item.py, item.en].filter(Boolean).join(' | '); }).join('\n');
-    if (handed.name) $('bgTitle').value = handed.name;
+    // A real list name makes a good title; the switcher's default name does not.
+    if (handed.name && ['我的词表', 'My word list'].indexOf(handed.name) === -1) $('bgTitle').value = handed.name;
     handoff.mountBar(handed);
   }
   render();

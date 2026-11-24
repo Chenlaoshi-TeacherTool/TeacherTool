@@ -36,6 +36,12 @@
     { id: 'whats-missing', group: 'play', icon: '🙈', href: '/teaching-tools/whats-missing', min: 4,
       name: ['What\'s Missing?', '什么不见了'],
       desc: ['Students study the word cards, close their eyes, then say which word disappeared.', '学生先记住词卡，闭上眼睛，再说出哪个词不见了。'] },
+    { id: 'board-games', group: 'play', icon: '♟️', href: '/teaching-tools/board-games', min: 4,
+      name: ['Board Game Maker', '棋盘游戏'],
+      desc: ['Race track, ladders & slides, get-in-a-row or flight race: play on the projector or print.', '前进游戏盘、梯子滑梯棋、连成一线、飞行棋：可以投影全班玩，也能打印。'] },
+    { id: 'vocabulary-gacha', group: 'play', icon: '🫧', href: '/teaching-tools/vocabulary-gacha', min: 1,
+      name: ['Vocabulary Gacha', '词汇扭蛋机'],
+      desc: ['Turn the handle and a capsule pops out with a word to read or use.', '转一转扭蛋机，掉出一个词，读一读或用一用。'] },
     { id: 'sentence-reorder', group: 'play', icon: '🔀', href: '/teaching-tools/sentence-reorder', min: 1,
       name: ['Sentence Reorder', '句子重组'],
       desc: ['Each word goes into a simple sentence. Students drag the words back into order.', '每个词放进一个简单句子，学生把打乱的词语拖回正确顺序。'] },
@@ -45,6 +51,9 @@
     { id: 'spin-wheel', group: 'print', icon: '🎡', href: '/teaching-tools/spin-wheel', min: 2,
       name: ['Spin Wheel Craft', '转盘手工'],
       desc: ['Two circles to cut out and pin together: turn the wheel and say a sentence with each word.', '剪下两个圆钉在一起，转动转盘，用每个词说句子。'] },
+    { id: 'component-cards', group: 'print', icon: '🎨', href: '/teaching-tools/component-cards', min: 1,
+      name: ['Component Cards', '部件卡片'],
+      desc: ['Each character split into coloured components: cards, colouring, cut-out puzzle, tracing.', '把字拆成彩色部件：字卡、涂色、拼图、描红。'] },
     { id: 'bingo-generator', group: 'print', icon: '🎱', href: '/teaching-tools/bingo-generator', min: 16,
       name: ['Bingo', '宾果'],
       desc: ['A set of different bingo sheets in Chinese, pinyin, English or all three.', '一套各不相同的宾果卡，可显示中文、拼音、英文或三者。'] },
@@ -54,6 +63,7 @@
   ];
 
   var currentList = null;
+  var TRY_PRESET = 'preset-food-and-fruit';
 
   function setStatus(message) { $('vgsStatus').textContent = message || ''; }
 
@@ -108,8 +118,9 @@
   function blocker(game, list) {
     var usable = game.needsEn ? list.items.filter(function (item) { return item.en; }).length : list.items.length;
     if (usable >= game.min) return '';
-    if (game.needsEn) return L('Needs ' + game.min + ' words with English meanings (this list has ' + usable + ').', '需要至少 ' + game.min + ' 个带英文释义的词（现在有 ' + usable + ' 个）。');
-    return L('Needs at least ' + game.min + ' words.', '需要至少 ' + game.min + ' 个词。');
+    var short = game.min - usable;
+    if (game.needsEn) return L(short + ' more word' + (short === 1 ? '' : 's') + ' with English needed (at least ' + game.min + ')', '还差 ' + short + ' 个带英文的词（至少要 ' + game.min + ' 个）');
+    return L(short + ' more word' + (short === 1 ? '' : 's') + ' needed (at least ' + game.min + ')', '还差 ' + short + ' 个词（至少要 ' + game.min + ' 个）');
   }
 
   function renderWords(list) {
@@ -145,7 +156,10 @@
         card.type = 'button';
         card.className = 'vgs-game';
         card.classList.toggle('vgs-game-awaiting-list', !list);
-        card.disabled = !list || Boolean(reason);
+        // Before a list is chosen the cards stay clickable and lead to the word box.
+        card.disabled = Boolean(list && reason);
+        if (!list) card.setAttribute('aria-describedby', 'vgsGamesHint');
+        else card.removeAttribute('aria-describedby');
         card.dataset.game = game.id;
         var icon = document.createElement('span');
         icon.className = 'vgs-game-icon';
@@ -162,7 +176,7 @@
         if (reason) {
           var note = document.createElement('span');
           note.className = 'vgs-game-note';
-          note.textContent = reason;
+          note.textContent = '⚠️ ' + reason;
           body.appendChild(note);
         }
         card.append(icon, body);
@@ -187,7 +201,14 @@
 
   function openGame(id) {
     var game = GAMES.filter(function (entry) { return entry.id === id; })[0];
-    if (!game || !currentList) return;
+    if (!game) return;
+    if (!currentList) {
+      var gameName = L(game.name[0], game.name[1]);
+      setStatus(L('Choose a word list first, then open ' + gameName + '.', '先选一套词，再打开「' + gameName + '」。'));
+      $('vgsChooser').scrollIntoView({ block: 'start', behavior: 'smooth' });
+      $('vgsPaste').focus({ preventScroll: true });
+      return;
+    }
     try {
       window.ChenWordlistHandoff.openGame(game.href, currentList);
     } catch (error) {
@@ -247,6 +268,7 @@
         if (!lists.length) throw new Error('no presets');
         lists.forEach(function (list) {
           var count = list.count != null ? list.count : (list.items || []).length;
+          if ((list.id || list.slug) === TRY_PRESET) $('vgsTryCount').textContent = ' · ' + wordCountText(count);
           box.appendChild(choiceButton(list.name, wordCountText(count), function () {
             if (list.items && list.items.length) useList(list);
             else loadPreset(list.id || list.slug);
@@ -286,7 +308,7 @@
     });
     $('vgsUsePaste').addEventListener('click', usePasted);
     $('vgsTryPreset').addEventListener('click', function () {
-      loadPreset('preset-food-and-fruit');
+      loadPreset(TRY_PRESET);
     });
 
     renderSaved();

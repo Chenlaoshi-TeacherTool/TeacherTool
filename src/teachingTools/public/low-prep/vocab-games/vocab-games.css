@@ -165,15 +165,17 @@ textarea.vgs-input { resize: vertical; }
 
 .vgs-game:not(:disabled):hover,
 .vgs-game:not(:disabled):focus-visible { border-color: #356e57; background: var(--vgs-green-soft); transform: translateY(-1px); }
-.vgs-game:disabled { cursor: not-allowed; opacity: 0.6; }
+.vgs-game:disabled { cursor: not-allowed; background: #f6f7f3; }
+.vgs-game:disabled .vgs-game-icon,
+.vgs-game:disabled .vgs-game-body strong,
+.vgs-game:disabled .vgs-game-desc { opacity: 0.55; }
 
-.vgs-game-awaiting-list:disabled { opacity: 1; }
 
 .vgs-game-icon { flex: none; font-size: 30px; line-height: 1; }
 .vgs-game-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .vgs-game-body strong { font-size: 17px; }
 .vgs-game-desc { color: var(--vgs-muted); font-size: 14px; line-height: 1.45; }
-.vgs-game-note { color: #9a4b16; font-size: 13px; font-weight: 600; }
+.vgs-game-note { align-self: flex-start; margin-top: 2px; padding: 3px 9px; border: 1px solid #f2c79a; border-radius: 999px; background: #fff3e4; color: #9a4b16; font-size: 14px; font-weight: 700; }
 
 @media (prefers-reduced-motion: reduce) {
   .vgs-game { transition: none; }
