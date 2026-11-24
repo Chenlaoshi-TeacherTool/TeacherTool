@@ -55,7 +55,14 @@
             <label><input type="radio" name="wmMode" value="py"> <span><%= L('Pinyin', '拼音') %></span></label>
             <label><input type="radio" name="wmMode" value="both"> <span><%= L('Chinese + pinyin', '中文 + 拼音') %></span></label>
           </div>
-          <label class="wm-check"><input type="checkbox" id="wmEmoji" checked> <span><%= L('Add an emoji picture to each word', '给每个词配 emoji 图片') %></span></label>
+        </fieldset>
+
+        <fieldset class="wm-field">
+          <legend><%= L('Pictures on the cards', '词卡上的图片') %></legend>
+          <div class="wm-options">
+            <label><input type="radio" name="wmPic" value="on" id="wmEmoji" checked> <span>🖼️ <%= L('Show pictures', '显示图片') %></span></label>
+            <label><input type="radio" name="wmPic" value="off" id="wmEmojiOff"> <span><%= L('Words only', '只显示文字') %></span></label>
+          </div>
         </fieldset>
 
         <fieldset class="wm-field">

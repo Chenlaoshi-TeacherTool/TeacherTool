@@ -72,7 +72,7 @@
     if (typeof data.text === 'string') $('wmWords').value = data.text;
     if (data.mode) setRadio('wmMode', data.mode);
     if (data.missing) setRadio('wmMissing', data.missing);
-    if (typeof data.emoji === 'boolean') $('wmEmoji').checked = data.emoji;
+    if (typeof data.emoji === 'boolean') $(data.emoji ? 'wmEmoji' : 'wmEmojiOff').checked = true;
     if (typeof data.repeat === 'boolean') $('wmRepeat').checked = data.repeat;
     if (data.time != null) $('wmTime').value = String(data.time);
     if (data.picOff && typeof data.picOff === 'object') picOff = data.picOff;
@@ -502,8 +502,11 @@
       clearTimeout(previewTimer);
       previewTimer = setTimeout(refreshWords, 400);
     });
-    ['wmEmoji', 'wmRepeat', 'wmTime'].forEach(function (id) {
-      $(id).addEventListener('change', id === 'wmEmoji' ? refreshWords : saveDraft);
+    ['wmRepeat', 'wmTime'].forEach(function (id) {
+      $(id).addEventListener('change', saveDraft);
+    });
+    ['wmEmoji', 'wmEmojiOff'].forEach(function (id) {
+      $(id).addEventListener('change', refreshWords);
     });
     Array.prototype.forEach.call(document.querySelectorAll('input[name="wmMode"], input[name="wmMissing"]'), function (input) {
       input.addEventListener('change', saveDraft);
