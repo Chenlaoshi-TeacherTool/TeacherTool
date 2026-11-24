@@ -8,7 +8,7 @@
   <%- include('../partials/seo', { pageDescription: 'Type Chinese characters and colour each component: show colour cards like 好 = 女 + 子 on the projector, print a colour-by-component worksheet, or print the components as cut-out pieces students glue back together. 输入汉字，按部件上色：彩色字卡、部件涂色练习纸、部件拼图。' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
-  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=1">
+  <link rel="stylesheet" href="/low-prep/component-cards/component-cards.css?v=2">
   <style id="cc-page-size">@page { size: A4; margin: 0; }</style>
 </head>
 <body class="cc-page">
@@ -36,7 +36,39 @@
             <button type="button" role="radio" data-mode="color" aria-checked="true">🌈 <b><%= L('Colour cards', '彩色字卡') %></b><small><%= L('Projector or print', '投影或打印') %></small></button>
             <button type="button" role="radio" data-mode="coloring" aria-checked="false">🖍️ <b><%= L('Colouring sheet', '部件涂色') %></b><small><%= L('Students colour by legend', '学生照图例涂色') %></small></button>
             <button type="button" role="radio" data-mode="puzzle" aria-checked="false">✂️ <b><%= L('Cut-out puzzle', '部件拼图') %></b><small><%= L('Cut, then glue back', '剪下来拼回原字') %></small></button>
+            <button type="button" role="radio" data-mode="family" aria-checked="false">🌳 <b><%= L('Component family', '部件家族图') %></b><small><%= L('One component, many characters', '一个部件，一串字') %></small></button>
           </div>
+        </section>
+
+        <section class="cc-panel" data-for="family">
+          <p class="cc-kicker"><span class="cc-step">🌳</span><%= L('Family', '家族') %></p>
+          <div class="cc-two">
+            <div>
+              <label for="ccFamComp"><%= L('Component in the middle', '中间的部件') %></label>
+              <input id="ccFamComp" type="text" maxlength="2" value="氵" class="cc-fam-comp">
+            </div>
+            <div>
+              <label for="ccFamCount"><%= L('Characters around it', '周围几个字') %></label>
+              <select id="ccFamCount">
+                <option value="4">4</option>
+                <option value="6" selected>6</option>
+                <option value="8">8</option>
+              </select>
+            </div>
+          </div>
+          <label for="ccFamCaption"><%= L('Words under the component', '部件下面的说明') %> <small><%= L('(optional)', '（可不填）') %></small></label>
+          <input id="ccFamCaption" type="text" maxlength="30" placeholder="<%= L('e.g. water (三点水)', '比如：三点水 · 和水有关') %>">
+          <label for="ccFamBlank"><%= L('Empty boxes for students to fill in', '留几个空格让学生写') %></label>
+          <select id="ccFamBlank">
+            <option value="0"><%= L('None (teacher display)', '不留（老师展示）') %></option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="all"><%= L('All of them', '全部留空') %></option>
+          </select>
+          <p class="cc-note"><%= L('Characters you typed above that contain this component come first; click the suggestions to add or remove characters.', '上面输入的字里含有这个部件的会排在前面；点下面的推荐字可以加入或拿掉。') %></p>
+          <div id="ccFamPick" class="cc-chips"></div>
         </section>
 
         <section class="cc-panel">
@@ -57,7 +89,7 @@
             </div>
           </div>
           <label class="cc-check"><input type="checkbox" id="ccPinyin" checked> <%= L('Show pinyin', '显示拼音') %></label>
-          <label class="cc-check" data-for="coloring"><input type="checkbox" id="ccKey" checked> <%= L('Add a coloured answer page', '加一页彩色答案') %></label>
+          <label class="cc-check" data-for="coloring family"><input type="checkbox" id="ccKey" checked> <%= L('Add a coloured answer page', '加一页彩色答案') %></label>
           <label class="cc-check" data-for="puzzle"><input type="checkbox" id="ccHint" checked> <%= L('Faint outline on the gluing board', '拼贴格里印淡淡的轮廓') %></label>
           <label class="cc-check" data-for="puzzle"><input type="checkbox" id="ccPieceColor"> <%= L('Pieces in colour (otherwise black)', '部件印成彩色（不勾就是黑色）') %></label>
         </section>
@@ -101,7 +133,7 @@
   <script>window.CC_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
-  <script src="/low-prep/component-cards/component-cards.js?v=1" defer></script>
+  <script src="/low-prep/component-cards/component-cards.js?v=2" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

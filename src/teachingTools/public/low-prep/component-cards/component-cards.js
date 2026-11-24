@@ -30,11 +30,15 @@
     { hex: '#9c36b5', zh: '紫', en: 'purple' },
     { hex: '#0c8599', zh: '青', en: 'teal' }
   ];
-  var PER = { color: [1, 2, 4, 6], coloring: [2, 4, 6], puzzle: [1, 2, 3, 4] };
-  var PER_DEFAULT = { color: 4, coloring: 4, puzzle: 2 };
+  var PER = { color: [1, 2, 4, 6], coloring: [2, 4, 6], puzzle: [1, 2, 3, 4], family: [1] };
+  var PER_DEFAULT = { color: 4, coloring: 4, puzzle: 2, family: 1 };
+  var ORDER_URL = '/low-prep/component-cards/data/common-order.txt';
+  var HIGHLIGHT = '#1c7ed6';
+  // A component typed in its full form also finds its side form (水 → 氵).
+  var VARIANTS = { '水': '氵', '手': '扌', '人': '亻', '心': '忄', '言': '讠', '金': '钅', '食': '饣', '糸': '纟', '犬': '犭', '刀': '刂', '衣': '衤', '示': '礻', '竹': '⺮', '艸': '艹', '草': '艹', '肉': '⺼', '月': '⺼', '辵': '辶', '火': '灬', '玉': '王', '阜': '阝', '邑': '阝', '网': '罒', '爪': '爫', '老': '耂' };
   var PAPER = { A4: [210, 297], Letter: [215.9, 279.4] };
 
-  var state = { mode: 'color', chars: [], selected: null, per: {}, show: 0 };
+  var state = { mode: 'color', chars: [], selected: null, per: {}, show: 0, famPicks: {} };
   var dataPromise = null;
   var strokeCache = {};
   var bboxCache = {};
@@ -158,7 +162,7 @@
     } else {
       body = '<g transform="' + FLIP + '">' + item.strokes.map(function (d, i) {
         if (!keep(i)) return '';
-        var fillColor = style === 'solid' ? '#1f2d27' : style === 'faint' ? '#e3e7e5' : color(split.parts[i]);
+        var fillColor = style === 'solid' ? '#1f2d27' : style === 'faint' ? '#e3e7e5' : style === 'highlight' ? (split.parts[i] === opts.hl ? HIGHLIGHT : '#1f2d27') : color(split.parts[i]);
         return '<path data-i="' + i + '" fill="' + fillColor + '" d="' + d + '"/>';
       }).join('') + '</g>';
     }
@@ -284,6 +288,158 @@
     });
   }
 
+  // ---------- component family ----------
+
+  var orderPromise = null;
+  function loadOrder() {
+    if (!orderPromise) {
+      orderPromise = fetch(ORDER_URL).then(function (res) { return res.ok ? res.text() : ''; }).catch(function () { return ''; }).then(function (text) {
+        var rank = {};
+        Array.from(text.trim()).forEach(function (ch, i) { rank[ch] = i; });
+        return rank;
+      });
+    }
+    return orderPromise;
+  }
+
+  function variantsOf(comp) {
+    var list = [comp];
+    if (VARIANTS[comp]) list.push(VARIANTS[comp]);
+    if (comp === '⺼') list.push('月');
+    return list;
+  }
+
+  // Characters whose top-level parts include the component, easiest first.
+  function familyOf(comp, data, rank) {
+    var forms = variantsOf(comp);
+    var found = [];
+    Object.keys(data).forEach(function (ch) {
+      var labels = data[ch][0];
+      if (!labels || ch === comp) return;
+      if (forms.some(function (f) { return labels.indexOf(f) !== -1; })) found.push(ch);
+    });
+    return found.sort(function (a, b) {
+      var ra = rank[a] == null ? 1e6 + a.codePointAt(0) : rank[a];
+      var rb = rank[b] == null ? 1e6 + b.codePointAt(0) : rank[b];
+      return ra - rb;
+    });
+  }
+
+  // The part of this character that is the component (-1 when none).
+  function familyPart(split, forms) {
+    for (var p = 0; p < split.labels.length; p++) if (forms.indexOf(split.labels[p]) !== -1) return p;
+    return -1;
+  }
+
+  // Which of n branches are left empty, spread around the circle.
+  function blankSlots(n, blanks) {
+    var slots = {};
+    for (var k = 0; k < blanks; k++) slots[Math.floor((k + 0.5) * n / blanks)] = true;
+    return slots;
+  }
+
+  // A square view around the strokes, so side forms like 氵 sit in the middle of the circle.
+  function centeredView(item) {
+    var b = strokeBoxes(item).reduce(function (acc, s) {
+      return { x0: Math.min(acc.x0, s.x0), x1: Math.max(acc.x1, s.x1), y0: Math.min(acc.y0, s.y0), y1: Math.max(acc.y1, s.y1) };
+    }, { x0: 1024, x1: 0, y0: 1024, y1: 0 });
+    var side = Math.max(b.x1 - b.x0, b.y1 - b.y0, 420) + 120;
+    var mx = (b.x0 + b.x1) / 2, my = (b.y0 + b.y1) / 2;
+    return (mx - side / 2) + ' ' + (my - side / 2) + ' ' + side + ' ' + side;
+  }
+
+  var famView = null;
+  var famToken = 0;
+  function renderFamily() {
+    var token = ++famToken;
+    var comp = Array.from($('ccFamComp').value.trim())[0] || '';
+    var count = Number($('ccFamCount').value);
+    var box = $('ccSheets');
+    if (!comp) {
+      famView = null;
+      $('ccFamPick').innerHTML = '';
+      box.innerHTML = '<p class="cc-empty">' + T('Type a component in the middle box, like 氵 or 木.', '在“中间的部件”里输入一个部件，比如 氵 或 木。') + '</p>';
+      return;
+    }
+    $('ccStatus').textContent = T('Loading…', '正在加载…');
+    Promise.all([loadData(), loadOrder()]).then(function (res) {
+      if (token !== famToken) return null;
+      var data = res[0], rank = res[1];
+      var family = familyOf(comp, data, rank);
+      var typed = parseChars($('ccChars').value).filter(function (ch) { return family.indexOf(ch) !== -1; });
+      var suggestions = typed.concat(family.filter(function (ch) { return typed.indexOf(ch) === -1; })).slice(0, 36);
+      var key = comp + '|' + count;
+      var picked = (state.famPicks[key] || suggestions.slice(0, count)).filter(function (ch) { return suggestions.indexOf(ch) !== -1; }).slice(0, count);
+      famView = { key: key, count: count, picked: picked };
+      $('ccFamPick').innerHTML = suggestions.map(function (ch) {
+        return '<button type="button" class="cc-chip' + (picked.indexOf(ch) !== -1 ? ' is-active' : '') + '" data-ch="' + esc(ch) + '"><b>' + esc(ch) + '</b></button>';
+      }).join('');
+      if (!picked.length) {
+        box.innerHTML = '<p class="cc-empty">' + T('No characters found with this component. Try its other form, like 氵 for 水.', '没有找到含这个部件的字。可以换个写法试试，比如“水”在字的左边写作“氵”。') + '</p>';
+        $('ccStatus').textContent = '';
+        return null;
+      }
+      var center = variantsOf(comp).filter(function (f) {
+        return picked.some(function (ch) { return data[ch][0].indexOf(f) !== -1; });
+      })[0] || comp;
+      return Promise.all([loadStrokes(center)].concat(picked.map(loadStrokes))).then(function (strokes) {
+        if (token !== famToken) return;
+        var items = picked.map(function (ch, i) {
+          var list = strokes[i + 1];
+          return list ? { ch: ch, strokes: list, base: baseSplit(ch, data[ch], list.length), py: pinyinOf(ch) } : null;
+        }).filter(Boolean);
+        var blankValue = $('ccFamBlank').value;
+        var blanks = blankValue === 'all' ? items.length : Math.min(Number(blankValue), items.length);
+        var forms = variantsOf(comp).concat(center);
+        var centerItem = strokes[0] ? { ch: center, strokes: strokes[0] } : null;
+        var html = familySheet(center, centerItem, items, forms, blankSlots(items.length, blanks), blanks > 0, false);
+        if (blanks && $('ccKey').checked) html += familySheet(center, centerItem, items, forms, {}, false, true);
+        box.innerHTML = html;
+        fitPreview();
+        $('ccStatus').textContent = '';
+      });
+    }).catch(function (error) {
+      $('ccStatus').textContent = T('Could not load the character data. Check the internet connection and reload.', '汉字数据没有加载成功，请检查网络后刷新页面。');
+      console.error(error);
+    });
+  }
+
+  function familySheet(center, centerItem, items, forms, blank, student, answer) {
+    var size = PAPER[$('ccPaper').value];
+    var w = size[0] - 26;                    // inner width (mm)
+    var h = size[1] - 24 - 30;               // map height: page minus padding, head, foot and instruction
+    var cx = w / 2, cy = h / 2;
+    var node = Math.min(40, w / 4.6);        // side of each 田字格
+    var rx = cx - node * 0.62, ry = Math.min(cy - node * 0.75, rx * 1.35);
+    var hub = 58;
+    var lines = '', nodes = '';
+    items.forEach(function (item, i) {
+      var a = -Math.PI / 2 + i * 2 * Math.PI / items.length;
+      var x = cx + rx * Math.cos(a), y = cy + ry * Math.sin(a);
+      lines += '<line x1="' + cx.toFixed(1) + '" y1="' + cy.toFixed(1) + '" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '"/>';
+      var split = splitOf(item);
+      var empty = blank[i];
+      var drawn = empty ? glyph({ strokes: [] }, split, { grid: true }) : glyph(item, split, { grid: true, style: 'highlight', hl: familyPart(split, forms) });
+      var py = $('ccPinyin').checked ? '<span class="cc-py">' + (empty ? '&nbsp;' : esc(item.py)) + '</span>' : '';
+      nodes += '<div class="cc-fam-node' + (empty ? ' is-blank' : '') + '" style="left:' + (x - node / 2).toFixed(1) + 'mm;top:' + (y - node / 2).toFixed(1) + 'mm;width:' + node.toFixed(1) + 'mm">' +
+        '<div class="cc-fam-box" style="height:' + node.toFixed(1) + 'mm">' + drawn + '</div>' + py + '</div>';
+    });
+    var hubGlyph = centerItem
+      ? glyph(centerItem, { labels: [center], parts: centerItem.strokes.map(function () { return 0; }) }, { style: 'highlight', hl: 0, viewBox: centeredView(centerItem) })
+      : '<span class="cc-fam-text">' + esc(center) + '</span>';
+    var caption = $('ccFamCaption').value.trim();
+    var hubHtml = '<div class="cc-fam-hub" style="left:' + (cx - hub / 2).toFixed(1) + 'mm;top:' + (cy - hub / 2).toFixed(1) + 'mm;width:' + hub + 'mm;height:' + hub + 'mm">' +
+      '<div class="cc-fam-hub-glyph">' + hubGlyph + '</div>' + (caption ? '<span class="cc-fam-caption">' + esc(caption) + '</span>' : '') + '</div>';
+    var head = answer
+      ? '<p class="cc-instruct cc-answer">' + T('Answer key', '答案') + '</p>'
+      : '<p class="cc-instruct">' + (student
+        ? T('Write characters that have「' + center + '」in the empty boxes.', '在空格里写出带「' + center + '」的字。')
+        : T('All of these characters have「' + center + '」.', '这些字都有「' + center + '」。')) + '</p>';
+    return sheet(head + '<div class="cc-fam" style="height:' + h + 'mm">' +
+      '<svg class="cc-fam-lines" viewBox="0 0 ' + w + ' ' + h + '" style="width:' + w + 'mm;height:' + h + 'mm">' + lines + '</svg>' +
+      nodes + hubHtml + '</div>', student ? 'is-student' : '');
+  }
+
   // ---------- render ----------
 
   var renderToken = 0;
@@ -293,6 +449,7 @@
     if (!chars.length) {
       state.chars = [];
       paintChips();
+      if (state.mode === 'family') { renderFamily(); return; }
       $('ccSheets').innerHTML = '<p class="cc-empty">' + T('Type a few characters to start.', '输入几个汉字就能开始。') + '</p>';
       return;
     }
@@ -317,6 +474,7 @@
   function usable() { return state.chars.filter(function (c) { return !c.missing; }); }
 
   function paintSheets() {
+    if (state.mode === 'family') { renderFamily(); return; }
     var items = usable();
     var per = Number($('ccPer').value);
     var box = $('ccSheets');
@@ -506,8 +664,9 @@
     if (!PER[mode]) mode = 'color';
     state.mode = mode;
     document.querySelectorAll('.cc-modes [data-mode]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.mode === mode)); });
-    document.querySelectorAll('[data-for]').forEach(function (el) { el.hidden = el.dataset.for !== mode; });
+    document.querySelectorAll('[data-for]').forEach(function (el) { el.hidden = el.dataset.for.split(' ').indexOf(mode) === -1; });
     $('ccShow').hidden = mode !== 'color';
+    $('ccPer').closest('div').hidden = mode === 'family';
     var per = state.per[mode] || PER_DEFAULT[mode];
     $('ccPer').innerHTML = PER[mode].map(function (n) { return '<option value="' + n + '"' + (n === per ? ' selected' : '') + '>' + n + '</option>'; }).join('');
     try {
@@ -521,7 +680,7 @@
     var button = event.target.closest('[data-mode]');
     if (!button) return;
     setMode(button.dataset.mode);
-    if (state.chars.length) paintSheets();
+    if (state.chars.length || state.mode === 'family') paintSheets();
   });
 
   $('ccPer').addEventListener('change', function () { state.per[state.mode] = Number($('ccPer').value); paintSheets(); });
@@ -529,7 +688,23 @@
     $('cc-page-size').textContent = '@page { size: ' + $('ccPaper').value + '; margin: 0; }';
     paintSheets();
   });
-  ['ccPinyin', 'ccKey', 'ccHint', 'ccPieceColor'].forEach(function (id) { $(id).addEventListener('change', paintSheets); });
+  ['ccPinyin', 'ccKey', 'ccHint', 'ccPieceColor', 'ccFamCount', 'ccFamBlank'].forEach(function (id) { $(id).addEventListener('change', paintSheets); });
+  $('ccFamCaption').addEventListener('input', paintSheets);
+  var famTyping = null;
+  $('ccFamComp').addEventListener('input', function () { clearTimeout(famTyping); famTyping = setTimeout(paintSheets, 350); });
+  $('ccFamPick').addEventListener('click', function (event) {
+    var chip = event.target.closest('.cc-chip');
+    if (!chip || !famView) return;
+    var picked = famView.picked.slice();
+    var at = picked.indexOf(chip.dataset.ch);
+    if (at !== -1) picked.splice(at, 1);
+    else if (picked.length >= famView.count) {
+      $('ccStatus').textContent = T('Already ' + famView.count + ' characters: remove one first, or show more characters around it.', '已经选了 ' + famView.count + ' 个字，先拿掉一个，或者把“周围几个字”调多一点。');
+      return;
+    } else picked.push(chip.dataset.ch);
+    state.famPicks[famView.key] = picked;
+    paintSheets();
+  });
   $('ccTitle').addEventListener('input', paintSheets);
   var typing = null;
   $('ccChars').addEventListener('input', function () { clearTimeout(typing); typing = setTimeout(render, 350); });

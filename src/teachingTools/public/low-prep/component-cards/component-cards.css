@@ -131,3 +131,21 @@
   .cc-sheet:last-child { break-after: auto; page-break-after: auto; }
   .cc-sheet, .cc-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ---------- component family ---------- */
+.cc-fam-comp { font-size: 1.6rem !important; text-align: center; }
+.cc-fam { position: relative; flex-shrink: 0; }
+.cc-fam-lines { position: absolute; left: 0; top: 0; }
+.cc-fam-lines line { stroke: #9cc3e6; stroke-width: .8; stroke-dasharray: 2.5 1.8; }
+.cc-fam-node { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 1mm; }
+.cc-fam-box { width: 100%; }
+.cc-fam-box .cc-glyph { width: 100%; height: 100%; }
+.cc-fam-node .cc-py { font-size: 13pt; min-height: 1.2em; }
+.cc-fam-node.is-blank .cc-py { width: 70%; border-bottom: .3mm solid #9aa79f; }
+.cc-fam-hub { position: absolute; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1.2mm solid #1c7ed6; border-radius: 50%; background: #f1f7fd; }
+.cc-fam-hub-glyph { width: 62%; height: 62%; }
+.cc-fam-hub-glyph .cc-glyph { width: 100%; height: 100%; }
+.cc-fam-text { display: grid; place-items: center; height: 100%; color: #1c7ed6; font-size: 26mm; line-height: 1; }
+.cc-fam-caption { max-width: 90%; margin-top: -1mm; font: 700 10.5pt "Microsoft YaHei", sans-serif; color: #194f45; text-align: center; }
+.cc-panel[hidden] { display: none; }
+.cc-two > div[hidden] { display: none; }

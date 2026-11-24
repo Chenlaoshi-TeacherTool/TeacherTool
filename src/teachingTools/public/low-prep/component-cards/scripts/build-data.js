@@ -1,7 +1,7 @@
 'use strict';
 // Builds data/components.json.gz for 部件卡片 · Component Cards.
 //
-// Usage: node scripts/build-data.js [path/to/makemeahanzi/dictionary.txt]
+// Usage: node scripts/build-data.js [dictionary.txt] [folder with HSK L1.txt … L6.txt]
 // Without a path it downloads dictionary.txt from GitHub.
 //
 // Each entry:  "好": ["女子", "000111"]
@@ -34,7 +34,30 @@ function topParts(ids) {
   return i === chars.length ? parts : null;
 }
 
+// data/common-order.txt: HSK 1–6 (2012) characters, easiest first: by the level
+// of the first word they appear in, then by that word's frequency. The
+// component family view lists its suggestions in this order.
+async function writeOrder(hskDir) {
+  const seen = new Set();
+  let order = '';
+  for (let level = 1; level <= 6; level++) {
+    const name = 'HSK Official With Definitions 2012 L' + level + ' freqorder.txt';
+    const text = hskDir
+      ? fs.readFileSync(path.join(hskDir, 'L' + level + '.txt'), 'utf8')
+      : await (await fetch('https://raw.githubusercontent.com/glxxyz/hskhsk.com/main/data/lists/' + encodeURIComponent(name))).text();
+    for (const line of text.replace(/^﻿/, '').split('\n')) {
+      for (const ch of (line.split('\t')[0] || '').match(/\p{Script=Han}/gu) || []) {
+        if (!seen.has(ch)) { seen.add(ch); order += ch; }
+      }
+    }
+  }
+  fs.writeFileSync(path.join(__dirname, '..', 'data', 'common-order.txt'), order);
+  console.log(seen.size + ' characters in common-order.txt');
+}
+
+// Usage: node scripts/build-data.js [dictionary.txt] [folder with L1.txt … L6.txt]
 async function main() {
+  await writeOrder(process.argv[3]);
   const text = process.argv[2]
     ? fs.readFileSync(process.argv[2], 'utf8')
     : await (await fetch('https://raw.githubusercontent.com/skishore/makemeahanzi/master/dictionary.txt')).text();
