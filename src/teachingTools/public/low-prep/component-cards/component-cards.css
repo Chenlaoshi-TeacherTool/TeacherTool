@@ -107,7 +107,7 @@
 .cc-show[hidden] { display: none; }
 .cc-show-close { position: absolute; top: 16px; right: 20px; border: 0; background: none; font-size: 28px; cursor: pointer; color: #4b5f56; }
 .cc-show-card { display: flex; flex-direction: column; align-items: center; gap: 2vh; --g: 62vh; }
-.cc-show-card .cc-glyph { width: 62vh; height: 62vh; overflow: visible; }
+.cc-show-card > .cc-glyph { width: 62vh; height: 62vh; overflow: visible; }
 .cc-show-text { display: flex; align-items: baseline; gap: 4vh; }
 .cc-show-text .cc-formula { gap: 2vh; font-size: 9vh; font-family: "KaiTi", "STKaiti", "Kaiti SC", serif; }
 .cc-show-text .cc-py { font-size: 6vh; }
@@ -226,8 +226,12 @@
 
 .cc-gd-show { width: min(1100px, 94vw); height: 80vh; display: flex; }
 .cc-gd-show .cc-gd-card { flex: 1; font-size: 2.3vh; }
-.cc-gd-show .cc-gd-big { width: 30vh; height: 30vh; }
-#ccShowCard:not(.is-reveal) .cc-gd-examples { visibility: hidden; }
+.cc-gd-show .cc-gd-big { width: 28vh; height: 28vh; margin-top: 1.5vh; }
+.cc-gd-show .cc-gd-ex .cc-glyph { width: min(100%, 22vh); }
+/* Before "Show examples": each example is a "?" box for the class to guess. */
+.cc-gd-show .cc-gd-ex { position: relative; }
+#ccShowCard:not(.is-reveal) .cc-gd-ex > * { visibility: hidden; }
+#ccShowCard:not(.is-reveal) .cc-gd-ex::after { content: "?"; position: absolute; inset: 0; display: grid; place-items: center; color: #bf7f35; font-size: 3em; font-weight: 800; }
 .cc-show-card .cc-gd-try { display: none; }
 
 @media print {
