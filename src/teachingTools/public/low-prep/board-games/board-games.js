@@ -203,14 +203,31 @@
   function dieNet(color) {
     var s = 24;
     var spots = { 1: [[0.5, 0.5]], 2: [[0.25, 0.25], [0.75, 0.75]], 3: [[0.25, 0.25], [0.5, 0.5], [0.75, 0.75]], 4: [[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]], 5: [[0.25, 0.25], [0.75, 0.25], [0.5, 0.5], [0.25, 0.75], [0.75, 0.75]], 6: [[0.25, 0.22], [0.75, 0.22], [0.25, 0.5], [0.75, 0.5], [0.25, 0.78], [0.75, 0.78]] };
+    // Cross net: 0 top, 1 left, 2 front, 3 right, 4 back, 5 bottom (offset by m so tabs stay inside the viewBox).
+    var m = 0.5, tab = 6;
     var faces = [[1, 0, 1], [0, 1, 2], [1, 1, 3], [2, 1, 5], [3, 1, 4], [1, 2, 6]];
-    var body = '';
+    // The 14 outer edges fold into 7 pairs; each pair gets exactly one glue tab.
+    var outer = [[0, 't', 0], [0, 'l', 1], [0, 'r', 1], [1, 't', 0], [1, 'l', 0], [1, 'b', 0], [3, 't', 0], [3, 'b', 0],
+      [4, 't', 1], [4, 'r', 1], [4, 'b', 1], [5, 'l', 1], [5, 'r', 1], [5, 'b', 0]];
+    var cut = 'fill="none" stroke="' + INK + '" stroke-width="0.4" stroke-dasharray="1.2 0.8"';
+    var pt = function (x, y) { return n(x) + ',' + n(y); };
+    var tabs = '', cuts = '', body = '';
+    outer.forEach(function (e) {
+      var x = m + faces[e[0]][0] * s, y = m + faces[e[0]][1] * s;
+      var g = { t: [x, y, x + s, y, 0, -1], b: [x, y + s, x + s, y + s, 0, 1], l: [x, y, x, y + s, -1, 0], r: [x + s, y, x + s, y + s, 1, 0] }[e[1]];
+      var dx = (g[2] - g[0]) / s, dy = (g[3] - g[1]) / s;
+      if (!e[2]) { cuts += '<line x1="' + n(g[0]) + '" y1="' + n(g[1]) + '" x2="' + n(g[2]) + '" y2="' + n(g[3]) + '" ' + cut + '/>'; return; }
+      var pts = pt(g[0], g[1]) + ' ' + pt(g[0] + g[4] * tab + dx * tab, g[1] + g[5] * tab + dy * tab) + ' ' +
+        pt(g[2] + g[4] * tab - dx * tab, g[3] + g[5] * tab - dy * tab) + ' ' + pt(g[2], g[3]);
+      tabs += '<polygon points="' + pts + '" fill="#eef1ef"/>';
+      cuts += '<polyline points="' + pts + '" ' + cut + '/>';
+    });
     faces.forEach(function (f) {
-      var x = f[0] * s, y = f[1] * s;
-      body += '<rect x="' + x + '" y="' + y + '" width="' + s + '" height="' + s + '" fill="#fff" stroke="' + INK + '" stroke-width="0.4" stroke-dasharray="1.2 0.8"/>';
+      var x = m + f[0] * s, y = m + f[1] * s;
+      body += '<rect x="' + n(x) + '" y="' + n(y) + '" width="' + s + '" height="' + s + '" fill="#fff" stroke="#9aa79f" stroke-width="0.3"/>';
       spots[f[2]].forEach(function (p) { body += '<circle cx="' + n(x + p[0] * s) + '" cy="' + n(y + p[1] * s) + '" r="2.1" fill="' + (color && f[2] === 1 ? '#e8594a' : INK) + '"/>'; });
     });
-    return svg(4 * s + 1, 3 * s + 1, body);
+    return svg(4 * s + tab + 2 * m, 3 * s + 2 * m, tabs + body + cuts);
   }
 
   function pawns(color) {
