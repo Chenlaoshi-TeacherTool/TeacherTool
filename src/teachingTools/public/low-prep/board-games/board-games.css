@@ -125,6 +125,12 @@
 .pl-chip { grid-row: span 2; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--team); color: #fff; font-size: 1.1rem; }
 .pl-die { font-size: 92px; line-height: 1; text-align: center; color: #194f45; transition: transform .07s; }
 .pl-die.is-shake { transform: rotate(14deg) scale(1.06); }
+.pl-rollstage { position: fixed; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; background: rgba(20,40,32,.28); pointer-events: none; }
+.pl-bigdie { width: min(34vh, 34vw); height: min(34vh, 34vw); border-radius: 18%; background: #fff; border: max(6px, .9vh) solid var(--team, #194f45); box-shadow: 0 2.4vh 5vh rgba(0,0,0,.3); }
+.pl-bigdie svg { display: block; width: 100%; height: 100%; }
+.pl-rollnum { margin: 0; padding: .5em 1.2em; border-radius: 999px; background: #fff; color: #194f45; font-weight: 800; font-size: clamp(1.2rem, 3.6vh, 2.2rem); box-shadow: 0 6px 18px rgba(0,0,0,.18); opacity: 0; transform: translateY(1vh); transition: opacity .2s, transform .2s; }
+.pl-rollnum.is-in { opacity: 1; transform: none; }
+.pl-rollnum b { color: #c8553d; font-size: 1.3em; }
 .pl-roll { padding: 14px; border: 0; border-radius: 14px; background: #c8553d; color: #fff; font-family: inherit; font-weight: 800; font-size: 1.3rem; cursor: pointer; }
 .pl-roll:hover { filter: brightness(1.06); }
 .pl-msg { min-height: 2.6em; margin: 0; color: #194f45; font-weight: 700; font-size: 1.05rem; }
