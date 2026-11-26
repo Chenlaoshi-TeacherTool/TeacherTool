@@ -183,7 +183,7 @@ function createRegistry(options) {
     if (!active || active.id !== player.id) throw httpError(409, 'It is not your turn.');
     var team = room.teams[room.turn];
     var value = 1 + random(6);
-    room.roll = { value: value, at: now() };
+    room.roll = { value: value, at: now(), team: room.turn };
     team.prev = team.pos;
     if (room.data.board === 'flight' && team.pos < 0) {
       if (room.opts.six && value !== 6) { say(room, 'needSix'); nextTurn(room); return; }

@@ -226,7 +226,57 @@
     return svg(W, S, body);
   }
 
+  // ---------- big rolling die (projector play and online rooms) ----------
+
+  // Die face as SVG pips, so it looks the same on every screen (the ⚀–⚅ glyphs vary by font).
+  var PIPS = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[28, 28], [50, 50], [72, 72]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]],
+    5: [[28, 28], [72, 28], [50, 50], [28, 72], [72, 72]], 6: [[28, 25], [72, 25], [28, 50], [72, 50], [28, 75], [72, 75]] };
+  function faceSvg(v) {
+    return '<svg viewBox="0 0 100 100" aria-hidden="true">' + PIPS[v].map(function (p) {
+      return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="9" fill="' + (v === 1 ? '#e8594a' : '#1f2b26') + '"/>';
+    }).join('') + '</svg>';
+  }
+  function pause(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  var reducedMotion = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Drops a die into the middle of the screen, tumbles, lands on `value`, then clears.
+  // Resolves when it is gone. Timers, not animation .finished: a background tab can stall those promises.
+  function rollDie(parent, value, color, label) {
+    var stage = document.createElement('div');
+    stage.className = 'pl-rollstage';
+    stage.innerHTML = '<div class="pl-bigdie" style="--team:' + (color || '#194f45') + '">' + faceSvg(value) + '</div>' +
+      '<p class="pl-rollnum">' + label + ' <b>' + value + '</b></p>';
+    (parent || document.body).appendChild(stage);
+    var big = stage.querySelector('.pl-bigdie'), num = stage.querySelector('.pl-rollnum');
+    if (reducedMotion || !big.animate) {
+      num.classList.add('is-in');
+      return pause(900).then(function () { stage.remove(); });
+    }
+    stage.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, fill: 'forwards' });
+    var spin = setInterval(function () { big.innerHTML = faceSvg(1 + Math.floor(Math.random() * 6)); }, 85);
+    big.animate([
+      { transform: 'translateY(-70vh) rotate(-260deg) scale(.55)' },
+      { transform: 'translateY(0) rotate(-25deg) scale(1)', offset: .55 },
+      { transform: 'translateY(-9vh) rotate(10deg) scale(1)', offset: .72 },
+      { transform: 'translateY(0) rotate(0) scale(1.08, .92)', offset: .88 },
+      { transform: 'translateY(0) rotate(0) scale(1)' }
+    ], { duration: 950, easing: 'cubic-bezier(.3,.7,.4,1)' });
+    return pause(620).then(function () {
+      clearInterval(spin);
+      big.innerHTML = faceSvg(value);
+      return pause(330);
+    }).then(function () {
+      num.classList.add('is-in');
+      big.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 260, easing: 'ease-out' });
+      return pause(900);
+    }).then(function () {
+      stage.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.9)' }], { duration: 220, easing: 'ease-in', fill: 'forwards' });
+      return pause(220);
+    }).then(function () { stage.remove(); });
+  }
+
   global.BoardGamesDraw = {
+    rollDie: rollDie,
     draw: function (layout, W, H, geom, pics) {
       pictures = pics || {};
       return { path: drawPath, ladder: drawLadder, line: drawLine, flight: drawFlight }[layout.data.board](layout, W, H, geom);

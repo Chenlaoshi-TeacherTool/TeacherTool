@@ -195,6 +195,30 @@
     return '<div class="pl-action"><span class="pl-icon">' + a.icon + '</span><b>' + esc(a.zh) + '</b>' + (a.py ? '<span class="pl-py">' + esc(a.py) + '</span>' : '') + (a.en ? '<small>' + esc(a.en) + '</small>' : '') + '</div>';
   }
 
+  // Wraps a paint function: when a new roll arrives, show the big die first and paint
+  // the moved board after it lands. The first state (joining / reconnecting) never replays a roll.
+  function withRollDie(getParent, paint) {
+    var seen, busy = false, queued = null;
+    return function onState(s) {
+      if (busy) { queued = s; return; }
+      var key = s.roll ? s.roll.at + ':' + s.roll.value : null;
+      var fresh = seen !== undefined && key && key !== seen;
+      seen = key;
+      var parent = getParent();
+      if (!fresh || !parent) { paint(s); return; }
+      busy = true;
+      var team = s.roll.team != null ? s.teams[s.roll.team] : null;
+      var label = team ? esc(team.name) + ' · ' + T('rolled', '掷到') : T('Rolled', '掷到');
+      D.rollDie(parent, s.roll.value, team ? TEAMS[team.color].color : null, label).then(function () {
+        busy = false;
+        paint(s);
+        var next = queued;
+        queued = null;
+        if (next) onState(next);
+      });
+    };
+  }
+
   function listen(code, token, onState, onGone) {
     var source = new EventSource('/api/board-rooms/' + code + '/events?token=' + encodeURIComponent(token));
     source.onmessage = function (e) {
@@ -281,7 +305,9 @@
     loadQr().then(function () { new window.QRCode(box.querySelector('.rm-qr'), { text: url, width: 132, height: 132 }); }).catch(function () {});
     var board = new Board(box.querySelector('.pl-board'));
     host = { code: code, token: token, board: board };
-    host.source = listen(code, token, function (s) { host.s = s; hostPaint(s); }, function () { hostClose(true); });
+    host.source = listen(code, token, withRollDie(function () { return box.querySelector('.pl-game'); }, function (s) {
+      if (host) { host.s = s; hostPaint(s); }
+    }), function () { hostClose(true); });
     box.onclick = function (e) {
       if (e.target.closest('[data-close]')) { if (confirm(T('Close the room? Students will be disconnected.', '关闭房间？学生会断开连接。'))) { send('close'); hostClose(); } return; }
       var a = e.target.closest('[data-host]');
@@ -401,7 +427,8 @@
     function act(type, extra) {
       return api('/' + code + '/action', Object.assign({ token: me.token, type: type }, extra || {})).catch(function (e) { root.querySelector('.rm-panel').insertAdjacentHTML('afterbegin', '<p class="rm-error">' + esc(e.message) + '</p>'); });
     }
-    listen(code, me.token, function (s) {
+    listen(code, me.token, withRollDie(function () { return root; }, function (s) {
+      if (!root.querySelector('.rm-board')) return; // room closed while the die was rolling
       state = s;
       board.update(s, function (i) { if (s.status === 'playing' && s.active === me.id && !s.pending) act('claim', { square: i }); });
       var mine = s.you.team, team = s.teams[mine], t = TEAMS[team.color];
@@ -432,7 +459,7 @@
           ? wordCard(s, { canAnswer: true })
           : judgeCard(s, sq) + '<p class="rm-note">' + T('Do it! Your teacher will mark it.', '做一做！老师会帮你确认。') + '</p>') + '</div>';
       } else pop.hidden = true;
-    }, function (info) {
+    }), function (info) {
       try { sessionStorage.removeItem('board-room:' + code); } catch (e) { /* ignore */ }
       root.innerHTML = '<div class="rm-join"><p class="rm-big">' + (info.removed ? T('The teacher removed you from the room.', '老师把你移出了房间。') : T('The room has closed.', '房间已经关闭。')) + '</p><a class="pl-start" href="/board">' + T('Join another room', '加入别的房间') + '</a></div>';
     });

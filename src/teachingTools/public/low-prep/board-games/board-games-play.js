@@ -208,7 +208,7 @@
     var die = $('bgPlay').querySelector('.pl-die');
     var value = 1 + Math.floor(Math.random() * 6);
     die.textContent = '🎲';
-    await bigRoll(value, team);
+    await window.BoardGamesDraw.rollDie($('bgPlay').querySelector('.pl-game'), value, team.t.color, esc(team.name) + ' · ' + T('rolled', '掷到'));
     die.textContent = DICE[value - 1];
     team.prev = team.pos;
     if (g.board === 'flight' && team.pos < 0) {
@@ -218,51 +218,6 @@
     }
     await walk(team, Math.min(g.last, team.pos + value));
     await land(team);
-  }
-
-  // Die face as SVG pips, so it looks the same on every projector (the ⚀–⚅ glyphs vary by font).
-  var PIPS = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[28, 28], [50, 50], [72, 72]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]],
-    5: [[28, 28], [72, 28], [50, 50], [28, 72], [72, 72]], 6: [[28, 25], [72, 25], [28, 50], [72, 50], [28, 75], [72, 75]] };
-  function faceSvg(v) {
-    return '<svg viewBox="0 0 100 100" aria-hidden="true">' + PIPS[v].map(function (p) {
-      return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="9" fill="' + (v === 1 ? '#e8594a' : '#1f2b26') + '"/>';
-    }).join('') + '</svg>';
-  }
-
-  // Big die that drops into the middle of the screen, tumbles, lands on the value, then gets out of the way.
-  async function bigRoll(value, team) {
-    var game = $('bgPlay').querySelector('.pl-game');
-    var stage = document.createElement('div');
-    stage.className = 'pl-rollstage';
-    stage.innerHTML = '<div class="pl-bigdie" style="--team:' + team.t.color + '">' + faceSvg(value) + '</div>' +
-      '<p class="pl-rollnum">' + esc(team.name) + ' · ' + T('rolled ', '掷到 ') + '<b>' + value + '</b></p>';
-    game.appendChild(stage);
-    var big = stage.querySelector('.pl-bigdie'), num = stage.querySelector('.pl-rollnum');
-    var animate = !reduced && big.animate;
-    if (animate) {
-      stage.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, fill: 'forwards' });
-      var spin = setInterval(function () { big.innerHTML = faceSvg(1 + Math.floor(Math.random() * 6)); }, 85);
-      big.animate([
-        { transform: 'translateY(-70vh) rotate(-260deg) scale(.55)' },
-        { transform: 'translateY(0) rotate(-25deg) scale(1)', offset: .55 },
-        { transform: 'translateY(-9vh) rotate(10deg) scale(1)', offset: .72 },
-        { transform: 'translateY(0) rotate(0) scale(1.08, .92)', offset: .88 },
-        { transform: 'translateY(0) rotate(0) scale(1)' }
-      ], { duration: 950, easing: 'cubic-bezier(.3,.7,.4,1)' });
-      await wait(620);
-      clearInterval(spin);
-      big.innerHTML = faceSvg(value);
-      await wait(330); // timers, not .finished: a background tab can stall animation promises and freeze the game
-      num.classList.add('is-in');
-      big.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 260, easing: 'ease-out' });
-      await wait(900);
-      stage.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.9)' }], { duration: 220, easing: 'ease-in', fill: 'forwards' });
-      await wait(220);
-    } else {
-      num.classList.add('is-in');
-      await wait(900);
-    }
-    stage.remove();
   }
 
   async function walk(team, target) {
