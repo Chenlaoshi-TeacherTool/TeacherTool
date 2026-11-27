@@ -37,7 +37,7 @@ var GAME_TYPES = {
   'dice-story': { zh: '骰子故事', en: 'Dice Story', icon: '🎲', tool: '/teaching-tools/dice-story', templateEditor: true, templateOnly: true },
   'spin-wheel': { zh: '转盘手工', en: 'Spin Wheel Craft', icon: '🎡', tool: '/teaching-tools/spin-wheel', templateEditor: true, templateOnly: true },
   'board-games': { zh: '棋盘游戏', en: 'Board Game Maker', icon: '♟️', tool: '/teaching-tools/board-games', templateEditor: true, templateOnly: true },
-  'escape-the-path': { zh: '闯关桌游', en: 'Escape the Path', icon: '🎲', tool: '/teaching-tools/escape-the-path', templateEditor: true, templateOnly: true },
+  'escape-the-path': { zh: '学生设计桌游 · Escape the Path', en: 'Student game · Escape the Path', icon: '🎲', tool: '/teaching-tools/student-board-games', templateEditor: true, templateOnly: true },
   'sentence-ladder': { zh: '扩句阶梯', en: 'Sentence Ladder', icon: '🪜', tool: '/teaching-tools/sentence-ladder', templateEditor: true }
 };
 

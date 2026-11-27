@@ -133,7 +133,7 @@ textarea.ep-input { resize: vertical; min-height: 160px; }
   background: #fbf8f1;
 }
 .ep-stage-board { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; padding: 8px; }
-.ep-board { position: relative; width: 100%; aspect-ratio: 1956 / 2374; container-type: inline-size; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 22px rgba(32, 71, 58, 0.15); user-select: none; }
+.ep-board { position: relative; width: 100%; aspect-ratio: 2494 / 2076; container-type: inline-size; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 22px rgba(32, 71, 58, 0.15); user-select: none; }
 .ep-board img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .ep-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .ep-connector { fill: none; stroke: #20473a; stroke-width: 9; stroke-dasharray: 22 16; stroke-linecap: round; filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 4px #fff); }
@@ -262,6 +262,12 @@ textarea.ep-input { resize: vertical; min-height: 160px; }
 .ep-side-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--ep-line); }
 .ep-side-credit { margin: 0; color: var(--ep-muted); font-size: 12px; }
 
+.ep-rollstage { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; background: rgba(20, 40, 32, 0.28); pointer-events: none; }
+.ep-bigdie { width: min(30vh, 30vw); height: min(30vh, 30vw); border-radius: 18%; background: #fff; border: max(6px, 0.9vh) solid var(--team, #20473a); box-shadow: 0 2.4vh 5vh rgba(0, 0, 0, 0.3); }
+.ep-bigdie svg { display: block; width: 100%; height: 100%; }
+.ep-rollnum { margin: 0; padding: 0.5em 1.2em; border-radius: 999px; background: #fff; color: #20473a; font-weight: 800; font-size: clamp(1.2rem, 3.6vh, 2.2rem); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18); opacity: 0; transform: translateY(1vh); transition: opacity 0.2s, transform 0.2s; }
+.ep-rollnum.is-in { opacity: 1; transform: none; }
+.ep-rollnum b { color: #c8553d; font-size: 1.3em; }
 .ep-rules-dialog { max-width: 560px; border: 0; border-radius: 18px; padding: 22px 26px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.3); }
 .ep-rules-dialog h2 { margin: 0; }
 .ep-rules-dialog form { margin-top: 16px; text-align: right; }

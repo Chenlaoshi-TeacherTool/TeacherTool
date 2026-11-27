@@ -4,20 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#356e57">
-  <title>闯关桌游 · Escape the Path - Chen Laoshi's Teaching Toolkit</title>
-  <%- include('../partials/seo', { pageDescription: 'Escape the Path: a student-designed board game for the classroom projector. Teams roll the dice, draw question cards you write or make from a word list, dodge jail and slide down snakes. 学生设计的投影桌游，老师自定义题卡，全班分队闯关。' }) %>
+  <title>学生设计桌游 · Student-Designed Board Games - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Student-designed board games for the classroom projector, starting with Escape the Path. Teams roll the dice and answer question cards you write or make from a word list. 学生自己设计的投影桌游，老师自定义题卡，全班分队玩。' }) %>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
-  <link rel="stylesheet" href="/low-prep/escape-the-path/escape-the-path.css?v=2">
+  <link rel="stylesheet" href="/low-prep/escape-the-path/escape-the-path.css?v=4">
 </head>
 <body class="ep-page">
   <main class="ep-wrap">
     <header class="ep-header">
       <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
-      <p class="ep-eyebrow"><%= L('Projector board game · designed by a student', '投影桌游 · 学生设计') %></p>
-      <h1>🎲 <%= L('Escape the Path', '闯关桌游 Escape the Path') %></h1>
-      <p><%= L('Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Watch out for jail!', '把棋盘投到屏幕上，全班分队轮流掷骰子。走到"抽卡"就答一张你出的题卡，小心别进监狱！') %></p>
+      <p class="ep-eyebrow"><%= L('Projector board games · designed by students', '投影桌游 · 学生设计') %></p>
+      <h1>🎲 <%= L('Student-Designed Board Games', '学生设计桌游') %></h1>
+      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Now playing: Escape the Path.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在可以玩：Escape the Path。') %></p>
     </header>
 
     <div class="ep-layout">
@@ -105,8 +105,8 @@
   <div id="epStage" class="ep-stage" hidden>
     <div class="ep-stage-board" id="epBoardArea">
       <div class="ep-board" id="epBoard">
-        <img src="/low-prep/escape-the-path/board.webp?v=2" alt="<%= L('Student-drawn game board', '学生手绘的棋盘') %>" draggable="false">
-        <svg class="ep-overlay" viewBox="0 0 1956 2374" aria-hidden="true">
+        <img src="/low-prep/escape-the-path/board.webp?v=3" alt="<%= L('Student-drawn game board', '学生手绘的棋盘') %>" draggable="false">
+        <svg class="ep-overlay" viewBox="0 0 2494 2076" aria-hidden="true">
           <defs><marker id="epArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#20473a"></path></marker></defs>
           <path id="epConnector" class="ep-connector" d="" marker-end="url(#epArrow)"></path>
           <circle id="epTarget" class="ep-target" r="46" cx="-100" cy="-100"></circle>
@@ -194,8 +194,8 @@
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/game-template.js?v=4" defer></script>
-  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=2"></script>
-  <script src="/low-prep/escape-the-path/escape-the-path.js?v=2" defer></script>
+  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=4"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path.js?v=4" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

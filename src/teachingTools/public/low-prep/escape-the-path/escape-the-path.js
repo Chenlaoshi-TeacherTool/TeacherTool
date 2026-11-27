@@ -457,21 +457,66 @@
     });
   }
 
+  // Die face as SVG pips (the ⚀–⚅ glyphs look different on every screen).
+  var PIPS = { 1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[28, 28], [50, 50], [72, 72]], 4: [[28, 28], [72, 28], [28, 72], [72, 72]],
+    5: [[28, 28], [72, 28], [50, 50], [28, 72], [72, 72]], 6: [[28, 25], [72, 25], [28, 50], [72, 50], [28, 75], [72, 75]] };
+  function faceSvg(v) {
+    return '<svg viewBox="0 0 100 100" aria-hidden="true">' + PIPS[v].map(function (p) {
+      return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="9" fill="' + (v === 1 ? '#e8594a' : '#1f2b26') + '"/>';
+    }).join('') + '</svg>';
+  }
+
+  // Big die drops onto the middle of the board, tumbles and lands on `value`
+  // (same feel as the 棋盘游戏 tool). Timers, not animation promises: a
+  // background tab can stall those.
+  async function bigRoll(value, team) {
+    var stage = document.createElement('div');
+    stage.className = 'ep-rollstage';
+    stage.innerHTML = '<div class="ep-bigdie" style="--team:' + Core.TEAMS[team.id].color + '">' + faceSvg(value) + '</div>' +
+      '<p class="ep-rollnum"></p>';
+    stage.querySelector('.ep-rollnum').textContent = L(team.name + ' rolled ', team.name + '掷出 ');
+    var b = document.createElement('b');
+    b.textContent = value;
+    stage.querySelector('.ep-rollnum').appendChild(b);
+    $('epBoardArea').appendChild(stage);
+    var big = stage.querySelector('.ep-bigdie');
+    var num = stage.querySelector('.ep-rollnum');
+    if (reduceMotion || !big.animate) {
+      num.classList.add('is-in');
+      await sleep(900);
+      stage.remove();
+      return;
+    }
+    stage.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, fill: 'forwards' });
+    var spin = setInterval(function () { big.innerHTML = faceSvg(1 + Math.floor(Math.random() * 6)); }, 85);
+    big.animate([
+      { transform: 'translateY(-60vh) rotate(-260deg) scale(.55)' },
+      { transform: 'translateY(0) rotate(-25deg) scale(1)', offset: 0.55 },
+      { transform: 'translateY(-8vh) rotate(10deg) scale(1)', offset: 0.72 },
+      { transform: 'translateY(0) rotate(0) scale(1.08, .92)', offset: 0.88 },
+      { transform: 'translateY(0) rotate(0) scale(1)' }
+    ], { duration: 950, easing: 'cubic-bezier(.3,.7,.4,1)' });
+    await sleep(620);
+    clearInterval(spin);
+    big.innerHTML = faceSvg(value);
+    await sleep(330);
+    num.classList.add('is-in');
+    big.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 260, easing: 'ease-out' });
+    await sleep(900);
+    stage.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.9)' }], { duration: 220, easing: 'ease-in', fill: 'forwards' });
+    await sleep(220);
+    stage.remove();
+  }
+
   async function rollDice(value) {
     if (busy || game.phase !== 'roll') return;
     busy = true;
     renderSide();
     var final = value || 1 + Math.floor(Math.random() * 6);
-    if (!value && !reduceMotion) {
-      $('epDie').classList.add('is-rolling');
-      for (var i = 0; i < 9; i++) {
-        showFace(1 + Math.floor(Math.random() * 6));
-        await sleep(60 + i * 8);
-      }
-      $('epDie').classList.remove('is-rolling');
-    }
+    // A real die was rolled in the room: just show the number. Otherwise roll the big die.
+    if (!value) await bigRoll(final, Core.current(game));
     showFace(final);
-    await sleep(250);
+    await sleep(value ? 250 : 80);
     play(Core.roll(game, final));
   }
 
@@ -665,7 +710,7 @@
         if (data.source === 'words' && !/\S/.test(data.words)) {
           throw new Error(L('Type at least one word before saving.', '请先输入至少一个词再保存。'));
         }
-        data.title = L('Escape the Path', '闯关桌游');
+        data.title = 'Escape the Path';
         return data;
       },
       restore: function (data) {
