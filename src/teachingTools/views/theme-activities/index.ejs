@@ -7,139 +7,38 @@
     <%- include('../partials/seo', { pageDescription: 'Browse Chinese language lessons, games, songs, and classroom-ready activities by theme.' }) %>
 
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-        }
+        /* Colours, fonts, cards and buttons come from site-theme.css; this is page layout only. */
+        .header { text-align: center; }
+        .header h1 { margin-bottom: 10px; }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
+        .theme-directory { max-width: 1240px; margin: 0 auto; padding: 0 20px 40px; }
 
-        .header h1 {
-            margin-bottom: 10px;
-        }
-
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: 1px solid white;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        /* 🔍 SEARCH BOX */
-        .search-container {
-            text-align: center;
-            margin: 20px;
-        }
-
-        #searchBox {
-            width: 80%;
-            max-width: 500px;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-
-        .theme-directory {
-            margin: 0 auto;
-            max-width: 1240px;
-            padding: 0 20px 40px;
-        }
+        .theme-search { max-width: 650px; margin: 30px 0 22px; }
+        .theme-search label { display: block; margin: 0 0 8px; color: var(--chalk); font-weight: 800; }
+        .theme-search-input { position: relative; }
+        .theme-search-input span { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: var(--leaf); pointer-events: none; }
+        .theme-search input { box-sizing: border-box; width: 100%; padding: 13px 16px 13px 42px; font-size: 1rem; }
+        .theme-search-status { min-height: 1.6em; margin: 7px 0 0; color: var(--muted); font-size: .9rem; }
+        .theme-search-status.is-empty { color: var(--ink); font-weight: 700; }
+        .theme-search .btn { margin-top: 10px; }
+        .theme-search .btn[hidden] { display: none; }
 
         .theme-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
-        .theme-jump a {
-            padding: 8px 14px;
-            border: 1px solid #cbdac2;
-            border-radius: 22px;
-            color: #194f45;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .theme-jump a:hover { background: #edf5df; }
+        .theme-jump a { padding: 8px 14px; border: 1px solid #cbdac2; border-radius: 22px; color: var(--chalk); font-weight: 700; text-decoration: none; }
+        .theme-jump a:hover { background: var(--leaf-wash); }
+        .theme-jump a[hidden] { display: none; }
         .theme-group { margin: 0 0 32px; scroll-margin-top: 24px; }
-        .theme-group h2 { margin: 0 0 14px; color: #194f45; }
+        .theme-group h2 { margin: 0 0 14px; color: var(--chalk); }
         .theme-group[hidden], .tool-card[hidden] { display: none; }
 
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-        }
-
-        .tool-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .tool-card:has(.btn:disabled) {
-            background: #f3f4f6;
-            box-shadow: none;
-            opacity: 0.68;
-        }
-
-        .tool-card:has(.btn:disabled):hover {
-            transform: none;
-        }
-
-        .tool-card h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .tool-card p {
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .btn {
-            background-color: #667eea;
-            color: white;
-            padding: 10px 18px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-        }
-
-        .btn:hover {
-            background-color: #5a67d8;
-        }
-
-        .btn:disabled {
-            background-color: #aab1bf;
-            color: #f8fafc;
-            cursor: not-allowed;
-        }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+        .tool-card { padding: 25px; text-align: center; }
+        .tool-card h3 { margin-bottom: 10px; }
+        .tool-card p { margin-bottom: 15px; font-size: 14px; }
+        .btn { display: inline-block; padding: 10px 18px; font-size: 14px; cursor: pointer; }
 
         @media (max-width: 768px) {
-            .tools-grid {
-                grid-template-columns: 1fr;
-            }
+            .tools-grid { grid-template-columns: 1fr; }
         }
     </style>
     <link rel="stylesheet" href="/stylesheets/site-theme.css">
@@ -148,19 +47,28 @@
 
 <body>
 
-    <a href="/" class="back-btn">← <%= t('themeActivities.backToHomepage') %></a>
-
     <section class="header">
         <h1><%= t('themeActivities.title') %></h1>
         <p><%= t('themeActivities.intro') %></p>
     </section>
 
-    <div class="search-container">
-        <input type="search" id="searchBox" aria-label="<%= t('themeActivities.searchPlaceholder') %>"
-            placeholder="🔍 <%= t('themeActivities.searchPlaceholder') %>">
-    </div>
-
     <main class="theme-directory">
+        <section class="theme-search" aria-labelledby="theme-search-label">
+            <label id="theme-search-label" for="searchBox"><%= t('themeActivities.findLabel') %></label>
+            <div class="theme-search-input">
+                <span aria-hidden="true">⌕</span>
+                <input type="search" id="searchBox" placeholder="<%= t('themeActivities.searchPlaceholder') %>" autocomplete="off" aria-describedby="themeSearchStatus">
+            </div>
+            <p id="themeSearchStatus" class="theme-search-status" role="status"></p>
+            <%# Message templates live in text (not data-* attributes) so the 繁体 converter in services/zhHant.js reaches them. %>
+            <div id="themeSearchMessages" hidden>
+                <span data-msg="all"><%= t('themeActivities.resultsAll') %></span>
+                <span data-msg="for"><%= t('themeActivities.resultsFor') %></span>
+                <span data-msg="none"><%= t('themeActivities.noResults') %></span>
+            </div>
+            <button id="clearThemeSearch" class="btn" type="button" hidden><%= t('themeActivities.clearSearch') %></button>
+        </section>
+
         <nav class="theme-jump" aria-label="<%= lang === 'zh' ? '主题分类' : 'Theme categories' %>">
             <% categories.forEach(function(category) { %>
             <a href="#<%= category.key %>"><%= category[lang] %></a>
@@ -206,18 +114,45 @@
         (function () {
             var search = document.getElementById('searchBox');
             var groups = document.querySelectorAll('.theme-group');
+            var status = document.getElementById('themeSearchStatus');
+            var clearSearch = document.getElementById('clearThemeSearch');
+
+            var messages = {};
+            document.querySelectorAll('#themeSearchMessages [data-msg]').forEach(function(el) { messages[el.dataset.msg] = el.textContent; });
+
+            function fill(template, count, query) {
+                return template.replace('{count}', count).replace('{query}', query);
+            }
 
             function filterThemes() {
-                var query = search.value.trim().toLowerCase();
+                var raw = search.value.trim();
+                var query = raw.toLowerCase();
+                var total = 0;
                 groups.forEach(function(group) {
                     group.querySelectorAll('.tool-card').forEach(function(card) {
                         card.hidden = !(card.dataset.tags + ' ' + card.textContent).toLowerCase().includes(query);
+                        if (!card.hidden) total += 1;
                     });
                     group.hidden = Boolean(query) && !group.querySelector('.tool-card:not([hidden])');
+                    // Hide the category chip too, so it never points at an empty section.
+                    if (group.id) {
+                        var chip = document.querySelector('.theme-jump a[href="#' + group.id + '"]');
+                        if (chip) chip.hidden = group.hidden;
+                    }
                 });
+                status.textContent = !query ? fill(messages.all, total, '')
+                    : total ? fill(messages.for, total, raw) : fill(messages.none, 0, raw);
+                status.classList.toggle('is-empty', Boolean(query) && !total);
+                clearSearch.hidden = !query || total > 0;
             }
 
+            clearSearch.addEventListener('click', function() {
+                search.value = '';
+                filterThemes();
+                search.focus();
+            });
             search.addEventListener('input', filterThemes);
+            filterThemes();
             document.addEventListener('click', function(event) {
                 var link = event.target.closest('.theme-jump a, .site-tool-categories a');
                 if (link && link.pathname.replace(/\/$/, '') === '/theme-activities' && search.value) {

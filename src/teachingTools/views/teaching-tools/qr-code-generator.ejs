@@ -135,9 +135,9 @@
 
 <body>
 
-<a href="/teaching-tools" class="back-btn"><%= t('qrCodeGenerator.backBtn') %></a>
-
+<%# Inside the header like the other tool pages, so it is positioned below the site nav. %>
 <section class="header">
+    <a href="/teaching-tools" class="back-btn"><%= t('qrCodeGenerator.backBtn') %></a>
     <h1><%= t('qrCodeGenerator.title') %></h1>
     <p><%= t('qrCodeGenerator.introPrefix') %>"<%= t('qrCodeGenerator.formatToken') %>"<%= t('qrCodeGenerator.introSuffix') %></p>
 </section>
