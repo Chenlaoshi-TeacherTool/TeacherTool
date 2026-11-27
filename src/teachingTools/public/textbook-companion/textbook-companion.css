@@ -1,6 +1,17 @@
 /* Textbook companion: /textbook-companion and the Jinan series, book and lesson pages */
 .tc-card h2 a { color: var(--chalk); text-decoration: none; }
 .tc-card h2 a:hover { color: var(--coral); }
+/* One link per card: the title link covers the whole card, so the card is a single tap target and tab stop. */
+.tc-card { position: relative; transition: transform 160ms var(--ease-out), box-shadow 160ms ease; }
+.tc-card h2 a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+.tc-card h2 a:focus-visible { outline: none; }
+.tc-card:has(h2 a:focus-visible) { outline: 3px solid var(--sun); outline-offset: 3px; }
+.tc-card .resource-card__link { display: inline-block; margin-top: 4px; }
+@media (hover: hover) and (pointer: fine) {
+  .tc-card:hover { transform: translateY(-3px); }
+  .tc-card:hover .resource-card__link { text-decoration: underline; }
+}
+@media (prefers-reduced-motion: reduce) { .tc-card:hover { transform: none; } }
 .tc-badge { display: inline-block; margin: 0 0 12px; padding: 3px 12px; border-radius: 999px; background: #fff2c5; color: #805512 !important; font-size: .8rem; font-weight: 900; letter-spacing: .04em; }
 
 .tc-empty { padding: 30px 20px; border: 1px dashed var(--line); border-radius: 18px; background: var(--paper); color: var(--muted); text-align: center; }

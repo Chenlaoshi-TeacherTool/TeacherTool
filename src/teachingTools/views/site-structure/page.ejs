@@ -20,7 +20,7 @@
   <main class="content-section">
     <div class="content-shell resource-grid">
       <% page.cards.forEach(function(card) { %>
-      <section class="resource-card<%= page.themeKey ? ' tool-card' : '' %><%= card.comingSoon ? ' is-coming-soon' : '' %>"<%- card.comingSoon ? ' aria-disabled="true"' : '' %>>
+      <section class="resource-card<%= page.themeKey ? ' tool-card' : '' %><%= card.comingSoon ? ' is-coming-soon' : '' %>">
         <% if (card.comingSoon) { %><p class="resource-card__soon"><%= card.comingSoon %></p><% } %>
         <h2><%= card.heading %></h2>
         <p><%= card.description %></p>

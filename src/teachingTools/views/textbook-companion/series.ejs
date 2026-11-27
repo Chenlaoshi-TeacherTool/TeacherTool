@@ -22,7 +22,7 @@
       <% if (series.membersOnly) { %><p class="tc-badge"><%= L('Members', '会员专享') %></p><% } %>
       <h2><a href="<%= book.href %>"><%= book.name %></a></h2>
       <p><%= book.lessons ? L(book.lessons + ' lessons', '共 ' + book.lessons + ' 课') : L('Materials are being added.', '材料正在陆续添加中。') %></p>
-      <a class="resource-card__link" href="<%= book.href %>"><%= L('Open book', '查看课文') %> →</a>
+      <span class="resource-card__link" aria-hidden="true"><%= L('Open book', '查看课文') %> →</span>
     </section>
     <% }) %>
   </div></main>

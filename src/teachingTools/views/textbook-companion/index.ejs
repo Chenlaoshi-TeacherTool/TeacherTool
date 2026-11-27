@@ -19,11 +19,11 @@
       <% if (card.membersOnly) { %><p class="tc-badge"><%= L('Members', '会员专享') %></p><% } %>
       <h2><a href="<%= card.href %>"><%= card.heading %></a></h2>
       <p><%= card.description %></p>
-      <a class="resource-card__link" href="<%= card.href %>"><%= L('Open', '进入') %> →</a>
+      <span class="resource-card__link" aria-hidden="true"><%= L('Open', '进入') %> →</span>
     </section>
     <% }) %>
     <% comingSoon.forEach(function (card) { %>
-    <section class="resource-card is-coming-soon" aria-disabled="true">
+    <section class="resource-card is-coming-soon">
       <p class="resource-card__soon"><%= L('Coming soon', '即将推出') %></p>
       <h2><%= card.heading %></h2>
       <p><%= card.description %></p>
