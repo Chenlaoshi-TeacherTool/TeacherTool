@@ -55,6 +55,10 @@
             <input type="checkbox" id="hide-punctuation-case">
             <%= t('sentenceReorder.ignoreCaseLabel') %>
           </label>
+          <label class="reorder-checkbox">
+            <input type="checkbox" id="show-pinyin">
+            <%= lang === 'zh' ? '显示拼音' : 'Show pinyin' %>
+          </label>
         </section>
 
         <button id="generate-button" class="reorder-primary" type="button">🧩 <%= t('sentenceReorder.generateButton') %></button>
@@ -115,7 +119,9 @@
   <script src="/shared/library-picker.js?v=2" defer></script>
   <script src="/shared/game-sharing.js?v=zh1" defer></script>
   <script src="/shared/game-template.js?v=4" defer></script>
-  <script src="/low-prep/sentence-reorder/sentence-reorder.js?v=10" defer></script>
+  <script src="/vendor/pinyin-pro.js" defer></script>
+  <script src="/low-prep/sentence-reorder/word-label.js" defer></script>
+  <script src="/low-prep/sentence-reorder/sentence-reorder.js?v=11" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

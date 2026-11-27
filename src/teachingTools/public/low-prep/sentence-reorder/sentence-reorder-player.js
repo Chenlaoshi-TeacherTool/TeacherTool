@@ -118,8 +118,8 @@
     chip.type = 'button';
     chip.disabled = assessment && (state.submitted || state.submitting);
     chip.className = 'reorder-student-chip';
-    chip.textContent = word;
     chip.dataset.word = word;
+    window.renderSentenceReorderWord(chip, data.showPinyin === true);
     chip.setAttribute('aria-label', `Word: ${word}`);
     chip.addEventListener('pointerdown', onPointerDown);
     chip.addEventListener('keydown', onChipKeyDown);

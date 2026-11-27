@@ -3,6 +3,7 @@
 
   var sentenceInput = document.getElementById('sentence-input');
   var relaxedCheckbox = document.getElementById('hide-punctuation-case');
+  var pinyinCheckbox = document.getElementById('show-pinyin');
   var generateButton = document.getElementById('generate-button');
   var shareButton = document.getElementById('share-button');
   var manageLinksButton = document.getElementById('manage-links-button');
@@ -36,6 +37,11 @@
   var templateButton = document.getElementById('save-template');
   var templateTitle = 'Sentence Reorder';
   relaxedCheckbox.addEventListener('change', updateSetupStatus);
+  pinyinCheckbox.addEventListener('change', function () {
+    stage.querySelectorAll('.word-chip').forEach(function (chip) {
+      window.renderSentenceReorderWord(chip, pinyinCheckbox.checked);
+    });
+  });
   updateSetupStatus();
   initLibraryPicker();
   buildCelebrationConfetti();
@@ -107,6 +113,7 @@
     return {
       title: 'Sentence Reorder',
       relaxed: relaxedCheckbox.checked,
+      showPinyin: pinyinCheckbox.checked,
       sentences: sentences.map(function (sentence) {
         return { words: sentence.words.slice() };
       })
@@ -184,6 +191,7 @@
         templateTitle = data.title;
         sentenceInput.value = data.sentences.map(function (sentence) { return sentence.words.join(' '); }).join('\n');
         relaxedCheckbox.checked = data.relaxed;
+        pinyinCheckbox.checked = data.showPinyin === true;
         updateSetupStatus();
         generateButton.click();
       }
@@ -229,8 +237,8 @@
   function makeChip(word) {
     var chip = document.createElement('div');
     chip.className = 'word-chip';
-    chip.textContent = word;
     chip.dataset.word = word;
+    window.renderSentenceReorderWord(chip, pinyinCheckbox.checked);
     chip.setAttribute('tabindex', '0');
     chip.setAttribute('role', 'button');
     chip.setAttribute('aria-label', 'Word: ' + word);
