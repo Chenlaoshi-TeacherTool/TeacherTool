@@ -91,8 +91,9 @@
   .bg-sheets { display: block; zoom: 1 !important; }
   /* A sheet exactly as tall as the paper can round a hair over it and push a blank page after it,
      so print each sheet 1mm short of the paper (the footer just sits 1mm higher). */
-  .bg-sheet { box-shadow: none; height: calc(var(--sheet-h) - 1mm) !important; overflow: hidden; break-inside: avoid; break-after: page; page-break-after: always; }
-  .bg-sheet:last-child { break-after: auto; page-break-after: auto; }
+  .bg-sheet { box-shadow: none; height: calc(var(--sheet-h) - 1mm) !important; overflow: hidden; break-inside: avoid; }
+  /* Break before each later sheet, never after the last one: a forced break after it makes a blank last page. */
+  .bg-sheet + .bg-sheet { break-before: page; page-break-before: always; }
   .bg-sheet.is-port { page: port; }
   .bg-sheet.is-land { page: land; }
   .bg-sheet, .bg-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
