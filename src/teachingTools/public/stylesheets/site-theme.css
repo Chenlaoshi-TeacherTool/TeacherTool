@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&family=ZCOOL+QingKe+HuangYou&display=swap');
+/* Keep this font URL identical to the <link> in views/partials/seo.ejs, which starts the same download earlier. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap');
 @import url('/stylesheets/content-pages.css');
 
 :root {
@@ -6,6 +7,8 @@
   --chalk-deep: #103e37;
   --leaf: #356e57;
   --leaf-light: #6f9e72;
+  --leaf-wash: #edf5df;
+  --leaf-line: #d7e3c7;
   --cream: #fff9e9;
   --paper: #fffdf7;
   --sun: #f8c63f;
@@ -94,7 +97,7 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
   display: block;
   margin-top: 2px;
   color: var(--muted);
-  font-size: .68rem;
+  font-size: .72rem;
   font-weight: 800;
   letter-spacing: .04em;
 }
@@ -226,6 +229,39 @@ html:has(.site-main-nav.is-compact) { --site-nav-height: 106px; }
 .site-main-nav.is-compact .site-main-nav-links::-webkit-scrollbar { display: none; }
 .site-main-nav.is-compact .site-main-nav-links a,
 .site-main-nav.is-compact .site-main-nav-links .site-nav-coming-soon { padding: 6px 9px; font-size: .78rem; }
+
+/* Fade the edge that still has links past it, so the strip reads as scrollable (classes set in milk-tea-footer.js). */
+.site-main-nav.is-compact .site-main-nav-links.can-scroll-right { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent); }
+.site-main-nav.is-compact .site-main-nav-links.can-scroll-left { -webkit-mask-image: linear-gradient(to right, transparent, #000 44px); mask-image: linear-gradient(to right, transparent, #000 44px); }
+.site-main-nav.is-compact .site-main-nav-links.can-scroll-left.can-scroll-right { -webkit-mask-image: linear-gradient(to right, transparent, #000 44px, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to right, transparent, #000 44px, #000 calc(100% - 44px), transparent); }
+
+/* Skip link (added by milk-tea-footer.js): hidden until a keyboard user tabs to it. */
+.site-skip-link {
+  position: absolute;
+  z-index: 200;
+  top: 8px;
+  left: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--chalk);
+  color: var(--paper);
+  font-weight: 900;
+  text-decoration: none;
+  transform: translateY(-160%);
+}
+.site-skip-link:focus { transform: none; outline: 3px solid var(--sun); outline-offset: 2px; }
+main[tabindex="-1"]:focus { outline: none; }
+
+/* Touch screens: 44px rows of tappable links in the two-row header. */
+@media (pointer: coarse) {
+  @media (max-width: 1600px) { :root { --site-nav-height: 114px; } }
+  html:has(.site-main-nav.is-compact) { --site-nav-height: 114px; }
+  .site-main-nav.is-compact .site-main-nav-inner { grid-template-rows: 42px 44px; }
+  .site-main-nav.is-compact .site-main-nav-links a,
+  .site-main-nav.is-compact .site-main-nav-links .site-nav-coming-soon { display: flex; align-items: center; min-height: 44px; padding: 0 11px; }
+  .site-main-nav.is-compact .site-tool-nav > button { min-width: 40px; }
+  .site-main-nav.is-compact .site-lang-switch a { display: flex; align-items: center; min-height: 36px; }
+}
 
 @media print {
   html body { padding-top: 0 !important; }

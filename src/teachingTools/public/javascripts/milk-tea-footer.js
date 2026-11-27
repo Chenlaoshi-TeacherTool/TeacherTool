@@ -196,6 +196,41 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
   }
 
+  // In the two-row header the links scroll sideways; mark which edges still have
+  // links past them so site-theme.css can fade that edge.
+  function watchNavScroll(nav) {
+    var links = nav && nav.querySelector('.site-main-nav-links');
+    if (!links || links.dataset.scrollWatch) return;
+    links.dataset.scrollWatch = '1';
+    var queued = false;
+    function update() {
+      queued = false;
+      var max = links.scrollWidth - links.clientWidth;
+      links.classList.toggle('can-scroll-left', max > 1 && links.scrollLeft > 1);
+      links.classList.toggle('can-scroll-right', max > 1 && links.scrollLeft < max - 1);
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+    update();
+    links.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    if (window.MutationObserver) new MutationObserver(queue).observe(nav, { attributes: true, attributeFilter: ['class'] });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(queue);
+  }
+
+  // Keyboard users land on the nav first; let them jump straight to the page's <main>.
+  function addSkipLink(lang) {
+    var main = document.querySelector('main');
+    if (!main || document.getElementById('siteSkipLink')) return;
+    if (!main.id) main.id = 'main';
+    if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+    var skip = document.createElement('a');
+    skip.id = 'siteSkipLink';
+    skip.className = 'site-skip-link';
+    skip.href = '#' + main.id;
+    skip.textContent = lang !== 'zh' ? 'Skip to main content' : getScript() === 'hant' ? '跳到主要內容' : '跳到主要内容';
+    document.body.prepend(skip);
+  }
+
   function createFooter() {
     var lang = getLang();
     var t = LABELS[lang];
@@ -267,6 +302,8 @@
       nav.querySelectorAll('.site-tool-nav').forEach(wireCategories);
     }
     watchNavFit(document.getElementById('siteMainNav'));
+    watchNavScroll(document.getElementById('siteMainNav'));
+    addSkipLink(lang);
 
     var legalFooters = document.querySelectorAll('footer');
     var legalFooter = legalFooters.length ? legalFooters[legalFooters.length - 1] : document.createElement('footer');

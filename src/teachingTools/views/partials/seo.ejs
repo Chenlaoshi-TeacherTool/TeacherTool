@@ -18,6 +18,10 @@
 <% if (seoNoindex) { %><meta name="robots" content="noindex, nofollow"><% } else { %><meta name="robots" content="index, follow, max-image-preview:large"><% } %>
 <link rel="canonical" href="<%= seoCanonical %>">
 <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+<%# Start the font download now instead of waiting for site-theme.css to @import it. Keep this URL identical to the @import on line 1 of site-theme.css so the browser reuses it. %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap">
 <link rel="apple-touch-icon" href="/images/chen-laoshi-avatar.png">
 <meta property="og:type" content="<%= seoPageType %>">
 <meta property="og:site_name" content="<%= seoBrand %>">
