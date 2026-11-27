@@ -10,7 +10,7 @@
   --paper: #fffdf7;
   --sun: #f8c63f;
   --sun-deep: #e7a81f;
-  --coral: #c9503f;
+  --coral: #c24a3a;
   --ink: #193d38;
   --muted: #5d7168;
   --line: #e5ddc9;
@@ -93,7 +93,7 @@ body::selection { background: #ffe08b; color: var(--chalk-deep); }
 .site-main-nav-brand small {
   display: block;
   margin-top: 2px;
-  color: #6a7d74;
+  color: var(--muted);
   font-size: .68rem;
   font-weight: 800;
   letter-spacing: .04em;

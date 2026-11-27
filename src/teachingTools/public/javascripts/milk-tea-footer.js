@@ -222,8 +222,8 @@
       '.milk-tea-footer-kicker { color: #356e57; font-size: .72rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }',
       '.milk-tea-footer-title { margin-top: 3px !important; color: #194f45; font-size: .98rem; font-weight: 800; line-height: 1.45; }',
       '.milk-tea-footer-actions { position: relative; flex: 0 0 auto; }',
-      '.milk-tea-footer-toggle { display: inline-flex; align-items: center; justify-content: center; min-height: 43px; padding: 10px 16px; border: 0; border-radius: 999px; background: #bf7f35; box-shadow: 0 4px 0 #8d5420; color: #fff; cursor: pointer; font: inherit; font-weight: 900; transition: transform .18s ease, box-shadow .18s ease; }',
-      '.milk-tea-footer-toggle:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #8d5420; }',
+      '.milk-tea-footer-toggle { display: inline-flex; align-items: center; justify-content: center; min-height: 43px; padding: 10px 16px; border: 0; border-radius: 999px; background: #9f6427; box-shadow: 0 4px 0 #7a4718; color: #fff; cursor: pointer; font: inherit; font-weight: 900; transition: transform .18s ease, box-shadow .18s ease; }',
+      '.milk-tea-footer-toggle:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #7a4718; }',
       '.milk-tea-footer-toggle:focus-visible, .milk-tea-option:focus-visible, .milk-tea-close:focus-visible { outline: 3px solid #1d6ed8; outline-offset: 3px; }',
       '.milk-tea-menu { position: absolute; z-index: 30; right: 0; bottom: calc(100% + 14px); width: min(360px, calc(100vw - 32px)); padding: 19px; border: 1px solid #d3c079; border-radius: 18px; background: #fffdf7; box-shadow: 0 16px 36px rgba(33, 74, 55, .22); }',
       '.milk-tea-menu[hidden] { display: none; }',
@@ -234,7 +234,7 @@
       '.milk-tea-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }',
       '.milk-tea-option { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 9px 10px; border: 1px solid #d1b459; border-radius: 10px; background: #fffdf7; color: #805512; font-size: .88rem; font-weight: 900; text-align: center; text-decoration: none; }',
       '.milk-tea-option:hover { background: #fff2c5; }',
-      '.milk-tea-option.primary { border-color: transparent; background: #bf7f35; color: #fff; }',
+      '.milk-tea-option.primary { border-color: transparent; background: #9f6427; color: #fff; }',
       '.milk-tea-option.primary:hover { background: #a96828; }',
       '@media (max-width: 640px) { .site-legal-footer { padding: 22px 18px; } .site-legal-footer-inner { width: min(100%, 1140px); } .milk-tea-site-footer { padding: 24px 14px; } .milk-tea-footer-inner { width: min(100%, 1140px); align-items: stretch; flex-direction: column; gap: 15px; } .milk-tea-footer-actions, .milk-tea-footer-toggle { width: 100%; } .milk-tea-menu { right: 0; left: 0; width: 100%; } }',
       '@media print { .site-main-nav, .milk-tea-site-footer, .site-legal-footer { display: none !important; } }'
@@ -248,7 +248,7 @@
       nav.setAttribute('aria-label', 'Main navigation');
       nav.innerHTML = [
         '<div class="site-main-nav-inner">',
-        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo.svg" width="42" height="42" alt=""><span>' + t.brand + '<small>' + t.tagline + '</small></span></a>',
+        '  <a class="site-main-nav-brand" href="/"><img src="/images/chen-laoshi-logo-96.webp" width="42" height="42" alt=""><span>' + t.brand + '<small>' + t.tagline + '</small></span></a>',
         '  <ul class="site-main-nav-links">',
         SITE_NAV.nav.map(function(item) { return navItemHtml(item, lang); }).join(''),
         '  </ul>',
