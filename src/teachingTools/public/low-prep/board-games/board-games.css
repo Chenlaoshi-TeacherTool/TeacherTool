@@ -84,11 +84,14 @@
 
 @media print {
   html, body.bg-page { margin: 0; padding: 0 !important; background: #fff !important; }
-  body > *:not(.bg-wrap), .bg-header, .bg-builder, .bg-status { display: none !important; }
+  body > *:not(.bg-wrap), .bg-header, .bg-builder, .bg-toolbar, .bg-status { display: none !important; }
+  html, body.bg-page, .bg-wrap, .bg-layout, .bg-preview, .bg-stage { height: auto !important; min-height: 0 !important; }
   .bg-wrap, .bg-layout, .bg-preview { display: block; max-width: none; margin: 0; padding: 0; }
   .bg-stage { max-height: none; overflow: visible; padding: 0; background: none; border-radius: 0; }
   .bg-sheets { display: block; zoom: 1 !important; }
-  .bg-sheet { box-shadow: none; break-after: page; page-break-after: always; }
+  /* A sheet exactly as tall as the paper can round a hair over it and push a blank page after it,
+     so print each sheet 1mm short of the paper (the footer just sits 1mm higher). */
+  .bg-sheet { box-shadow: none; height: calc(var(--sheet-h) - 1mm) !important; overflow: hidden; break-inside: avoid; break-after: page; page-break-after: always; }
   .bg-sheet:last-child { break-after: auto; page-break-after: auto; }
   .bg-sheet.is-port { page: port; }
   .bg-sheet.is-land { page: land; }

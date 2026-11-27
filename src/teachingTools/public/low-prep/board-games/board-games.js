@@ -158,7 +158,7 @@
 
   function sheet(inner, land) {
     var size = pageSize(land);
-    return '<div class="bg-sheet ' + (land ? 'is-land' : 'is-port') + '" style="width:' + size[0] + 'mm;height:' + size[1] + 'mm;padding:' + MARGIN + 'mm">' +
+    return '<div class="bg-sheet ' + (land ? 'is-land' : 'is-port') + '" style="width:' + size[0] + 'mm;height:' + size[1] + 'mm;--sheet-h:' + size[1] + 'mm;padding:' + MARGIN + 'mm">' +
       '<div class="bg-sheet-inner">' + inner +
       '<div class="bg-sheet-foot"><span>CLS Teaching Tools</span><span>clsteachingtools.com</span></div></div></div>';
   }
