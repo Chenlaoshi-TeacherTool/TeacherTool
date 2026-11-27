@@ -41,6 +41,11 @@ body {
 
 body::selection { background: #ffe08b; color: var(--chalk-deep); }
 
+/* Even out heading lines and keep a lone word off the last line of paragraphs.
+   Only line breaks change; browsers without support simply ignore these. */
+h1, h2, h3, h4 { text-wrap: balance; }
+p, li, figcaption, blockquote { text-wrap: pretty; }
+
 /*
  * The navigation is added by milk-tea-footer.js. Keep it outside normal flow
  * and reserve its space before JavaScript runs so it cannot shift the page.
