@@ -127,13 +127,14 @@ textarea.ep-input { resize: vertical; min-height: 160px; }
 .ep-stage {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 400; /* above the site menu (z 100) */
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
   background: #fbf8f1;
 }
-.ep-stage-board { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; padding: 8px; }
-.ep-board { position: relative; width: 100%; aspect-ratio: 2494 / 2076; container-type: inline-size; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 22px rgba(32, 71, 58, 0.15); user-select: none; }
+.ep-stage-board { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; padding: 8px; container-type: size; overflow: hidden; }
+/* The board always fits its area (portrait or landscape boards): --ratio is width / height. */
+.ep-board { --ratio: 1.2; position: relative; width: min(100cqw - 16px, (100cqh - 16px) * var(--ratio)); aspect-ratio: 2494 / 2076; container-type: inline-size; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 22px rgba(32, 71, 58, 0.15); user-select: none; }
 .ep-board img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .ep-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .ep-connector { fill: none; stroke: #20473a; stroke-width: 9; stroke-dasharray: 22 16; stroke-linecap: round; filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 4px #fff); }
@@ -280,3 +281,27 @@ textarea.ep-input { resize: vertical; min-height: 160px; }
   .ep-token, .ep-token.is-long, .ep-toast, .ep-target { transition: none; animation: none; }
   .ep-card-layer.is-in .ep-card, .ep-die.is-rolling { animation: none; }
 }
+
+/* game picker (学生设计桌游) */
+.ep-games { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 8px; }
+.ep-game { position: relative; display: grid; gap: 6px; padding: 8px; border: 2px solid var(--ep-line); border-radius: 14px; background: #fff; cursor: pointer; }
+.ep-game input { position: absolute; opacity: 0; pointer-events: none; }
+.ep-game img { width: 100%; aspect-ratio: 6 / 5; object-fit: cover; border-radius: 9px; background: #f6f2e8; }
+.ep-game span { display: grid; gap: 2px; }
+.ep-game small { color: var(--ep-muted); font-size: 13px; }
+.ep-game:has(input:checked) { border-color: var(--ep-green); box-shadow: 0 0 0 3px rgba(53, 110, 87, 0.18); }
+.ep-game:has(input:focus-visible) { outline: 3px solid var(--ep-green); outline-offset: 2px; }
+
+/* Candy Race fork choice */
+.ep-fork { display: grid; gap: 8px; padding: 10px; border-radius: 14px; background: #fff4dc; }
+.ep-fork-q { margin: 0; font-weight: 800; font-size: 18px; }
+.ep-fork .ep-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* marks drawn over a student's photo board (Candy Race) */
+.ep-link { fill: none; stroke: #c2417a; stroke-width: 12; stroke-dasharray: 28 18; stroke-linecap: round; filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 3px #fff); }
+.ep-fork-ring { fill: rgba(255, 236, 200, 0.35); stroke: #d9661f; stroke-width: 12; stroke-dasharray: 16 10; }
+.ep-mark-text { font-family: KaiTi, STKaiti, "Kaiti SC", serif; font-weight: 700; fill: #20473a; text-anchor: middle; paint-order: stroke; stroke: #fff; stroke-width: 16px; stroke-linejoin: round; }
+.ep-podium-box { stroke: #20473a; stroke-width: 6; }
+.ep-podium-1 { fill: #f5d55a; }
+.ep-podium-2 { fill: #d9d9e0; }
+.ep-podium-3 { fill: #e0a066; }

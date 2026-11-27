@@ -1,11 +1,18 @@
 /*
- * Escape the Path — projector page. Rules live in escape-the-path-core.js;
- * this file handles the setup form, the board, tokens, dice and question cards.
+ * 学生设计桌游 — projector page for the student-designed board games.
+ * Shared card/team/setup code lives in escape-the-path-core.js (Core); each
+ * game's board and rules live in its own core (G): EscapePathCore, CandyRaceCore.
+ * This file handles the setup form, the board, tokens, dice and question cards.
  */
 (function () {
   'use strict';
 
   var Core = window.EscapePathCore;
+  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore };
+  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6' };
+  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race' };
+  var G = Core;          // the game being played
+  var isCandy = false;
   var Words = window.ChenWordlist;
   var zh = document.documentElement.lang.indexOf('zh') === 0;
   function L(en, cn) { return zh ? cn : en; }
@@ -89,6 +96,15 @@
     countCards();
   }
 
+  // Only Escape the Path has the answer-your-way-out-of-jail option; each game has its own rules list.
+  function showGame() {
+    var id = radio('epGame') || 'escape-the-path';
+    $('epJailField').hidden = id !== 'escape-the-path';
+    Array.prototype.forEach.call(document.querySelectorAll('.ep-rules ol[data-game]'), function (ol) {
+      ol.hidden = ol.dataset.game !== id;
+    });
+  }
+
   function buildDeck() {
     if (radio('epSource') === 'words') {
       var items = Words ? Words.parseText($('epWords').value) : [];
@@ -108,7 +124,7 @@
   function readSetup() {
     return Core.normalize({
       source: radio('epSource'), cards: $('epCards').value, words: $('epWords').value,
-      types: types(), teams: radio('epTeams'), names: names(), jail: radio('epJail')
+      types: types(), teams: radio('epTeams'), names: names(), jail: radio('epJail'), game: radio('epGame')
     });
   }
 
@@ -122,6 +138,8 @@
     });
     setRadio('epTeams', d.teams);
     setRadio('epJail', d.jail);
+    setRadio('epGame', d.game);
+    showGame();
     typedNames = d.names.slice();
     var inputs = document.querySelectorAll('#epNames input');
     Array.prototype.forEach.call(inputs, function (el) { el.value = ''; });
@@ -142,24 +160,19 @@
 
   // ---------- board geometry ----------
   function pct(point) {
-    return { left: point[0] / Core.FRAME.w * 100, top: point[1] / Core.FRAME.h * 100 };
+    return { left: point[0] / G.FRAME.w * 100, top: point[1] / G.FRAME.h * 100 };
   }
 
+  // CSS sizes the board to its area (container query units); this only sets the shape.
   function fitBoard() {
-    var area = $('epBoardArea');
-    var board = $('epBoard');
-    var w = area.clientWidth - 16;
-    var h = area.clientHeight - 16;
-    var ratio = Core.FRAME.w / Core.FRAME.h;
-    var width = Math.min(w, h * ratio);
-    board.style.width = Math.max(200, width) + 'px';
+    $('epBoard').style.setProperty('--ratio', G.FRAME.w / G.FRAME.h);
   }
 
   function spotOf(id) {
     var s = shown[id];
-    if (s.at === 'jail') return Core.SPOTS.jail;
-    if (s.at === 'place') return s.n <= 3 ? Core.SPOTS.podium[s.n - 1] : Core.SPOTS.lots[Math.min(2, s.n - 4)];
-    return Core.BOARD[s.i];
+    if (s.at === 'jail') return G.SPOTS.jail;
+    if (s.at === 'place') return s.n <= 3 ? G.SPOTS.podium[s.n - 1] : G.SPOTS.lots[Math.min(2, s.n - 4)];
+    return G.BOARD[s.i];
   }
   function keyOf(id) {
     var s = shown[id];
@@ -173,7 +186,7 @@
       var key = keyOf(team.id);
       (groups[key] = groups[key] || []).push(team.id);
     });
-    var active = Core.current(game).id;
+    var active = G.current(game).id;
     game.teams.forEach(function (team) {
       var key = keyOf(team.id);
       var group = groups[key];
@@ -193,10 +206,10 @@
       el.style.top = p.top + '%';
       el.classList.toggle('is-active', team.id === active && game.phase !== 'over');
     });
-    var current = Core.current(game);
+    var current = G.current(game);
     var target = $('epTarget');
     if (game.phase !== 'over' && shown[current.id].at === 'sq') {
-      var sq = Core.BOARD[shown[current.id].i];
+      var sq = G.BOARD[shown[current.id].i];
       target.setAttribute('cx', sq[0]);
       target.setAttribute('cy', sq[1]);
       target.style.stroke = Core.TEAMS[current.id].color;
@@ -231,7 +244,7 @@
   }
 
   function renderSide() {
-    var team = Core.current(game);
+    var team = G.current(game);
     var over = game.phase === 'over';
     $('epTurnToken').textContent = over ? '🏆' : Core.TEAMS[team.id].emoji;
     $('epTurnBox').style.setProperty('--team', over ? '#20473a' : Core.TEAMS[team.id].color);
@@ -242,9 +255,13 @@
     $('epRoll').hidden = phase !== 'roll' || real;
     $('epManual').hidden = phase !== 'roll' || !real;
     $('epDie').disabled = phase !== 'roll' || real;
-    $('epChallenge').hidden = phase !== 'jail' || !Core.canChallenge(game);
+    $('epChallenge').hidden = phase !== 'jail' || !G.canChallenge(game);
     $('epChallenge').textContent = '🔓 ' + L('Try ' + game.jailQuestions + (game.jailQuestions === 1 ? ' card' : ' cards in a row'), '挑战连答 ' + game.jailQuestions + ' 题');
     $('epWait').hidden = phase !== 'jail';
+    $('epBuy').hidden = !(isCandy && phase === 'roll' && G.canBuy(game));
+    $('epUseRv').hidden = !(isCandy && phase === 'jail' && G.canUseRv(game));
+    if (isCandy) $('epUseRv').textContent = '🚐 ' + L('Drive out in the RV (' + team.rv + ' left)', '开房车出狱（还剩 ' + team.rv + ' 次）');
+    renderFork(phase);
     $('epNext').hidden = phase !== 'next';
 
     var list = $('epTeamList');
@@ -263,13 +280,47 @@
       info.className = 'ep-team-info';
       info.textContent = t.place ? (['🥇', '🥈', '🥉'][t.place - 1] || '#' + t.place)
         : t.jail ? '🔒 ' + L(t.jail + ' left', '还剩 ' + t.jail + ' 轮')
-          : (t.skip ? '⏭ ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格');
+          : isCandy ? '💰 $' + t.money + (t.rv ? ' · 🚐' + t.rv : '')
+            : (t.skip ? '⏭ ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格');
       li.appendChild(face);
       li.appendChild(name);
       li.appendChild(info);
       list.appendChild(li);
     });
     placeTokens();
+  }
+
+  // Candy Race: at a fork the team picks a way. The bridge needs enough money.
+  function renderFork(phase) {
+    var box = $('epFork');
+    box.innerHTML = '';
+    box.hidden = phase !== 'fork';
+    if (box.hidden) return;
+    var team = G.current(game);
+    var p = document.createElement('p');
+    p.className = 'ep-fork-q';
+    p.textContent = L('Which way, ' + team.name + '?', team.name + '想往哪走？');
+    box.appendChild(p);
+    var shortest = Math.min.apply(null, game.options.map(function (o) { return G.DIST[o.to]; }));
+    game.options.forEach(function (o) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ep-btn ep-btn-big';
+      var name = o.gate ? '🌉 ' + L('Bridge', '走桥') : G.DIST[o.to] === shortest ? '↘ ' + L('Short way', '近路') : '↗ ' + L('Long way', '远路');
+      btn.textContent = o.gate && !o.ok ? name + L(' (needs $' + o.gate + ')', '（要 $' + o.gate + '）') : name;
+      btn.disabled = !o.ok;
+      btn.addEventListener('click', function () { if (!busy) play(G.choose(game, o.to)); });
+      btn.addEventListener('mouseenter', function () { pointAt(o.to); });
+      btn.addEventListener('focus', function () { pointAt(o.to); });
+      box.appendChild(btn);
+    });
+  }
+
+  // Move the dashed target ring to a square (previews a fork choice).
+  function pointAt(i) {
+    var sq = G.BOARD[i];
+    $('epTarget').setAttribute('cx', sq[0]);
+    $('epTarget').setAttribute('cy', sq[1]);
   }
 
   function status(text) { $('epStatus').textContent = text; }
@@ -295,6 +346,14 @@
     }
   }
 
+  async function walkPath(id, path) {
+    for (var i = 1; i < path.length; i++) {
+      shown[id] = { at: 'sq', i: path[i] };
+      placeTokens();
+      await sleep(reduceMotion ? 40 : STEP_MS);
+    }
+  }
+
   async function jump(id, spot) {
     tokenEls[id].classList.add('is-long');
     shown[id] = spot;
@@ -313,7 +372,32 @@
       switch (ev.type) {
         case 'walk':
           status(L(team.name + ' rolled ' + ev.roll + '.', team.name + '掷出 ' + ev.roll + ' 点。'));
-          await walk(ev.team, ev.from, ev.to);
+          if (ev.path) await walkPath(ev.team, ev.path);
+          else await walk(ev.team, ev.from, ev.to);
+          break;
+        case 'fork':
+          toast('🔀 ' + L('A fork! Which way?', '岔路！往哪走？'));
+          status(L(team.name + ' reached a fork. ' + ev.steps + ' step' + (ev.steps === 1 ? '' : 's') + ' to go.', team.name + '走到岔路，还要走 ' + ev.steps + ' 步。'));
+          break;
+        case 'chose':
+          break;
+        case 'earn':
+          toast('💰 ' + L('Correct! +$' + ev.amount, '答对了！+$' + ev.amount), 'good');
+          status(L(team.name + ' now has $' + ev.money + '.', team.name + '现在有 $' + ev.money + '。'));
+          break;
+        case 'buy':
+          status(L('Answer a card to buy the RV.', '答对这张卡就能买房车。'));
+          break;
+        case 'rv':
+          toast('🚐 ' + L(team.name + ' bought the RV!', team.name + '买到房车了！'), 'good');
+          status(L('The RV can get you out of jail 3 times. Now roll!', '房车能帮你出狱 3 次。现在掷骰子吧！'));
+          break;
+        case 'nobuy':
+          toast(L('Not this time. Keep the money.', '这次没买成，钱还在。'), 'bad');
+          status(L('Now roll the dice.', '现在掷骰子。'));
+          break;
+        case 'rvout':
+          toast('🚐 ' + L('The RV drives ' + team.name + ' out of jail!', '房车开出监狱！'), 'good');
           break;
         case 'move':
           toast('👣 ' + (ev.steps > 0
@@ -328,6 +412,12 @@
           await jump(ev.team, { at: 'sq', i: ev.to });
           break;
         case 'back':
+          if (isCandy) {
+            toast(L('Not quite: no money, back to where you were.', '答错了，不给钱，回到原来的位置。'), 'bad');
+            await jump(ev.team, { at: 'sq', i: ev.to });
+            status(L(team.name + ' goes back.', team.name + '回到上一次的位置。'));
+            break;
+          }
           toast(L('Not quite: move back one space.', '答错了，退一格。'), 'bad');
           await walk(ev.team, ev.from, ev.to);
           status(L(team.name + ' moves back one space.', team.name + '退一格。'));
@@ -358,6 +448,7 @@
           status(L('A free square. Next team!', '空白格，安全！'));
           break;
         case 'card':
+          if (ev.value) { status(L('Draw a card! Worth $' + ev.value + '.', '抽卡！答对得 $' + ev.value + '。')); break; }
           status(ev.count > 1
             ? L('Draw a card! ' + ev.count + ' cards to go.', '抽卡！还要答 ' + ev.count + ' 张。')
             : L('Draw a card!', '抽卡！'));
@@ -389,13 +480,15 @@
     syncShown();
     busy = false;
     renderSide();
-    if (game.phase === 'card' || game.phase === 'challenge') openCard();
+    if (game.phase === 'card' || game.phase === 'challenge' || game.phase === 'buy') openCard();
     else if (game.phase === 'over') showResults();
     else focusMain();
   }
 
   function focusMain() {
-    var order = ['epRoll', 'epChallenge', 'epNext'];
+    var fork = $('epFork').querySelector('button:not([disabled])');
+    if (!$('epFork').hidden && fork) { fork.focus({ preventScroll: true }); return; }
+    var order = ['epRoll', 'epUseRv', 'epChallenge', 'epNext'];
     for (var i = 0; i < order.length; i++) {
       if (!$(order[i]).hidden) { $(order[i]).focus({ preventScroll: true }); return; }
     }
@@ -415,11 +508,13 @@
 
   function openCard() {
     var card = drawCard();
-    var team = Core.current(game);
+    var team = G.current(game);
     var n = game.total - game.left + 1;
     $('epCardTeam').textContent = teamLabel(team);
     $('epCardTeam').style.setProperty('--team', Core.TEAMS[team.id].color);
-    $('epCardCount').textContent = game.phase === 'challenge'
+    $('epCardCount').textContent = game.phase === 'buy' ? L('Buy the RV', '买房车')
+      : isCandy ? L('Worth $' + game.value, '答对得 $' + game.value)
+      : game.phase === 'challenge'
       ? L('Jail challenge ' + n + ' / ' + game.total, '出狱挑战 ' + n + ' / ' + game.total)
       : game.total > 1 ? L('Extra card ' + n + ' / ' + game.total, '加卡 ' + n + ' / ' + game.total) : L('Card', '抽卡');
     $('epCardLabel').textContent = card.label || '';
@@ -445,7 +540,7 @@
   function judge(correct) {
     if (busy || $('epCard').hidden) return;
     $('epCard').hidden = true;
-    play(Core.judge(game, correct));
+    play(G.judge(game, correct));
   }
 
   // ---------- dice ----------
@@ -514,10 +609,10 @@
     renderSide();
     var final = value || 1 + Math.floor(Math.random() * 6);
     // A real die was rolled in the room: just show the number. Otherwise roll the big die.
-    if (!value) await bigRoll(final, Core.current(game));
+    if (!value) await bigRoll(final, G.current(game));
     showFace(final);
     await sleep(value ? 250 : 80);
-    play(Core.roll(game, final));
+    play(G.roll(game, final));
   }
 
   // ---------- results ----------
@@ -535,7 +630,7 @@
       face.className = 'ep-token-face';
       face.textContent = Core.TEAMS[id].emoji;
       var name = document.createElement('span');
-      name.textContent = team.name;
+      name.textContent = team.name + (isCandy ? '  💰 $' + team.money : '');
       li.appendChild(medal);
       li.appendChild(face);
       li.appendChild(name);
@@ -546,8 +641,58 @@
   }
 
   // ---------- start / stop ----------
+  // Point the stage at the chosen game's board.
+  function setupBoard() {
+    G = GAMES[settings.game] || Core;
+    isCandy = settings.game === 'candy-race';
+    $('epBoardImg').src = IMAGES[settings.game];
+    $('epBoard').style.aspectRatio = G.FRAME.w + ' / ' + G.FRAME.h;
+    document.querySelector('.ep-overlay').setAttribute('viewBox', '0 0 ' + G.FRAME.w + ' ' + G.FRAME.h);
+    $('epConnector').setAttribute('d', G.CONNECTOR || '');
+    $('epConnector').style.display = G.CONNECTOR ? '' : 'none';
+    $('epRulesList').innerHTML = document.querySelector('.ep-rules ol[data-game="' + settings.game + '"]').innerHTML;
+    if (isCandy) $('epBuy').textContent = '🚐 ' + L('Buy the RV ($' + G.RV_PRICE + ')', '买房车（$' + G.RV_PRICE + '）');
+    drawMarks();
+  }
+
+  // Arrows for side paths that jump back to the main path, plus labels and fork rings over the photo.
+  function drawMarks() {
+    var NS = 'http://www.w3.org/2000/svg';
+    var g = $('epMarks');
+    g.innerHTML = '';
+    function el(tag, attrs, text) {
+      var node = document.createElementNS(NS, tag);
+      Object.keys(attrs).forEach(function (k) { node.setAttribute(k, attrs[k]); });
+      if (text) node.textContent = text;
+      g.appendChild(node);
+      return node;
+    }
+    (G.LINKS || []).forEach(function (link) {
+      var a = G.BOARD[link[0]], b = G.BOARD[link[1]];
+      var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+      var dx = b[0] - a[0], dy = b[1] - a[1], len = Math.sqrt(dx * dx + dy * dy) || 1;
+      var bend = Math.min(160, len * 0.25);
+      var cx = mx - dy / len * bend, cy = my + dx / len * bend;
+      // stop short of both squares so the arrow does not cover them
+      var sx = a[0] + (cx - a[0]) * 0.12, sy = a[1] + (cy - a[1]) * 0.12;
+      var ex = b[0] + (cx - b[0]) * 0.12, ey = b[1] + (cy - b[1]) * 0.12;
+      el('path', { d: 'M' + sx + ' ' + sy + ' Q' + cx + ' ' + cy + ' ' + ex + ' ' + ey, class: 'ep-link', 'marker-end': 'url(#epArrow)' });
+    });
+    (G.MARKS || []).forEach(function (m) {
+      if (m.t === 'ring') {
+        var sq = G.BOARD[m.i];
+        el('circle', { cx: sq[0], cy: sq[1], r: 58, class: 'ep-fork-ring' });
+      } else if (m.t === 'box') {
+        el('rect', { x: m.x - 60, y: m.y - 60, width: 120, height: 120, rx: 18, class: 'ep-podium-box ep-podium-' + m.s });
+        el('text', { x: m.x, y: m.y + 22, class: 'ep-mark-text', 'font-size': 64 }, m.s);
+      } else {
+        el('text', { x: m.x, y: m.y, class: 'ep-mark-text', 'font-size': m.size || 36 }, m.s);
+      }
+    });
+  }
+
   function begin() {
-    game = Core.newGame({ teams: settings.teams, names: settings.names, jail: settings.jail, zh: zh });
+    game = G.newGame({ teams: settings.teams, names: settings.names, jail: settings.jail, zh: zh, shared: Core });
     pile = [];
     shown = {};
     syncShown();
@@ -583,6 +728,7 @@
     }
     settings = readSetup();
     saveDraft();
+    setupBoard();
     $('epStage').hidden = false;
     document.body.classList.add('ep-playing');
     fitBoard();
@@ -602,15 +748,11 @@
     if (!$('epResults').hidden) return;
     if (!$('epCard').hidden) { if (!$('epReveal').hidden) reveal(); return; }
     if (game.phase === 'roll' && !$('epRealDie').checked) rollDice();
-    else if (game.phase === 'next') play(Core.next(game));
+    else if (game.phase === 'next') play(G.next(game));
   }
 
   // ---------- wiring ----------
   function init() {
-    if (Core.CONNECTOR) $('epConnector').setAttribute('d', Core.CONNECTOR);
-    else $('epConnector').remove();
-    document.querySelector('.ep-overlay').setAttribute('viewBox', '0 0 ' + Core.FRAME.w + ' ' + Core.FRAME.h);
-    $('epRulesList').innerHTML = document.querySelector('.ep-rules ol').innerHTML;
     renderNames();
     loadDraft();
 
@@ -624,6 +766,7 @@
       handoff.mountBar(handed);
     }
     showSource();
+    showGame();
 
     if (window.ChenZhContent) {
       zhScript = window.ChenZhContent.create({ mount: '#epZhSlot', label: L('Card characters', '卡片用字') })
@@ -636,6 +779,9 @@
     });
     Array.prototype.forEach.call(document.querySelectorAll('input[name="epTeams"]'), function (el) {
       el.addEventListener('change', function () { renderNames(); saveDraft(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="epGame"]'), function (el) {
+      el.addEventListener('change', function () { showGame(); saveDraft(); });
     });
     Array.prototype.forEach.call(document.querySelectorAll('input[name="epJail"], input[name="epType"]'), function (el) {
       el.addEventListener('change', saveDraft);
@@ -655,9 +801,11 @@
       btn.addEventListener('click', function () { rollDice(Number(btn.dataset.roll)); });
     });
     $('epRealDie').addEventListener('change', function () { if (game) renderSide(); });
-    $('epChallenge').addEventListener('click', function () { if (!busy) play(Core.challenge(game)); });
-    $('epWait').addEventListener('click', function () { if (!busy) play(Core.wait(game)); });
-    $('epNext').addEventListener('click', function () { if (!busy) play(Core.next(game)); });
+    $('epChallenge').addEventListener('click', function () { if (!busy) play(G.challenge(game)); });
+    $('epWait').addEventListener('click', function () { if (!busy) play(G.wait(game)); });
+    $('epBuy').addEventListener('click', function () { if (!busy) play(G.buyRv(game)); });
+    $('epUseRv').addEventListener('click', function () { if (!busy) play(G.useRv(game)); });
+    $('epNext').addEventListener('click', function () { if (!busy) play(G.next(game)); });
     $('epReveal').addEventListener('click', reveal);
     $('epCorrect').addEventListener('click', function () { judge(true); });
     $('epWrong').addEventListener('click', function () { judge(false); });
@@ -710,7 +858,7 @@
         if (data.source === 'words' && !/\S/.test(data.words)) {
           throw new Error(L('Type at least one word before saving.', '请先输入至少一个词再保存。'));
         }
-        data.title = 'Escape the Path';
+        data.title = NAMES[data.game] || 'Escape the Path';
         return data;
       },
       restore: function (data) {

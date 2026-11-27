@@ -65,6 +65,8 @@
   var JAIL_TURNS = 2;
   var PODIUM = 3;
   var CARD_TYPES = ['read', 'meaning', 'say', 'sentence'];
+  // Student games in the collection (学生设计桌游). A saved setup remembers which one.
+  var GAMES = ['escape-the-path', 'candy-race'];
   var LIMITS = { title: 120, name: 16, text: 20000, lines: 300, line: 300 };
 
   function clean(value, max) {
@@ -118,6 +120,7 @@
     var names = (Array.isArray(data.names) ? data.names : []).slice(0, MAX_TEAMS).map(function (name) { return clean(name, LIMITS.name); });
     return {
       title: clean(data.title, LIMITS.title),
+      game: GAMES.indexOf(data.game) !== -1 ? data.game : GAMES[0],
       source: data.source === 'words' ? 'words' : 'own',
       cards: clean(data.cards, LIMITS.text),
       words: clean(data.words, LIMITS.text),
@@ -334,7 +337,7 @@
 
   var api = {
     FRAME: FRAME, BOARD: BOARD, FINISH: FINISH, SPOTS: SPOTS, CONNECTOR: CONNECTOR, TEAMS: TEAMS,
-    MIN_TEAMS: MIN_TEAMS, MAX_TEAMS: MAX_TEAMS, JAIL_TURNS: JAIL_TURNS, PODIUM: PODIUM, CARD_TYPES: CARD_TYPES, LIMITS: LIMITS,
+    GAMES: GAMES, MIN_TEAMS: MIN_TEAMS, MAX_TEAMS: MAX_TEAMS, JAIL_TURNS: JAIL_TURNS, PODIUM: PODIUM, CARD_TYPES: CARD_TYPES, LIMITS: LIMITS,
     parseCards: parseCards, wordCards: wordCards, normalize: normalize, template: template,
     newGame: newGame, current: current, roll: roll, wait: wait, challenge: challenge, canChallenge: canChallenge, judge: judge, next: next
   };

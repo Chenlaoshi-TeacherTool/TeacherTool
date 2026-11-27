@@ -171,6 +171,8 @@ test('templates are sanitized, empty ones rejected, and the tool is registered',
   assert.equal(data.jail, 1);
   assert.deepEqual(data.types, ['read']);
   assert.equal(data.names[0].length, core.LIMITS.name);
+  assert.equal(data.game, 'escape-the-path');
+  assert.equal(core.template({ cards: '题|答', game: 'candy-race' }).game, 'candy-race');
   const adapter = registry.get('escape-the-path', 1);
   assert.ok(adapter && adapter.templateOnly);
   assert.ok(community.GAME_TYPES['escape-the-path'].templateEditor);
