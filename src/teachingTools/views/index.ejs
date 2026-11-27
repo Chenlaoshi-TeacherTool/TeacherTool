@@ -141,7 +141,21 @@
         @media (max-width: 1000px) { .home-newest-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         @media (max-width: 520px) { .home-newest-grid { grid-template-columns: 1fr; } }
         @media (prefers-reduced-motion: reduce) { .home-newest-card { transition: none; } .home-newest-card:hover { transform: none; } }
-        .home-chinese { background: var(--leaf-wash); }
+        .home-chinese { background: var(--leaf-wash); padding-block: 12px; }
+        .home-chinese .content-shell { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+        .home-chinese h2 { margin: 0; font-size: 1.1rem; }
+        .home-chinese-links { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+        .home-chinese .btn {
+            display: inline-block;
+            padding: 4px 12px;
+            border-color: #527952 !important;
+            background: linear-gradient(105deg, #174f44, #467b53) !important;
+            box-shadow: 0 4px 7px #2e503829;
+            text-decoration: none;
+        }
+        .home-chinese .btn:hover { background: linear-gradient(105deg, #1c5c4e, #52885e) !important; box-shadow: 0 5px 9px #2e503830; }
+        .home-chinese .btn:focus-visible { outline: 3px solid #bb952e; outline-offset: 3px; }
+        .home-chinese .home-chinese-all { margin-inline-start: auto; }
         .eyebrow.eyebrow--sun { border-color: #f1d58c; background: #fff2c5; color: #8a5b15; }
         .home-finds-heading { font-size: clamp(2rem, 4vw, 3rem); }
         .home-paths-about { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 30px; padding: 17px 22px; border: 1px dashed #cbdac2; border-radius: 16px; color: var(--muted); }
@@ -214,6 +228,18 @@
         </div>
     </section>
 
+    <section class="content-section home-chinese" aria-labelledby="chinese-teaching-title">
+        <div class="content-shell">
+            <h2 id="chinese-teaching-title"><%= lang === 'zh' ? '中文教学专区' : 'Chinese Teaching' %></h2>
+            <div class="home-chinese-links">
+                <a class="btn" href="/chinese-teaching#characters"><%= lang === 'zh' ? '汉字与拼音' : 'Characters & pinyin' %></a>
+                <a class="btn" href="/chinese-teaching#vocabulary"><%= lang === 'zh' ? '词汇与句型' : 'Vocabulary & sentence patterns' %></a>
+                <a class="btn" href="/chinese-teaching#textbooks"><%= lang === 'zh' ? '教材配套' : 'Textbook companion' %></a>
+            </div>
+            <a class="btn home-chinese-all" href="/chinese-teaching"><%= lang === 'zh' ? '全部资源' : 'All Chinese teaching resources' %> →</a>
+        </div>
+    </section>
+
     <section class="home-paths-section" aria-labelledby="home-paths-heading">
         <div class="home-paths-shell">
             <%# Signed-in teachers with favorites see "My favorite tools" here instead (script at the end of the page). %>
@@ -268,14 +294,6 @@
                 <a href="/about"><%= t('home.meetChenLaoshi') %></a>
             </div>
         </div>
-    </section>
-
-    <section class="content-section home-chinese" aria-labelledby="chinese-teaching-title">
-      <div class="content-shell">
-        <h2 id="chinese-teaching-title"><%= lang === 'zh' ? '中文教学专区' : 'Chinese Teaching' %></h2>
-        <p><%= lang === 'zh' ? '为中文课堂准备的识字、书写、词汇、句型和教材配套资源。' : 'Character recognition, writing, vocabulary, sentence patterns, and textbook resources for Chinese classrooms.' %></p>
-        <a class="btn" href="/chinese-teaching"><%= lang === 'zh' ? '按教学任务查找资源' : 'Browse by teaching task' %> →</a>
-      </div>
     </section>
 
     <section class="content-section" aria-labelledby="home-recommendations-heading">
