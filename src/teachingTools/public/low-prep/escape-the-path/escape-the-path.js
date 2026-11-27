@@ -8,12 +8,14 @@
   'use strict';
 
   var Core = window.EscapePathCore;
-  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore };
-  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3' };
-  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom' };
+  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore };
+  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2' };
+  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape' };
   var G = Core;          // the game being played
   var isCandy = false;
   var isClass = false;
+  var isMochi = false;
+  function actionName(card) { return zh ? { again: '再走一次', shield: '盾牌', swap: '和最前面的队换位置', push: '让最前面的队退一格' }[card] : { again: 'Move twice', shield: 'Shield', swap: 'Swap with the leading team', push: 'Push the leading team back' }[card]; }
   var teacherEl = null;
   var shownTeacher = -1;
   var Words = window.ChenWordlist;
@@ -278,7 +280,9 @@
     $('epChallenge').hidden = phase !== 'jail' || !G.canChallenge(game);
     $('epChallenge').textContent = '🔓 ' + L('Try ' + game.jailQuestions + (game.jailQuestions === 1 ? ' card' : ' cards in a row'), '挑战连答 ' + game.jailQuestions + ' 题');
     $('epWait').hidden = phase !== 'jail';
-    $('epBuy').hidden = !(isCandy && phase === 'roll' && G.canBuy(game));
+    $('epBuy').hidden = !((isCandy || isMochi) && phase === 'roll' && G.canBuy(game));
+    if (isMochi && !$('epBuy').hidden) $('epBuy').textContent = '🃏 ' + L('Use action card: ', '用动作卡：') + actionName(G.nextAction(game));
+    if (isMochi) $('epRoll').textContent = '🎴 ' + L('Flip a colour card', '翻颜色卡');
     $('epUseRv').hidden = !((isCandy || isClass) && phase === 'jail' && G.canUseRv(game));
     if (isClass) $('epUseRv').textContent = '🎉 ' + L('Play a Yay card (' + team.yay + ' left)', '用 Yay 卡出狱（还剩 ' + team.yay + ' 张）');
     if (isCandy) $('epUseRv').textContent = '🚐 ' + L('Drive out in the RV (' + team.rv + ' left)', '开房车出狱（还剩 ' + team.rv + ' 次）');
@@ -302,6 +306,7 @@
       info.textContent = t.place ? (['🥇', '🥈', '🥉'][t.place - 1] || '#' + t.place)
         : t.jail ? '🔒 ' + L(t.jail + ' left', '还剩 ' + t.jail + ' 轮')
           : isCandy ? '💰 $' + t.money + (t.rv ? ' · 🚐' + t.rv : '')
+            : isMochi ? (t.rescued ? '🦎' + t.rescued + ' ' : '') + (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.actions.length ? '🃏' + t.actions.length + ' ' : '') + L(G.DIST[t.pos] + ' to exit', '离出口 ' + G.DIST[t.pos] + ' 步')
             : isClass ? (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.yay ? '🎉' + t.yay + ' ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格')
             : (t.skip ? '⏭ ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格');
       li.appendChild(face);
@@ -328,7 +333,7 @@
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'ep-btn ep-btn-big';
-      var name = o.gate ? '🌉 ' + L('Bridge', '走桥') : G.DIST[o.to] === shortest ? '↘ ' + L('Short way', '近路') : '↗ ' + L('Long way', '远路');
+      var name = o.label ? o.label : o.gate ? '🌉 ' + L('Bridge', '走桥') : G.DIST[o.to] === shortest ? '↘ ' + L('Short way', '近路') : '↗ ' + L('Long way', '远路');
       btn.textContent = o.gate && !o.ok ? name + L(' (needs $' + o.gate + ')', '（要 $' + o.gate + '）') : name;
       btn.disabled = !o.ok;
       btn.addEventListener('click', function () { if (!busy) play(G.choose(game, o.to)); });
@@ -398,6 +403,11 @@
           else await walk(ev.team, ev.from, ev.to);
           break;
         case 'fork':
+          if (isMochi) {
+            status(ev.mode === 'colour' ? L('Two squares are just as near. Choose one!', '两个格子一样近，选一个！')
+              : ev.mode === 'extra' ? L('Bonus: take one more step.', '奖励：再走一格，选一个方向。') : L('Step to a neighbouring square.', '走到旁边的一个格子。'));
+            break;
+          }
           toast('🔀 ' + L('A fork! Which way?', '岔路！往哪走？'));
           status(L(team.name + ' reached a fork. ' + ev.steps + ' step' + (ev.steps === 1 ? '' : 's') + ' to go.', team.name + '走到岔路，还要走 ' + ev.steps + ' 步。'));
           break;
@@ -412,6 +422,7 @@
           await sleep(500);
           break;
         case 'shield':
+          if (isMochi) { toast('🛡️ ' + L('The shield blocks the alarm!', '盾牌挡住了警报！'), 'good'); await sleep(500); break; }
           toast('🛡️ ' + L('The shield blocks the teacher!', '盾牌挡住了老师！'), 'good');
           status(L(team.name + ' is safe.', team.name + '安全了。'));
           await sleep(500);
@@ -430,7 +441,43 @@
           toast('💰 ' + L('Correct! +$' + ev.amount, '答对了！+$' + ev.amount), 'good');
           status(L(team.name + ' now has $' + ev.money + '.', team.name + '现在有 $' + ev.money + '。'));
           break;
+        case 'colour':
+          toast({ yellow: '🟡 ' + L('Yellow!', '黄色！'), red: '🔴 ' + L('Red!', '红色！'), blue: '🔵 ' + L('Blue!', '蓝色！'), green: '🟢 ' + L('Green!', '绿色！'),
+            alarm: '🚨 ' + L('Alarm!', '警报！'), step: '👣 ' + L('One step!', '走一步！') }[ev.card], ev.card === 'alarm' ? 'bad' : 'good');
+          await sleep(700);
+          break;
+        case 'stepon':
+          toast('👣 ' + L('Step on!', '走一步！'), 'good');
+          break;
+        case 'bonus':
+          toast('⭐ ' + L('L1 correct: one more step!', 'L1 答对：多走一格！'), 'good');
+          break;
+        case 'gotshield':
+          toast('🛡️ ' + L('L2 correct: a shield!', 'L2 答对：得到盾牌！'), 'good');
+          break;
+        case 'gain':
+          toast('🃏 ' + L('Action card: ', '动作卡：') + actionName(ev.card), 'good');
+          status(L('Use it from next round, after a right answer.', '下一轮起可以用，答对一题才能用。'));
+          break;
+        case 'rescue':
+          toast('🦎 ' + L('You rescued a mochi salamander!', '救出一只麻糬小火蜥！'), 'good');
+          break;
+        case 'action':
+          toast('🃏 ' + actionName(ev.card) + '！', 'good');
+          await sleep(500);
+          break;
+        case 'swap':
+          await jump(ev.team, { at: 'sq', i: ev.to });
+          await jump(ev.other, { at: 'sq', i: ev.otherTo });
+          break;
+        case 'nothing':
+          status(L('Nothing happens.', '没有效果。'));
+          break;
+        case 'again':
+          toast('🔁 ' + L(team.name + ' goes again!', team.name + '再走一次！'), 'good');
+          break;
         case 'buy':
+          if (isMochi) { status(L('Answer a card to use the action card.', '答对这张卡才能用动作卡。')); break; }
           status(L('Answer a card to buy the RV.', '答对这张卡就能买房车。'));
           break;
         case 'rv':
@@ -438,6 +485,7 @@
           status(L('The RV can get you out of jail 3 times. Now roll!', '房车能帮你出狱 3 次。现在掷骰子吧！'));
           break;
         case 'nobuy':
+          if (isMochi) { toast(L('Not this time. Keep the card.', '这次不能用，卡留着。'), 'bad'); break; }
           toast(L('Not this time. Keep the money.', '这次没买成，钱还在。'), 'bad');
           status(L('Now roll the dice.', '现在掷骰子。'));
           break;
@@ -457,6 +505,11 @@
           await jump(ev.team, { at: 'sq', i: ev.to });
           break;
         case 'back':
+          if (isMochi) {
+            toast(L('Back you go.', '退回去。'), 'bad');
+            await walkPath(ev.team, ev.path);
+            break;
+          }
           if (isClass) {
             toast(L('Not quite: back half a table.', '答错了，退半张桌子。'), 'bad');
             await walkPath(ev.team, ev.path);
@@ -498,6 +551,7 @@
           status(L('A free square. Next team!', '空白格，安全！'));
           break;
         case 'card':
+          if (isMochi) { status(ev.alarm ? L('Alarm! Answer the alarm question.', '警报！回答警报题。') : L('Draw a card!', '抽卡！')); break; }
           if (isClass) { status(ev.phrase ? L('Desk: ' + ev.phrase + '. Answer the card!', '桌子：' + ev.phrase + '。回答卡片！') : L('A desk! Draw a card.', '到桌子了，抽卡！')); break; }
           if (ev.value) { status(L('Draw a card! Worth $' + ev.value + '.', '抽卡！答对得 $' + ev.value + '。')); break; }
           status(ev.count > 1
@@ -531,7 +585,7 @@
     syncShown();
     busy = false;
     renderSide();
-    if (game.phase === 'card' || game.phase === 'challenge' || game.phase === 'buy') openCard();
+    if (game.phase === 'card' || game.phase === 'challenge' || game.phase === 'buy' || game.phase === 'alarm') openCard();
     else if (game.phase === 'over') showResults();
     else focusMain();
   }
@@ -565,7 +619,10 @@
     var n = game.total - game.left + 1;
     $('epCardTeam').textContent = teamLabel(team);
     $('epCardTeam').style.setProperty('--team', Core.TEAMS[team.id].color);
-    $('epCardCount').textContent = isClass ? L('Right = flip a special card', '答对翻一张特别卡')
+    $('epCardCount').textContent = isMochi ? (game.phase === 'alarm' ? '🚨 ' + L('Alarm question', '警报题')
+        : game.phase === 'buy' ? '🃏 ' + actionName(G.current(game).actions[game.using].card)
+        : { q1: '问题 L1', q2: '问题 L2', q3: '问题 L3' }[game.qkind] || L('Card', '抽卡'))
+      : isClass ? L('Right = flip a special card', '答对翻一张特别卡')
       : game.phase === 'buy' ? L('Buy the RV', '买房车')
       : isCandy ? L('Worth $' + game.value, '答对得 $' + game.value)
       : game.phase === 'challenge'
@@ -700,6 +757,8 @@
     G = GAMES[settings.game] || Core;
     isCandy = settings.game === 'candy-race';
     isClass = settings.game === 'escape-classroom';
+    isMochi = settings.game === 'mochi';
+    $('epRoll').textContent = '🎲 ' + L('Roll', '掷骰子');
     $('epBoardImg').src = IMAGES[settings.game];
     $('epBoard').style.aspectRatio = G.FRAME.w + ' / ' + G.FRAME.h;
     document.querySelector('.ep-overlay').setAttribute('viewBox', '0 0 ' + G.FRAME.w + ' ' + G.FRAME.h);

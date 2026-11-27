@@ -17,7 +17,7 @@
       <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
       <p class="ep-eyebrow"><%= L('Projector board games · designed by students', '投影桌游 · 学生设计') %></p>
       <h1>🎲 <%= L('Student-Designed Board Games', '学生设计桌游') %></h1>
-      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race and Escape the Classroom.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom。') %></p>
+      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race, Escape the Classroom and Mochi Salamander Escape.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom、Mochi Salamander Escape。') %></p>
     </header>
 
     <div class="ep-layout">
@@ -74,6 +74,9 @@
             <label class="ep-game"><input type="radio" name="epGame" value="escape-classroom">
               <img src="/low-prep/escape-classroom/board.webp?v=3" alt="" loading="lazy">
               <span><b>Escape the Classroom</b><small><%= L('Sneak past the teacher, desk to desk', '绕着桌子跑，别被老师抓到') %></small></span></label>
+            <label class="ep-game"><input type="radio" name="epGame" value="mochi">
+              <img src="/low-prep/mochi/board.webp?v=2" alt="" loading="lazy">
+              <span><b>Mochi Salamander Escape</b><small><%= L('Colour cards, shields, rescue the salamanders', '翻颜色卡、拿盾牌、救小火蜥') %></small></span></label>
           </div>
           <p class="ep-hint"><%= L('The same question cards work in every game.', '同一套题卡，每款游戏都能用。') %></p>
         </fieldset>
@@ -121,6 +124,14 @@
             <li><%= L('In jail you can also try to answer cards in a row to leave at once, unless the next space is 结束: then you have to wait.', '在监狱里也可以挑战连续答题，答对就马上出狱。但如果下一格就是"结束"，不能挑战，只能等。') %></li>
             <li><%= L('往前走 / 往后走 Move ahead or back, 从蛇身上滑下去 slide along the snake, 再来一次 roll again.', '往前走几步、往后走几步、从蛇身上滑下去：照做。再来一次：再掷一次。') %></li>
             <li><%= L('Teams that reach 结束 take 第一名, 第二名 and 第三名. The game ends when three teams are in (or only one team is left).', '到达"结束"的队伍依次拿第一名、第二名、第三名。三个名次出来后游戏结束（或只剩一队还没到）。') %></li>
+          </ol>
+          <ol data-game="mochi" hidden>
+            <li><%= L('Start at 开始 and reach 结束 出口. Roll the die as a colour card: 1 yellow, 2 red, 3 blue, 4 green, 5 alarm, 6 step to any neighbouring square.', '从"开始"出发，走到"结束 出口"。掷骰子当颜色卡：1 黄、2 红、3 蓝、4 绿、5 警报、6 走到旁边任意一格。') %></li>
+            <li><%= L('A colour sends you to the nearest square of that colour (choose if two are as near).', '翻到什么颜色，就走到离你最近的那个颜色的格子；两个一样近就自己选。') %></li>
+            <li><%= L('Plain squares: answer a card. Right stays, wrong goes back. 问题 L1: right = one more step. L2: right = a shield. L3: right = an action card. 抽动作卡: take one. 走一步: step on.', '普通格答一张题卡：答对留下，答错退回去。问题 L1 答对多走一格，L2 答对得盾牌，L3 答对得动作卡。"抽动作卡"直接拿一张，"走一步"再走一格。') %></li>
+            <li><%= L('Alarm: answer the alarm question. Right rescues a mochi salamander 🦎 (it breaks ties). Wrong: back one square, unless a shield blocks it.', '警报：回答警报题。答对救出一只麻糬小火蜥 🦎（名次一样时比谁救得多）；答错退一格，有盾牌可以挡住。') %></li>
+            <li><%= L('Action cards (move twice, shield, swap with the leading team, push the leading team back) work from the next round, after a right answer.', '动作卡（再走一次、盾牌、和最前面的队换位置、让最前面的队退一格）下一轮起才能用，而且要先答对一题。') %></li>
+            <li><%= L('The first three teams out of the exit win.', '最先走到出口的三队获胜。') %></li>
           </ol>
           <ol data-game="escape-classroom" hidden>
             <li><%= L('Start at 开始 and escape through the door at 结束. Roll: 1–2 = half a table, 3–4 = one table, 5–6 = one and a half tables.', '从"开始"出发，从"结束"的门逃出去。掷骰子：1–2 点走半张桌子，3–4 点走一张，5–6 点走一张半。') %></li>
@@ -244,10 +255,11 @@
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/game-template.js?v=4" defer></script>
-  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=7"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=8"></script>
   <script src="/low-prep/candy-race/candy-race-core.js?v=6"></script>
   <script src="/low-prep/escape-classroom/escape-classroom-core.js?v=3"></script>
-  <script src="/low-prep/escape-the-path/escape-the-path.js?v=11" defer></script>
+  <script src="/low-prep/mochi/mochi-core.js?v=2"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path.js?v=13" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
