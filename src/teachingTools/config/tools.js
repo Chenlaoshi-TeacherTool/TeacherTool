@@ -46,6 +46,7 @@ var TOOLS = [
   { href: '/teaching-tools/class-pet-points', added: '2026-08-20', icon: '🐾', titleKey: 'teachingToolsIndex.petTitle', scopeKey: 'teachingToolsIndex.petScope', descKey: 'teachingToolsIndex.petDesc', actionKey: 'teachingToolsIndex.openTool', section: 'manage', uses: ['manage'] },
   { href: '/teaching-tools/name-tent-generator', added: '2026-08-23', icon: '🔺', titleKey: 'teachingToolsIndex.nameTentTitle', scopeKey: 'teachingToolsIndex.nameTentScope', descKey: 'teachingToolsIndex.nameTentDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'manage', uses: ['print', 'manage'] },
   { href: '/teaching-tools/qr-code-generator', added: '2026-04-02', icon: '📌', titleKey: 'teachingToolsIndex.qrTitle', scopeKey: 'teachingToolsIndex.worksAcrossSubjects', descKey: 'teachingToolsIndex.qrDesc', actionKey: 'teachingToolsIndex.openTool', section: 'manage', uses: ['print'] },
+  { href: '/teaching-tools/escape-the-path', added: '2026-11-26', icon: '🎲', titleKey: 'teachingToolsIndex.escapePathTitle', scopeKey: 'teachingToolsIndex.escapePathScope', descKey: 'teachingToolsIndex.escapePathDesc', actionKey: 'teachingToolsIndex.openActivity', section: 'review-games', uses: ['project'] },
   { href: '/teaching-tools/vocab-games', added: '2026-11-23', icon: '🎮', titleKey: 'teachingToolsIndex.vocabGamesTitle', scopeKey: 'teachingToolsIndex.vocabGamesScope', descKey: 'teachingToolsIndex.vocabGamesDesc', actionKey: 'teachingToolsIndex.openTool', section: 'review-games', uses: ['project', 'print'] },
   { href: '/teaching-tools/quiz-city', added: '2026-10-25', titleKey: 'teachingToolsIndex.quizCityTitle', scopeKey: 'teachingToolsIndex.worksAcrossSubjects', descKey: 'teachingToolsIndex.quizCityDesc', actionKey: 'teachingToolsIndex.openTool', section: 'review-games', uses: ['project'] },
   { href: '/teaching-tools/team-race', added: '2026-10-22', icon: '🏁', titleKey: 'teachingToolsIndex.teamRaceTitle', scopeKey: 'teachingToolsIndex.worksAcrossSubjects', descKey: 'teachingToolsIndex.teamRaceDesc', actionKey: 'teachingToolsIndex.openTool', section: 'review-games', uses: ['project'] },
@@ -126,7 +127,7 @@ function chineseGroups() {
 var DIRECTORY = {
   manage: { main: 'home.luckyWheelTitle groupTitle noiseMonitorTitle petTitle nameTentTitle' },
   'classroom-games': {
-    'review-games': 'vocabGamesTitle quizCityTitle teamRaceTitle jeopardyTitle rewardGridTitle poisonGameTitle gachaTitle',
+    'review-games': 'escapePathTitle vocabGamesTitle quizCityTitle teamRaceTitle jeopardyTitle rewardGridTitle poisonGameTitle gachaTitle',
     'warmup-games': 'home.luckyWheelTitle wordMatchTitle pixelArtTitle whatsMissingTitle imageRevealerTitle zoomRevealTitle termRaceTitle hanziWordChoiceTitle missingPartsTitle',
     'paper-games': 'tearPaperBingoTitle'
   },

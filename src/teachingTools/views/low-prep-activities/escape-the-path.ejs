@@ -1,0 +1,202 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>闯关桌游 · Escape the Path - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Escape the Path: a student-designed board game for the classroom projector. Teams roll the dice, draw question cards you write or make from a word list, dodge jail and slide down snakes. 学生设计的投影桌游，老师自定义题卡，全班分队闯关。' }) %>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
+  <link rel="stylesheet" href="/low-prep/escape-the-path/escape-the-path.css?v=2">
+</head>
+<body class="ep-page">
+  <main class="ep-wrap">
+    <header class="ep-header">
+      <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+      <p class="ep-eyebrow"><%= L('Projector board game · designed by a student', '投影桌游 · 学生设计') %></p>
+      <h1>🎲 <%= L('Escape the Path', '闯关桌游 Escape the Path') %></h1>
+      <p><%= L('Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Watch out for jail!', '把棋盘投到屏幕上，全班分队轮流掷骰子。走到"抽卡"就答一张你出的题卡，小心别进监狱！') %></p>
+    </header>
+
+    <div class="ep-layout">
+      <section class="ep-panel" aria-labelledby="epCardsHeading">
+        <div class="ep-panel-head">
+          <div>
+            <p class="ep-kicker"><%= L('Step 1', '第一步') %></p>
+            <h2 id="epCardsHeading"><%= L('Question cards', '题卡') %></h2>
+          </div>
+          <button id="epSaveTemplate" class="ep-btn ep-btn-ghost" type="button" disabled>💾 <%= L('Save', '保存') %></button>
+        </div>
+
+        <div class="ep-options" role="radiogroup" aria-label="<%= L('Where the cards come from', '题卡来源') %>">
+          <label><input type="radio" name="epSource" value="own" checked> <span>✏️ <%= L('Write my own', '自己出题') %></span></label>
+          <label><input type="radio" name="epSource" value="words"> <span>📚 <%= L('Make from a word list', '用词表出题') %></span></label>
+        </div>
+
+        <div id="epOwnBox" class="ep-source">
+          <label for="epCards" class="ep-label"><%= L('One question per line', '每行一道题') %></label>
+          <p class="ep-hint"><%= L('Add the answer after a | if you want one to reveal. Leave the box empty to try the sample cards.', '想显示参考答案，就在 | 后面写上。框里空着就用示例题。') %> <code>请用「旁边」说一句话。| 桌子旁边有一把椅子。</code></p>
+          <textarea id="epCards" class="ep-input" rows="9" spellcheck="false" placeholder="请读出「客厅」。| kè tīng&#10;「书架」是什么意思？| bookshelf&#10;说一说，你的房间里有什么？&#10;一（把／张）椅子？| 一把椅子"></textarea>
+        </div>
+
+        <div id="epWordsBox" class="ep-source" hidden>
+          <label for="epWords" class="ep-label"><%= L('One word per line', '每行一个词') %></label>
+          <p class="ep-hint"><%= L('Pinyin and English are filled in for you. To set them yourself:', '拼音和英文会自动配好。也可以自己写：') %> <code>书架 | shū jià | bookshelf</code></p>
+          <textarea id="epWords" class="ep-input" rows="7" spellcheck="false" placeholder="客厅&#10;书架&#10;旁边&#10;沙发&#10;窗户"></textarea>
+          <fieldset class="ep-field">
+            <legend><%= L('Card types', '题型') %></legend>
+            <div class="ep-checks">
+              <label><input type="checkbox" name="epType" value="read" checked> <%= L('Read it aloud (answer: pinyin)', '读一读（答案：拼音）') %></label>
+              <label><input type="checkbox" name="epType" value="meaning" checked> <%= L('What does it mean? (answer: English)', '是什么意思？（答案：英文）') %></label>
+              <label><input type="checkbox" name="epType" value="say"> <%= L('English → say it in Chinese', '看英文说中文') %></label>
+              <label><input type="checkbox" name="epType" value="sentence"> <%= L('Make a sentence with the word', '用这个词说一句话') %></label>
+            </div>
+          </fieldset>
+        </div>
+        <p id="epCount" class="ep-count" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="ep-panel" aria-labelledby="epTeamsHeading">
+        <p class="ep-kicker"><%= L('Step 2', '第二步') %></p>
+        <h2 id="epTeamsHeading"><%= L('Teams and rules', '分队和规则') %></h2>
+
+        <fieldset class="ep-field">
+          <legend><%= L('Number of teams', '几队') %></legend>
+          <div class="ep-options" id="epTeamCount">
+            <% for (var n = 2; n <= 6; n++) { %>
+            <label><input type="radio" name="epTeams" value="<%= n %>"<%= n === 4 ? ' checked' : '' %>> <span><%= n %></span></label>
+            <% } %>
+          </div>
+        </fieldset>
+        <div id="epNames" class="ep-names"></div>
+
+        <fieldset class="ep-field">
+          <legend><%= L('Leaving jail early', '提前出狱') %></legend>
+          <p class="ep-hint"><%= L('A team in jail can skip the wait by answering this many cards in a row.', '在监狱里的队伍，连续答对几题就能马上出狱。') %></p>
+          <div class="ep-options">
+            <label><input type="radio" name="epJail" value="1"> <span><%= L('1 card', '1 题') %></span></label>
+            <label><input type="radio" name="epJail" value="3"> <span><%= L('3 cards', '3 题') %></span></label>
+            <label><input type="radio" name="epJail" value="5" checked> <span><%= L('5 cards (original)', '5 题（原版）') %></span></label>
+          </div>
+        </fieldset>
+
+        <details class="ep-rules">
+          <summary><%= L('How to play', '玩法') %></summary>
+          <ol>
+            <li><%= L('Roll the dice and move. Do what the square says.', '掷骰子走棋，按格子上写的做。') %></li>
+            <li><%= L('抽卡 Draw a card: answer right and stay; answer wrong and move back one space. 抽四张卡 means four cards in a row.', '抽卡：答对留在原地，答错退一格。抽四张卡要连答四张。') %></li>
+            <li><%= L('去监狱 Go to jail: wait two turns, then come out on the space after that 去监狱 square.', '去监狱：停两轮，出狱后回到那个"去监狱"格的下一格。') %></li>
+            <li><%= L('In jail you can also try to answer cards in a row to leave at once, unless the next space is 结束: then you have to wait.', '在监狱里也可以挑战连续答题，答对就马上出狱。但如果下一格就是"结束"，不能挑战，只能等。') %></li>
+            <li><%= L('往前走 / 往后走 Move ahead or back, 从蛇身上滑下去 slide along the snake, 再来一次 roll again.', '往前走几步、往后走几步、从蛇身上滑下去：照做。再来一次：再掷一次。') %></li>
+            <li><%= L('Teams that reach 结束 take 第一名, 第二名 and 第三名. The game ends when three teams are in (or only one team is left).', '到达"结束"的队伍依次拿第一名、第二名、第三名。三个名次出来后游戏结束（或只剩一队还没到）。') %></li>
+          </ol>
+        </details>
+
+        <div id="epZhSlot" class="zh-script-slot"></div>
+        <p id="epError" class="ep-error" role="alert"></p>
+        <button id="epStart" class="ep-btn ep-btn-big" type="button">▶ <%= L('Start the game', '开始游戏') %></button>
+      </section>
+    </div>
+    <p class="ep-credit"><%= L('Board and original game designed by a student.', '棋盘和原版游戏由学生设计。') %></p>
+  </main>
+
+  <div id="epStage" class="ep-stage" hidden>
+    <div class="ep-stage-board" id="epBoardArea">
+      <div class="ep-board" id="epBoard">
+        <img src="/low-prep/escape-the-path/board.webp?v=2" alt="<%= L('Student-drawn game board', '学生手绘的棋盘') %>" draggable="false">
+        <svg class="ep-overlay" viewBox="0 0 1956 2374" aria-hidden="true">
+          <defs><marker id="epArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#20473a"></path></marker></defs>
+          <path id="epConnector" class="ep-connector" d="" marker-end="url(#epArrow)"></path>
+          <circle id="epTarget" class="ep-target" r="46" cx="-100" cy="-100"></circle>
+        </svg>
+        <div id="epTokens" class="ep-tokens" aria-hidden="true"></div>
+        <div id="epToast" class="ep-toast" aria-hidden="true"></div>
+      </div>
+
+      <div id="epCard" class="ep-card-layer" hidden>
+        <div class="ep-card" role="dialog" aria-modal="false" aria-labelledby="epCardQ">
+          <div class="ep-card-top">
+            <span id="epCardTeam" class="ep-card-team"></span>
+            <span id="epCardCount" class="ep-card-count"></span>
+          </div>
+          <p id="epCardLabel" class="ep-card-label"></p>
+          <p id="epCardQ" class="ep-card-q" tabindex="-1"></p>
+          <button id="epReveal" class="ep-btn ep-btn-ghost" type="button"><%= L('Show answer', '显示答案') %></button>
+          <p id="epCardA" class="ep-card-a" hidden></p>
+          <div class="ep-card-judge">
+            <button id="epCorrect" class="ep-btn ep-btn-yes" type="button">✓ <%= L('Correct', '答对') %></button>
+            <button id="epWrong" class="ep-btn ep-btn-no" type="button">✗ <%= L('Wrong', '答错') %></button>
+          </div>
+        </div>
+      </div>
+
+      <div id="epResults" class="ep-card-layer" hidden>
+        <div class="ep-card ep-results" role="dialog" aria-labelledby="epResultsTitle">
+          <h2 id="epResultsTitle">🏆 <%= L('Results', '比赛结果') %></h2>
+          <ol id="epRanking" class="ep-ranking"></ol>
+          <div class="ep-card-judge">
+            <button id="epAgain" class="ep-btn" type="button">🔁 <%= L('Play again', '再玩一局') %></button>
+            <button id="epCloseResults" class="ep-btn ep-btn-ghost" type="button"><%= L('Look at the board', '看看棋盘') %></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="ep-side">
+      <div class="ep-turn" id="epTurnBox">
+        <span id="epTurnToken" class="ep-token-face"></span>
+        <div>
+          <p class="ep-turn-label"><%= L('Now playing', '现在轮到') %></p>
+          <h2 id="epTurnName" aria-live="polite"></h2>
+        </div>
+      </div>
+
+      <div class="ep-dice-row">
+        <button id="epDie" class="ep-die" type="button" aria-label="<%= L('Roll the dice', '掷骰子') %>" data-face="1"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></button>
+        <p id="epStatus" class="ep-status" role="status"></p>
+      </div>
+
+      <div class="ep-actions">
+        <button id="epRoll" class="ep-btn ep-btn-big" type="button">🎲 <%= L('Roll', '掷骰子') %></button>
+        <div id="epManual" class="ep-manual" hidden>
+          <p><%= L('Rolled a real die? Tap the number:', '用的是真骰子？点点数：') %></p>
+          <div><% for (var f = 1; f <= 6; f++) { %><button type="button" class="ep-btn ep-btn-ghost" data-roll="<%= f %>"><%= f %></button><% } %></div>
+        </div>
+        <button id="epChallenge" class="ep-btn ep-btn-big" type="button" hidden></button>
+        <button id="epWait" class="ep-btn ep-btn-ghost" type="button" hidden>⏳ <%= L('Wait this turn', '这轮等待') %></button>
+        <button id="epNext" class="ep-btn ep-btn-big" type="button" hidden><%= L('Next team ▶', '下一队 ▶') %></button>
+      </div>
+
+      <ol id="epTeamList" class="ep-team-list"></ol>
+
+      <div class="ep-side-tools">
+        <label class="ep-check"><input type="checkbox" id="epRealDie"> <%= L('Real die', '用真骰子') %></label>
+        <button id="epRulesBtn" class="ep-btn ep-btn-ghost ep-btn-small" type="button"><%= L('Rules', '规则') %></button>
+        <button id="epFullscreen" class="ep-btn ep-btn-ghost ep-btn-small" type="button"><%= L('Full screen', '全屏') %></button>
+        <button id="epExit" class="ep-btn ep-btn-ghost ep-btn-small" type="button"><%= L('Settings', '返回设置') %></button>
+      </div>
+      <p class="ep-side-credit"><%= L('Board designed by a student', '棋盘由学生设计') %></p>
+    </aside>
+
+    <dialog id="epRulesDialog" class="ep-rules-dialog">
+      <h2><%= L('How to play', '玩法') %></h2>
+      <ol id="epRulesList"></ol>
+      <form method="dialog"><button class="ep-btn" type="submit"><%= L('Got it', '知道了') %></button></form>
+    </dialog>
+  </div>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script src="/shared/zh-script.js?v=4"></script>
+  <script src="/shared/zh-content.js?v=4"></script>
+  <script src="/shared/wordlist-core.js?v=zh-1"></script>
+  <script src="/shared/wordlist-handoff.js?v=1"></script>
+  <script src="/shared/game-template.js?v=4" defer></script>
+  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=2"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path.js?v=2" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

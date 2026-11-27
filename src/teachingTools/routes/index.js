@@ -294,6 +294,10 @@ router.get('/teaching-tools/stroke-order-worksheet', function(req, res, next) {
   res.render('low-prep-activities/stroke-order-worksheet', { title: '汉字笔顺练习纸 · Stroke Order Worksheet', toolGuide: siteContentStore.get().toolGuides['stroke-order-worksheet'] });
 });
 
+router.get('/teaching-tools/escape-the-path', function(req, res, next) {
+  res.render('low-prep-activities/escape-the-path', { title: '闯关桌游 · Escape the Path', toolGuide: siteContentStore.get().toolGuides['escape-the-path'] });
+});
+
 router.get('/teaching-tools/vocab-games', function(req, res, next) {
   res.render('low-prep-activities/vocab-games', { title: '一套词换着玩 · Vocab Game Switcher', toolGuide: siteContentStore.get().toolGuides['vocab-games'] });
 });
@@ -344,7 +348,7 @@ router.get('/low-prep-activities', function(req, res) {
   'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary',
   'stroke-order-worksheet', 'vocab-puzzle', 'worksheet-generator', 'secret-message',
   'character-unscrambler', 'measure-words', 'vocab-games', 'whats-missing', 'pixel-art',
-  'spin-wheel', 'dice-story', 'sentence-ladder', 'component-cards', 'board-games', 'exit-ticket', 'speaking-cards'
+  'spin-wheel', 'dice-story', 'sentence-ladder', 'component-cards', 'board-games', 'exit-ticket', 'speaking-cards', 'escape-the-path'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -406,7 +410,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary', '/teaching-tools/hanzi-word-choice',
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator', '/teaching-tools/secret-message',
     '/teaching-tools/character-unscrambler', '/teaching-tools/measure-words', '/teaching-tools/vocab-games', '/teaching-tools/whats-missing',
-    '/teaching-tools/pixel-art', '/teaching-tools/spin-wheel', '/teaching-tools/dice-story', '/teaching-tools/sentence-ladder', '/teaching-tools/component-cards', '/teaching-tools/board-games', '/teaching-tools/exit-ticket', '/teaching-tools/speaking-cards', '/teaching-tools/hanzi-batch/index.html'
+    '/teaching-tools/pixel-art', '/teaching-tools/spin-wheel', '/teaching-tools/dice-story', '/teaching-tools/sentence-ladder', '/teaching-tools/component-cards', '/teaching-tools/board-games', '/teaching-tools/exit-ticket', '/teaching-tools/speaking-cards', '/teaching-tools/escape-the-path', '/teaching-tools/hanzi-batch/index.html'
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
   paths = paths.concat(catalog.themes.map(function (theme) { return theme.href; }));

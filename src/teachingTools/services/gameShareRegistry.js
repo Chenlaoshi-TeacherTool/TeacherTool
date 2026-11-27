@@ -24,5 +24,6 @@ register(require('./games/spinWheelGame'));
 register(require('./games/pixelArtGame'));
 register(require('./games/sentenceLadderGame'));
 register(require('./games/boardGamesGame'));
+register(require('./games/escapePathGame'));
 
 module.exports = { register: register, get: get };
