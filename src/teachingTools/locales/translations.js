@@ -98,6 +98,8 @@ module.exports = {
       websiteUrl: "Website URL (http or https)",
       audience: "Suitable ages (optional)",
       deadline: "Registration deadline (optional)",
+      // Shown on contest cards and pages; "deadline" above is the share-form label.
+      deadlineDisplay: "Registration deadline",
       closed: "Registration closed",
       visitContest: "Visit competition website",
       visitWebsite: "Visit website",
@@ -1642,6 +1644,7 @@ module.exports = {
       websiteUrl: "网站链接（http 或 https）",
       audience: "适合年龄（选填）",
       deadline: "报名截止日期（选填）",
+      deadlineDisplay: "报名截止",
       closed: "报名已截止",
       visitContest: "查看比赛官网",
       visitWebsite: "访问网站",

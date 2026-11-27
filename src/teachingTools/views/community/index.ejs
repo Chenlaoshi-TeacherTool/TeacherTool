@@ -29,7 +29,7 @@
     <% } %>
     <a class="btn community-share-cta" href="/community/share"><%= t('community.shareCta') %></a>
     <a class="btn btn-secondary community-share-cta" href="/community/websites/new"><%= lang === 'zh' ? '分享教学网站' : 'Share a website' %></a>
-    <a class="btn btn-secondary community-share-cta" href="/community/websites/mine"><%= lang === 'zh' ? '我的网站投稿' : 'My submissions' %></a>
+    <% if (signedIn) { %><a class="btn btn-secondary community-share-cta" href="/community/websites/mine"><%= lang === 'zh' ? '我的网站投稿' : 'My submissions' %></a><% } %>
   </div></header>
 
   <main class="content-section community-main"><div class="content-shell">
@@ -41,31 +41,51 @@
       <button class="btn" type="submit"><%= t('community.searchButton') %></button>
     </form>
 
+    <%
+      // Names of the active filters, for the collapsed summary on phones.
+      var activeFilters = [];
+      if (result.kind) activeFilters.push(community.kindLabel(result.kind, lang));
+      ['learner', 'grade'].forEach(function (group) { if (result[group]) activeFilters.push(stageLabel(result[group])); });
+      if (result.textbook) activeFilters.push(result.customTextbooks.get(result.textbook) || textbookLabel(result.textbook));
+    %>
+    <%# Open by default (desktop, no JS); the script below collapses it on phones so posts show in the first screen. %>
+    <details class="community-filter-panel" id="communityFilters" open>
+      <summary><%= lang === 'zh' ? '筛选' : 'Filters' %><span><%= lang === 'zh' ? '：' : ': ' %><%= activeFilters.length ? activeFilters.join('、') : (lang === 'zh' ? '全部' : 'All') %></span></summary>
     <div class="community-filters">
       <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterType') %></span>
-        <a class="chip<%= !result.kind ? ' is-on' : '' %>" href="<%- link({ kind: '' }) %>"><%= t('community.all') %></a>
+        <a class="chip<%= !result.kind ? ' is-on' : '' %>" href="<%- link({ kind: '' }) %>"<%- !result.kind ? ' aria-current="true"' : '' %>><%= t('community.all') %></a>
         <% ['game', 'wordlist', 'website', 'contest', 'grant'].forEach(function(kind) { %>
-        <a class="chip community-kind kind-<%= kind %><%= result.kind === kind ? ' is-on' : '' %>" href="<%- link({ kind: kind }) %>" <%- result.kind === kind ? 'aria-current="true"' : '' %>><%= community.kindLabel(kind, lang) %></a>
+        <a class="chip community-kind kind-<%= kind %><%= result.kind === kind ? ' is-on' : '' %>" href="<%- link({ kind: kind }) %>"<%- result.kind === kind ? ' aria-current="true"' : '' %>><%= community.kindLabel(kind, lang) %></a>
         <% }); %>
       </div>
       <% ['learner', 'grade'].forEach(function (group) { %>
       <div class="community-filter-row"><span class="community-filter-label"><%= group === 'learner' ? (lang === 'zh' ? '学习者类型' : 'Learner type') : (lang === 'zh' ? '年级' : 'Grade level') %></span>
-        <a class="chip<%= !result[group] ? ' is-on' : '' %>" href="<%- link({ [group]: '' }) %>"><%= t('community.all') %></a>
+        <a class="chip<%= !result[group] ? ' is-on' : '' %>" href="<%- link({ [group]: '' }) %>"<%- !result[group] ? ' aria-current="true"' : '' %>><%= t('community.all') %></a>
         <% community.STAGES.filter(function (stage) { return stage.group === group; }).forEach(function (stage) { %>
-          <a class="chip<%= result[group] === stage.key ? ' is-on' : '' %>" href="<%- link({ [group]: stage.key }) %>"><%= stageLabel(stage.key) %></a>
+          <a class="chip<%= result[group] === stage.key ? ' is-on' : '' %>" href="<%- link({ [group]: stage.key }) %>"<%- result[group] === stage.key ? ' aria-current="true"' : '' %>><%= stageLabel(stage.key) %></a>
         <% }) %>
       </div>
       <% }) %>
       <div class="community-filter-row"><span class="community-filter-label"><%= t('community.filterTextbook') %></span>
-        <a class="chip<%= !result.textbook ? ' is-on' : '' %>" href="<%- link({ textbook: '' }) %>"><%= t('community.all') %></a>
+        <a class="chip<%= !result.textbook ? ' is-on' : '' %>" href="<%- link({ textbook: '' }) %>"<%- !result.textbook ? ' aria-current="true"' : '' %>><%= t('community.all') %></a>
         <% community.TEXTBOOKS.forEach(function (book) { %>
-          <a class="chip<%= result.textbook === book.key ? ' is-on' : '' %>" href="<%- link({ textbook: book.key }) %>"><%= textbookLabel(book.key) %></a>
+          <a class="chip<%= result.textbook === book.key ? ' is-on' : '' %>" href="<%- link({ textbook: book.key }) %>"<%- result.textbook === book.key ? ' aria-current="true"' : '' %>><%= textbookLabel(book.key) %></a>
         <% }) %>
         <% result.customTextbooks.forEach(function (name, key) { %>
-          <a class="chip<%= result.textbook === key ? ' is-on' : '' %>" href="<%- link({ textbook: key }) %>"><%= name %></a>
+          <a class="chip<%= result.textbook === key ? ' is-on' : '' %>" href="<%- link({ textbook: key }) %>"<%- result.textbook === key ? ' aria-current="true"' : '' %>><%= name %></a>
         <% }) %>
       </div>
     </div>
+    </details>
+    <script>
+      (function () {
+        var panel = document.getElementById('communityFilters');
+        var phone = window.matchMedia('(max-width: 640px)');
+        function fit() { panel.open = !phone.matches; }
+        fit();
+        if (phone.addEventListener) phone.addEventListener('change', fit);
+      })();
+    </script>
 
     <div class="community-list-head">
       <h2><%= myShares ? (lang === 'zh' ? '我的分享' : 'My shares') : filtered ? t('community.results') : t('community.latest') %></h2>
@@ -97,15 +117,15 @@
             <button type="button" class="btn btn-secondary" data-resource-open="resource-<%= item.id %>"><%= lang === 'zh' ? '查看介绍' : 'Read introduction' %> →</button>
           </article>
           <% } else { %>
-          <a href="/community/<%= post.id %>">
-            <span class="community-card-type">
+          <a href="/community/<%= post.id %>" aria-labelledby="post-type-<%= post.id %> post-title-<%= post.id %>"<% if (post.description) { %> aria-describedby="post-desc-<%= post.id %>"<% } %>>
+            <span class="community-card-type" id="post-type-<%= post.id %>">
               <span aria-hidden="true"><%= game ? game.icon : post.kind === 'contest' ? '🏆' : post.kind === 'website' ? '🌐' : post.kind === 'grant' ? '💰' : '📝' %></span>
               <%= community.kindLabel(post.kind, lang) %>
             </span>
-            <h3><%= post.title %></h3>
-            <% if (post.description) { %><p class="community-card-desc"><%= post.description %></p><% } %>
-            <% if (post.kind === 'contest' && post.payload && post.payload.deadline) { %><p class="hint"><%= t('community.deadline') %>: <%= post.payload.deadline %> <% if (post.payload.deadline < new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })) { %><span class="community-tag"><%= t('community.closed') %></span><% } %></p><% } %>
-            <% if (post.kind === 'grant' && post.payload) { %><p class="hint"><% if (post.payload.amount) { %><strong><%= post.payload.amount %></strong> · <% } %><%= t('community.grantDeadlineLabel') %>: <%= post.payload.deadline || t('community.grantRolling') %> <% if (community.isClosed(post)) { %><span class="community-tag"><%= t('community.grantClosed') %></span><% } %></p><% if (post.payload.funder) { %><p class="hint"><%= post.payload.funder %></p><% } %><% } %>
+            <h3 id="post-title-<%= post.id %>"><%= post.title %></h3>
+            <% if (post.description) { %><p class="community-card-desc" id="post-desc-<%= post.id %>"><%= post.description %></p><% } %>
+            <% if (post.kind === 'contest' && post.payload && post.payload.deadline) { %><p class="hint"><%= t('community.deadlineDisplay') %><%= lang === 'zh' ? '：' : ': ' %><%= post.payload.deadline %> <% if (post.payload.deadline < new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })) { %><span class="community-tag"><%= t('community.closed') %></span><% } %></p><% } %>
+            <% if (post.kind === 'grant' && post.payload) { %><p class="hint"><% if (post.payload.amount) { %><strong><%= post.payload.amount %></strong> · <% } %><%= t('community.grantDeadlineLabel') %><%= lang === 'zh' ? '：' : ': ' %><%= post.payload.deadline || t('community.grantRolling') %> <% if (community.isClosed(post)) { %><span class="community-tag"><%= t('community.grantClosed') %></span><% } %></p><% if (post.payload.funder) { %><p class="hint"><%= post.payload.funder %></p><% } %><% } %>
             <p class="community-tags">
               <% post.stages.forEach(function (key) { %><span class="community-tag"><%= stageLabel(key) %></span><% }) %>
               <% if (post.textbook) { %><span class="community-tag is-book"><%= textbookLabel(post.textbook) %></span><% } %>

@@ -15,6 +15,17 @@
 .community-search input { flex: 1; min-width: 0; min-height: 46px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); color: var(--ink); font: inherit; }
 .community-search input:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
 
+/* Filter panel: a <details> that is open on desktop (summary hidden) and collapsed on phones (index.ejs script). */
+.community-filter-panel > summary { display: none; }
+@media (max-width: 640px) {
+  .community-filter-panel > summary { display: flex; align-items: center; gap: 0; min-height: 48px; padding: 0 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); color: var(--chalk); font-weight: 900; cursor: pointer; list-style: none; }
+  .community-filter-panel > summary::-webkit-details-marker { display: none; }
+  .community-filter-panel > summary span { overflow: hidden; color: var(--muted); font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+  .community-filter-panel > summary::after { content: "▾"; margin-left: auto; color: var(--leaf); transition: transform 160ms var(--ease-out); }
+  .community-filter-panel[open] > summary { margin-bottom: 10px; }
+  .community-filter-panel[open] > summary::after { transform: rotate(180deg); }
+  .community-filter-panel > summary:focus-visible { outline: 3px solid var(--sun); outline-offset: 3px; }
+}
 .community-filters { display: grid; gap: 10px; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
 .community-filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .community-filter-label { min-width: 4.5em; color: var(--chalk); font-size: .88rem; font-weight: 900; }
