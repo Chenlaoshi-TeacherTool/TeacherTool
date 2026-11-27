@@ -7,23 +7,12 @@
     <title>教学工具 · Teaching Tools - Chen Laoshi's Teaching Toolkit</title>
     <%- include('../partials/seo', { pageDescription: 'Discover practical classroom tools for teachers across subjects, including random groups, QR worksheets, spinners, question banks, and vocabulary resources. 陈老师教学工具：随机分组、二维码练习单、转盘、题库、课堂游戏和中文词汇工具。' }) %>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        .header h1 {
-            margin-bottom: 10px;
-        }
+        /* Layout the shared site-theme.css does not set for this page. */
+        .header { text-align: center; }
+        .header h1 { margin-bottom: 10px; }
+        .tool-card { padding: 30px; text-align: center; }
+        .btn { padding: 10px 20px; cursor: pointer; }
+        .coming-soon .btn { cursor: not-allowed; }
         .tool-search {
             width: min(650px, calc(100% - 40px));
             margin: 30px auto -14px;
@@ -31,7 +20,7 @@
         .tool-search label {
             display: block;
             margin: 0 0 8px;
-            color: #194f45;
+            color: var(--chalk);
             font-weight: 800;
         }
         .tool-search-input {
@@ -42,7 +31,7 @@
             top: 50%;
             left: 15px;
             transform: translateY(-50%);
-            color: #356e57;
+            color: var(--leaf);
             pointer-events: none;
         }
         .tool-search input {
@@ -53,19 +42,19 @@
         .tool-search-status {
             min-height: 1.6em;
             margin: 7px 0 0;
-            color: #5d7168;
+            color: var(--muted);
             font-size: .9rem;
         }
         .tool-search input { box-sizing: border-box; }
         .tool-empty-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .tool-empty-actions[hidden] { display: none; }
-        .quick-start { box-sizing: border-box; display: flex; align-items: center; gap: 24px; max-width: 1200px; margin: 40px auto 0; padding: 22px 28px; border: 2px solid #cbdac2; border-radius: 16px; background: #fffdf7; }
+        .quick-start { box-sizing: border-box; display: flex; align-items: center; gap: 24px; max-width: 1200px; margin: 40px auto 0; padding: 22px 28px; border: 2px solid #cbdac2; border-radius: 16px; background: var(--paper); }
         .quick-start[hidden] { display: none; }
         .quick-start-text { flex: 1; }
-        .quick-start-kicker { margin: 0; color: #bf7f35; font-size: .8rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-        .quick-start h2 { margin: 2px 0 10px; color: #194f45; }
+        .quick-start-kicker { margin: 0; color: #9f6427; font-size: .8rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+        .quick-start h2 { margin: 2px 0 10px; color: var(--chalk); }
         .quick-start-steps { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 0; list-style: none; color: #34463f; }
-        .quick-start-steps span { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-right: 7px; border-radius: 50%; background: #356e57; color: #fff; font-size: .8rem; font-weight: 800; }
+        .quick-start-steps span { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-right: 7px; border-radius: 50%; background: var(--leaf); color: #fff; font-size: .8rem; font-weight: 800; }
         .quick-start-btn { flex-shrink: 0; padding: 12px 22px; font-weight: 700; }
         @media (max-width: 768px) {
             .quick-start { flex-direction: column; align-items: stretch; margin: 32px 16px 0; padding: 18px; }
@@ -81,24 +70,30 @@
         .tool-section {
             max-width: 1200px;
             margin: 0 auto 46px;
-            scroll-margin-top: 24px;
+            scroll-margin-top: 88px;
         }
         .tool-section[hidden] {
             display: none;
         }
-        .tool-jump { display: flex; flex-wrap: wrap; gap: 8px; max-width: 1200px; margin: 0 auto 30px; }
-        .tool-jump a { padding: 8px 14px; border: 1px solid #cbdac2; border-radius: 22px; background: #fffdf7; color: #194f45; font-weight: 700; text-decoration: none; }
-        .tool-jump a:hover { background: #edf5df; }
+        /* The category chips stay at the top of the screen so the long list is never far from them (sections scroll in 88px below). */
+        .tool-jump { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; max-width: 1200px; margin: 0 auto 30px; padding: 10px 0; background: var(--cream); }
+        @media (max-width: 768px) {
+            .tool-jump { flex-wrap: nowrap; margin-inline: -16px; padding: 10px 16px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--leaf-line); }
+            .tool-jump::-webkit-scrollbar { display: none; }
+            .tool-jump a { flex: none; }
+        }
+        .tool-jump a { padding: 8px 14px; border: 1px solid #cbdac2; border-radius: 22px; background: var(--paper); color: var(--chalk); font-weight: 700; text-decoration: none; }
+        .tool-jump a:hover { background: var(--leaf-wash); }
         .tool-jump a:focus-visible { outline: 3px solid #bf7f35; outline-offset: 3px; }
         .tool-jump a[hidden] { display: none; }
-        .tool-jump span { margin-left: 4px; color: #5d7168; font-weight: 400; }
+        .tool-jump span { margin-left: 4px; color: var(--muted); font-weight: 400; }
         .tool-group + .tool-group { margin-top: 28px; }
-        .tool-group, .tool-anchor { scroll-margin-top: 24px; }
+        .tool-group, .tool-anchor { scroll-margin-top: 88px; }
         .tool-anchor { height: 1px; }
-        .tool-group-heading { margin: 0 0 12px; color: #194f45; }
+        .tool-group-heading { margin: 0 0 12px; color: var(--chalk); }
         .tool-social-links { padding-left: 20px; margin-bottom: 12px; }
-        .tool-social-links a { color: #194f45; }
-        .tool-card .tool-categories { display: none; color: #356e57; font-weight: 700; }
+        .tool-social-links a { color: var(--chalk); }
+        .tool-card .tool-categories { display: none; color: var(--leaf); font-weight: 700; }
         .is-filtering .tool-card .tool-categories { display: block; }
         .tool-section-heading {
             max-width: 760px;
@@ -106,22 +101,11 @@
         }
         .tool-section-heading h2 {
             margin: 0 0 6px;
-            color: #2f3f77;
+            color: var(--chalk);
         }
         .tool-section-heading p {
             margin: 0;
-            color: #5d7168;
-        }
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: 1px solid white;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
+            color: var(--muted);
         }
         .tools-grid {
             display: grid;
@@ -129,66 +113,17 @@
             gap: 20px;
             padding: 0;
         }
-        .tool-card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s;
-        }
         .tool-card:not(.coming-soon):hover {
             transform: translateY(-5px);
-        }
-        .tool-card h3 {
-            color: #667eea;
-            margin-bottom: 15px;
         }
         .tool-limited-free { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #fff3cd; color: #855500; font-size: .75rem; font-weight: 800; vertical-align: middle; }
         .tool-card p {
             margin-bottom: 20px;
         }
         .tool-subject { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #fde8e4; color: #a63f34; font-size: .75rem; font-weight: 800; vertical-align: middle; }
-        .tool-scope { display: inline-block; margin: 0 0 12px !important; padding: 4px 9px; border-radius: 999px; background: #edf5df; color: #356e57; font-size: .75rem; font-weight: 800; }
-        .btn {
-            background-color: #667eea;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn:hover {
-            background-color: #5a67d8;
-        }
+        .tool-scope { display: inline-block; margin: 0 0 12px !important; padding: 4px 9px; border-radius: 999px; background: var(--leaf-wash); color: var(--leaf); font-size: .75rem; font-weight: 800; }
         .coming-soon {
             opacity: 0.6;
-        }
-        .coming-soon .btn {
-            background-color: #a8acb9;
-            cursor: not-allowed;
-        }
-        .qr-generator {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-        .qr-generator input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .qr-output {
-            margin-top: 20px;
-            text-align: center;
         }
         @media (max-width: 768px) {
             .tools-grid {
@@ -204,7 +139,6 @@
     <link rel="stylesheet" href="/shared/tool-favorites.css?v=2">
 </head>
 <body>
-    <a href="/" class="back-btn">← <%= t('teachingToolsIndex.backToHomepage') %></a>
     <section class="header">
         <h1><%= t('teachingToolsIndex.title') %></h1>
         <p><%= t('teachingToolsIndex.intro') %></p>
@@ -297,10 +231,6 @@
     <script src="/javascripts/account-coming-soon.js"></script>
     <script src="/shared/tool-favorites.js?v=2"></script>
     <script>window.ChenFavorites.attachStars(document); window.ChenFavorites.load();</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
-    <script>
-        // Removed QR generator functionality as it's now on a separate page
-    </script>
     <script>
         (function () {
             var search = document.getElementById('toolSearch');
