@@ -6,17 +6,21 @@
   <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: 'Chinese self-introduction reading cards and Guess Who game cards with printable and editable downloads.' }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/stylesheets/theme-detail.css">
 </head>
-<body>
-  <header class="content-hero">
+<body class="theme-detail">
+  <header class="header">
     <div class="content-shell">
-      <a class="text-link" href="<%= parent.href %>">← <%= parent.label %></a>
-      <h1><%= title %></h1>
+      <a class="back-btn" href="<%= parent.href %>">← <%= parent.label %></a>
+      <h1><span aria-hidden="true">👋</span> <%= title %></h1>
       <%- include('../partials/theme-favorite', { themeKey: 'self-introduction' }) %>
       <p><%= lang === 'zh' ? '通过阅读、人物配对和猜人游戏练习个人介绍。可直接打印 PDF，或下载可编辑版本。' : 'Practice self-introductions through reading, character matching, and Guess Who. Print the PDF or download an editable version.' %></p>
     </div>
   </header>
-  <%- include('../materials/theme-section') %>
+  <%- include('../materials/theme-section', { previewImages: {
+    'self-intro-guess-who': '/printables/self-introduction/guess-who-game-cards-preview.webp',
+    'self-intro-who-am-i': '/printables/self-introduction/who-am-i-reading-cards-preview.webp'
+  } }) %>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
 </html>

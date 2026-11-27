@@ -6,12 +6,13 @@
   <title><%= title %> · Chen Laoshi's Teaching Toolkit</title>
   <%- include('../partials/seo', { pageDescription: page.intro }) %>
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <% if (page.themeKey) { %><link rel="stylesheet" href="/stylesheets/theme-detail.css"><% } %>
 </head>
-<body>
-  <header class="content-hero">
+<body<% if (page.themeKey) { %> class="theme-detail"<% } %>>
+  <header class="<%= page.themeKey ? 'header' : 'content-hero' %>">
     <div class="content-shell">
-      <% if (page.parent) { %><a class="text-link" href="<%= page.parent.href %>">← <%= page.parent.label %></a><% } %>
-      <h1><%= page.heading %></h1>
+      <% if (page.parent) { %><a class="<%= page.themeKey ? 'back-btn' : 'text-link' %>" href="<%= page.parent.href %>">← <%= page.parent.label %></a><% } %>
+      <h1><% if (page.themeIcon) { %><span aria-hidden="true"><%= page.themeIcon %></span> <% } %><%= page.heading %></h1>
       <% if (page.themeKey) { %><%- include('../partials/theme-favorite', { themeKey: page.themeKey }) %><% } %>
       <p><%= page.intro %></p>
     </div>
@@ -19,11 +20,11 @@
   <main class="content-section">
     <div class="content-shell resource-grid">
       <% page.cards.forEach(function(card) { %>
-      <section class="resource-card<%= card.comingSoon ? ' is-coming-soon' : '' %>"<%- card.comingSoon ? ' aria-disabled="true"' : '' %>>
+      <section class="resource-card<%= page.themeKey ? ' tool-card' : '' %><%= card.comingSoon ? ' is-coming-soon' : '' %>"<%- card.comingSoon ? ' aria-disabled="true"' : '' %>>
         <% if (card.comingSoon) { %><p class="resource-card__soon"><%= card.comingSoon %></p><% } %>
         <h2><%= card.heading %></h2>
         <p><%= card.description %></p>
-        <% if (card.href && !card.comingSoon) { %><a class="resource-card__link" href="<%= card.href %>"><%= card.label %> →</a><% } %>
+        <% if (card.href && !card.comingSoon) { %><a class="<%= page.themeKey ? 'btn' : 'resource-card__link' %>" href="<%= card.href %>"><%= card.label %> →</a><% } %>
       </section>
       <% }) %>
     </div>
