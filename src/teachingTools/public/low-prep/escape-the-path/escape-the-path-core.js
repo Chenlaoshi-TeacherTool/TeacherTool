@@ -66,7 +66,7 @@
   var PODIUM = 3;
   var CARD_TYPES = ['read', 'meaning', 'say', 'sentence'];
   // Student games in the collection (学生设计桌游). A saved setup remembers which one.
-  var GAMES = ['escape-the-path', 'candy-race'];
+  var GAMES = ['escape-the-path', 'candy-race', 'escape-classroom'];
   var LIMITS = { title: 120, name: 16, text: 20000, lines: 300, line: 300 };
 
   function clean(value, max) {
@@ -121,6 +121,9 @@
     return {
       title: clean(data.title, LIMITS.title),
       game: GAMES.indexOf(data.game) !== -1 ? data.game : GAMES[0],
+      // Escape the Classroom: desks ask about their own phrase, or draw the teacher's cards
+      desk: data.desk === 'cards' ? 'cards' : 'phrase',
+      deskWords: clean(data.deskWords, LIMITS.text),
       source: data.source === 'words' ? 'words' : 'own',
       cards: clean(data.cards, LIMITS.text),
       words: clean(data.words, LIMITS.text),

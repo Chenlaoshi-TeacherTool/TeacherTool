@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
-  <link rel="stylesheet" href="/low-prep/escape-the-path/escape-the-path.css?v=9">
+  <link rel="stylesheet" href="/low-prep/escape-the-path/escape-the-path.css?v=11">
 </head>
 <body class="ep-page">
   <main class="ep-wrap">
@@ -17,7 +17,7 @@
       <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
       <p class="ep-eyebrow"><%= L('Projector board games · designed by students', '投影桌游 · 学生设计') %></p>
       <h1>🎲 <%= L('Student-Designed Board Games', '学生设计桌游') %></h1>
-      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path and Candy Race.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race。') %></p>
+      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race and Escape the Classroom.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom。') %></p>
     </header>
 
     <div class="ep-layout">
@@ -71,6 +71,9 @@
             <label class="ep-game"><input type="radio" name="epGame" value="candy-race">
               <img src="/low-prep/candy-race/board.webp?v=6" alt="" loading="lazy">
               <span><b>Candy Race</b><small><%= L('Earn money, choose forks, buy an RV', '赚钱、选岔路、买房车') %></small></span></label>
+            <label class="ep-game"><input type="radio" name="epGame" value="escape-classroom">
+              <img src="/low-prep/escape-classroom/board.webp?v=3" alt="" loading="lazy">
+              <span><b>Escape the Classroom</b><small><%= L('Sneak past the teacher, desk to desk', '绕着桌子跑，别被老师抓到') %></small></span></label>
           </div>
           <p class="ep-hint"><%= L('The same question cards work in every game.', '同一套题卡，每款游戏都能用。') %></p>
         </fieldset>
@@ -84,6 +87,20 @@
           </div>
         </fieldset>
         <div id="epNames" class="ep-names"></div>
+
+        <fieldset class="ep-field" id="epDeskField" hidden>
+          <legend><%= L('Desk cards', '停在桌子上') %></legend>
+          <div class="ep-options">
+            <label><input type="radio" name="epDesk" value="phrase" checked> <span><%= L('Ask about the desk phrase', '用桌子上的话出情景题') %></span></label>
+            <label><input type="radio" name="epDesk" value="cards"> <span><%= L('Use my question cards', '用我的题卡') %></span></label>
+          </div>
+          <label for="epDeskWords" class="ep-label"><%= L('Words on the desks (optional)', '桌上的字（可以不填）') %></label>
+          <p class="ep-hint"><%= L('One word or phrase per line, written on the desks in order and repeated if there are fewer words than desks (21). Leave it empty to use the student\'s own words.', '每行一个词或短语，按顺序写到桌子上；词不够 21 个会重复使用。空着就用学生原来写的字。') %></p>
+          <textarea id="epDeskWords" class="ep-input" rows="4" spellcheck="false" placeholder="你好&#10;谢谢&#10;对不起&#10;没关系&#10;再见"></textarea>
+          <button id="epDeskFromWords" class="ep-btn ep-btn-ghost ep-btn-small" type="button"><%= L('Use my step-1 word list', '用第一步的词表') %></button>
+          <p id="epDeskWordsHint" class="ep-hint" role="status"></p>
+          <p class="ep-hint"><%= L('Polite phrases (你好, 对不起…) get a situation question; other words get "read it and make a sentence". Desks without a word use your cards.', '礼貌用语（你好、对不起……）会出情景题；其他词是"读一读，用它说一句话"。没写字的桌子用你的题卡。') %></p>
+        </fieldset>
 
         <fieldset class="ep-field" id="epJailField">
           <legend><%= L('Leaving jail early', '提前出狱') %></legend>
@@ -104,6 +121,13 @@
             <li><%= L('In jail you can also try to answer cards in a row to leave at once, unless the next space is 结束: then you have to wait.', '在监狱里也可以挑战连续答题，答对就马上出狱。但如果下一格就是"结束"，不能挑战，只能等。') %></li>
             <li><%= L('往前走 / 往后走 Move ahead or back, 从蛇身上滑下去 slide along the snake, 再来一次 roll again.', '往前走几步、往后走几步、从蛇身上滑下去：照做。再来一次：再掷一次。') %></li>
             <li><%= L('Teams that reach 结束 take 第一名, 第二名 and 第三名. The game ends when three teams are in (or only one team is left).', '到达"结束"的队伍依次拿第一名、第二名、第三名。三个名次出来后游戏结束（或只剩一队还没到）。') %></li>
+          </ol>
+          <ol data-game="escape-classroom" hidden>
+            <li><%= L('Start at 开始 and escape through the door at 结束. Roll: 1–2 = half a table, 3–4 = one table, 5–6 = one and a half tables.', '从"开始"出发，从"结束"的门逃出去。掷骰子：1–2 点走半张桌子，3–4 点走一张，5–6 点走一张半。') %></li>
+            <li><%= L('On a desk, answer a card. Right: flip a special card. Wrong: back half a table.', '停在桌子上要回答一张卡。答对翻一张特别卡；答错退半张桌子。') %></li>
+            <li><%= L('Special cards: 🛡️ shield blocks the teacher once, 🚀 bullet goes one and a half tables, 💥 Dang it sends you to prison, 🎉 Yay gets you out of prison (keep it).', '特别卡：🛡️ 盾牌挡老师一次；🚀 子弹再走一张半桌子；💥 Dang it 去监狱；🎉 Yay 出狱（可以留着用）。') %></li>
+            <li><%= L('After every round the teacher walks two steps toward the leading team. Caught in the aisle: prison for two turns. Desks are safe.', '每轮结束，老师朝最前面的队走两步。在过道被抓到就进监狱停两轮。站在桌子上很安全。') %></li>
+            <li><%= L('The first three teams out of the door win.', '最先从门逃出去的三队获胜。') %></li>
           </ol>
           <ol data-game="candy-race" hidden>
             <li><%= L('Start at 开始 and roll the dice. At a 岔路 fork, the team chooses which way to go.', '从"开始"出发，掷骰子走。走到"岔路"，由这一队自己选往哪走。') %></li>
@@ -220,9 +244,10 @@
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/game-template.js?v=4" defer></script>
-  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=5"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=7"></script>
   <script src="/low-prep/candy-race/candy-race-core.js?v=6"></script>
-  <script src="/low-prep/escape-the-path/escape-the-path.js?v=8" defer></script>
+  <script src="/low-prep/escape-classroom/escape-classroom-core.js?v=3"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path.js?v=11" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

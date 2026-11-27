@@ -8,11 +8,14 @@
   'use strict';
 
   var Core = window.EscapePathCore;
-  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore };
-  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6' };
-  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race' };
+  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore };
+  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3' };
+  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom' };
   var G = Core;          // the game being played
   var isCandy = false;
+  var isClass = false;
+  var teacherEl = null;
+  var shownTeacher = -1;
   var Words = window.ChenWordlist;
   var zh = document.documentElement.lang.indexOf('zh') === 0;
   function L(en, cn) { return zh ? cn : en; }
@@ -100,6 +103,7 @@
   function showGame() {
     var id = radio('epGame') || 'escape-the-path';
     $('epJailField').hidden = id !== 'escape-the-path';
+    $('epDeskField').hidden = id !== 'escape-classroom';
     Array.prototype.forEach.call(document.querySelectorAll('.ep-rules ol[data-game]'), function (ol) {
       ol.hidden = ol.dataset.game !== id;
     });
@@ -124,7 +128,7 @@
   function readSetup() {
     return Core.normalize({
       source: radio('epSource'), cards: $('epCards').value, words: $('epWords').value,
-      types: types(), teams: radio('epTeams'), names: names(), jail: radio('epJail'), game: radio('epGame')
+      types: types(), teams: radio('epTeams'), names: names(), jail: radio('epJail'), game: radio('epGame'), desk: radio('epDesk'), deskWords: $('epDeskWords').value
     });
   }
 
@@ -139,6 +143,8 @@
     setRadio('epTeams', d.teams);
     setRadio('epJail', d.jail);
     setRadio('epGame', d.game);
+    setRadio('epDesk', d.desk);
+    $('epDeskWords').value = d.deskWords;
     showGame();
     typedNames = d.names.slice();
     var inputs = document.querySelectorAll('#epNames input');
@@ -206,6 +212,11 @@
       el.style.top = p.top + '%';
       el.classList.toggle('is-active', team.id === active && game.phase !== 'over');
     });
+    if (teacherEl) {
+      var tp = pct(G.BOARD[shownTeacher]);
+      teacherEl.style.left = tp.left + '%';
+      teacherEl.style.top = tp.top + '%';
+    }
     var current = G.current(game);
     var target = $('epTarget');
     if (game.phase !== 'over' && shown[current.id].at === 'sq') {
@@ -236,6 +247,15 @@
       box.appendChild(el);
       return el;
     });
+    teacherEl = null;
+    if (game.teacher != null) {
+      teacherEl = document.createElement('span');
+      teacherEl.className = 'ep-token ep-teacher';
+      teacherEl.textContent = '👩‍🏫';
+      teacherEl.title = L('Teacher', '老师');
+      box.appendChild(teacherEl);
+      shownTeacher = game.teacher;
+    }
   }
 
   // ---------- side panel ----------
@@ -259,7 +279,8 @@
     $('epChallenge').textContent = '🔓 ' + L('Try ' + game.jailQuestions + (game.jailQuestions === 1 ? ' card' : ' cards in a row'), '挑战连答 ' + game.jailQuestions + ' 题');
     $('epWait').hidden = phase !== 'jail';
     $('epBuy').hidden = !(isCandy && phase === 'roll' && G.canBuy(game));
-    $('epUseRv').hidden = !(isCandy && phase === 'jail' && G.canUseRv(game));
+    $('epUseRv').hidden = !((isCandy || isClass) && phase === 'jail' && G.canUseRv(game));
+    if (isClass) $('epUseRv').textContent = '🎉 ' + L('Play a Yay card (' + team.yay + ' left)', '用 Yay 卡出狱（还剩 ' + team.yay + ' 张）');
     if (isCandy) $('epUseRv').textContent = '🚐 ' + L('Drive out in the RV (' + team.rv + ' left)', '开房车出狱（还剩 ' + team.rv + ' 次）');
     renderFork(phase);
     $('epNext').hidden = phase !== 'next';
@@ -281,6 +302,7 @@
       info.textContent = t.place ? (['🥇', '🥈', '🥉'][t.place - 1] || '#' + t.place)
         : t.jail ? '🔒 ' + L(t.jail + ' left', '还剩 ' + t.jail + ' 轮')
           : isCandy ? '💰 $' + t.money + (t.rv ? ' · 🚐' + t.rv : '')
+            : isClass ? (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.yay ? '🎉' + t.yay + ' ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格')
             : (t.skip ? '⏭ ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格');
       li.appendChild(face);
       li.appendChild(name);
@@ -381,6 +403,29 @@
           break;
         case 'chose':
           break;
+        case 'teacher':
+          toast('👩‍🏫 ' + L('The teacher is coming!', '老师来了！'), 'bad');
+          for (var tp2 = 1; tp2 < ev.path.length; tp2++) { shownTeacher = ev.path[tp2]; placeTokens(); await sleep(reduceMotion ? 60 : 380); }
+          break;
+        case 'caught':
+          toast('😱 ' + L('Caught by the teacher!', '被老师抓到了！'), 'bad');
+          await sleep(500);
+          break;
+        case 'shield':
+          toast('🛡️ ' + L('The shield blocks the teacher!', '盾牌挡住了老师！'), 'good');
+          status(L(team.name + ' is safe.', team.name + '安全了。'));
+          await sleep(500);
+          break;
+        case 'special':
+          toast({ shield: '🛡️ ' + L('Shield card! It blocks the teacher once.', '盾牌卡！能挡老师一次。'),
+            bullet: '🚀 ' + L('Bullet card! Go one and a half tables.', '子弹卡！再走一张半桌子。'),
+            dang: '💥 ' + L('Dang it! Off to prison.', 'Dang it！去监狱。'),
+            yay: '🎉 ' + L('Yay card! Keep it to get out of prison.', 'Yay 卡！留着，进监狱时可以马上出来。') }[ev.card], ev.card === 'dang' ? 'bad' : 'good');
+          await sleep(900);
+          break;
+        case 'yay':
+          toast('🎉 ' + L('Yay! You got freed!', 'Yay！你自由了！'), 'good');
+          break;
         case 'earn':
           toast('💰 ' + L('Correct! +$' + ev.amount, '答对了！+$' + ev.amount), 'good');
           status(L(team.name + ' now has $' + ev.money + '.', team.name + '现在有 $' + ev.money + '。'));
@@ -412,6 +457,11 @@
           await jump(ev.team, { at: 'sq', i: ev.to });
           break;
         case 'back':
+          if (isClass) {
+            toast(L('Not quite: back half a table.', '答错了，退半张桌子。'), 'bad');
+            await walkPath(ev.team, ev.path);
+            break;
+          }
           if (isCandy) {
             toast(L('Not quite: no money, back to where you were.', '答错了，不给钱，回到原来的位置。'), 'bad');
             await jump(ev.team, { at: 'sq', i: ev.to });
@@ -427,7 +477,7 @@
           status(L('Correct! ' + team.name + ' stays.', '答对！' + team.name + '留在原地。'));
           break;
         case 'jail':
-          toast('🚔 ' + L('Go to jail! Wait two turns.', '去监狱！停两轮。'), 'bad');
+          if (!isClass || ev.why !== 'teacher') toast('🚔 ' + L('Go to jail! Wait two turns.', '去监狱！停两轮。'), 'bad');
           await sleep(600);
           await jump(ev.team, { at: 'jail' });
           status(L(team.name + ' is in jail for two turns.', team.name + '进监狱，停两轮。'));
@@ -448,6 +498,7 @@
           status(L('A free square. Next team!', '空白格，安全！'));
           break;
         case 'card':
+          if (isClass) { status(ev.phrase ? L('Desk: ' + ev.phrase + '. Answer the card!', '桌子：' + ev.phrase + '。回答卡片！') : L('A desk! Draw a card.', '到桌子了，抽卡！')); break; }
           if (ev.value) { status(L('Draw a card! Worth $' + ev.value + '.', '抽卡！答对得 $' + ev.value + '。')); break; }
           status(ev.count > 1
             ? L('Draw a card! ' + ev.count + ' cards to go.', '抽卡！还要答 ' + ev.count + ' 张。')
@@ -507,18 +558,21 @@
   }
 
   function openCard() {
-    var card = drawCard();
+    var card = null;
+    if (isClass && settings.desk === 'phrase') card = G.situation(G.phrase(G.current(game).pos, game), zh);
+    card = card || drawCard();
     var team = G.current(game);
     var n = game.total - game.left + 1;
     $('epCardTeam').textContent = teamLabel(team);
     $('epCardTeam').style.setProperty('--team', Core.TEAMS[team.id].color);
-    $('epCardCount').textContent = game.phase === 'buy' ? L('Buy the RV', '买房车')
+    $('epCardCount').textContent = isClass ? L('Right = flip a special card', '答对翻一张特别卡')
+      : game.phase === 'buy' ? L('Buy the RV', '买房车')
       : isCandy ? L('Worth $' + game.value, '答对得 $' + game.value)
       : game.phase === 'challenge'
       ? L('Jail challenge ' + n + ' / ' + game.total, '出狱挑战 ' + n + ' / ' + game.total)
       : game.total > 1 ? L('Extra card ' + n + ' / ' + game.total, '加卡 ' + n + ' / ' + game.total) : L('Card', '抽卡');
-    $('epCardLabel').textContent = card.label || '';
-    $('epCardLabel').hidden = !card.label;
+    $('epCardLabel').textContent = (card.label || '') + (card.hint ? (card.label ? ' · ' : '') + card.hint : '');
+    $('epCardLabel').hidden = !card.label && !card.hint;
     $('epCardQ').textContent = card.q;
     $('epCardQ').classList.toggle('is-big', !!card.big || card.q.length <= 6);
     $('epCardA').textContent = card.a;
@@ -645,6 +699,7 @@
   function setupBoard() {
     G = GAMES[settings.game] || Core;
     isCandy = settings.game === 'candy-race';
+    isClass = settings.game === 'escape-classroom';
     $('epBoardImg').src = IMAGES[settings.game];
     $('epBoard').style.aspectRatio = G.FRAME.w + ' / ' + G.FRAME.h;
     document.querySelector('.ep-overlay').setAttribute('viewBox', '0 0 ' + G.FRAME.w + ' ' + G.FRAME.h);
@@ -678,6 +733,18 @@
       var ex = b[0] + (cx - b[0]) * 0.12, ey = b[1] + (cy - b[1]) * 0.12;
       el('path', { d: 'M' + sx + ' ' + sy + ' Q' + cx + ' ' + cy + ' ' + ex + ' ' + ey, class: 'ep-link', 'marker-end': 'url(#epArrow)' });
     });
+    if (isClass && game) {
+      G.DESK_SQUARES.forEach(function (sq, n) {
+        var word = G.phrase(sq, game) || '?';
+        var chars = Array.from(word).slice(0, 6);
+        var w = G.DESKS[n][0], h = G.DESKS[n][1];
+        var size = Math.min(w * 0.5, h * 0.82 / chars.length);
+        var x = G.BOARD[sq][0], y = G.BOARD[sq][1];
+        chars.forEach(function (ch, k) {
+          el('text', { x: x, y: y + (k - (chars.length - 1) / 2) * size * 1.08 + size * 0.36, class: 'ep-desk-text' + (word === '?' ? ' is-blank' : ''), 'font-size': size }, ch);
+        });
+      });
+    }
     (G.MARKS || []).forEach(function (m) {
       if (m.t === 'ring') {
         var sq = G.BOARD[m.i];
@@ -692,7 +759,9 @@
   }
 
   function begin() {
-    game = G.newGame({ teams: settings.teams, names: settings.names, jail: settings.jail, zh: zh, shared: Core });
+    var deskWords = isClass && G.parseWords ? G.parseWords(settings.deskWords) : [];
+    game = G.newGame({ teams: settings.teams, names: settings.names, jail: settings.jail, zh: zh, shared: Core, words: deskWords });
+    drawMarks();
     pile = [];
     shown = {};
     syncShown();
@@ -771,7 +840,8 @@
     if (window.ChenZhContent) {
       zhScript = window.ChenZhContent.create({ mount: '#epZhSlot', label: L('Card characters', '卡片用字') })
         .region($('epCard'), { convert: true })
-        .region($('epToast'), { convert: true });
+        .region($('epToast'), { convert: true })
+        .region($('epMarks'), { convert: true });   // desk words on the board
     }
 
     Array.prototype.forEach.call(document.querySelectorAll('input[name="epSource"]'), function (el) {
@@ -779,6 +849,17 @@
     });
     Array.prototype.forEach.call(document.querySelectorAll('input[name="epTeams"]'), function (el) {
       el.addEventListener('change', function () { renderNames(); saveDraft(); });
+    });
+    $('epDeskFromWords').addEventListener('click', function () {
+      var items = Words ? Words.parseText($('epWords').value) : [];
+      if (!items.length) { $('epDeskWordsHint').textContent = L('Type some words in step 1 first.', '请先在第一步输入词表。'); return; }
+      $('epDeskWords').value = items.map(function (item) { return item.zh; }).join('\n');
+      $('epDeskWordsHint').textContent = '';
+      saveDraft();
+    });
+    $('epDeskWords').addEventListener('input', function () { clearTimeout(typing); typing = setTimeout(saveDraft, 300); });
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="epDesk"]'), function (el) {
+      el.addEventListener('change', saveDraft);
     });
     Array.prototype.forEach.call(document.querySelectorAll('input[name="epGame"]'), function (el) {
       el.addEventListener('change', function () { showGame(); saveDraft(); });
