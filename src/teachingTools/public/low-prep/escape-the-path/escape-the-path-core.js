@@ -66,7 +66,7 @@
   var PODIUM = 3;
   var CARD_TYPES = ['read', 'meaning', 'say', 'sentence'];
   // Student games in the collection (学生设计桌游). A saved setup remembers which one.
-  var GAMES = ['escape-the-path', 'candy-race', 'escape-classroom', 'mochi', 'space', 'money', 'mpy', 'maze'];
+  var GAMES = ['escape-the-path', 'candy-race', 'escape-classroom', 'mochi', 'space', 'money', 'mpy', 'maze', 'sweets'];
   var LIMITS = { title: 120, name: 16, text: 20000, lines: 300, line: 300 };
 
   function clean(value, max) {
