@@ -200,7 +200,7 @@
                 <% group.tools.forEach(function(tool) {
                     var links = tool.titleKey === 'teachingToolsIndex.socialMediaHubTitle' ? socialTools : [];
                     var searchKeys = [tool.titleKey, tool.scopeKey, tool.descKey].concat(links.map(function(link) { return link.titleKey; }));
-                    var searchText = searchKeys.map(function(key) { return t(key) + ' ' + tOther(key); }).join(' ');
+                    var searchText = buildSearchText(searchKeys.map(function(key) { return t(key) + ' ' + tOther(key); }), tool.keywords);
                     var categories = categoryNames.get(tool);
                 %>
                 <div data-tool="<%= tool.titleKey %>" data-search="<%= searchText %>"<% if (tool.href) { %> data-fav-ref="<%= tool.href %>"<% } %> class="tool-card <%= tool.comingSoon ? 'coming-soon' : 'snapshot-card' %>">
@@ -230,6 +230,7 @@
 
     <script src="/javascripts/account-coming-soon.js"></script>
     <script src="/shared/tool-favorites.js?v=2"></script>
+    <script src="/shared/tool-search.js?v=1"></script>
     <script>window.ChenFavorites.attachStars(document); window.ChenFavorites.load();</script>
     <script>
         (function () {
@@ -247,7 +248,7 @@
                 var seen = new Set();
 
                 cards.forEach(function (card) {
-                    var isMatch = !query || (!seen.has(card.dataset.tool) && card.dataset.search.toLocaleLowerCase().includes(query));
+                    var isMatch = !query || (!seen.has(card.dataset.tool) && window.ChenToolSearch.matches(card.dataset.search, query));
                     card.hidden = !isMatch;
                     if (isMatch && !card.classList.contains('coming-soon')) seen.add(card.dataset.tool);
                 });
