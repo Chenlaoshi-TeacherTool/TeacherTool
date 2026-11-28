@@ -2,7 +2,9 @@
 
 var express = require('express');
 var multer = require('multer');
-var ExcelJS = require('exceljs');
+// exceljs takes ~1 s to load and is only needed for exports, so it loads on
+// first use instead of at startup (keeps Azure's start-up probe short).
+var ExcelJS = { get Workbook() { return require('exceljs').Workbook; } };
 var router = express.Router();
 var requireAdmin = require('../middleware/requireAdmin');
 var sqlClient = require('../services/sqlClient');
