@@ -54,7 +54,10 @@
     } catch (err) { /* localStorage may be full or unavailable; drafts just won't persist */ }
   }
 
-  function uploadAsset(pageId, kind, file) {
+  // A 503 means the server is handling too many uploads at once: wait and
+  // try again (up to 3 times) before showing an error.
+  function uploadAsset(pageId, kind, file, attempt) {
+    attempt = attempt || 0;
     var formData = new FormData();
     formData.append('draftId', draftId);
     if (draftToken) formData.append('draftToken', draftToken);
@@ -63,7 +66,12 @@
     formData.append('file', file);
     return fetch('/api/book-generator/pages/upload', { method: 'POST', body: formData })
       .then(function (res) {
-        if (!res.ok) return res.json().then(function (body) { throw new Error(body.error || I18N.uploadError); });
+        if (res.status === 503 && attempt < 3) {
+          var wait = (parseInt(res.headers.get('Retry-After'), 10) || 2) * 1000 * (attempt + 1);
+          return new Promise(function (resolve) { setTimeout(resolve, wait); })
+            .then(function () { return uploadAsset(pageId, kind, file, attempt + 1); });
+        }
+        if (!res.ok) return res.json().catch(function () { return {}; }).then(function (body) { throw new Error(body.error || I18N.uploadError); });
         return res.json();
       });
   }

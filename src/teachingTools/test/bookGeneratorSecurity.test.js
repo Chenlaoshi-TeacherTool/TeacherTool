@@ -133,3 +133,16 @@ test('escapes book data before embedding it in the player script', async functio
   assert.doesNotMatch(html, /<script>window\.__bookPwned/);
   assert.match(html, /\\u003c\/script>/);
 });
+
+test('an upload over the size limit gets a JSON error the page can show', async function () {
+  var draft = await createDraft();
+  var upload = new FormData();
+  upload.append('draftId', draft.draftId);
+  upload.append('draftToken', draft.draftToken);
+  upload.append('pageId', 'page-1');
+  upload.append('kind', 'image');
+  upload.append('file', new Blob([new Uint8Array(15 * 1024 * 1024 + 1)]), 'huge.png');
+  var response = await fetch(baseUrl + '/api/book-generator/pages/upload', { method: 'POST', body: upload });
+  assert.equal(response.status, 413);
+  assert.match((await response.json()).error, /15MB/);
+});

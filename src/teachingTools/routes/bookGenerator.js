@@ -3,6 +3,7 @@
 var crypto = require('crypto');
 var express = require('express');
 var multer = require('multer');
+var rateLimit = require('../services/rateLimit');
 var bcrypt = require('bcryptjs');
 var router = express.Router();
 var bookStorage = require('../services/bookGeneratorStorage');
@@ -21,8 +22,36 @@ var AUTH_COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 var upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: Math.max(SIZE_LIMITS.image, SIZE_LIMITS.narration, SIZE_LIMITS.music) }
+  limits: { fileSize: Math.max(SIZE_LIMITS.image, SIZE_LIMITS.narration, SIZE_LIMITS.music), files: 1 }
 });
+
+// Uploads are held in memory until they reach blob storage, and no sign-in is
+// needed, so cap them before multer reads the body: a generous per-IP budget
+// (a whole class may share one school IP) and a site-wide cap on uploads in
+// progress at once (6 x 15 MB at most). The page retries a 503 by itself.
+var uploadsPerClient = rateLimit.perClient({
+  windowMs: 10 * 60 * 1000,
+  max: 300,
+  message: 'Too many uploads from this network. Please wait a few minutes and try again. / 上传太频繁，请稍等几分钟再试。'
+});
+var uploadsInProgress = rateLimit.concurrency({
+  max: 6,
+  message: 'The server is busy. Please try again in a moment. / 服务器正忙，请稍后再试。'
+});
+
+// multer's own errors (file over 15 MB, extra files) as JSON the page can show.
+function receiveFile(req, res, next) {
+  upload.single('file')(req, res, function (err) {
+    if (!err) return next();
+    if (err instanceof multer.MulterError) {
+      var tooBig = err.code === 'LIMIT_FILE_SIZE';
+      return res.status(tooBig ? 413 : 400).json({ error: tooBig
+        ? 'File too large (max ' + Math.round(SIZE_LIMITS.music / (1024 * 1024)) + 'MB). / 文件太大（最大' + Math.round(SIZE_LIMITS.music / (1024 * 1024)) + 'MB）。'
+        : 'Upload one file at a time. / 请一次上传一个文件。' });
+    }
+    next(err);
+  });
+}
 
 function isExpired(manifest) {
   return !manifest.expiresAt || new Date(manifest.expiresAt).getTime() < Date.now();
@@ -77,7 +106,7 @@ router.post('/api/book-generator/drafts', async function (req, res, next) {
 
 // ===== Draft asset upload =====
 
-router.post('/api/book-generator/pages/upload', upload.single('file'), async function (req, res) {
+router.post('/api/book-generator/pages/upload', uploadsPerClient, uploadsInProgress, receiveFile, async function (req, res) {
   try {
     var draftId = req.body.draftId;
     var pageId = req.body.pageId;
