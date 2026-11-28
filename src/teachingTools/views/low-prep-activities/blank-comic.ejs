@@ -1,0 +1,117 @@
+<% var zh = lang === 'zh'; function L(en, cn) { return zh ? cn : en; } %><!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#356e57">
+  <title>空白漫画模板 · Blank Comic Template Maker - Chen Laoshi's Teaching Toolkit</title>
+  <%- include('../partials/seo', { pageDescription: 'Make a printable blank comic strip template: 3, 4 or 6 panels in a grid, mixed or slanted layout, with empty speech, thought, shout and caption bubbles. Students draw and write their own story. 空白漫画模板：选格数和版式，配空白气泡，打印后让学生自己画、自己写。' }) %>
+  <link rel="stylesheet" href="/stylesheets/site-theme.css">
+  <link rel="stylesheet" href="/low-prep/blank-comic/blank-comic.css?v=1">
+  <style>@page { size: A4 portrait; margin: 0; }</style>
+</head>
+<body class="bc-page">
+  <main class="bc-wrap">
+    <header class="bc-header">
+      <div>
+        <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
+        <h1>💭 <%= L('Blank Comic Template Maker', '空白漫画模板') %></h1>
+        <p><%= L('Choose a layout, give each panel empty bubbles, then print. Students draw the characters and write the story themselves.', '选版式，给每格配上空白气泡，打印后让学生自己画人物、编故事、写对话。') %></p>
+      </div>
+      <div class="bc-top-actions">
+        <button id="bcReset" type="button" class="bc-btn bc-btn-ghost">↺ <%= L('Reset', '重置') %></button>
+        <button id="bcPrint" type="button" class="bc-btn">🖨️ <%= L('Print / Save PDF', '打印 / 保存 PDF') %></button>
+      </div>
+    </header>
+
+    <div class="bc-layout">
+      <section class="bc-panel bc-page-settings" aria-label="<%= L('Page settings', '整页设置') %>">
+        <h2><%= L('Page', '整页版式') %></h2>
+        <p class="bc-label" id="bcCountLabel"><%= L('Panels', '格数') %></p>
+        <div class="bc-seg" role="radiogroup" aria-labelledby="bcCountLabel" data-field="count">
+          <button type="button" data-value="3"><%= L('3 panels', '三格') %></button>
+          <button type="button" data-value="4"><%= L('4 panels', '四格') %></button>
+          <button type="button" data-value="6"><%= L('6 panels', '六格') %></button>
+        </div>
+
+        <p class="bc-label" id="bcArrangeLabel"><%= L('Layout', '排列方式') %></p>
+        <div class="bc-tiles" role="radiogroup" aria-labelledby="bcArrangeLabel" data-field="arrange">
+          <button type="button" data-value="grid"><span class="bc-thumb" data-thumb="grid"></span><%= L('Even grid', '规整方格') %></button>
+          <button type="button" data-value="mixed"><span class="bc-thumb" data-thumb="mixed"></span><%= L('Mixed sizes', '大小组合') %></button>
+          <button type="button" data-value="slant"><span class="bc-thumb" data-thumb="slant"></span><%= L('Slanted', '漫画斜格') %></button>
+        </div>
+
+        <h2 class="bc-h2-gap"><%= L('Header', '页头信息') %></h2>
+        <label class="bc-check"><input type="checkbox" id="bcShowTitle"> <%= L('Title', '标题') %></label>
+        <input type="text" id="bcTitleText" class="bc-input" maxlength="30" placeholder="<%= L('Leave empty for a blank line', '不填就留一条横线手写') %>">
+        <label class="bc-check"><input type="checkbox" id="bcShowName"> <%= L('Name', '姓名') %></label>
+        <label class="bc-check"><input type="checkbox" id="bcShowDate"> <%= L('Date', '日期') %></label>
+
+        <h2 class="bc-h2-gap"><%= L('Paper', '纸张') %></h2>
+        <p class="bc-note">A4 · <%= L('portrait', '纵向') %></p>
+        <label class="bc-check"><input type="checkbox" id="bcBinding"> <%= L('Binding margin on the left (20 mm)', '左侧预留装订边（20 mm）') %></label>
+
+        <p class="bc-hint">ⓘ <%= L('Click a panel in the preview to give it its own bubbles.', '点击预览里的画格，单独设置气泡。') %></p>
+      </section>
+
+      <section class="bc-preview" aria-label="<%= L('Preview', '预览') %>">
+        <p class="bc-preview-bar"><span class="bc-live"><%= L('Live preview', '实时预览') %></span> A4 · <%= L('portrait', '纵向') %></p>
+        <div class="bc-stage"><div id="bcSheet" class="bc-sheet"></div></div>
+      </section>
+
+      <section class="bc-panel bc-cell-settings" aria-label="<%= L('Panel settings', '画格设置') %>">
+        <h2 id="bcCellTitle"></h2>
+        <p class="bc-note"><%= L('Changes apply to this panel only.', '仅修改当前画格。') %></p>
+
+        <p class="bc-label" id="bcStyleLabel"><%= L('Bubble style', '气泡样式') %></p>
+        <div class="bc-styles" role="radiogroup" aria-labelledby="bcStyleLabel" data-field="style">
+          <button type="button" data-value="none"><span class="bc-icon" data-icon="none"></span><%= L('No bubble', '完全空白') %></button>
+          <button type="button" data-value="ellipse"><span class="bc-icon" data-icon="ellipse"></span><%= L('Speech', '椭圆对话框') %></button>
+          <button type="button" data-value="rounded"><span class="bc-icon" data-icon="rounded"></span><%= L('Rounded box', '圆角对话框') %></button>
+          <button type="button" data-value="thought"><span class="bc-icon" data-icon="thought"></span><%= L('Thought', '思想泡泡') %></button>
+          <button type="button" data-value="burst"><span class="bc-icon" data-icon="burst"></span><%= L('Shout / burst', '锯齿爆炸框') %></button>
+          <button type="button" data-value="caption"><span class="bc-icon" data-icon="caption"></span><%= L('Caption box', '矩形旁白框') %></button>
+        </div>
+
+        <div id="bcBubbleOptions">
+          <p class="bc-label" id="bcNumLabel"><%= L('How many', '气泡数量') %></p>
+          <div class="bc-seg" role="radiogroup" aria-labelledby="bcNumLabel" data-field="num">
+            <button type="button" data-value="1"><%= L('One', '1 个') %></button>
+            <button type="button" data-value="2"><%= L('Two', '2 个') %></button>
+          </div>
+
+          <p class="bc-label" id="bcSizeLabel"><%= L('Size', '气泡大小') %></p>
+          <div class="bc-seg" role="radiogroup" aria-labelledby="bcSizeLabel" data-field="size">
+            <button type="button" data-value="s"><%= L('Small', '小') %></button>
+            <button type="button" data-value="m"><%= L('Medium', '中') %></button>
+            <button type="button" data-value="l"><%= L('Large', '大') %></button>
+          </div>
+
+          <p class="bc-label" id="bcPosLabel"><%= L('Position', '摆放位置') %></p>
+          <div class="bc-seg bc-seg-wrap" role="radiogroup" aria-labelledby="bcPosLabel" data-field="pos1">
+            <button type="button" data-value="tl"><%= L('Top left', '左上') %></button>
+            <button type="button" data-value="tr"><%= L('Top right', '右上') %></button>
+            <button type="button" data-value="bl"><%= L('Bottom left', '左下') %></button>
+            <button type="button" data-value="br"><%= L('Bottom right', '右下') %></button>
+          </div>
+          <div class="bc-seg" role="radiogroup" aria-labelledby="bcPosLabel" data-field="pos2">
+            <button type="button" data-value="top"><%= L('Both top', '上方') %></button>
+            <button type="button" data-value="bottom"><%= L('Both bottom', '下方') %></button>
+            <button type="button" data-value="diag"><%= L('One up, one down', '一上一下') %></button>
+          </div>
+        </div>
+
+        <button id="bcApplyAll" type="button" class="bc-btn bc-btn-soft"><%= L('Apply to all panels', '应用到所有画格') %></button>
+        <p id="bcStatus" class="bc-note" role="status"></p>
+      </section>
+    </div>
+  </main>
+
+  <%- include('../partials/tool-guide', { toolGuide: toolGuide }) %>
+
+  <script>window.BC_LANG = <%- JSON.stringify(zh ? 'zh' : 'en') %>;</script>
+  <script src="/low-prep/blank-comic/blank-comic.js?v=1" defer></script>
+  <script src="/javascripts/account-coming-soon.js"></script>
+  <script src="/javascripts/milk-tea-footer.js"></script>
+</body>
+</html>

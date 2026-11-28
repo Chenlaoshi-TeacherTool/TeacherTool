@@ -343,6 +343,10 @@ router.get('/teaching-tools/sentence-ladder', function(req, res, next) {
   res.render('low-prep-activities/sentence-ladder', { title: '扩句阶梯 · Sentence Ladder', toolGuide: siteContentStore.get().toolGuides['sentence-ladder'] });
 });
 
+router.get('/teaching-tools/blank-comic', function(req, res, next) {
+  res.render('low-prep-activities/blank-comic', { title: '空白漫画模板 · Blank Comic Template Maker', toolGuide: siteContentStore.get().toolGuides['blank-comic'] });
+});
+
 router.get('/low-prep-activities', function(req, res) {
   res.redirect(301, '/teaching-tools#low-prep-activities');
 });
@@ -353,7 +357,7 @@ router.get('/low-prep-activities', function(req, res) {
   'image-revealer', 'zoom-reveal', 'name-tent-generator', 'flash-card-generator', 'sentence-reorder', 'witchs-poison', 'uno-card-generator', 'decode-practice', 'vocab-glossary',
   'stroke-order-worksheet', 'vocab-puzzle', 'worksheet-generator', 'secret-message',
   'character-unscrambler', 'measure-words', 'vocab-games', 'whats-missing', 'pixel-art',
-  'spin-wheel', 'dice-story', 'sentence-ladder', 'component-cards', 'board-games', 'exit-ticket', 'speaking-cards', 'student-board-games'
+  'spin-wheel', 'dice-story', 'sentence-ladder', 'component-cards', 'board-games', 'exit-ticket', 'speaking-cards', 'student-board-games', 'blank-comic'
 ].forEach(function(slug) {
   router.get('/low-prep-activities/' + slug, function(req, res) {
     res.redirect(301, '/teaching-tools/' + slug);
@@ -415,7 +419,7 @@ router.get('/sitemap.xml', async function(req, res, next) {
     '/teaching-tools/decode-practice', '/teaching-tools/vocab-glossary', '/teaching-tools/hanzi-word-choice',
     '/teaching-tools/stroke-order-worksheet', '/teaching-tools/vocab-puzzle', '/teaching-tools/worksheet-generator', '/teaching-tools/secret-message',
     '/teaching-tools/character-unscrambler', '/teaching-tools/measure-words', '/teaching-tools/vocab-games', '/teaching-tools/whats-missing',
-    '/teaching-tools/pixel-art', '/teaching-tools/spin-wheel', '/teaching-tools/dice-story', '/teaching-tools/sentence-ladder', '/teaching-tools/component-cards', '/teaching-tools/board-games', '/teaching-tools/exit-ticket', '/teaching-tools/speaking-cards', '/teaching-tools/student-board-games', '/teaching-tools/hanzi-batch/index.html'
+    '/teaching-tools/pixel-art', '/teaching-tools/spin-wheel', '/teaching-tools/dice-story', '/teaching-tools/sentence-ladder', '/teaching-tools/component-cards', '/teaching-tools/board-games', '/teaching-tools/exit-ticket', '/teaching-tools/speaking-cards', '/teaching-tools/student-board-games', '/teaching-tools/blank-comic', '/teaching-tools/hanzi-batch/index.html'
   ]).concat(siteContentStore.get().articles.map(function(article) { return '/resources/' + article.slug; }));
   var products = siteContentStore.get().recommendations || [];
   paths = paths.concat(catalog.themes.map(function (theme) { return theme.href; }));

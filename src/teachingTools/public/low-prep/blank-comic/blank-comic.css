@@ -1,0 +1,86 @@
+/* 空白漫画模板 · Blank Comic Template Maker — prefix bc- */
+.bc-page { background: #f6f3ea; }
+.bc-wrap { max-width: 1360px; margin: 0 auto; padding: 24px 20px 48px; color: #1f2d27; }
+.bc-header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 24px; margin-bottom: 20px; }
+.bc-header h1 { margin: 6px 0 6px; color: #194f45; }
+.bc-header p { max-width: 720px; margin: 0; color: #4b5f56; }
+/* the site theme styles .back-btn for dark headers; this header is light */
+.bc-header .back-btn { display: inline-block; margin-bottom: 10px; padding: 5px 14px; border-color: #c9d6c2 !important; background: #fffdf7 !important; color: #194f45 !important; font-weight: 700; text-decoration: none; }
+.bc-header .back-btn:hover { background: #eef4ec !important; }
+.bc-top-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.bc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border: 1px solid #194f45; border-radius: 10px; background: #194f45; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.bc-btn:hover { background: #123d35; }
+.bc-btn-ghost { background: #fff; color: #194f45; }
+.bc-btn-ghost:hover { background: #eef4ec; }
+.bc-btn-soft { width: 100%; margin-top: 18px; border-color: #9cc3a6; background: #e9f3e6; color: #194f45; }
+.bc-btn-soft:hover { background: #dcebd7; }
+.bc-btn:focus-visible, .bc-seg button:focus-visible, .bc-tiles button:focus-visible, .bc-styles button:focus-visible { outline: 3px solid #e2a93b; outline-offset: 2px; }
+
+.bc-layout { display: grid; grid-template-columns: minmax(240px, 290px) minmax(0, 1fr) minmax(260px, 320px); gap: 20px; align-items: start; }
+.bc-panel { padding: 16px 18px 18px; border: 1px solid #d9e3d2; border-radius: 14px; background: #fffdf7; }
+.bc-panel h2 { margin: 0 0 4px; color: #194f45; font-size: 1.1rem; }
+.bc-h2-gap { margin-top: 20px !important; padding-top: 16px; border-top: 1px solid #e6ebe1; }
+.bc-label { margin: 14px 0 6px; font-weight: 700; font-size: .92rem; }
+.bc-note { margin: 2px 0 0; color: #5d7168; font-size: .85rem; }
+.bc-hint { margin: 20px 0 0; padding-top: 14px; border-top: 1px solid #e6ebe1; color: #5d7168; font-size: .86rem; }
+.bc-check { display: flex; align-items: center; gap: 8px; margin: 8px 0 4px; font-weight: 500; cursor: pointer; }
+.bc-check input { width: 17px; height: 17px; accent-color: #2f7d4a; }
+.bc-input { box-sizing: border-box; width: 100%; margin: 2px 0 6px; padding: 8px 10px; border: 1px solid #c9d6c2; border-radius: 9px; background: #fff; font: inherit; }
+.bc-input:disabled { background: #f1f1ec; color: #9aa59f; }
+
+.bc-seg { display: flex; overflow: hidden; border: 1px solid #c9d6c2; border-radius: 10px; background: #fff; }
+.bc-seg[hidden] { display: none; }
+.bc-seg button { flex: 1; padding: 8px 6px; border: 0; border-left: 1px solid #e1e8dc; background: none; color: #1f2d27; font: inherit; font-size: .92rem; cursor: pointer; }
+.bc-seg button:first-child { border-left: 0; }
+.bc-seg button:hover { background: #f4f8f1; }
+.bc-seg button.is-on { background: #fbe6a6; font-weight: 700; }
+.bc-seg-wrap { display: grid; grid-template-columns: 1fr 1fr; }
+.bc-seg-wrap button { border-left: 0; border-top: 1px solid #e1e8dc; }
+.bc-seg-wrap button:nth-child(-n+2) { border-top: 0; }
+.bc-seg-wrap button:nth-child(even) { border-left: 1px solid #e1e8dc; }
+
+.bc-tiles, .bc-styles { display: grid; gap: 8px; }
+.bc-tiles { grid-template-columns: repeat(3, 1fr); }
+.bc-styles { grid-template-columns: 1fr 1fr; }
+.bc-tiles button, .bc-styles button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border: 1px solid #d4ddcf; border-radius: 10px; background: #fff; color: #1f2d27; font: inherit; font-size: .85rem; cursor: pointer; }
+.bc-tiles button:hover, .bc-styles button:hover { border-color: #9cc3a6; }
+.bc-tiles button.is-on, .bc-styles button.is-on { border: 2px solid #2f7d4a; padding: 7px 3px; background: #f1f8ee; font-weight: 700; }
+.bc-thumb { display: block; width: 40px; height: 50px; color: #33413a; }
+.bc-icon { display: block; width: 60px; height: 35px; }
+.bc-thumb svg, .bc-icon svg { width: 100%; height: 100%; }
+
+.bc-preview { min-width: 0; }
+.bc-preview-bar { margin: 0 0 8px; color: #5d7168; font-size: .88rem; }
+.bc-live { display: inline-block; margin-right: 6px; padding: 2px 9px; border-radius: 6px; background: #dcebd7; color: #194f45; font-weight: 700; }
+.bc-stage { display: flex; justify-content: center; padding: 14px; border-radius: 14px; background: #e4e0d4; }
+.bc-sheet { width: 100%; max-width: 600px; aspect-ratio: 210 / 297; background: #fff; box-shadow: 0 3px 14px rgba(0,0,0,.16); }
+.bc-svg { display: block; width: 100%; height: 100%; }
+.bc-hit { fill: transparent; stroke: transparent; stroke-width: 1.6; cursor: pointer; pointer-events: all; outline: none; }
+.bc-hit:hover { fill: rgba(47, 125, 74, .05); }
+.bc-hit:focus-visible { stroke: #e2a93b; }
+.bc-hit.is-on { stroke: #2f7d4a; fill: rgba(47, 125, 74, .04); }
+
+@media (max-width: 1100px) {
+  .bc-layout { grid-template-columns: minmax(240px, 300px) minmax(0, 1fr); }
+  .bc-cell-settings { grid-column: 1 / -1; }
+  .bc-cell-settings .bc-styles { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 760px) {
+  .bc-wrap { padding: 16px 14px 40px; }
+  .bc-layout { grid-template-columns: 1fr; }
+  .bc-cell-settings { grid-column: auto; }
+  .bc-cell-settings .bc-styles { grid-template-columns: 1fr 1fr; }
+  .bc-top-actions { width: 100%; }
+  .bc-top-actions .bc-btn { flex: 1; }
+  .bc-stage { padding: 8px; }
+}
+
+@media print {
+  html, body.bc-page { width: 210mm; height: 297mm; margin: 0 !important; padding: 0 !important; overflow: hidden; background: #fff !important; }
+  body.bc-page > *:not(.bc-wrap) { display: none !important; }
+  .bc-header, .bc-page-settings, .bc-cell-settings, .bc-preview-bar, .bc-ui { display: none !important; }
+  .bc-wrap, .bc-layout, .bc-preview, .bc-stage { display: block; max-width: none; margin: 0; padding: 0; border-radius: 0; background: none; }
+  .bc-sheet { width: 210mm; height: 297mm; max-width: none; box-shadow: none; aspect-ratio: auto; break-inside: avoid; page-break-after: avoid; }
+  .bc-svg { width: 210mm; height: 297mm; }
+}

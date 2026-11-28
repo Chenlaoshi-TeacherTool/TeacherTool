@@ -75,6 +75,7 @@ var TOOLS = [
   { href: '/teaching-tools/spin-wheel', added: '2026-11-21', icon: '🎡', titleKey: 'teachingToolsIndex.spinWheelTitle', scopeKey: 'teachingToolsIndex.spinWheelScope', descKey: 'teachingToolsIndex.spinWheelDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'project'] },
   { href: '/teaching-tools/dice-story', added: '2026-11-22', icon: '🎲', titleKey: 'teachingToolsIndex.diceStoryTitle', scopeKey: 'teachingToolsIndex.diceStoryScope', descKey: 'teachingToolsIndex.diceStoryDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'independent'] },
   { href: '/teaching-tools/sentence-ladder', added: '2026-11-22', icon: '🪜', titleKey: 'teachingToolsIndex.sentenceLadderTitle', scopeKey: 'teachingToolsIndex.sentenceLadderScope', descKey: 'teachingToolsIndex.sentenceLadderDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'project', 'independent'], subject: 'chinese' },
+  { href: '/teaching-tools/blank-comic', added: '2026-11-27', icon: '💭', titleKey: 'teachingToolsIndex.blankComicTitle', scopeKey: 'teachingToolsIndex.blankComicScope', descKey: 'teachingToolsIndex.blankComicDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'independent'] },
   { href: '/teaching-tools/vocab-puzzle', added: '2026-10-14', icon: '🧩', titleKey: 'teachingToolsIndex.vocabPuzzleTitle', scopeKey: 'teachingToolsIndex.vocabPuzzleScope', descKey: 'teachingToolsIndex.vocabPuzzleDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'] },
   { href: '/teaching-tools/decode-practice', added: '2026-09-01', icon: '🔡', titleKey: 'teachingToolsIndex.decodeTitle', scopeKey: 'teachingToolsIndex.decodeScope', descKey: 'teachingToolsIndex.decodeDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print'], subject: 'chinese' },
   { href: '/teaching-tools/speaking-cards', added: '2026-11-23', icon: '💬', titleKey: 'teachingToolsIndex.speakingPromptsTitle', scopeKey: 'teachingToolsIndex.speakingPromptsScope', descKey: 'teachingToolsIndex.speakingPromptsDesc', actionKey: 'teachingToolsIndex.openGenerator', section: 'printables', uses: ['print', 'project'], subject: 'chinese' },
@@ -138,7 +139,7 @@ var DIRECTORY = {
   },
   printables: {
     'classroom-supplies': 'nameTentTitle qrTitle',
-    'printable-games': 'boardGamesTitle sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle spinWheelTitle diceStoryTitle vocabPuzzleTitle pixelArtTitle',
+    'printable-games': 'boardGamesTitle sudokuTitle wordCloudTitle bingoTitle mazeTitle tarsiaTitle secretMessageTitle spinWheelTitle diceStoryTitle blankComicTitle vocabPuzzleTitle pixelArtTitle',
     'chinese-materials': 'exitTicketTitle speakingPromptsTitle decodeTitle worksheetTitle sentenceLadderTitle flashCardTitle vocabBookletTitle strokeOrderTitle hanziBatchTitle missingPartsTitle componentCardsTitle charUnscramblerTitle hanziWheelTitle independentReadingTitle glossaryTitle'
   },
   prep: { main: 'libraryTitle questionBankTitle emojiSearchTitle glossaryTitle fontTitle' }
