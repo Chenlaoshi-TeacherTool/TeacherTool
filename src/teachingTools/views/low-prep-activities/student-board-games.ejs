@@ -17,7 +17,7 @@
       <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
       <p class="ep-eyebrow"><%= L('Projector board games · designed by students', '投影桌游 · 学生设计') %></p>
       <h1>🎲 <%= L('Student-Designed Board Games', '学生设计桌游') %></h1>
-      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race, Escape the Classroom and Mochi Salamander Escape.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom、Mochi Salamander Escape。') %></p>
+      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race, Escape the Classroom, Mochi Salamander Escape and 太大一.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom、Mochi Salamander Escape、太大一。') %></p>
     </header>
 
     <div class="ep-layout">
@@ -77,6 +77,9 @@
             <label class="ep-game"><input type="radio" name="epGame" value="mochi">
               <img src="/low-prep/mochi/board.webp?v=2" alt="" loading="lazy">
               <span><b>Mochi Salamander Escape</b><small><%= L('Colour cards, shields, rescue the salamanders', '翻颜色卡、拿盾牌、救小火蜥') %></small></span></label>
+            <label class="ep-game"><input type="radio" name="epGame" value="space">
+              <img src="/low-prep/space/board.webp?v=1" alt="" loading="lazy">
+              <span><b>太大一</b><small><%= L('Space loop: grow a moon into a star', '太空绕圈：月亮长成恒星') %></small></span></label>
           </div>
           <p class="ep-hint"><%= L('The same question cards work in every game.', '同一套题卡，每款游戏都能用。') %></p>
         </fieldset>
@@ -124,6 +127,13 @@
             <li><%= L('In jail you can also try to answer cards in a row to leave at once, unless the next space is 结束: then you have to wait.', '在监狱里也可以挑战连续答题，答对就马上出狱。但如果下一格就是"结束"，不能挑战，只能等。') %></li>
             <li><%= L('往前走 / 往后走 Move ahead or back, 从蛇身上滑下去 slide along the snake, 再来一次 roll again.', '往前走几步、往后走几步、从蛇身上滑下去：照做。再来一次：再掷一次。') %></li>
             <li><%= L('Teams that reach 结束 take 第一名, 第二名 and 第三名. The game ends when three teams are in (or only one team is left).', '到达"结束"的队伍依次拿第一名、第二名、第三名。三个名次出来后游戏结束（或只剩一队还没到）。') %></li>
+          </ol>
+          <ol data-game="space" hidden>
+            <li><%= L('Start at 开始, go once round the loop, then up the diagonal to 结果.', '从"开始"出发，绕一圈，再走对角线到"结果"。') %></li>
+            <li><%= L('Green and yellow squares: forward 3. Red, orange and teal: back 3. Black hole: back 6. Cobweb (you died): back to the start.', '绿色、黄色格前进 3 格；红色、橙色、青色格后退 3 格；黑洞后退 6 格；蜘蛛网（you died）回到起点。') %></li>
+            <li><%= L('拿卡片: answer a card. Right = grow one step: 🌙 moon → 🪐 dwarf planet → 🌍 planet → ⭐ star. Wrong = back one square.', '拿卡片：回答一张卡。答对升一级：🌙 月亮 → 🪐 矮行星 → 🌍 行星 → ⭐ 恒星；答错后退一格。') %></li>
+            <li><%= L('Rolling past 结果 lands on "you died": back to the start of the diagonal.', '走过"结果"就到了"you died"：回到对角线的起点。') %></li>
+            <li><%= L('To win, reach 结果 with a star. Without one you stay on 结果 and answer a card each turn until you form it. The first three teams win.', '带着恒星到"结果"才算赢。还没有恒星就留在"结果"，每轮回答一张卡，直到形成恒星。最先完成的三队获胜。') %></li>
           </ol>
           <ol data-game="mochi" hidden>
             <li><%= L('Start at 开始 and reach 结束 出口. Roll the die as a colour card: 1 yellow, 2 red, 3 blue, 4 green, 5 alarm, 6 step to any neighbouring square.', '从"开始"出发，走到"结束 出口"。掷骰子当颜色卡：1 黄、2 红、3 蓝、4 绿、5 警报、6 走到旁边任意一格。') %></li>
@@ -255,11 +265,12 @@
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/game-template.js?v=4" defer></script>
-  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=8"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=9"></script>
   <script src="/low-prep/candy-race/candy-race-core.js?v=6"></script>
   <script src="/low-prep/escape-classroom/escape-classroom-core.js?v=3"></script>
   <script src="/low-prep/mochi/mochi-core.js?v=2"></script>
-  <script src="/low-prep/escape-the-path/escape-the-path.js?v=13" defer></script>
+  <script src="/low-prep/space/space-core.js?v=1"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path.js?v=14" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

@@ -8,13 +8,15 @@
   'use strict';
 
   var Core = window.EscapePathCore;
-  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore };
-  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2' };
-  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape' };
+  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore, 'space': window.SpaceCore };
+  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1' };
+  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape', 'space': '太大一' };
   var G = Core;          // the game being played
   var isCandy = false;
   var isClass = false;
   var isMochi = false;
+  var isSpace = false;
+  function levelText(n) { var l = G.LEVELS[n]; return l && l.emoji ? l.emoji + ' ' + L(l.en, l.zh) : ''; }
   function actionName(card) { return zh ? { again: '再走一次', shield: '盾牌', swap: '和最前面的队换位置', push: '让最前面的队退一格' }[card] : { again: 'Move twice', shield: 'Shield', swap: 'Swap with the leading team', push: 'Push the leading team back' }[card]; }
   var teacherEl = null;
   var shownTeacher = -1;
@@ -306,6 +308,7 @@
       info.textContent = t.place ? (['🥇', '🥈', '🥉'][t.place - 1] || '#' + t.place)
         : t.jail ? '🔒 ' + L(t.jail + ' left', '还剩 ' + t.jail + ' 轮')
           : isCandy ? '💰 $' + t.money + (t.rv ? ' · 🚐' + t.rv : '')
+            : isSpace ? (G.LEVELS[t.level].emoji ? G.LEVELS[t.level].emoji + ' ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格')
             : isMochi ? (t.rescued ? '🦎' + t.rescued + ' ' : '') + (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.actions.length ? '🃏' + t.actions.length + ' ' : '') + L(G.DIST[t.pos] + ' to exit', '离出口 ' + G.DIST[t.pos] + ' 步')
             : isClass ? (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.yay ? '🎉' + t.yay + ' ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格')
             : (t.skip ? '⏭ ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格');
@@ -440,6 +443,32 @@
         case 'earn':
           toast('💰 ' + L('Correct! +$' + ev.amount, '答对了！+$' + ev.amount), 'good');
           status(L(team.name + ' now has $' + ev.money + '.', team.name + '现在有 $' + ev.money + '。'));
+          break;
+        case 'hole':
+          toast('🕳️ ' + L('Black hole! Back 6.', '黑洞！后退 6 格。'), 'bad');
+          await sleep(500);
+          await walk(ev.team, ev.from, ev.to);
+          break;
+        case 'web':
+          toast('🕸️ ' + L('You died! Back to the start.', 'You died！回到起点。'), 'bad');
+          await sleep(600);
+          await jump(ev.team, { at: 'sq', i: ev.to });
+          break;
+        case 'overshoot':
+          toast('💥 ' + L('Too far! Back to the start of the diagonal.', '走过头了！回到对角线的起点。'), 'bad');
+          await sleep(600);
+          await jump(ev.team, { at: 'sq', i: ev.to });
+          break;
+        case 'level':
+          toast(levelText(ev.level) + (ev.level >= G.STAR ? L(' You formed a star!', ' 恒星形成了！') : ''), 'good');
+          status(L(team.name + ' grows to ', team.name + '升级为') + levelText(ev.level));
+          await sleep(500);
+          break;
+        case 'quest':
+          status(L(team.name + ' is on 结果 but needs a star. Answer a card!', team.name + '到了「结果」，还没有恒星。回答一张卡！'));
+          break;
+        case 'waitstar':
+          toast(L('Not yet. Try again next turn.', '还没形成恒星，下一轮再试。'), 'bad');
           break;
         case 'colour':
           toast({ yellow: '🟡 ' + L('Yellow!', '黄色！'), red: '🔴 ' + L('Red!', '红色！'), blue: '🔵 ' + L('Blue!', '蓝色！'), green: '🟢 ' + L('Green!', '绿色！'),
@@ -619,7 +648,9 @@
     var n = game.total - game.left + 1;
     $('epCardTeam').textContent = teamLabel(team);
     $('epCardTeam').style.setProperty('--team', Core.TEAMS[team.id].color);
-    $('epCardCount').textContent = isMochi ? (game.phase === 'alarm' ? '🚨 ' + L('Alarm question', '警报题')
+    $('epCardCount').textContent = isSpace ? (game.quest ? L('Form a star to finish', '形成恒星才能到终点')
+        : L('Right = grow one step', '答对升一级') + (G.current(game).level ? ' · ' + levelText(G.current(game).level) : ''))
+      : isMochi ? (game.phase === 'alarm' ? '🚨 ' + L('Alarm question', '警报题')
         : game.phase === 'buy' ? '🃏 ' + actionName(G.current(game).actions[game.using].card)
         : { q1: '问题 L1', q2: '问题 L2', q3: '问题 L3' }[game.qkind] || L('Card', '抽卡'))
       : isClass ? L('Right = flip a special card', '答对翻一张特别卡')
@@ -758,6 +789,7 @@
     isCandy = settings.game === 'candy-race';
     isClass = settings.game === 'escape-classroom';
     isMochi = settings.game === 'mochi';
+    isSpace = settings.game === 'space';
     $('epRoll').textContent = '🎲 ' + L('Roll', '掷骰子');
     $('epBoardImg').src = IMAGES[settings.game];
     $('epBoard').style.aspectRatio = G.FRAME.w + ' / ' + G.FRAME.h;
