@@ -111,6 +111,8 @@
     function setOpen(open) {
       menu.hidden = !open;
       toggle.setAttribute('aria-expanded', String(open));
+      var strip = item.parentElement;
+      strip.classList.toggle('has-open-menu', !!strip.querySelector('.site-tool-categories:not([hidden])'));
       if (open) {
         var rect = item.getBoundingClientRect();
         menu.style.left = Math.max(8, Math.min(rect.left, document.documentElement.clientWidth - menu.offsetWidth - 8)) + 'px';

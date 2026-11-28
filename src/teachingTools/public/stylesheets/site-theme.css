@@ -239,6 +239,8 @@ html:has(.site-main-nav.is-compact) { --site-nav-height: 106px; }
 .site-main-nav.is-compact .site-main-nav-links.can-scroll-right { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent); }
 .site-main-nav.is-compact .site-main-nav-links.can-scroll-left { -webkit-mask-image: linear-gradient(to right, transparent, #000 44px); mask-image: linear-gradient(to right, transparent, #000 44px); }
 .site-main-nav.is-compact .site-main-nav-links.can-scroll-left.can-scroll-right { -webkit-mask-image: linear-gradient(to right, transparent, #000 44px, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to right, transparent, #000 44px, #000 calc(100% - 44px), transparent); }
+/* A mask clips fixed-position descendants too, so drop the fade while a category menu is open or the menu is invisible. */
+.site-main-nav.is-compact .site-main-nav-links.has-open-menu { -webkit-mask-image: none; mask-image: none; }
 
 /* Skip link (added by milk-tea-footer.js): hidden until a keyboard user tabs to it. */
 .site-skip-link {
