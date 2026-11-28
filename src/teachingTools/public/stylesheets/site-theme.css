@@ -346,6 +346,21 @@ main[tabindex="-1"]:focus { outline: none; }
   .back-btn:hover { transform: translateX(-3px); background: rgba(255, 253, 247, 0.24) !important; }
 }
 
+/* The default back link is built for dark green headers; tools with a light
+   header add back-btn--light so it stays readable. */
+.back-btn.back-btn--light {
+  display: inline-block;
+  padding: 5px 14px;
+  border-color: #c9d6c2 !important;
+  background: #fffdf7 !important;
+  color: #194f45 !important;
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .back-btn.back-btn--light:hover { background: #eef4ec !important; }
+}
+
 .btn,
 .activity-btn,
 .open-btn {
