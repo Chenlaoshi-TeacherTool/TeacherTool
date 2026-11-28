@@ -9,7 +9,7 @@
 
   var Core = window.EscapePathCore;
   var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore, 'space': window.SpaceCore, 'money': window.MoneyCore, 'mpy': window.MpyCore, 'maze': window.MazeCore, 'sweets': window.SweetsCore };
-  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1', 'money': '/low-prep/money/board.webp?v=2', 'mpy': '/low-prep/mpy/board.webp?v=1', 'maze': '/low-prep/maze/board.webp?v=1', 'sweets': '/low-prep/sweets/board.webp?v=1' };
+  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1', 'money': '/low-prep/money/board.webp?v=2', 'mpy': '/low-prep/mpy/board.webp?v=1', 'maze': '/low-prep/maze/board.webp?v=1', 'sweets': '/low-prep/sweets/board.webp?v=2' };
   var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape', 'space': '太大一', 'money': '汉字大富翁', 'mpy': 'MPY', 'maze': 'Maze 迷宫', 'sweets': '糖果乐园' };
   var G = Core;          // the game being played
   var isCandy = false;
