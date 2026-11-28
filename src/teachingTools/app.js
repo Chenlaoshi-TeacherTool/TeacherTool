@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var compression = require('compression');
 var fs = require('fs');
 var i18n = require('./services/i18n');
 var zhHant = require('./services/zhHant');
@@ -26,6 +27,18 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.set('trust proxy', 1);
 
+// Azure health check: answers without touching the database, so a slow or
+// paused database does not get a healthy site restarted. Registered before the
+// canonical-host redirect, because Azure pings the default *.azurewebsites.net
+// address and would otherwise get a 301.
+app.get('/healthz', function(req, res) {
+  res.set('Cache-Control', 'no-store');
+  res.type('text/plain').send('ok');
+});
+
+// gzip pages, scripts and JSON. Board-room event streams send
+// Cache-Control: no-transform, which compression leaves alone.
+app.use(compression());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -86,14 +99,28 @@ app.use('/teaching-tools/sunflower-spinner', function(req, res, next) {
 // The shared nav script gets its links from config/siteMap.js, so the menu,
 // footer, sitemap, and admin dashboard all follow the same structure.
 var navScript = fs.readFileSync(path.join(__dirname, 'public/javascripts/milk-tea-footer.js'), 'utf8');
+// Every page loads this script, so the built copy is kept for 5 minutes (or
+// until an admin changes the catalog) instead of querying the database each
+// time. A failed catalog load is retried on the next request, not cached.
 var contentCatalog = require('./services/contentCatalog');
-app.get('/javascripts/milk-tea-footer.js', async function(req, res) {
+var NAV_CACHE_MS = 5 * 60 * 1000;
+var navCache = null;
+async function buildNavScript() {
+  var version = contentCatalog.version();
+  if (navCache && navCache.version === version && Date.now() - navCache.at < NAV_CACHE_MS) return navCache.body;
   var catalog = await contentCatalog.load().catch(function() { return null; });
-  var nav = siteMap.clientNav(catalog && catalog.textbooks.SERIES);
-  res.type('application/javascript').send(navScript.replace('/*SITE_NAV*/{ nav: [], footer: [] }', function() {
-    return JSON.stringify(nav);
-  }));
+  var body = navScript.replace('/*SITE_NAV*/{ nav: [], footer: [] }', function() {
+    return JSON.stringify(siteMap.clientNav(catalog && catalog.textbooks.SERIES));
+  });
+  if (catalog) navCache = { version: version, at: Date.now(), body: body };
+  return body;
+}
+app.get('/javascripts/milk-tea-footer.js', async function(req, res) {
+  var body = await buildNavScript();
+  res.set('Cache-Control', 'public, max-age=300');
+  res.type('application/javascript').send(body);
 });
+
 
 app.use(function(req, res, next) {
   if (/^\/(?:api|admin|book|play)(?:\/|$)/.test(req.path) || /^\/teaching-tools\/(?:my-library|my-activities|word-list-library|question-bank-library)(?:\/|$)/.test(req.path)) {

@@ -126,15 +126,19 @@ function create(options) {
       return Object.assign(themeRow(currentRows, themes.find(function (theme) { return theme.key === key; })), { sort_order: index + 1 });
     }));
   }
+  // Goes up after every admin change, so caches of the catalog (the nav
+  // script in app.js) know to rebuild at once instead of waiting out their TTL.
+  var changes = 0;
   function queue(work) {
-    var operation = pending.then(work);
+    var operation = pending.then(work).then(function (result) { changes++; return result; });
     pending = operation.catch(function () {});
     return operation;
   }
   function add(kind, body) { return queue(function () { return insert(kind, body); }); }
   function updateTheme(key, body) { return queue(function () { return change(key, body); }); }
   function orderThemes(keys) { return queue(function () { return order(keys); }); }
-  return { load: load, add: add, updateTheme: updateTheme, orderThemes: orderThemes };
+  function version() { return changes; }
+  return { load: load, add: add, updateTheme: updateTheme, orderThemes: orderThemes, version: version };
 }
 
 module.exports = create();
