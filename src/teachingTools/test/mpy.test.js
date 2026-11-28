@@ -86,3 +86,16 @@ test('passing Start pays M200; laps end the game', () => {
   assert.equal(s.phase, 'over');
   assert.equal(shared.template({ cards: '题|答', game: 'mpy' }).game, 'mpy');
 });
+
+test('the teacher can choose the words on the land squares; empty keeps the student\'s', () => {
+  const words = core.parseWords('苹果\n香蕉，西瓜');
+  const s = core.newGame({ teams: 2, words });
+  const [a, b, , d] = core.WORD_SQUARES;
+  assert.equal(core.phrase(a, s), '苹果');
+  assert.equal(core.phrase(b, s), '香蕉');
+  assert.equal(core.phrase(d, s), '苹果');
+  assert.equal(core.phrase(a, core.newGame({ teams: 2 })), core.DEFAULT_WORDS[0]);
+  core.current(s).pos = b - 1;
+  core.roll(s, 1);
+  assert.equal(core.cardFor(s, true).q, '香蕉');
+});

@@ -9,7 +9,7 @@
 
   var Core = window.EscapePathCore;
   var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore, 'space': window.SpaceCore, 'money': window.MoneyCore, 'mpy': window.MpyCore, 'maze': window.MazeCore, 'sweets': window.SweetsCore };
-  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1', 'money': '/low-prep/money/board.webp?v=2', 'mpy': '/low-prep/mpy/board.webp?v=1', 'maze': '/low-prep/maze/board.webp?v=1', 'sweets': '/low-prep/sweets/board.webp?v=2' };
+  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1', 'money': '/low-prep/money/board.webp?v=2', 'mpy': '/low-prep/mpy/board.webp?v=2', 'maze': '/low-prep/maze/board.webp?v=1', 'sweets': '/low-prep/sweets/board.webp?v=2' };
   var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape', 'space': '太大一', 'money': '汉字大富翁', 'mpy': 'MPY', 'maze': 'Maze 迷宫', 'sweets': '糖果乐园' };
   var G = Core;          // the game being played
   var isCandy = false;
@@ -111,7 +111,14 @@
   function showGame() {
     var id = radio('epGame') || 'escape-the-path';
     $('epJailField').hidden = id !== 'escape-the-path';
-    $('epDeskField').hidden = id !== 'escape-classroom';
+    $('epDeskField').hidden = id !== 'escape-classroom' && id !== 'mpy';
+    var squaresMode = id === 'mpy';   // MPY writes the words on its land squares (25)
+    $('epDeskLegend').textContent = squaresMode ? L('Words on the squares', '格子上的字') : L('Desk cards', '停在桌子上');
+    $('epDeskOpt').textContent = squaresMode ? L('Ask about the word on the square', '用格子上的字出题') : L('Ask about the desk phrase', '用桌子上的话出情景题');
+    $('epDeskLabel').textContent = squaresMode ? L('Words on the land squares (optional)', '地块上的字（可以不填）') : L('Words on the desks (optional)', '桌上的字（可以不填）');
+    $('epDeskCount').textContent = squaresMode
+      ? L('One word or phrase per line, written on the 25 land squares in order and repeated if there are fewer. Leave it empty to use the student\'s own words.', '每行一个词或短语，按顺序写到 25 块地上；词不够会重复使用。空着就用学生原来写的字。')
+      : L('One word or phrase per line, written on the desks in order and repeated if there are fewer words than desks (21). Leave it empty to use the student\'s own words.', '每行一个词或短语，按顺序写到桌子上；词不够 21 个会重复使用。空着就用学生原来写的字。');
     $('epLapsField').hidden = id !== 'money' && id !== 'mpy';
     Array.prototype.forEach.call(document.querySelectorAll('.ep-rules ol[data-game]'), function (ol) {
       ol.hidden = ol.dataset.game !== id;
@@ -660,7 +667,8 @@
         case 'card':
           if (isMochi) { status(ev.alarm ? L('Alarm! Answer the alarm question.', '警报！回答警报题。') : L('Draw a card!', '抽卡！')); break; }
           if (isClass) { status(ev.phrase ? L('Desk: ' + ev.phrase + '. Answer the card!', '桌子：' + ev.phrase + '。回答卡片！') : L('A desk! Draw a card.', '到桌子了，抽卡！')); break; }
-          if (ev.value) { status(L('Draw a card! Worth $' + ev.value + '.', '抽卡！答对得 $' + ev.value + '。')); break; }
+          if (isMoney && ev.kind === 'buy') { status(L('Answer right and you may buy this land for ' + CUR + ev.value + '.', '答对就可以花 ' + CUR + ev.value + ' 买下这块地。')); break; }
+          if (ev.value) { status(L('Draw a card! Worth ' + (isMoney ? CUR : '$') + ev.value + '.', '抽卡！答对得 ' + (isMoney ? CUR : '$') + ev.value + '。')); break; }
           status(ev.count > 1
             ? L('Draw a card! ' + ev.count + ' cards to go.', '抽卡！还要答 ' + ev.count + ' 张。')
             : L('Draw a card!', '抽卡！'));
@@ -726,7 +734,11 @@
   function openCard() {
     var card = null;
     if (isClass && settings.desk === 'phrase') card = G.situation(G.phrase(G.current(game).pos, game), zh);
-    if (!card && G.cardFor) card = G.cardFor(game, zh);   // MPY: the word written on the square
+    // MPY: the word on the square (polite phrases get a situation question, like Escape the Classroom)
+    if (!card && isMpy && settings.desk !== 'cards' && game.qkind !== 'special' && window.EscapeClassroomCore) {
+      card = window.EscapeClassroomCore.situation(G.phrase(G.current(game).pos, game), zh);
+      if (card) card.label = card.label.replace('桌子上的', '格子上的').replace('Desk ', 'Square ');
+    }
     card = card || drawCard();
     var team = G.current(game);
     var n = game.total - game.left + 1;
@@ -918,6 +930,14 @@
       var ex = b[0] + (cx - b[0]) * 0.12, ey = b[1] + (cy - b[1]) * 0.12;
       el('path', { d: 'M' + sx + ' ' + sy + ' Q' + cx + ' ' + cy + ' ' + ex + ' ' + ey, class: 'ep-link', 'marker-end': 'url(#epArrow)' });
     });
+    if (isMpy && game) {
+      G.WORD_SQUARES.forEach(function (sq) {
+        var word = G.phrase(sq, game);
+        if (!word) return;
+        var size = Math.min(70, 230 / Math.max(1, Array.from(word).length));
+        el('text', { x: G.BOARD[sq][0], y: G.BOARD[sq][1] + size * 0.36 - 2, class: 'ep-desk-text', 'font-size': size }, word);
+      });
+    }
     if (isClass && game) {
       G.DESK_SQUARES.forEach(function (sq, n) {
         var word = G.phrase(sq, game) || '?';
@@ -953,7 +973,7 @@
   }
 
   function begin() {
-    var deskWords = isClass && G.parseWords ? G.parseWords(settings.deskWords) : [];
+    var deskWords = (isClass || isMpy) && G.parseWords ? G.parseWords(settings.deskWords) : [];
     game = G.newGame({ teams: settings.teams, names: settings.names, jail: settings.jail, zh: zh, shared: Core, words: deskWords, laps: settings.laps });
     drawMarks();
     pile = [];

@@ -48,6 +48,9 @@
   var GATE = {};
 
   var JAIL = DATA.jail;
+  // Land squares in board order: the word squares. The page writes a word on each.
+  var WORD_SQUARES = BOARD.map(function (s, i) { return s[2] === 'prop' ? i : -1; }).filter(function (i) { return i >= 0; });
+  var DEFAULT_WORDS = WORD_SQUARES.map(function (i) { return BOARD[i][4] || ''; });
   var JAIL_FEE = 50;
   var START_MONEY = 1500;
   var SALARY = 200;
@@ -73,7 +76,8 @@
         laps: 0, skip: false, out: false, done: false, jail: 0, place: 0 });
     }
     return { teams: teams, turn: 0, phase: 'roll', left: 0, total: 0, value: 0, places: [], options: [],
-      owner: BOARD.map(function () { return -1; }), laps: clamp(opts.laps, 1, 5, 2), zh: !!opts.zh };
+      owner: BOARD.map(function () { return -1; }), laps: clamp(opts.laps, 1, 5, 2), zh: !!opts.zh,
+      words: Array.isArray(opts.words) ? opts.words.filter(Boolean) : [] };
   }
 
   function current(state) { return state.teams[state.turn]; }
@@ -270,9 +274,23 @@
   }
 
   // The card for the square the team is on: its Chinese word, if it has one.
+  // The word on land square i: the teacher's words (in order, repeating) or the student's.
+  function phrase(i, state) {
+    var n = WORD_SQUARES.indexOf(i);
+    if (n < 0) return '';
+    var words = state && state.words;
+    return words && words.length ? words[n % words.length] : DEFAULT_WORDS[n];
+  }
+
+  // Teacher's text → words (one per line, or split by commas).
+  function parseWords(text) {
+    return String(text || '').split(/[\r\n,，、;；]+/).map(function (w) {
+      return w.split('|')[0].trim().slice(0, 12);
+    }).filter(Boolean).slice(0, 60);
+  }
+
   function cardFor(state, zh) {
-    var sq = BOARD[current(state).pos];
-    var word = sq[2] === 'prop' ? sq[4] : '';
+    var word = phrase(current(state).pos, state);
     if (!word || state.qkind === 'special') return null;
     return { label: zh ? '读一读，用它说一句话' : 'Read it, then make a sentence', q: word, a: '', big: true };
   }
@@ -282,7 +300,7 @@
     FRAME: FRAME, BOARD: BOARD, FINISH: FINISH, SPOTS: SPOTS, LINKS: LINKS, MARKS: MARKS, CONNECTOR: CONNECTOR,
     NEXT: NEXT, GATE: GATE, PODIUM: PODIUM, JAIL_TURNS: JAIL_TURNS,
     START_MONEY: START_MONEY, SALARY: SALARY, SPECIAL_PRIZE: SPECIAL_PRIZE, NORMAL_PRIZE: NORMAL_PRIZE, JAIL: JAIL, JAIL_FEE: JAIL_FEE,
-    rent: rent, cardFor: cardFor,
+    rent: rent, cardFor: cardFor, phrase: phrase, parseWords: parseWords, WORD_SQUARES: WORD_SQUARES, DEFAULT_WORDS: DEFAULT_WORDS,
     DIST: BOARD.map(function () { return 0; }),
     wealth: wealth, end: end,
     newGame: newGame, current: current, roll: roll, judge: judge, choose: choose, next: next,

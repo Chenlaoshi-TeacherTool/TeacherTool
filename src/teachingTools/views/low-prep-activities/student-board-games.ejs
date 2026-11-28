@@ -84,7 +84,7 @@
               <img src="/low-prep/money/board.webp?v=2" alt="" loading="lazy">
               <span><b>汉字大富翁</b><small><%= L('Answer to buy land, collect rent', '答对买地，收租金') %></small></span></label>
             <label class="ep-game"><input type="radio" name="epGame" value="mpy">
-              <img src="/low-prep/mpy/board.webp?v=1" alt="" loading="lazy">
+              <img src="/low-prep/mpy/board.webp?v=2" alt="" loading="lazy">
               <span><b>MPY</b><small><%= L('Travel the world: read the word, buy the place', '环游世界：读词买地') %></small></span></label>
             <label class="ep-game"><input type="radio" name="epGame" value="maze">
               <img src="/low-prep/maze/board.webp?v=1" alt="" loading="lazy">
@@ -117,13 +117,13 @@
         </fieldset>
 
         <fieldset class="ep-field" id="epDeskField" hidden>
-          <legend><%= L('Desk cards', '停在桌子上') %></legend>
+          <legend id="epDeskLegend"><%= L('Desk cards', '停在桌子上') %></legend>
           <div class="ep-options">
-            <label><input type="radio" name="epDesk" value="phrase" checked> <span><%= L('Ask about the desk phrase', '用桌子上的话出情景题') %></span></label>
+            <label><input type="radio" name="epDesk" value="phrase" checked> <span id="epDeskOpt"><%= L('Ask about the desk phrase', '用桌子上的话出情景题') %></span></label>
             <label><input type="radio" name="epDesk" value="cards"> <span><%= L('Use my question cards', '用我的题卡') %></span></label>
           </div>
-          <label for="epDeskWords" class="ep-label"><%= L('Words on the desks (optional)', '桌上的字（可以不填）') %></label>
-          <p class="ep-hint"><%= L('One word or phrase per line, written on the desks in order and repeated if there are fewer words than desks (21). Leave it empty to use the student\'s own words.', '每行一个词或短语，按顺序写到桌子上；词不够 21 个会重复使用。空着就用学生原来写的字。') %></p>
+          <label for="epDeskWords" class="ep-label" id="epDeskLabel"><%= L('Words on the desks (optional)', '桌上的字（可以不填）') %></label>
+          <p class="ep-hint" id="epDeskCount"><%= L('One word or phrase per line, written on the desks in order and repeated if there are fewer words than desks (21). Leave it empty to use the student\'s own words.', '每行一个词或短语，按顺序写到桌子上；词不够 21 个会重复使用。空着就用学生原来写的字。') %></p>
           <textarea id="epDeskWords" class="ep-input" rows="4" spellcheck="false" placeholder="你好&#10;谢谢&#10;对不起&#10;没关系&#10;再见"></textarea>
           <button id="epDeskFromWords" class="ep-btn ep-btn-ghost ep-btn-small" type="button"><%= L('Use my step-1 word list', '用第一步的词表') %></button>
           <p id="epDeskWordsHint" class="ep-hint" role="status"></p>
@@ -324,10 +324,10 @@
   <script src="/low-prep/mochi/mochi-core.js?v=2"></script>
   <script src="/low-prep/space/space-core.js?v=1"></script>
   <script src="/low-prep/money/money-core.js?v=2"></script>
-  <script src="/low-prep/mpy/mpy-core.js?v=1"></script>
+  <script src="/low-prep/mpy/mpy-core.js?v=2"></script>
   <script src="/low-prep/maze/maze-core.js?v=1"></script>
   <script src="/low-prep/sweets/sweets-core.js?v=2"></script>
-  <script src="/low-prep/escape-the-path/escape-the-path.js?v=20" defer></script>
+  <script src="/low-prep/escape-the-path/escape-the-path.js?v=23" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>
