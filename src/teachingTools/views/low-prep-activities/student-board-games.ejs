@@ -17,7 +17,7 @@
       <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
       <p class="ep-eyebrow"><%= L('Projector board games · designed by students', '投影桌游 · 学生设计') %></p>
       <h1>🎲 <%= L('Student-Designed Board Games', '学生设计桌游') %></h1>
-      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race, Escape the Classroom, Mochi Salamander Escape, 太大一 and 汉字大富翁.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom、Mochi Salamander Escape、太大一、汉字大富翁。') %></p>
+      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race, Escape the Classroom, Mochi Salamander Escape, 太大一, 汉字大富翁 and MPY.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom、Mochi Salamander Escape、太大一、汉字大富翁、MPY。') %></p>
     </header>
 
     <div class="ep-layout">
@@ -83,6 +83,9 @@
             <label class="ep-game"><input type="radio" name="epGame" value="money">
               <img src="/low-prep/money/board.webp?v=2" alt="" loading="lazy">
               <span><b>汉字大富翁</b><small><%= L('Answer to buy land, collect rent', '答对买地，收租金') %></small></span></label>
+            <label class="ep-game"><input type="radio" name="epGame" value="mpy">
+              <img src="/low-prep/mpy/board.webp?v=1" alt="" loading="lazy">
+              <span><b>MPY</b><small><%= L('Travel the world: read the word, buy the place', '环游世界：读词买地') %></small></span></label>
           </div>
           <p class="ep-hint"><%= L('The same question cards work in every game.', '同一套题卡，每款游戏都能用。') %></p>
         </fieldset>
@@ -140,6 +143,14 @@
             <li><%= L('In jail you can also try to answer cards in a row to leave at once, unless the next space is 结束: then you have to wait.', '在监狱里也可以挑战连续答题，答对就马上出狱。但如果下一格就是"结束"，不能挑战，只能等。') %></li>
             <li><%= L('往前走 / 往后走 Move ahead or back, 从蛇身上滑下去 slide along the snake, 再来一次 roll again.', '往前走几步、往后走几步、从蛇身上滑下去：照做。再来一次：再掷一次。') %></li>
             <li><%= L('Teams that reach 结束 take 第一名, 第二名 and 第三名. The game ends when three teams are in (or only one team is left).', '到达"结束"的队伍依次拿第一名、第二名、第三名。三个名次出来后游戏结束（或只剩一队还没到）。') %></li>
+          </ol>
+          <ol data-game="mpy" hidden>
+            <li><%= L('Every team starts with M1500. Passing Start pays M200.', '每队开始有 M1500。经过起点拿 M200。') %></li>
+            <li><%= L('A square with a Chinese word: read the word and make a sentence. Other squares use your cards. Right on unowned land = you may buy it at its price.', '格子上有中文词：读这个词，用它说一句话；其他格子用你的题卡。答对，没人买的地就可以照价钱买下。') %></li>
+            <li><%= L('Someone else\'s land: pay a fifth of its price as rent. A team that cannot pay is out.', '别人的地：付地价的五分之一当租金。付不起就破产出局。') %></li>
+            <li><%= L('Super card and 读一读: right = M100. Your own land: right = M50.', 'Super card 和"读一读"：答对得 M100。自己的地：答对得 M50。') %></li>
+            <li><%= L('Go to Jail: next turn wait, or pay M50 to get out at once.', '去监狱：下一轮等一轮，或付 M50 马上出狱。') %></li>
+            <li><%= L('After the laps (or when you press End & count), teams rank by money + land value.', '走完圈数（或按"结算"）后，按钱数加地价排名次。') %></li>
           </ol>
           <ol data-game="money" hidden>
             <li><%= L('Every team starts with $1000. Passing 起点 pays $200.', '每队开始有 $1000。经过起点拿 $200。') %></li>
@@ -287,13 +298,14 @@
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/game-template.js?v=4" defer></script>
-  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=10"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=11"></script>
   <script src="/low-prep/candy-race/candy-race-core.js?v=6"></script>
   <script src="/low-prep/escape-classroom/escape-classroom-core.js?v=3"></script>
   <script src="/low-prep/mochi/mochi-core.js?v=2"></script>
   <script src="/low-prep/space/space-core.js?v=1"></script>
   <script src="/low-prep/money/money-core.js?v=2"></script>
-  <script src="/low-prep/escape-the-path/escape-the-path.js?v=16" defer></script>
+  <script src="/low-prep/mpy/mpy-core.js?v=1"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path.js?v=18" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

@@ -8,15 +8,17 @@
   'use strict';
 
   var Core = window.EscapePathCore;
-  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore, 'space': window.SpaceCore, 'money': window.MoneyCore };
-  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1', 'money': '/low-prep/money/board.webp?v=2' };
-  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape', 'space': '太大一', 'money': '汉字大富翁' };
+  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore, 'space': window.SpaceCore, 'money': window.MoneyCore, 'mpy': window.MpyCore };
+  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1', 'money': '/low-prep/money/board.webp?v=2', 'mpy': '/low-prep/mpy/board.webp?v=1' };
+  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape', 'space': '太大一', 'money': '汉字大富翁', 'mpy': 'MPY' };
   var G = Core;          // the game being played
   var isCandy = false;
   var isClass = false;
   var isMochi = false;
   var isSpace = false;
-  var isMoney = false;
+  var isMoney = false;   // 汉字大富翁 and MPY (buy-the-land games)
+  var isMpy = false;
+  var CUR = '$';
   function levelText(n) { var l = G.LEVELS[n]; return l && l.emoji ? l.emoji + ' ' + L(l.en, l.zh) : ''; }
   function actionName(card) { return zh ? { again: '再走一次', shield: '盾牌', swap: '和最前面的队换位置', push: '让最前面的队退一格' }[card] : { again: 'Move twice', shield: 'Shield', swap: 'Swap with the leading team', push: 'Push the leading team back' }[card]; }
   var teacherEl = null;
@@ -109,7 +111,7 @@
     var id = radio('epGame') || 'escape-the-path';
     $('epJailField').hidden = id !== 'escape-the-path';
     $('epDeskField').hidden = id !== 'escape-classroom';
-    $('epLapsField').hidden = id !== 'money';
+    $('epLapsField').hidden = id !== 'money' && id !== 'mpy';
     Array.prototype.forEach.call(document.querySelectorAll('.ep-rules ol[data-game]'), function (ol) {
       ol.hidden = ol.dataset.game !== id;
     });
@@ -288,7 +290,8 @@
     $('epBuy').hidden = !((isCandy || isMochi) && phase === 'roll' && G.canBuy(game));
     if (isMochi && !$('epBuy').hidden) $('epBuy').textContent = '🃏 ' + L('Use action card: ', '用动作卡：') + actionName(G.nextAction(game));
     if (isMochi) $('epRoll').textContent = '🎴 ' + L('Flip a colour card', '翻颜色卡');
-    $('epUseRv').hidden = !((isCandy || isClass) && phase === 'jail' && G.canUseRv(game));
+    $('epUseRv').hidden = !((isCandy || isClass || isMpy) && phase === 'jail' && G.canUseRv(game));
+    if (isMpy) $('epUseRv').textContent = '💵 ' + L('Pay M50 to get out', '付 M50 马上出狱');
     if (isClass) $('epUseRv').textContent = '🎉 ' + L('Play a Yay card (' + team.yay + ' left)', '用 Yay 卡出狱（还剩 ' + team.yay + ' 张）');
     if (isCandy) $('epUseRv').textContent = '🚐 ' + L('Drive out in the RV (' + team.rv + ' left)', '开房车出狱（还剩 ' + team.rv + ' 次）');
     renderFork(phase);
@@ -313,7 +316,7 @@
       info.textContent = t.place ? (['🥇', '🥈', '🥉'][t.place - 1] || '#' + t.place)
         : t.jail ? '🔒 ' + L(t.jail + ' left', '还剩 ' + t.jail + ' 轮')
           : isCandy ? '💰 $' + t.money + (t.rv ? ' · 🚐' + t.rv : '')
-            : isMoney ? (t.out ? '💥 ' + L('Out', '破产') : '💰 $' + t.money + ' · ' + L('lap ', '第 ') + Math.min(game.laps, t.laps + 1) + L('/' + game.laps, '/' + game.laps + ' 圈') + (t.done ? ' ✔' : '') + (t.skip ? ' ⏭' : ''))
+            : isMoney ? (t.out ? '💥 ' + L('Out', '破产') : '💰 ' + CUR + t.money + ' · ' + L('lap ', '第 ') + Math.min(game.laps, t.laps + 1) + L('/' + game.laps, '/' + game.laps + ' 圈') + (t.done ? ' ✔' : '') + (t.skip ? ' ⏭' : ''))
             : isSpace ? (G.LEVELS[t.level].emoji ? G.LEVELS[t.level].emoji + ' ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格')
             : isMochi ? (t.rescued ? '🦎' + t.rescued + ' ' : '') + (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.actions.length ? '🃏' + t.actions.length + ' ' : '') + L(G.DIST[t.pos] + ' to exit', '离出口 ' + G.DIST[t.pos] + ' 步')
             : isClass ? (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.yay ? '🎉' + t.yay + ' ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格')
@@ -447,14 +450,14 @@
           toast('🎉 ' + L('Yay! You got freed!', 'Yay！你自由了！'), 'good');
           break;
         case 'salary':
-          toast('💵 ' + L('Passed 起点: +$200', '经过起点：+$200'), 'good');
+          toast('💵 ' + L('Passed the start: +' + CUR + '200', '经过起点：+' + CUR + '200'), 'good');
           await sleep(500);
           break;
         case 'done':
           status(L(team.name + ' finished all laps!', team.name + '走完所有圈数了！'));
           break;
         case 'offer':
-          status(L('Correct! Buy this property for $' + ev.price + '?', '答对了！要花 $' + ev.price + ' 买下这块地吗？'));
+          status(L('Correct! Buy this property for ' + CUR + ev.price + '?', '答对了！要花 ' + CUR + ev.price + ' 买下这块地吗？'));
           break;
         case 'bought':
           toast('🏠 ' + L(team.name + ' bought it!', team.name + '买下了这块地！'), 'good');
@@ -470,7 +473,7 @@
           toast(L('Not quite. No money this time.', '答错了，这次没有钱。'), 'bad');
           break;
         case 'rent':
-          toast('💸 ' + L(team.name + ' pays $' + ev.amount + ' rent to ' + game.teams[ev.owner].name, team.name + '付给' + game.teams[ev.owner].name + ' $' + ev.amount + ' 租金'), 'bad');
+          toast('💸 ' + L(team.name + ' pays ' + CUR + ev.amount + ' rent to ' + game.teams[ev.owner].name, team.name + '付给' + game.teams[ev.owner].name + ' ' + CUR + ev.amount + ' 租金'), 'bad');
           await sleep(700);
           break;
         case 'bankrupt':
@@ -484,8 +487,8 @@
           await jump(ev.team, { at: 'sq', i: ev.to });
           break;
         case 'earn':
-          toast('💰 ' + L('Correct! +$' + ev.amount, '答对了！+$' + ev.amount), 'good');
-          status(L(team.name + ' now has $' + ev.money + '.', team.name + '现在有 $' + ev.money + '。'));
+          toast('💰 ' + L('Correct! +' + CUR + ev.amount, '答对了！+' + CUR + ev.amount), 'good');
+          status(L(team.name + ' now has ' + CUR + ev.money + '.', team.name + '现在有 ' + CUR + ev.money + '。'));
           break;
         case 'hole':
           toast('🕳️ ' + L('Black hole! Back 6.', '黑洞！后退 6 格。'), 'bad');
@@ -602,6 +605,13 @@
           status(L('Correct! ' + team.name + ' stays.', '答对！' + team.name + '留在原地。'));
           break;
         case 'jail':
+          if (isMpy) {
+            toast('🚔 ' + L('Go to jail!', '去监狱！'), 'bad');
+            await sleep(600);
+            await jump(ev.team, { at: 'jail' });
+            status(L('Next turn: wait, or pay M50 to get out.', '下一轮：等一轮，或付 M50 马上出狱。'));
+            break;
+          }
           if (!isClass || ev.why !== 'teacher') toast('🚔 ' + L('Go to jail! Wait two turns.', '去监狱！停两轮。'), 'bad');
           await sleep(600);
           await jump(ev.team, { at: 'jail' });
@@ -638,7 +648,12 @@
         case 'failed':
           toast(L('Challenge failed.', '挑战失败。'), 'bad');
           break;
+        case 'bail':
+          toast('💵 ' + L(team.name + ' paid M50 and is out!', team.name + '付了 M50，出狱了！'), 'good');
+          status(L('Now roll the dice.', '现在掷骰子。'));
+          break;
         case 'wait':
+          if (isMpy) { status(L(team.name + ' waits in jail this turn.', team.name + '这轮在监狱里等待。')); break; }
           status(L(team.name + ' waits. ' + ev.left + ' more turn' + (ev.left === 1 ? '' : 's') + ' in jail.', team.name + '继续等待，还剩 ' + ev.left + ' 轮。'));
           break;
         case 'released':
@@ -688,14 +703,15 @@
   function openCard() {
     var card = null;
     if (isClass && settings.desk === 'phrase') card = G.situation(G.phrase(G.current(game).pos, game), zh);
+    if (!card && G.cardFor) card = G.cardFor(game, zh);   // MPY: the word written on the square
     card = card || drawCard();
     var team = G.current(game);
     var n = game.total - game.left + 1;
     $('epCardTeam').textContent = teamLabel(team);
     $('epCardTeam').style.setProperty('--team', Core.TEAMS[team.id].color);
-    $('epCardCount').textContent = isMoney ? ({ buy: L('Right = you may buy it ($' + game.value + ')', '答对可以买这块地（$' + game.value + '）'),
-        special: '❓ ' + L('Special card: right = $' + game.value, '特别卡：答对得 $' + game.value),
-        normal: L('Right = $' + game.value, '答对得 $' + game.value) }[game.qkind] || '')
+    $('epCardCount').textContent = isMoney ? ({ buy: L('Right = you may buy it (' + CUR + game.value + ')', '答对可以买这块地（' + CUR + game.value + '）'),
+        special: '❓ ' + L('Special card: right = ' + CUR + game.value, '特别卡：答对得 ' + CUR + game.value),
+        normal: L('Right = ' + CUR + game.value, '答对得 ' + CUR + game.value) }[game.qkind] || '')
       : isSpace ? (game.quest ? L('Form a star to finish', '形成恒星才能到终点')
         : L('Right = grow one step', '答对升一级') + (G.current(game).level ? ' · ' + levelText(G.current(game).level) : ''))
       : isMochi ? (game.phase === 'alarm' ? '🚨 ' + L('Alarm question', '警报题')
@@ -820,7 +836,7 @@
       face.className = 'ep-token-face';
       face.textContent = Core.TEAMS[id].emoji;
       var name = document.createElement('span');
-      name.textContent = team.name + (isCandy ? '  💰 $' + team.money : isMoney ? (team.out ? '  💥' : '  💰 $' + G.wealth(game, team)) : '');
+      name.textContent = team.name + (isCandy ? '  💰 $' + team.money : isMoney ? (team.out ? '  💥' : '  💰 ' + CUR + G.wealth(game, team)) : '');
       li.appendChild(medal);
       li.appendChild(face);
       li.appendChild(name);
@@ -838,7 +854,9 @@
     isClass = settings.game === 'escape-classroom';
     isMochi = settings.game === 'mochi';
     isSpace = settings.game === 'space';
-    isMoney = settings.game === 'money';
+    isMpy = settings.game === 'mpy';
+    isMoney = settings.game === 'money' || isMpy;
+    CUR = isMpy ? 'M' : '$';
     $('epRoll').textContent = '🎲 ' + L('Roll', '掷骰子');
     $('epBoardImg').src = IMAGES[settings.game];
     $('epBoard').style.aspectRatio = G.FRAME.w + ' / ' + G.FRAME.h;
