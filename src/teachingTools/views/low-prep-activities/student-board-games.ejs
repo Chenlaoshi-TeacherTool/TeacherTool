@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap">
   <link rel="stylesheet" href="/stylesheets/site-theme.css">
   <link rel="stylesheet" href="/shared/game-sharing.css?v=template1">
-  <link rel="stylesheet" href="/low-prep/escape-the-path/escape-the-path.css?v=11">
+  <link rel="stylesheet" href="/low-prep/escape-the-path/escape-the-path.css?v=12">
 </head>
 <body class="ep-page">
   <main class="ep-wrap">
@@ -17,7 +17,7 @@
       <a href="/teaching-tools#low-prep-activities" class="back-btn"><%= L('← Back to Teaching Tools', '← 返回教学工具') %></a>
       <p class="ep-eyebrow"><%= L('Projector board games · designed by students', '投影桌游 · 学生设计') %></p>
       <h1>🎲 <%= L('Student-Designed Board Games', '学生设计桌游') %></h1>
-      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race, Escape the Classroom, Mochi Salamander Escape and 太大一.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom、Mochi Salamander Escape、太大一。') %></p>
+      <p><%= L('Board games my students designed. Project the board, split the class into teams and take turns rolling the dice. Land on 抽卡 and the team answers one of your question cards. Games so far: Escape the Path, Candy Race, Escape the Classroom, Mochi Salamander Escape, 太大一 and 汉字大富翁.', '我的学生自己设计的桌游。把棋盘投到屏幕上，全班分队轮流掷骰子，走到"抽卡"就答一张你出的题卡。现在有：Escape the Path、Candy Race、Escape the Classroom、Mochi Salamander Escape、太大一、汉字大富翁。') %></p>
     </header>
 
     <div class="ep-layout">
@@ -80,6 +80,9 @@
             <label class="ep-game"><input type="radio" name="epGame" value="space">
               <img src="/low-prep/space/board.webp?v=1" alt="" loading="lazy">
               <span><b>太大一</b><small><%= L('Space loop: grow a moon into a star', '太空绕圈：月亮长成恒星') %></small></span></label>
+            <label class="ep-game"><input type="radio" name="epGame" value="money">
+              <img src="/low-prep/money/board.webp?v=2" alt="" loading="lazy">
+              <span><b>汉字大富翁</b><small><%= L('Answer to buy land, collect rent', '答对买地，收租金') %></small></span></label>
           </div>
           <p class="ep-hint"><%= L('The same question cards work in every game.', '同一套题卡，每款游戏都能用。') %></p>
         </fieldset>
@@ -93,6 +96,16 @@
           </div>
         </fieldset>
         <div id="epNames" class="ep-names"></div>
+
+        <fieldset class="ep-field" id="epLapsField" hidden>
+          <legend><%= L('How many laps', '走几圈') %></legend>
+          <div class="ep-options">
+            <label><input type="radio" name="epLaps" value="1"> <span><%= L('1 lap (about 10 min)', '1 圈（约 10 分钟）') %></span></label>
+            <label><input type="radio" name="epLaps" value="2" checked> <span><%= L('2 laps', '2 圈') %></span></label>
+            <label><input type="radio" name="epLaps" value="3"> <span><%= L('3 laps', '3 圈') %></span></label>
+          </div>
+          <p class="ep-hint"><%= L('You can also press "End & count" any time during the game.', '游戏中也可以随时按"结算"提前结束。') %></p>
+        </fieldset>
 
         <fieldset class="ep-field" id="epDeskField" hidden>
           <legend><%= L('Desk cards', '停在桌子上') %></legend>
@@ -127,6 +140,14 @@
             <li><%= L('In jail you can also try to answer cards in a row to leave at once, unless the next space is 结束: then you have to wait.', '在监狱里也可以挑战连续答题，答对就马上出狱。但如果下一格就是"结束"，不能挑战，只能等。') %></li>
             <li><%= L('往前走 / 往后走 Move ahead or back, 从蛇身上滑下去 slide along the snake, 再来一次 roll again.', '往前走几步、往后走几步、从蛇身上滑下去：照做。再来一次：再掷一次。') %></li>
             <li><%= L('Teams that reach 结束 take 第一名, 第二名 and 第三名. The game ends when three teams are in (or only one team is left).', '到达"结束"的队伍依次拿第一名、第二名、第三名。三个名次出来后游戏结束（或只剩一队还没到）。') %></li>
+          </ol>
+          <ol data-game="money" hidden>
+            <li><%= L('Every team starts with $1000. Passing 起点 pays $200.', '每队开始有 $1000。经过起点拿 $200。') %></li>
+            <li><%= L('Unowned land: answer a card. Right = you may buy it ($100 / $150 / $200).', '没人买的地：答一张卡，答对就可以买（$100 / $150 / $200）。') %></li>
+            <li><%= L('Someone else\'s land: pay the owner $100. A team that cannot pay is out.', '别人的地：付给主人 $100。付不起就破产出局。') %></li>
+            <li><%= L('? special card: right = $100. Your own land and other squares: right = $50.', '❓ 特别卡：答对得 $100。自己的地和其他格子：答对得 $50。') %></li>
+            <li><%= L('Banana peel or jail: skip a turn. Airplane: fly back to 起点 (+$200).', '香蕉皮或监狱：停一轮。飞机：飞回起点（+$200）。') %></li>
+            <li><%= L('After the laps (or when you press End & count), teams rank by money + land value.', '走完圈数（或按"结算"）后，按钱数加地价排名次。') %></li>
           </ol>
           <ol data-game="space" hidden>
             <li><%= L('Start at 开始, go once round the loop, then up the diagonal to 结果.', '从"开始"出发，绕一圈，再走对角线到"结果"。') %></li>
@@ -245,6 +266,7 @@
       <div class="ep-side-tools">
         <label class="ep-check"><input type="checkbox" id="epRealDie"> <%= L('Real die', '用真骰子') %></label>
         <button id="epRulesBtn" class="ep-btn ep-btn-ghost ep-btn-small" type="button"><%= L('Rules', '规则') %></button>
+        <button id="epEndGame" class="ep-btn ep-btn-ghost ep-btn-small" type="button" hidden>🧮 <%= L('End & count', '结算') %></button>
         <button id="epFullscreen" class="ep-btn ep-btn-ghost ep-btn-small" type="button"><%= L('Full screen', '全屏') %></button>
         <button id="epExit" class="ep-btn ep-btn-ghost ep-btn-small" type="button"><%= L('Settings', '返回设置') %></button>
       </div>
@@ -265,12 +287,13 @@
   <script src="/shared/wordlist-core.js?v=zh-1"></script>
   <script src="/shared/wordlist-handoff.js?v=1"></script>
   <script src="/shared/game-template.js?v=4" defer></script>
-  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=9"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path-core.js?v=10"></script>
   <script src="/low-prep/candy-race/candy-race-core.js?v=6"></script>
   <script src="/low-prep/escape-classroom/escape-classroom-core.js?v=3"></script>
   <script src="/low-prep/mochi/mochi-core.js?v=2"></script>
   <script src="/low-prep/space/space-core.js?v=1"></script>
-  <script src="/low-prep/escape-the-path/escape-the-path.js?v=14" defer></script>
+  <script src="/low-prep/money/money-core.js?v=2"></script>
+  <script src="/low-prep/escape-the-path/escape-the-path.js?v=16" defer></script>
   <script src="/javascripts/account-coming-soon.js"></script>
   <script src="/javascripts/milk-tea-footer.js"></script>
 </body>

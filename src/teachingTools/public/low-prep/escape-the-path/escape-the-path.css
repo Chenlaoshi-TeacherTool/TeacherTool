@@ -313,3 +313,7 @@ textarea.ep-input { resize: vertical; min-height: 160px; }
 .ep-desk-text { font-family: KaiTi, STKaiti, "Kaiti SC", serif; font-weight: 700; fill: #2b2118; text-anchor: middle; }
 .ep-desk-text.is-blank { fill: #8a6a48; font-family: "Segoe Print", cursive; }
 #epDeskFromWords { margin-top: 6px; }
+
+/* 汉字大富翁: who owns a square */
+.ep-owner { fill: #fff; stroke-width: 7; }
+.ep-owner-face { text-anchor: middle; }

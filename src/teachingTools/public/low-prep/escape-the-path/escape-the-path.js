@@ -8,14 +8,15 @@
   'use strict';
 
   var Core = window.EscapePathCore;
-  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore, 'space': window.SpaceCore };
-  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1' };
-  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape', 'space': '太大一' };
+  var GAMES = { 'escape-the-path': window.EscapePathCore, 'candy-race': window.CandyRaceCore, 'escape-classroom': window.EscapeClassroomCore, 'mochi': window.MochiCore, 'space': window.SpaceCore, 'money': window.MoneyCore };
+  var IMAGES = { 'escape-the-path': '/low-prep/escape-the-path/board.webp?v=3', 'candy-race': '/low-prep/candy-race/board.webp?v=6', 'escape-classroom': '/low-prep/escape-classroom/board.webp?v=3', 'mochi': '/low-prep/mochi/board.webp?v=2', 'space': '/low-prep/space/board.webp?v=1', 'money': '/low-prep/money/board.webp?v=2' };
+  var NAMES = { 'escape-the-path': 'Escape the Path', 'candy-race': 'Candy Race', 'escape-classroom': 'Escape the Classroom', 'mochi': 'Mochi Salamander Escape', 'space': '太大一', 'money': '汉字大富翁' };
   var G = Core;          // the game being played
   var isCandy = false;
   var isClass = false;
   var isMochi = false;
   var isSpace = false;
+  var isMoney = false;
   function levelText(n) { var l = G.LEVELS[n]; return l && l.emoji ? l.emoji + ' ' + L(l.en, l.zh) : ''; }
   function actionName(card) { return zh ? { again: '再走一次', shield: '盾牌', swap: '和最前面的队换位置', push: '让最前面的队退一格' }[card] : { again: 'Move twice', shield: 'Shield', swap: 'Swap with the leading team', push: 'Push the leading team back' }[card]; }
   var teacherEl = null;
@@ -108,6 +109,7 @@
     var id = radio('epGame') || 'escape-the-path';
     $('epJailField').hidden = id !== 'escape-the-path';
     $('epDeskField').hidden = id !== 'escape-classroom';
+    $('epLapsField').hidden = id !== 'money';
     Array.prototype.forEach.call(document.querySelectorAll('.ep-rules ol[data-game]'), function (ol) {
       ol.hidden = ol.dataset.game !== id;
     });
@@ -132,7 +134,7 @@
   function readSetup() {
     return Core.normalize({
       source: radio('epSource'), cards: $('epCards').value, words: $('epWords').value,
-      types: types(), teams: radio('epTeams'), names: names(), jail: radio('epJail'), game: radio('epGame'), desk: radio('epDesk'), deskWords: $('epDeskWords').value
+      types: types(), teams: radio('epTeams'), names: names(), jail: radio('epJail'), game: radio('epGame'), desk: radio('epDesk'), deskWords: $('epDeskWords').value, laps: radio('epLaps')
     });
   }
 
@@ -149,6 +151,7 @@
     setRadio('epGame', d.game);
     setRadio('epDesk', d.desk);
     $('epDeskWords').value = d.deskWords;
+    setRadio('epLaps', d.laps);
     showGame();
     typedNames = d.names.slice();
     var inputs = document.querySelectorAll('#epNames input');
@@ -290,6 +293,8 @@
     if (isCandy) $('epUseRv').textContent = '🚐 ' + L('Drive out in the RV (' + team.rv + ' left)', '开房车出狱（还剩 ' + team.rv + ' 次）');
     renderFork(phase);
     $('epNext').hidden = phase !== 'next';
+    $('epEndGame').hidden = !isMoney || game.phase === 'over';
+    if (isMoney) drawMarks();
 
     var list = $('epTeamList');
     list.innerHTML = '';
@@ -308,6 +313,7 @@
       info.textContent = t.place ? (['🥇', '🥈', '🥉'][t.place - 1] || '#' + t.place)
         : t.jail ? '🔒 ' + L(t.jail + ' left', '还剩 ' + t.jail + ' 轮')
           : isCandy ? '💰 $' + t.money + (t.rv ? ' · 🚐' + t.rv : '')
+            : isMoney ? (t.out ? '💥 ' + L('Out', '破产') : '💰 $' + t.money + ' · ' + L('lap ', '第 ') + Math.min(game.laps, t.laps + 1) + L('/' + game.laps, '/' + game.laps + ' 圈') + (t.done ? ' ✔' : '') + (t.skip ? ' ⏭' : ''))
             : isSpace ? (G.LEVELS[t.level].emoji ? G.LEVELS[t.level].emoji + ' ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格')
             : isMochi ? (t.rescued ? '🦎' + t.rescued + ' ' : '') + (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.actions.length ? '🃏' + t.actions.length + ' ' : '') + L(G.DIST[t.pos] + ' to exit', '离出口 ' + G.DIST[t.pos] + ' 步')
             : isClass ? (t.shield ? '🛡️' + t.shield + ' ' : '') + (t.yay ? '🎉' + t.yay + ' ' : '') + L('Square ' + t.pos, '第 ' + t.pos + ' 格')
@@ -329,7 +335,7 @@
     var team = G.current(game);
     var p = document.createElement('p');
     p.className = 'ep-fork-q';
-    p.textContent = L('Which way, ' + team.name + '?', team.name + '想往哪走？');
+    p.textContent = isMoney ? L(team.name + ', buy this land?', team.name + '，要买下这块地吗？') : L('Which way, ' + team.name + '?', team.name + '想往哪走？');
     box.appendChild(p);
     var shortest = Math.min.apply(null, game.options.map(function (o) { return G.DIST[o.to]; }));
     game.options.forEach(function (o) {
@@ -439,6 +445,43 @@
           break;
         case 'yay':
           toast('🎉 ' + L('Yay! You got freed!', 'Yay！你自由了！'), 'good');
+          break;
+        case 'salary':
+          toast('💵 ' + L('Passed 起点: +$200', '经过起点：+$200'), 'good');
+          await sleep(500);
+          break;
+        case 'done':
+          status(L(team.name + ' finished all laps!', team.name + '走完所有圈数了！'));
+          break;
+        case 'offer':
+          status(L('Correct! Buy this property for $' + ev.price + '?', '答对了！要花 $' + ev.price + ' 买下这块地吗？'));
+          break;
+        case 'bought':
+          toast('🏠 ' + L(team.name + ' bought it!', team.name + '买下了这块地！'), 'good');
+          drawMarks();
+          break;
+        case 'pass':
+          status(L('Not buying this time.', '这次不买。'));
+          break;
+        case 'poor':
+          toast(L('Correct, but not enough money to buy.', '答对了，可是钱不够买。'), 'bad');
+          break;
+        case 'miss':
+          toast(L('Not quite. No money this time.', '答错了，这次没有钱。'), 'bad');
+          break;
+        case 'rent':
+          toast('💸 ' + L(team.name + ' pays $' + ev.amount + ' rent to ' + game.teams[ev.owner].name, team.name + '付给' + game.teams[ev.owner].name + ' $' + ev.amount + ' 租金'), 'bad');
+          await sleep(700);
+          break;
+        case 'bankrupt':
+          toast('💥 ' + L(team.name + ' is out of money!', team.name + '破产了！'), 'bad');
+          drawMarks();
+          await sleep(700);
+          break;
+        case 'plane':
+          toast('✈️ ' + L('Fly back to 起点!', '飞回起点！'), 'good');
+          await sleep(500);
+          await jump(ev.team, { at: 'sq', i: ev.to });
           break;
         case 'earn':
           toast('💰 ' + L('Correct! +$' + ev.amount, '答对了！+$' + ev.amount), 'good');
@@ -565,6 +608,8 @@
           status(L(team.name + ' is in jail for two turns.', team.name + '进监狱，停两轮。'));
           break;
         case 'skip':
+          if (isMoney && ev.why === 'banana') { toast('🍌 ' + L('Banana peel! Skip a turn.', '踩到香蕉皮！停一轮。'), 'bad'); break; }
+          if (isMoney && ev.why === 'jail') { toast('🔒 ' + L('Jail! Skip a turn.', '进监狱！停一轮。'), 'bad'); break; }
           toast('⏭ ' + L('Skip your next turn.', '跳过：下一轮停一次。'), 'bad');
           status(L(team.name + ' will skip the next turn.', team.name + '下一轮停一次。'));
           break;
@@ -648,7 +693,10 @@
     var n = game.total - game.left + 1;
     $('epCardTeam').textContent = teamLabel(team);
     $('epCardTeam').style.setProperty('--team', Core.TEAMS[team.id].color);
-    $('epCardCount').textContent = isSpace ? (game.quest ? L('Form a star to finish', '形成恒星才能到终点')
+    $('epCardCount').textContent = isMoney ? ({ buy: L('Right = you may buy it ($' + game.value + ')', '答对可以买这块地（$' + game.value + '）'),
+        special: '❓ ' + L('Special card: right = $' + game.value, '特别卡：答对得 $' + game.value),
+        normal: L('Right = $' + game.value, '答对得 $' + game.value) }[game.qkind] || '')
+      : isSpace ? (game.quest ? L('Form a star to finish', '形成恒星才能到终点')
         : L('Right = grow one step', '答对升一级') + (G.current(game).level ? ' · ' + levelText(G.current(game).level) : ''))
       : isMochi ? (game.phase === 'alarm' ? '🚨 ' + L('Alarm question', '警报题')
         : game.phase === 'buy' ? '🃏 ' + actionName(G.current(game).actions[game.using].card)
@@ -772,7 +820,7 @@
       face.className = 'ep-token-face';
       face.textContent = Core.TEAMS[id].emoji;
       var name = document.createElement('span');
-      name.textContent = team.name + (isCandy ? '  💰 $' + team.money : '');
+      name.textContent = team.name + (isCandy ? '  💰 $' + team.money : isMoney ? (team.out ? '  💥' : '  💰 $' + G.wealth(game, team)) : '');
       li.appendChild(medal);
       li.appendChild(face);
       li.appendChild(name);
@@ -790,6 +838,7 @@
     isClass = settings.game === 'escape-classroom';
     isMochi = settings.game === 'mochi';
     isSpace = settings.game === 'space';
+    isMoney = settings.game === 'money';
     $('epRoll').textContent = '🎲 ' + L('Roll', '掷骰子');
     $('epBoardImg').src = IMAGES[settings.game];
     $('epBoard').style.aspectRatio = G.FRAME.w + ' / ' + G.FRAME.h;
@@ -836,6 +885,15 @@
         });
       });
     }
+    if (isMoney && game) {
+      game.owner.forEach(function (o, i) {
+        if (o < 0) return;
+        var sq = G.BOARD[i];
+        // a small flag in the square's corner so it never hides the tokens
+        el('circle', { cx: sq[0] + 52, cy: sq[1] - 62, r: 27, class: 'ep-owner', style: 'stroke:' + Core.TEAMS[o].color });
+        el('text', { x: sq[0] + 52, y: sq[1] - 52, class: 'ep-owner-face', 'font-size': 30 }, Core.TEAMS[o].emoji);
+      });
+    }
     (G.MARKS || []).forEach(function (m) {
       if (m.t === 'ring') {
         var sq = G.BOARD[m.i];
@@ -851,7 +909,7 @@
 
   function begin() {
     var deskWords = isClass && G.parseWords ? G.parseWords(settings.deskWords) : [];
-    game = G.newGame({ teams: settings.teams, names: settings.names, jail: settings.jail, zh: zh, shared: Core, words: deskWords });
+    game = G.newGame({ teams: settings.teams, names: settings.names, jail: settings.jail, zh: zh, shared: Core, words: deskWords, laps: settings.laps });
     drawMarks();
     pile = [];
     shown = {};
@@ -985,6 +1043,14 @@
     $('epCloseResults').addEventListener('click', function () { $('epResults').hidden = true; });
     $('epExit').addEventListener('click', closeStage);
     $('epRulesBtn').addEventListener('click', function () { $('epRulesDialog').showModal(); });
+    $('epEndGame').addEventListener('click', function () {
+      if (busy || !game || !window.confirm(L('End the game and count the money now?', '现在结束游戏、结算钱数吗？'))) return;
+      $('epCard').hidden = true;
+      play(G.end(game));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="epLaps"]'), function (el) {
+      el.addEventListener('change', saveDraft);
+    });
     $('epFullscreen').addEventListener('click', function () {
       if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
       else if ($('epStage').requestFullscreen) $('epStage').requestFullscreen().catch(function () {});

@@ -66,7 +66,7 @@
   var PODIUM = 3;
   var CARD_TYPES = ['read', 'meaning', 'say', 'sentence'];
   // Student games in the collection (学生设计桌游). A saved setup remembers which one.
-  var GAMES = ['escape-the-path', 'candy-race', 'escape-classroom', 'mochi', 'space'];
+  var GAMES = ['escape-the-path', 'candy-race', 'escape-classroom', 'mochi', 'space', 'money'];
   var LIMITS = { title: 120, name: 16, text: 20000, lines: 300, line: 300 };
 
   function clean(value, max) {
@@ -130,7 +130,9 @@
       types: types.length ? types : ['read', 'meaning'],
       teams: teams,
       names: names,
-      jail: clamp(data.jail, 1, 5, 5)
+      jail: clamp(data.jail, 1, 5, 5),
+      // 汉字大富翁: how many laps before the game is counted
+      laps: clamp(data.laps, 1, 3, 2)
     };
   }
 
