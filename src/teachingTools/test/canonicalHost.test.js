@@ -45,3 +45,11 @@ test('the canonical host and non-GET requests are served normally', async functi
   var post = await fetch(base + '/api/teacher-library/redeem', { method: 'POST', redirect: 'manual', headers: { 'x-forwarded-host': 'www.clsteachingtools.com' } });
   assert.notEqual(post.status, 301);
 });
+
+test('robots.txt keeps crawlers off the language toggle, sign-in and community filters', async function() {
+  var text = await (await fetch(base + '/robots.txt')).text();
+  ['Disallow: /set-language', 'Disallow: /.auth/', 'Disallow: /community?', 'Sitemap: https://clsteachingtools.com/sitemap.xml'].forEach(function(line) {
+    assert.ok(text.split('\n').includes(line), line);
+  });
+  assert.ok(!text.split('\n').includes('Disallow: /community'), 'the community page itself stays crawlable');
+});

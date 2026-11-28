@@ -391,7 +391,21 @@ router.get('/theme-activities/weather/songs', function(req, res, next) {
 
 router.get('/robots.txt', function(req, res) {
   var baseUrl = res.locals.siteUrl.replace(/\/$/, '');
-  res.type('text/plain').send('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin/\nSitemap: ' + baseUrl + '/sitemap.xml\n');
+  // Keep crawlers off URLs that only redirect or repeat a canonical page:
+  // the EN/简/繁 toggle (/set-language), sign-in (/.auth/), and the
+  // community filter combinations (/community?kind=...), which Search
+  // Console counted by the thousand.
+  res.type('text/plain').send([
+    'User-agent: *',
+    'Allow: /',
+    'Disallow: /api/',
+    'Disallow: /admin/',
+    'Disallow: /set-language',
+    'Disallow: /.auth/',
+    'Disallow: /community?',
+    'Sitemap: ' + baseUrl + '/sitemap.xml',
+    ''
+  ].join('\n'));
 });
 
 router.get('/sitemap.xml', async function(req, res, next) {
